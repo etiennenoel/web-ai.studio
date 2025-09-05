@@ -16,7 +16,6 @@ export class SidebarComponent extends BaseComponent implements OnInit {
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
-              @Optional() @Inject(WEBAI_STUDIO_BASE_URL) private readonly baseUrl?: string,
   ) {
     super(document)
   }
@@ -37,7 +36,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   }
 
   getRouterLink(route: RouteEnum) {
-    return this.baseUrl + route;
+    return route;
   }
 
   determineCurrentActiveRoute(pathname: string) {
