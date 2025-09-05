@@ -1,0 +1,41 @@
+<div class="p-2 pt-3">
+<h1 class="text-center">WebAI Studio</h1>
+
+  <ul class="nav flex-column mt-3 gap-1">
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Chat">
+      <a class="nav-link" [routerLink]="getRouterLink(RouteEnum.Chat)">
+        <i class="bi bi-chat-left me-1"></i>
+        Chat</a>
+    </li>
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Translation">
+      <a class="nav-link"  [routerLink]="getRouterLink(RouteEnum.Translation)"><i class="bi bi-translate me-1"></i> Translation</a>
+    </li>
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.WritingAssistance">
+      <a class="nav-link position-relative" [routerLink]="getRouterLink(RouteEnum.WritingAssistance)">
+        <i class="bi bi-pencil-square me-1"></i>
+        Writing Assistance
+      </a>
+    </li>
+
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.MediaGeneration">
+      <a class="nav-link position-relative" [routerLink]="getRouterLink(RouteEnum.Chat)"><i class="bi bi-chat-left-heart me-1"></i> Media Generation
+        <span class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-warning">
+          WIP</span>
+      </a>
+
+    </li>
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Build">
+      <a class="nav-link position-relative" [routerLink]="getRouterLink(RouteEnum.Chat)"><i class="bi bi-puzzle"></i> Build
+        <span class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-warning">
+          WIP</span>
+      </a>
+
+    </li>
+    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Demos">
+      <a class="nav-link position-relative" [routerLink]="getRouterLink(RouteEnum.Chat)"><i class="bi bi-display"></i> Demos
+        <span class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-warning">
+          WIP</span>
+      </a>
+    </li>
+  </ul>
+</div>

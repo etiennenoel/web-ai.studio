@@ -1,0 +1,135 @@
+<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+  <webai-studio-header>
+    <div class="d-flex align-items-center mt-5 ms-3 me-3">
+      <h2 class="h6 flex-grow-1">Translation</h2>
+
+      <div class="d-flex align-items-center gap-2">
+        <div class="dropdown">
+          @let downloadStatus = this.getDownloadStatus();
+
+          <button class="btn  dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Language Packs Download: <span
+            class="badge"
+            [class.text-bg-secondary]="downloadStatus === 'idle'"
+            [class.text-bg-primary]="downloadStatus === 'downloading'"
+            [class.text-bg-danger]="downloadStatus === 'unavailable'"
+            [class.text-bg-success]="downloadStatus === 'completed'">{{ downloadStatus }}</span>
+          </button>
+          <ul class="dropdown-menu w-100 p-3">
+            @for (languagePackDownload of languagePacksDownload; track $index) {
+              <li class="card p-3 mb-3">
+                <div class="d-flex justify-content-center align-items-center gap-3">
+                  <span class="badge text-bg-light">{{ languagePackDownload.sourceLocale.language }}</span>
+                  <i class="bi bi-arrow-left-right"></i>
+                  <span class="badge text-bg-light">{{ languagePackDownload.destinationLocale.language }}</span>
+                </div>
+
+                <div class="d-flex gap-2 align-items-center mt-3">
+                  <div class="progress flex-fill" role="progressbar" aria-label="Basic example" aria-valuenow="0"
+                       aria-valuemin="0"
+                       aria-valuemax="100">
+                    <div class="progress-bar" [style.width]="languagePackDownload.progress * 100 + '%'"></div>
+                  </div>
+
+                  <span
+                    class="badge"
+                    [class.text-bg-primary]="languagePackDownload.status === 'downloading'"
+                    [class.text-bg-danger]="languagePackDownload.status === 'unavailable'"
+                    [class.text-bg-success]="languagePackDownload.status === 'completed'">{{ languagePackDownload.status }}</span>
+
+                </div>
+              </li>
+            } @empty {
+              <div>Select languages to see the download in progress here.</div>
+            }
+          </ul>
+        </div>
+      </div>
+
+
+      <button class="btn" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
+        class="bi bi-code-square"></i></button>
+    </div>
+
+  </webai-studio-header>
+
+  <div class="container">
+    <div class="d-flex flex-row gap-3 align-items-center">
+      <ul class="nav nav-underline ms-3 flex-fill w-100">
+        <li class="nav-item">
+          @if (this.detectedLanguage) {
+            <button class="nav-link" (click)="onDetectLanguageClick()" [class.active]="this.sourceLocale === undefined"
+                    aria-current="page" href="#">{{ this.detectedLanguage.language }} - Detected
+            </button>
+          } @else {
+            <button class="nav-link" (click)="onDetectLanguageClick()" [class.active]="this.sourceLocale === undefined"
+                    aria-current="page" href="#">Detect Language
+            </button>
+          }
+        </li>
+        @for (locale of recentSourceLocales | slice:0:2; track $index) {
+          <li class="nav-item">
+            <button class="nav-link" (click)="onRecentSourceLanguageClick(locale)" href="#"
+                    [class.active]="sourceLocale?.code === locale.code">{{ locale.language }}
+            </button>
+          </li>
+        }
+        <li class="nav-item dropdown">
+          <button class="btn btn-soft dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-chevron-down"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            @for (locale of locales; track locale.code) {
+              <li>
+                <button class="dropdown-item" type="button"
+                        (click)="onSourceLanguageSelect(locale)">{{ locale.language }}
+                </button>
+              </li>
+            }
+          </ul>
+        </li>
+      </ul>
+      <div class="ms-2">
+        <button class="btn btn-soft" (click)="onSwapLanguagesClick()"><i class="bi bi-arrow-left-right"></i></button>
+      </div>
+      <ul class="nav nav-underline ms-3 flex-fill w-100">
+        @for (locale of recentDestinationLocales | slice:0:2; track $index) {
+          <li class="nav-item">
+            <button class="nav-link" (click)="onRecentDestinationLanguageClick(locale)" href="#"
+                    [class.active]="destinationLocale?.code === locale.code">{{ locale.language }}
+            </button>
+          </li>
+        }
+        <li class="nav-item dropdown">
+          <button class="btn btn-soft dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-chevron-down"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            @for (locale of locales; track locale.code) {
+              <li>
+                <button class="dropdown-item" type="button"
+                        (click)="onDestinationLanguageSelect(locale)">{{ locale.language }}
+                </button>
+              </li>
+            }
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="d-flex flex-row gap-3">
+      <textarea class="form-control flex-grow-1 w-100" rows="8" [formControl]="textareaFormControl"></textarea>
+      <div class="card bg-body-secondary flex-grow-1 w-100">
+        <div class="card-body">
+          {{ this.translatedText }}
+        </div>
+
+      </div>
+    </div>
+
+    <div class="d-grid mt-3">
+      <button class="btn btn-primary btn-lg" (click)="translate()">Translate</button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,69 @@
+<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+  <webai-studio-header title="Chat Prompt">
+
+    <div class="d-flex align-items-center mt-5 ms-3 me-3">
+      <h2 class="h6 flex-grow-1">Chat</h2>
+      <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <div><small>Local LLM status:</small></div>
+          <div><span
+            class="badge text-bg-secondary"
+            [class.text-bg-secondary]="this.languageModelAvailability === 'downloadable'"
+            [class.text-bg-danger]="this.languageModelAvailability === 'unavailable'"
+            [class.text-bg-success]="this.languageModelAvailability === 'available'"
+            [class.text-bg-primary]="this.languageModelAvailability === 'downloading'">{{ this.languageModelAvailability }}</span>
+          </div>
+        </div>
+        <button class="btn" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
+          class="bi bi-code-square"></i></button>
+      </div>
+    </div>
+    @if (this.languageModelAvailability === "downloadable" || this.languageModelAvailability === "downloading") {
+      <div class="alert alert-warning"
+      >
+        <div>The Browser's LLM is not installed. Click here to trigger the download and installation in your
+          browser.
+        </div>
+
+        <div class="d-grid">
+          <button class="btn btn-primary mt-3" (click)="triggerDownload()">Trigger Local LLM Download</button>
+        </div>
+
+        @if (this.languageModelAvailability === "downloading" || progress !== 0) {
+          Download in progress:
+          <div class="progress mt-4" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0"
+               aria-valuemax="100">
+            <div class="progress-bar" [style.width]="progress * 100 + '%'"></div>
+          </div>
+        }
+      </div>
+    } @else if (this.languageModelAvailability === "unavailable") {
+      <div class="alert alert-danger">The "Prompt API" is not available. Make sure you are using a compatible hardware or browser. <a href="https://developer.chrome.com/docs/ai/prompt-api#hardware-requirements">See more details</a></div>
+    }
+  </webai-studio-header>
+
+  <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
+    <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
+
+      @if (this.conversationManager.state !== InferenceStateEnum.Initial) {
+        <magieno-conversation class="flex-grow-1"
+                              [conversation]="this.conversationManager.conversation"
+                              [state]="this.conversationManager.state"
+                              style="height: calc(100vh - 190px); overflow:auto;"
+        ></magieno-conversation>
+      }
+
+      @if (this.conversationManager.state === InferenceStateEnum.Initial) {
+        <h1 class="display-4 text-center">Web AI Studio</h1>
+      }
+
+      <magieno-prompt-input
+        [class.sticky-bottom]="this.conversationManager.state !== InferenceStateEnum.Initial"
+        [(state)]="state"
+        (run)="onRun($event)"
+        (cancel)="onCancel()"
+      ></magieno-prompt-input>
+
+    </div>
+  </div>
+</div>

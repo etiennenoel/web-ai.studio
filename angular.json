@@ -7,7 +7,14 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "standalone": false
+        },
+        "@schematics/angular:directive": {
+          "standalone": false
+        },
+        "@schematics/angular:pipe": {
+          "standalone": false
         }
       },
       "root": "",
@@ -15,26 +22,44 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/web-ai.studio",
-            "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "input": "node_modules/ace-builds/src/",
+                "glob": "mode-javascript.js"
+              },
+              {
+                "input": "node_modules/ace-builds/src/",
+                "glob": "theme-github.js"
+              },
+              {
+                "input": "node_modules/ace-builds/src/",
+                "glob": "theme-xcode.js"
+              },
+              {
+                "input": "node_modules/ace-builds/src/",
+                "glob": "theme-github_dark.js"
+              },
+              {
+                "glob": "pdf.worker.mjs",
+                "input": "node_modules/pdfjs-dist/build/"
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/ace-builds/src/ace.js",
+              "node_modules/ace-builds/src/ext-beautify.js"
+            ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -66,7 +91,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "web-ai.studio:build:production"
@@ -81,15 +106,11 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
+          "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -100,8 +121,7 @@
             ],
             "styles": [
               "src/styles.scss"
-            ],
-            "scripts": []
+            ]
           }
         }
       }
@@ -141,6 +161,6 @@
     }
   },
   "cli": {
-    "analytics": "04702458-4be2-44fd-9bfb-8e9b228a65b0"
+    "analytics": "a660aab9-6b97-44cb-87d5-3ec60ff05b1e"
   }
 }

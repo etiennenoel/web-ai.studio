@@ -1,0 +1,17 @@
+.btn-soft {
+  transition: none;
+
+  &:hover {
+    background-color: var(--bs-dark-bg-subtle);
+  }
+
+  &.disabled, &:disabled, &.active, &:active, &.show {
+    border: 1px solid transparent;
+  }
+}
+
+.sidebar-icon{
+  @media screen and (min-width: 992px) {
+    display: none;
+  }
+}
