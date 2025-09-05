@@ -2,8 +2,10 @@ import {Component, Inject, OnDestroy, OnInit, PLATFORM_ID, DOCUMENT} from '@angu
 import {ActivatedRoute, Router} from '@angular/router';
 import {isPlatformServer} from '@angular/common';
 import {Title} from '@angular/platform-browser';
-import {ConversationManager, InferenceStateEnum, PromptInputStateEnum, PromptRunOptions} from '@magieno/angular-ai';
+import {ConversationManager, PromptManager, InferenceStateEnum, PromptInputStateEnum, PromptRunOptions} from '@magieno/angular-ai';
 import {BasePage} from '../base-page';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
 
 
 @Component({
@@ -15,9 +17,12 @@ import {BasePage} from '../base-page';
 export class ChatPage extends BasePage implements OnInit, OnDestroy {
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
 
-  languageModelAvailability?: "unavailable" | "downloadable" | "downloading" | "available";
+  languageModelAvailability?: "unavailable" | "downloadable" | "downloading" | "available" | "loading..." = "loading...";
 
   progress: number = 0;
+
+  options: PromptRunOptions = new PromptRunOptions();
+
   constructor(
     router: Router,
     route: ActivatedRoute,
@@ -25,6 +30,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
     title: Title,
     public readonly conversationManager: ConversationManager,
+
+    private readonly ngbModal: NgbModal,
   ) {
     super(document, title)
 
@@ -35,6 +42,18 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     super.ngOnInit();
 
     await this.checkAvailability()
+  }
+
+  onOptionsChange(options: PromptRunOptions) {
+    this.options = options;
+  }
+
+  openCodeModal() {
+    const codeModalComponent = this.ngbModal.open(PromptCodeModal, {
+      size: "xl",
+    });
+    (codeModalComponent.componentInstance as PromptCodeModal).options = this.options;
+    codeModalComponent.componentInstance.updateCode();
   }
 
   async onRun(options: PromptRunOptions) {

@@ -8,14 +8,17 @@
           <div><small>Local LLM status:</small></div>
           <div><span
             class="badge text-bg-secondary"
+            [class.text-bg-warning]="this.languageModelAvailability === 'loading...'"
             [class.text-bg-secondary]="this.languageModelAvailability === 'downloadable'"
             [class.text-bg-danger]="this.languageModelAvailability === 'unavailable'"
             [class.text-bg-success]="this.languageModelAvailability === 'available'"
             [class.text-bg-primary]="this.languageModelAvailability === 'downloading'">{{ this.languageModelAvailability }}</span>
           </div>
         </div>
-        <button class="btn" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
-          class="bi bi-code-square"></i></button>
+        <button class="btn btn-soft"
+                (click)="openCodeModal()"
+                ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
+          class="bi bi-code-square"></i> Get code</button>
       </div>
     </div>
     @if (this.languageModelAvailability === "downloadable" || this.languageModelAvailability === "downloading") {
@@ -62,6 +65,7 @@
         [(state)]="state"
         (run)="onRun($event)"
         (cancel)="onCancel()"
+        (optionsChange)="onOptionsChange($event)"
       ></magieno-prompt-input>
 
     </div>

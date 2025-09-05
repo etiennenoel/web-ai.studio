@@ -38,3 +38,15 @@ body {
 .w-auto {
   width: auto !important;
 }
+
+.btn-soft {
+  transition: none;
+
+  &:hover, &:active {
+    background-color: var(--bs-dark-bg-subtle) !important;
+  }
+
+  &.disabled, &:disabled, &.active, &:active, &.show {
+    border: 1px solid transparent !important;
+  }
+}

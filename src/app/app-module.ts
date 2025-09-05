@@ -17,6 +17,7 @@ import { WritingAssistancePage } from './pages/writing-assistance/writing-assist
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
+import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { AppRoutingModule } from './app-routing-module';
     SidebarComponent,
     TranslationPage,
     WritingAssistancePage,
+    PromptCodeModal,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +48,7 @@ import { AppRoutingModule } from './app-routing-module';
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
   ],
   bootstrap: [RootComponent]
 })
