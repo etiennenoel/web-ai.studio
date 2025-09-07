@@ -22,6 +22,9 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
+  "types": [
+    "@types/dom-chromium-ai"
+  ],
   "files": [],
   "references": [
     {

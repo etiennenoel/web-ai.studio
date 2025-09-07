@@ -1,6 +1,6 @@
-import {Component} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID, signal, WritableSignal} from '@angular/core';
 import {
-  BaseWritingAssistanceManager,
+  BaseWritingAssistanceManager, Conversation,
   InferenceStateEnum, PromptInputStateEnum,
   RewriterManager,
   RewriterRunOptions,
@@ -10,6 +10,8 @@ import {
   WriterRunOptions,
   WritingAssistanceApiEnum
 } from '@magieno/angular-ai';
+import {isPlatformServer} from '@angular/common';
+import {magienoSignal, MagienoWritableSignal} from '@magieno/angular-core';
 
 @Component({
   selector: 'webai-studio-writing-assistance',
@@ -17,37 +19,51 @@ import {
   templateUrl: './writing-assistance.page.html',
   styleUrl: './writing-assistance.page.scss'
 })
-export class WritingAssistancePage {
+export class WritingAssistancePage implements OnInit {
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
 
   api!: WritingAssistanceApiEnum;
 
   languageModelAvailability?: "unavailable" | "downloadable" | "downloading" | "available";
 
-  manager!: BaseWritingAssistanceManager;
+  manager: MagienoWritableSignal<BaseWritingAssistanceManager>;
   protected readonly InferenceStateEnum = InferenceStateEnum;
 
   constructor(
-    private readonly writerManager: WriterManager,
-    private readonly summarizerManager: SummarizerManager,
-    private readonly rewriterManager: RewriterManager,
+    protected readonly writerManager: WriterManager,
+    protected readonly summarizerManager: SummarizerManager,
+    protected readonly rewriterManager: RewriterManager,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
+
+    this.manager = magienoSignal(this.summarizerManager);
     this.apiSelected(WritingAssistanceApiEnum.SummarizerApi)
   }
 
+  ngOnInit() {
+    if (isPlatformServer(this.platformId)) {
+      return;
+    }
+
+  }
+
   async apiSelected(api: WritingAssistanceApiEnum, options?: SummarizerRunOptions | WriterRunOptions | RewriterRunOptions) {
+    if (isPlatformServer(this.platformId)) {
+      return;
+    }
+
     this.api = api;
     switch (api) {
       case WritingAssistanceApiEnum.SummarizerApi:
-        this.manager = this.summarizerManager;
+        this.manager.set(this.summarizerManager);
         this.languageModelAvailability = await this.summarizerManager.checkAvailability()
         break;
       case WritingAssistanceApiEnum.WriterApi:
-        this.manager = this.writerManager;
+        this.manager.set(this.writerManager);
         this.languageModelAvailability = await this.writerManager.checkAvailability()
         break;
       case WritingAssistanceApiEnum.RewriterApi:
-        this.manager = this.rewriterManager;
+        this.manager.set(this.rewriterManager);
         this.languageModelAvailability = await this.rewriterManager.checkAvailability()
         break;
     }
@@ -75,6 +91,6 @@ export class WritingAssistancePage {
   }
 
   onCancel() {
-    this.manager.cancel();
+    this.manager().cancel();
   }
 }

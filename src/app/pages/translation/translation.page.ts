@@ -142,7 +142,6 @@ export class TranslationPage {
     this.languagePacksDownload.push(languagePacksDownload);
 
     try {
-      // @ts-expect-error
       this.translator = await Translator.create({
         sourceLanguage: sourceLocale.code,
         targetLanguage: targetLocale.code,
@@ -167,21 +166,20 @@ export class TranslationPage {
 
     if(!this.sourceLocale) {
       // Use the language detector API to find the locale.
-      // @ts-expect-error
       const detector = await LanguageDetector.create();
 
-      const locales = await detector.detect(this.textareaFormControl.value);
+      const locales = await detector.detect(this.textareaFormControl.value ?? "");
       console.log(locales);
 
       if(locales[0].detectedLanguage === 'und') {
         return; // todo: add a visual error.
       }
 
-      this.detectedLanguage = LOCALES_MAP[locales[0].detectedLanguage];
+      this.detectedLanguage = LOCALES_MAP[locales[0].detectedLanguage ?? "en"] as LocaleInterface;
 
       await this.createTranslator(this.detectedLanguage, this.destinationLocale);
     }
 
-    this.translatedText = await this.translator.translate(this.textareaFormControl.value);
+    this.translatedText = await this.translator.translate(this.textareaFormControl.value ?? "");
   }
 }

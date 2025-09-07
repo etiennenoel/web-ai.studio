@@ -22,15 +22,15 @@
   <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
     <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
 
-      @if (this.manager.state !== InferenceStateEnum.Initial) {
+      @if (this.manager().state() !== InferenceStateEnum.Initial) {
         <magieno-conversation class="flex-grow-1"
-                              [conversation]="this.manager.conversation"
-                              [state]="this.manager.state"
+                              [conversation]="this.manager().conversation()"
+                              [state]="this.manager().state()"
                               style="height: calc(100vh - 190px); overflow:auto;"
         ></magieno-conversation>
       }
 
-      @if (this.manager.state === InferenceStateEnum.Initial) {
+      @if (this.manager().state() === InferenceStateEnum.Initial) {
         <h1 class="display-4 text-center">Web AI Studio</h1>
       }
 
