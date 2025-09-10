@@ -52,7 +52,8 @@
         <magieno-conversation class="flex-grow-1"
                               [conversation]="this.conversationManager.conversation()"
                               [state]="this.conversationManager.state()"
-                              style="height: calc(100vh - 190px); overflow:auto;"
+                              style="height: calc(100vh - 190px); overflow:auto;overflow-anchor: none;"
+                              autoScroll
         ></magieno-conversation>
       }
 

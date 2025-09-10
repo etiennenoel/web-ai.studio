@@ -18,6 +18,7 @@ import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDete
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
+import {AutoScrollDirective} from './directives/auto-scroll.directive';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,8 @@ import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-moda
     TranslationPage,
     WritingAssistancePage,
     PromptCodeModal,
+
+    AutoScrollDirective,
   ],
   imports: [
     BrowserModule,
