@@ -42,10 +42,17 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     super.ngOnInit();
 
     await this.checkAvailability()
+
+    this.conversationManager.createAndLoadSession(this.options);
   }
 
   onOptionsChange(options: PromptRunOptions) {
+    if(this.options === options) {
+      return;
+    }
+    
     this.options = options;
+    this.conversationManager.createAndLoadSession(options);
   }
 
   openCodeModal() {
