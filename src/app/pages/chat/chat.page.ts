@@ -48,9 +48,22 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   onOptionsChange(options: PromptRunOptions) {
     if(this.options === options) {
-      return;
+      let isEqual = true;
+      // cheeck if all the properties are equal first
+      for (const key in options) {
+        if (options.hasOwnProperty(key)) {
+          if (options[key as keyof PromptRunOptions] !== this.options[key as keyof PromptRunOptions]) {
+            isEqual = false;
+            break;
+          }
+        }
+      }
+
+      if (isEqual) {
+        return;
+      }
     }
-    
+
     this.options = options;
     this.conversationManager.createAndLoadSession(options);
   }
