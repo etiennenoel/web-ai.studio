@@ -14,11 +14,18 @@ import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { TranslationPage } from './pages/translation/translation.page';
 import { WritingAssistancePage } from './pages/writing-assistance/writing-assistance.page';
-import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { EvalsPage } from './pages/evals/evals.page';
+import {
+  NgModule,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  provideZonelessChangeDetection
+} from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
+import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
 
 @NgModule({
   declarations: [
@@ -28,6 +35,7 @@ import {AutoScrollDirective} from './directives/auto-scroll.directive';
     SidebarComponent,
     TranslationPage,
     WritingAssistancePage,
+    EvalsPage,
     PromptCodeModal,
 
     AutoScrollDirective,
@@ -47,11 +55,12 @@ import {AutoScrollDirective} from './directives/auto-scroll.directive';
     MagienoAIModule,
     NgbTooltipModule,
     NgbOffcanvasModule,
+    MagienoAdvancedFormsModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideZonelessChangeDetection(),
     provideClientHydration(withEventReplay()),
+    provideZoneChangeDetection({ eventCoalescing: true }),
   ],
   bootstrap: [RootComponent]
 })

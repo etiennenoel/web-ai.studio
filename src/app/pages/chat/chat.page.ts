@@ -43,6 +43,10 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
     await this.checkAvailability()
 
+    if(isPlatformServer(this.platformId)) {
+      return;
+    }
+
     this.conversationManager.createAndLoadSession(this.options);
   }
 

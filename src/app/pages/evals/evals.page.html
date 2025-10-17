@@ -1,0 +1,86 @@
+<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+  <webai-studio-header title="Evals">
+
+    <div class="d-flex align-items-center mt-5 ms-3 me-3">
+      <h2 class="h6 flex-grow-1">Evals</h2>
+
+    </div>
+  </webai-studio-header>
+
+
+<div class="container-fluid flex-grow-1" style="    height: calc(100vh - 120px);">
+
+  <div class="alert alert-primary">
+    <h2 class="display-6">How to Use?</h2>
+    <h5><i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets?</h5>
+    <div>
+      <ol>
+        <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy">Copy the template</a></li>
+        <li>Fill the rows in the spreadsheet.</li>
+        <li>Copy your spreadsheet (without the header columns) and paste it in the first input in the first row, named "Context"</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="d-grid">
+    <button class="btn btn-primary btn-lg" (click)="run()"><i class="bi bi-lightning"></i> Run Evals</button>
+  </div>
+
+  @if(status !== EvalsExecutionEnum.Idle) {
+    <div class="alert"
+         [class.alert-danger]="status === EvalsExecutionEnum.Error"
+         [class.alert-primary]="status === EvalsExecutionEnum.InProgress"
+    >
+      @if(status === EvalsExecutionEnum.InProgress) {
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      }
+      <div>{{ this.statusMessage }}</div>
+    </div>
+  }
+
+  <table class="table mt-5">
+    <thead>
+      <tr>
+        <th style="min-width: 250px;">Context</th>
+        <th style="min-width: 250px;">Input</th>
+        <th>API</th>
+        <th>Status</th>
+        <th>Performance</th>
+        <th>Output</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (formRow of rowsAdvancedFormArray.formGroups; track $index) {
+        <tr>
+          <td>
+            <magieno-textarea (paste)="onPaste($event, $index)" [showTitle]="false" [showInfoIcon]="false" [advancedFormControl]="formRow.formElements.context | asAdvancedFormControl"></magieno-textarea>
+          </td>
+          <td>
+            <magieno-textarea [showTitle]="false" [showInfoIcon]="false" [advancedFormControl]="formRow.formElements.input | asAdvancedFormControl"></magieno-textarea>
+          </td>
+          <td>
+            <magieno-select [advancedFormControl]="formRow.formElements.api | asAdvancedFormControl"></magieno-select>
+          </td>
+          <td><span
+            class="badge"
+              [class.text-bg-secondary]="formRow.value.status === InferenceStatusEnum.Idle"
+              [class.text-bg-primary]="formRow.value.status === InferenceStatusEnum.InProgress"
+              [class.text-bg-success]="formRow.value.status === InferenceStatusEnum.Success"
+              [class.text-bg-danger]="formRow.value.status === InferenceStatusEnum.Error"
+            >{{ formRow.value.status }}</span></td>
+          <td></td>
+          <td>
+            {{ formRow.value.output }}
+          </td>
+          <td>
+            <button class="btn btn-sm btn-danger"><i class="bi bi-trash3"></i></button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+</div>

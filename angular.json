@@ -60,6 +60,9 @@
               "node_modules/ace-builds/src/ace.js",
               "node_modules/ace-builds/src/ext-beautify.js"
             ],
+            "polyfills": [
+              "zone.js",
+            ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {

@@ -4,6 +4,7 @@ import {ChatPage} from './pages/chat/chat.page';
 import {TranslationPage} from './pages/translation/translation.page';
 import {RouteEnum} from './enums/route.enum';
 import {WritingAssistancePage} from './pages/writing-assistance/writing-assistance.page';
+import {EvalsPage} from './pages/evals/evals.page';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
@@ -30,6 +31,13 @@ const routes: Routes = [  {
       component: WritingAssistancePage,
       data: {
         route: RouteEnum.Translation
+      }
+    },
+    {
+      path: "evals",
+      component: EvalsPage,
+      data: {
+        route: RouteEnum.Evals
       }
     }
   ]
