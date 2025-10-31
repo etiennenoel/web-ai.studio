@@ -6,7 +6,7 @@ export interface AxonTestResultInterface {
 
   api: BuiltInAiApi;
 
-  output: string;
+  output?: string;
 
   status: TestStatus;
 

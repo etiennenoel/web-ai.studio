@@ -29,6 +29,9 @@ import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
 import { CortexPage } from './pages/cortex/cortex.page';
 import { AxonPage } from './pages/cortex/axon/axon.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
+import {
+  LanguageDetectorShortStringColdStartAxonTest
+} from './pages/cortex/axon/tests/language-detector-short-string-cold-start.axon-test';
 
 @NgModule({
   declarations: [
@@ -69,6 +72,8 @@ import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executo
 
     // Axon
     AxonTestSuiteExecutor,
+
+    LanguageDetectorShortStringColdStartAxonTest,
   ],
   bootstrap: [RootComponent]
 })
