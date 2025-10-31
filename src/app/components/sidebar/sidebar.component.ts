@@ -55,6 +55,9 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       case "evals":
         this.routeEnum = RouteEnum.Evals;
         break;
+      case "cortex":
+        this.routeEnum = RouteEnum.Cortex;
+        break;
 
       default:
         this.routeEnum = RouteEnum.Chat;

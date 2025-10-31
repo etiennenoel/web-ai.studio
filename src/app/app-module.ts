@@ -26,6 +26,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
+import { CortexPage } from './pages/cortex/cortex.page';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
     PromptCodeModal,
 
     AutoScrollDirective,
+     CortexPage,
   ],
   imports: [
     BrowserModule,

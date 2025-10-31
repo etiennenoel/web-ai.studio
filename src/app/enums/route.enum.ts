@@ -5,5 +5,6 @@ export enum RouteEnum {
   MediaGeneration = "/media-generation",
   Build = "/build",
   Evals = "/evals",
+  Cortex = "/cortex",
   Demos = "/demos",
 }

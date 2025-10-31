@@ -1,0 +1,26 @@
+<div class="container">
+  <h1 class="display-1 mt-5 text-center">Cortex Test Suite</h1>
+  <p class="text-center">Cortex is a series of high reliability performance test for the Built-In AI APIs.</p>
+
+  <div class="d-flex gap-3">
+    <div>
+      <img src="images/axon-icon.png" style="width: 150px;">
+      <h3>Axon</h3>
+      <p>The <strong>Axon Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
+
+      <button class="btn btn-outline-dark">Run Axon Test</button>
+    </div>
+    <div>
+      <img src="images/synapse-icon.png" style="width: 150px;">
+      <h3>Synapse</h3>
+      <p>The <strong>Synapse Test</strong> evaluates the AI API's ability to maintain performance and quality under stress. It simulates real-world browser contention by running other resource-intensive tasks (e.g., WebGPU computations, heavy DOM operations) in parallel with AI API calls. This test assesses the API's resilience and how effectively it manages and shares system resources without significant degradation.</p>
+      <button class="btn btn-outline-dark">Run Synapse Test</button>
+    </div>
+    <div>
+      <img src="images/lobe-icon.png" style="width: 150px;">
+      <h3>Lobe</h3>
+      <p>The <strong>Lobe Test</strong> assesses the breadth and quality of the AI API's capabilities, particularly focusing on its multimodal features and advanced understanding. This test goes beyond simple text-to-text, evaluating the API's ability to process and generate responses from complex, diverse inputs such as images, audio, and structured data, and the accuracy and relevance of those outputs.</p>
+      <button class="btn btn-outline-dark">Run Synapse Test</button>
+    </div>
+  </div>
+</div>

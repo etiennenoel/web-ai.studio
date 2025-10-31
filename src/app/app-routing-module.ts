@@ -7,6 +7,7 @@ import {WritingAssistancePage} from './pages/writing-assistance/writing-assistan
 import {EvalsPage} from './pages/evals/evals.page';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
+import {CortexPage} from './pages/cortex/cortex.page';
 
 const routes: Routes = [  {
   path: "",
@@ -38,6 +39,13 @@ const routes: Routes = [  {
       component: EvalsPage,
       data: {
         route: RouteEnum.Evals
+      }
+    },
+    {
+      path: "cortex",
+      component: CortexPage,
+      data: {
+        route: RouteEnum.Cortex
       }
     }
   ]
