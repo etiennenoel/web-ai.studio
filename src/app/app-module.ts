@@ -27,6 +27,8 @@ import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-moda
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
 import { CortexPage } from './pages/cortex/cortex.page';
+import { AxonPage } from './pages/cortex/axon/axon.page';
+import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
 
 @NgModule({
   declarations: [
@@ -41,6 +43,7 @@ import { CortexPage } from './pages/cortex/cortex.page';
 
     AutoScrollDirective,
      CortexPage,
+     AxonPage,
   ],
   imports: [
     BrowserModule,
@@ -63,6 +66,9 @@ import { CortexPage } from './pages/cortex/cortex.page';
     provideBrowserGlobalErrorListeners(),
     provideClientHydration(withEventReplay()),
     provideZoneChangeDetection({ eventCoalescing: true }),
+
+    // Axon
+    AxonTestSuiteExecutor,
   ],
   bootstrap: [RootComponent]
 })

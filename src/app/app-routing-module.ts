@@ -8,6 +8,7 @@ import {EvalsPage} from './pages/evals/evals.page';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
+import {AxonPage} from './pages/cortex/axon/axon.page';
 
 const routes: Routes = [  {
   path: "",
@@ -46,6 +47,13 @@ const routes: Routes = [  {
       component: CortexPage,
       data: {
         route: RouteEnum.Cortex
+      }
+    },
+    {
+      path: "cortex/axon",
+      component: AxonPage,
+      data: {
+        route: RouteEnum.Axon
       }
     }
   ]
