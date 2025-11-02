@@ -33,6 +33,9 @@ import {
   LanguageDetectorShortStringColdStartAxonTest
 } from './pages/cortex/axon/tests/language-detector-short-string-cold-start.axon-test';
 import { AxonTestStatusBadgeComponent } from './pages/cortex/axon/components/axon-test-status-badge/axon-test-status-badge.component';
+import {
+  LanguageDetectorShortStringWarmStartAxonTest
+} from './pages/cortex/axon/tests/language-detector-short-string-warm-start.axon-test';
 
 @NgModule({
   declarations: [
@@ -76,6 +79,7 @@ import { AxonTestStatusBadgeComponent } from './pages/cortex/axon/components/axo
     AxonTestSuiteExecutor,
 
     LanguageDetectorShortStringColdStartAxonTest,
+    LanguageDetectorShortStringWarmStartAxonTest,
   ],
   bootstrap: [RootComponent]
 })

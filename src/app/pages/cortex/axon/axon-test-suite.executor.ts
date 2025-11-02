@@ -9,6 +9,9 @@ import {AxonResultInterface} from './interfaces/axon-result.interface';
 import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
 import {MathematicalCalculations} from './util/mathematical-calculations';
 import {AxonTestIterationResultInterface} from './interfaces/axon-test-iteration-result.interface';
+import {
+  LanguageDetectorShortStringWarmStartAxonTest
+} from './tests/language-detector-short-string-warm-start.axon-test';
 
 @Injectable()
 export class AxonTestSuiteExecutor {
@@ -17,16 +20,19 @@ export class AxonTestSuiteExecutor {
 
   testsSuite: AxonTestId[] = [
     AxonTestId.LanguageDetectorShortStringColdStart,
+    AxonTestId.LanguageDetectorShortStringWarmStart,
   ];
 
   results: AxonResultInterface;
 
   constructor(
     private readonly languageDetectorShortStringColdStartAxonTest: LanguageDetectorShortStringColdStartAxonTest,
+    private readonly languageDetectorShortStringWarmStartAxonTest: LanguageDetectorShortStringWarmStartAxonTest,
   ) {
 
     this.testIdMap = {
       [AxonTestId.LanguageDetectorShortStringColdStart]: this.languageDetectorShortStringColdStartAxonTest,
+      [AxonTestId.LanguageDetectorShortStringWarmStart]: this.languageDetectorShortStringWarmStartAxonTest,
     }
 
     this.results = {

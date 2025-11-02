@@ -19,7 +19,9 @@ export class AxonPage {
 
   viewData: { [id in AxonTestId]: {iterationsCollapsed?:boolean} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {
-    }
+    },
+    [AxonTestId.LanguageDetectorShortStringWarmStart]: {
+    },
   }
 
   constructor(
