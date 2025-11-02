@@ -1,15 +1,10 @@
 import {BuiltInAiApi} from '../../../../enums/built-in-ai-api.enum';
 import {TestStatus} from '../../../../enums/test-status.enum';
-import {AxonTestIterationResultInterface} from './axon-test-iteration-result.interface';
 
-export interface AxonTestResultInterface {
-  id: string;
-
-  api: BuiltInAiApi;
+export interface AxonTestIterationResultInterface {
+  output?: string;
 
   status: TestStatus;
-
-  numberOfIterations: number;
 
   timeToFirstToken?: number;
 
@@ -20,8 +15,4 @@ export interface AxonTestResultInterface {
   totalNumberOfInputTokens?: number;
 
   totalNumberOfOutputTokens?: number;
-
-  startType: "cold" | "warm";
-
-  testIterationResults: AxonTestIterationResultInterface[];
 }

@@ -1,0 +1,21 @@
+<span class="badge rounded-pill d-flex flex-row align-items-center gap-1 ps-2 pe-2"
+      [class.text-bg-danger]="status === TestStatus.Fail"
+      [class.text-bg-primary]="status === TestStatus.Executing"
+      [class.text-bg-secondary]="status === TestStatus.Idle"
+      [class.text-bg-success]="status === TestStatus.Success">
+                  @if(status === TestStatus.Fail) {
+                    <i class="bi bi-x-circle"></i>
+                  }
+  @if(status === TestStatus.Executing) {
+    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+  }
+  @if(status === TestStatus.Idle) {
+    <i class="bi bi-clock"></i>
+  }
+  @if(status === TestStatus.Success) {
+    <i class="bi bi-check"></i>
+  }
+
+  {{ status }}</span>

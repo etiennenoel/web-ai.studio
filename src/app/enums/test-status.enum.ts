@@ -1,8 +1,8 @@
 export enum TestStatus {
-  Success = "SUCCESS",
-  Fail = "FAIL",
-  Error = "ERROR",
-  Executing = "EXECUTING",
-  Idle = "IDLE",
-  Skipped = "SKIPPED",
+  Success = "Success",
+  Fail = "Fail",
+  Error = "Error",
+  Executing = "Executing",
+  Idle = "Idle",
+  Skipped = "Skipped",
 }

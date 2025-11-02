@@ -32,6 +32,7 @@ import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executo
 import {
   LanguageDetectorShortStringColdStartAxonTest
 } from './pages/cortex/axon/tests/language-detector-short-string-cold-start.axon-test';
+import { AxonTestStatusBadgeComponent } from './pages/cortex/axon/components/axon-test-status-badge/axon-test-status-badge.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import {
     AutoScrollDirective,
      CortexPage,
      AxonPage,
+     AxonTestStatusBadgeComponent,
   ],
   imports: [
     BrowserModule,

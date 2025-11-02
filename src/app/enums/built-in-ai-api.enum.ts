@@ -1,9 +1,11 @@
 export enum BuiltInAiApi {
-  Summarizer = "SUMMARIZER",
-  LanguageDetector = "LANGUAGE_DETECTOR",
-  Translator = "TRANSLATOR",
-  Prompt = "PROMPT",
-  Proofreader = "PROOFREADER",
-  Writer = "WRITER",
-  Rewriter = "REWRITER",
+  LanguageDetector = "Language Detector",
+  Translator = "Translator",
+  Summarizer = "Summarizer",
+  Prompt = "Prompt",
+  PromptWithImage = "Prompt (with Image)",
+  PromptWithAudio = "Prompt (with Audio)",
+  Proofreader = "Proofreader",
+  Rewriter = "Rewriter",
+  Writer = "Writer",
 }

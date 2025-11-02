@@ -1,0 +1,11 @@
+.axon-test-card {
+  thead {
+    border-bottom: 1px solid var(--bs-table-border-color);
+  }
+
+  th, td {
+    background-color: transparent;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+}

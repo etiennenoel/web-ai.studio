@@ -9,7 +9,96 @@
 </div>
 
   @if(this.axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-    <div>Running!</div>
+
+    <table class="table text-center">
+      <thead>
+        <tr>
+          <th></th>
+          <th colspan="2">Average Token per second</th>
+        </tr>
+      <tr>
+        <th></th>
+        <th class="text-primary">Cold</th>
+        <th class="text-warning">Warm</th>
+      </tr>
+      </thead>
+      <tbody>
+
+        @for (element of builtInAiApis; track $index) {
+          <tr>
+            <td class="text-start">{{ element.id }}</td>
+            <td class="text-primary">0.12s</td>
+            <td class="text-warning">0.05s</td>
+          </tr>
+        }
+
+
+      </tbody>
+    </table>
+
+    @for (element of builtInAiApis; track $index) {
+
+      <h2 class="mt-5 display-6 fs-5">{{ element.id }}</h2>
+      <hr>
+
+      <div class="d-flex">
+        <!-- Retrieve all the tests for this specific API -->
+
+        @for (test of this.getTests(getBuiltInAiAPIFromItemInterface(element)); track $index) {
+          <div class="card bg-body-secondary">
+            <div class="card-body">
+              <div class="d-flex gap-4">
+                <div class="flex-grow-1">
+                  <small>{{ test.id }}</small>
+                </div>
+                <div>
+                  @if(test.results.startType === "cold") {
+                    <i class="bi bi-thermometer-snow text-primary"></i>
+                  } @else {
+                    <i class="bi bi-thermometer-sun text-warning"></i>
+                  }
+                </div>
+                                <!-- show status here -->
+                <div>
+                  <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
+                  </div>
+
+              </div>
+
+              <div class="d-flex mt-2">
+                <div>
+                  <span class="badge rounded-pill bg-body-tertiary">
+                  <i class="bi bi-arrow-clockwise"></i> {{ test.results.numberOfIterations }} iterations
+                  </span>
+                </div>
+              </div>
+
+              <table class="table table-borderless table-sm mt-3 axon-test-card">
+                <thead>
+                  <tr>
+                    <th># (total: {{ test.results.numberOfIterations }})</th>
+                    <th>Status</th>
+                    <th>TTFT</th>
+                    <th>Total</th>
+                    <th>Tok/s</th>
+                  </tr>
+                </thead>
+
+                <tbody class="table-group-divider">
+                  @for (testIterationResult of test.results.testIterationResults; track $index) {
+                    <tr>
+                      <td>{{ $index }}</td>
+                      <td><axon-test-status-badge [status]="testIterationResult.status"></axon-test-status-badge></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+
+      </div>
+    }
   }
 </div>
 

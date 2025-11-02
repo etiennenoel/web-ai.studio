@@ -30,6 +30,14 @@ export class AxonTestSuiteExecutor {
   async start(): Promise<void> {
     this.results.status = TestStatus.Executing
 
+    for (const testSuite of this.testsSuite) {
+      const test = this.testIdMap[testSuite];
+
+      await test.setup();
+      await test.run();
+      await test.postRun();
+    }
+
     // Loop over the testSuite in order and start executing the tests.
   }
 }

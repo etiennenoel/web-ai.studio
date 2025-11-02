@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, NgZone} from '@angular/core';
 import {AxonTestSuiteExecutor} from './axon-test-suite.executor';
 import {TestStatus} from '../../../enums/test-status.enum';
+import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
+import {EnumUtils, ItemInterface} from '@magieno/common';
 
 @Component({
   selector: 'page-axon',
@@ -9,11 +11,29 @@ import {TestStatus} from '../../../enums/test-status.enum';
   styleUrl: './axon.page.scss'
 })
 export class AxonPage {
-  constructor(protected readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,) {
+
+  builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
+
+  constructor(
+    protected readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,
+    ) {
   }
 
   async start() {
     await this.axonTestSuiteExecutor.start();
+  }
+
+  getTests(api: BuiltInAiApi) {
+    return this.axonTestSuiteExecutor.testsSuite.filter(testId => {
+      return this.axonTestSuiteExecutor.testIdMap[testId].results.api === api;
+    }).map(testId => {
+      return this.axonTestSuiteExecutor.testIdMap[testId];
+    });
+  }
+
+
+  getBuiltInAiAPIFromItemInterface(item: ItemInterface): BuiltInAiApi {
+    return item.id as BuiltInAiApi;
   }
 
   protected readonly TestStatus = TestStatus;
