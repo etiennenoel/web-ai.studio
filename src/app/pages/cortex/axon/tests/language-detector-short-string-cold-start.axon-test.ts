@@ -4,6 +4,7 @@ import {AxonTestResultInterface} from '../interfaces/axon-test-result.interface'
 import {Injectable} from '@angular/core';
 import {AxonTestId} from '../enums/axon-test-id.enum';
 import {TestStatus} from '../../../../enums/test-status.enum';
+import {AxonTestResultCalculator} from '../util/axon-test-result-calculator';
 
 @Injectable()
 export class LanguageDetectorShortStringColdStartAxonTest implements AxonTestInterface {
@@ -54,30 +55,7 @@ export class LanguageDetectorShortStringColdStartAxonTest implements AxonTestInt
       iterationResult.status = TestStatus.Success;
     }
 
-    // Calculate the average
-    this.results.averageTotalResponseTime = this.results.testIterationResults.reduce((a, b) => { return a + (b.totalResponseTime ?? 0)} , 0) / this.results.numberOfIterations;
-    this.results.averageTokensPerSecond = this.results.testIterationResults.reduce((a, b) => { return a + (b.tokensPerSecond ?? 0)} , 0) / this.results.numberOfIterations;
-    this.results.averageTimeToFirstToken = this.results.testIterationResults.reduce((a, b) => { return a + (b.timeToFirstToken ?? 0)} , 0) / this.results.numberOfIterations;
-
-    // Calculate the median
-    const totalResponseTimes = this.results.testIterationResults.map(r => r.totalResponseTime ?? 0).sort((a, b) => a - b);
-    const tokensPerSeconds = this.results.testIterationResults.map(r => r.tokensPerSecond ?? 0).sort((a, b) => a - b);
-    const timeToFirstTokens = this.results.testIterationResults.map(r => r.timeToFirstToken ?? 0).sort((a, b) => a - b);
-
-    const mid = Math.floor(this.results.numberOfIterations / 2);
-
-    this.results.medianTotalResponseTime = this.results.numberOfIterations % 2 === 0
-      ? (totalResponseTimes[mid - 1] + totalResponseTimes[mid]) / 2
-      : totalResponseTimes[mid];
-
-    this.results.medianTokensPerSecond = this.results.numberOfIterations % 2 === 0
-        ? (tokensPerSeconds[mid - 1] + tokensPerSeconds[mid]) / 2
-        : tokensPerSeconds[mid];
-
-    this.results.medianTimeToFirstToken = this.results.numberOfIterations % 2 === 0
-        ? (timeToFirstTokens[mid - 1] + timeToFirstTokens[mid]) / 2
-        : timeToFirstTokens[mid];
-
+    AxonTestResultCalculator.calculate(this.results);
 
     return this.results;
   }

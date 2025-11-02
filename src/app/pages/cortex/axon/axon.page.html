@@ -49,7 +49,7 @@
             <div class="card-body">
               <div class="d-flex gap-4">
                 <div class="flex-grow-1">
-                  <small>{{ test.id }}</small>
+                  <h6 class="fs-6"><i class="bi bi-gear-wide-connected"></i> {{ test.id }}</h6>
                 </div>
                 <div>
                   @if(test.results.startType === "cold") {
@@ -70,7 +70,7 @@
                   <th></th>
                   <th>TTFT</th>
                   <th>Total Response Time</th>
-                  <th>Tok/s</th>
+                  <th>Characters/second</th>
                 </thead>
                 <tbody>
                   <tr>
@@ -87,10 +87,11 @@
                   </tr>
                 </tbody>
               </table>
+
               @let iterationsCollapsed = viewData[test.id].iterationsCollapsed || (viewData[test.id].iterationsCollapsed === undefined && test.results.status === 'Success');
 
               <div class="d-flex mt-5 align-items-center">
-                <h6 class="fs-6 flex-grow-1">Iterations (total: {{ test.results.numberOfIterations }})</h6>
+                <small class="fs-6 flex-grow-1"><i class="bi bi-arrow-clockwise"></i> Iterations (total: {{ test.results.numberOfIterations }})</small>
                   <button class="btn bg-dark-subtle btn-sm" (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
                     @if(iterationsCollapsed) {
                       <i class="bi bi-plus"></i> Expand iterations
@@ -101,6 +102,12 @@
 
               </div>
 
+              <div class="card bg-dark-subtle ps-2 pt-2 mt-3">
+                <strong style="font-size: 0.7rem;"><i class="bi bi-input-cursor"></i> Input</strong>
+                <p class="text-secondary"><small>{{ test.results.input }}</small></p>
+              </div>
+
+
               <table class="table table-borderless table-sm mt-3 axon-test-card">
                 <thead class="text-center text-body-emphasis">
                   <tr>
@@ -109,6 +116,8 @@
                     <th>TTFT (ms)</th>
                     <th>Total Response Time (ms)</th>
                     <th>Characters/second</th>
+<!--                    <th>Output</th>-->
+                    <!-- Todo: Find a way to show the output without breaking the UI entirely -->
                   </tr>
                 </thead>
 
@@ -120,6 +129,8 @@
                       <td>{{ testIterationResult.timeToFirstToken | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.totalResponseTime | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.tokensPerSecond | number:'1.2-2' }}</td>
+<!--                      <td style="width: 50px;">{{ testIterationResult.output }} </td>-->
+                      <!-- Todo: Find a way to show the output without breaking the UI entirely -->
                     </tr>
                   }
                 </tbody>
