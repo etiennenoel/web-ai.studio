@@ -3,6 +3,8 @@ import {AxonTestSuiteExecutor} from './axon-test-suite.executor';
 import {TestStatus} from '../../../enums/test-status.enum';
 import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
 import {EnumUtils, ItemInterface} from '@magieno/common';
+import {AxonTestId} from './enums/axon-test-id.enum';
+import {AxonTestInterface} from './interfaces/axon-test.interface';
 
 @Component({
   selector: 'page-axon',
@@ -13,6 +15,11 @@ import {EnumUtils, ItemInterface} from '@magieno/common';
 export class AxonPage {
 
   builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
+
+  viewData: { [id in AxonTestId]: {iterationsCollapsed?:boolean} } = {
+    [AxonTestId.LanguageDetectorShortStringColdStart]: {
+    }
+  }
 
   constructor(
     protected readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,

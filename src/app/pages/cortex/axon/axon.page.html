@@ -65,34 +65,77 @@
 
               </div>
 
-              <div class="d-flex mt-2">
-                <div>
-                  <span class="badge rounded-pill bg-body-tertiary">
-                  <i class="bi bi-arrow-clockwise"></i> {{ test.results.numberOfIterations }} iterations
-                  </span>
-                </div>
+              <table class="table table-borderless axon-test-highlights text-center mt-3">
+                <thead>
+                  <th></th>
+                  <th>TTFT</th>
+                  <th>Total Response Time</th>
+                  <th>Tok/s</th>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>avg.</th>
+                    <td>{{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.2-2' }}</td>
+                    <td>{{ (test.results.averageTotalResponseTime) ?? "---" | number:'1.2-2' }}</td>
+                    <td>{{ (test.results.averageTokensPerSecond) ?? "---" | number:'1.2-2' }}</td>
+                  </tr>
+                  <tr>
+                    <th>median.</th>
+                    <td>{{ (test.results.medianTimeToFirstToken ?? "---") | number:'1.2-2'  }}</td>
+                    <td>{{ (test.results.medianTotalResponseTime ?? "---") | number:'1.2-2'  }}</td>
+                    <td>{{ (test.results.medianTokensPerSecond ?? "---") | number:'1.2-2'  }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              @let iterationsCollapsed = viewData[test.id].iterationsCollapsed || (viewData[test.id].iterationsCollapsed === undefined && test.results.status === 'Success');
+
+              <div class="d-flex mt-5 align-items-center">
+                <h6 class="fs-6 flex-grow-1">Iterations (total: {{ test.results.numberOfIterations }})</h6>
+                  <button class="btn bg-dark-subtle btn-sm" (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
+                    @if(iterationsCollapsed) {
+                      <i class="bi bi-plus"></i> Expand iterations
+                    } @else {
+                      <i class="bi bi-dash"></i> Collapse iterations
+                    }
+                  </button>
+
               </div>
 
               <table class="table table-borderless table-sm mt-3 axon-test-card">
-                <thead>
+                <thead class="text-center text-body-emphasis">
                   <tr>
-                    <th># (total: {{ test.results.numberOfIterations }})</th>
+                    <th>#</th>
                     <th>Status</th>
-                    <th>TTFT</th>
-                    <th>Total</th>
-                    <th>Tok/s</th>
+                    <th>TTFT (ms)</th>
+                    <th>Total Response Time (ms)</th>
+                    <th>Characters/second</th>
                   </tr>
                 </thead>
 
-                <tbody class="table-group-divider">
+                <tbody class="table-group-divider  text-end" [class.collapse]="iterationsCollapsed">
                   @for (testIterationResult of test.results.testIterationResults; track $index) {
                     <tr>
-                      <td>{{ $index }}</td>
+                      <td class="text-center">{{ $index }}</td>
                       <td><axon-test-status-badge [status]="testIterationResult.status"></axon-test-status-badge></td>
+                      <td>{{ testIterationResult.timeToFirstToken | number:'1.2-2' }}</td>
+                      <td>{{ testIterationResult.totalResponseTime | number:'1.2-2' }}</td>
+                      <td>{{ testIterationResult.tokensPerSecond | number:'1.2-2' }}</td>
                     </tr>
                   }
                 </tbody>
               </table>
+
+              <!-- Create another tbody and use it as a group to then say expand iterations and not just see/hide iterations -->
+
+              <div class="d-grid mt-4">
+                <button class="btn bg-dark-subtle btn-sm" (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
+                  @if(iterationsCollapsed) {
+                    <i class="bi bi-chevron-right"></i> See iterations
+                  } @else {
+                    <i class="bi bi-chevron-up"></i> Hide iterations
+                  }
+                </button>
+              </div>
             </div>
           </div>
         }

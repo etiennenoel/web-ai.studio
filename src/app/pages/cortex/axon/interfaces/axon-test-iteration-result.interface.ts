@@ -6,6 +6,8 @@ export interface AxonTestIterationResultInterface {
 
   status: TestStatus;
 
+  creationTime?: number;
+
   timeToFirstToken?: number;
 
   totalResponseTime?: number;

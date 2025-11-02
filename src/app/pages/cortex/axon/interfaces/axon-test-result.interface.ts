@@ -9,17 +9,21 @@ export interface AxonTestResultInterface {
 
   status: TestStatus;
 
+  input: string;
+
   numberOfIterations: number;
 
-  timeToFirstToken?: number;
+  averageTimeToFirstToken?: number;
 
-  totalResponseTime?: number;
+  averageTotalResponseTime?: number;
 
-  tokensPerSecond?: number;
+  averageTokensPerSecond?: number;
 
-  totalNumberOfInputTokens?: number;
+  medianTimeToFirstToken?: number;
 
-  totalNumberOfOutputTokens?: number;
+  medianTotalResponseTime?: number;
+
+  medianTokensPerSecond?: number;
 
   startType: "cold" | "warm";
 

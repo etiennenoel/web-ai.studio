@@ -16,6 +16,7 @@ export class AxonTestSuiteExecutor {
     AxonTestId.LanguageDetectorShortStringColdStart,
   ];
 
+
   results = new AxonTestSuiteResults();
 
   constructor(

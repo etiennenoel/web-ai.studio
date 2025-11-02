@@ -9,3 +9,19 @@
     font-weight: normal;
   }
 }
+
+.axon-test-highlights {
+  th, td {
+    background-color: transparent;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+
+  th {
+    color: var(--bs-gray-600)
+  }
+
+  td {
+    font-weight: bold;
+  }
+}
