@@ -1,41 +1,148 @@
 <div class="container-fluid">
-<div class="container">
-  <h1 class="display-1 mt-2 text-center">Axon</h1>
-  <p class="text-center">The <strong>Axon Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
-
-  <div class="d-grid">
-    <button class="btn btn-lg btn-primary" (click)="start()">Run Axon Test</button>
+  <div class="container">
+    <div class="d-flex gap-5 align-items-center">
+      <div class=" flex-fill">
+        <h1 class="display-1 mt-2 text-start">Axon</h1>
+        <p class="text-start text-secondary">The <strong>Axon Test</strong> measures the raw, uncontended speed of the AI API. It
+          evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached,
+          subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and
+          efficiently the AI API can deliver its output when dedicated resources are available.</p>
+      </div>
+      <div class="flex-fill">
+        <button class="btn btn-lg btn-primary d-flex align-items-center gap-3"
+                (click)="start()"
+                style="width:225px;"
+                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+          @if(this.axonTestSuiteExecutor.results.status === 'Executing') {
+            <div class="spinner-grow text-light" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            Running...
+          } @else {
+            <i class="bi bi-play"></i> Run Axon Test
+          }
+        </button>
+      </div>
+    </div>
   </div>
-</div>
 
-  @if(this.axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
+  <h2 class="display-6 mt-5 fs-4">Overall Summary</h2>
+  <hr>
 
-    <table class="table text-center">
+  @if (this.axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
+    <div class="rounded-1 axon-summary-table">
+    <table class="table table-borderless text-center m-0">
       <thead>
-        <tr>
-          <th></th>
-          <th colspan="2">Average Token per second</th>
-        </tr>
       <tr>
         <th></th>
-        <th class="text-primary">Cold</th>
-        <th class="text-warning">Warm</th>
+        <th colspan="2">avg. TTFT (ms)</th>
+        <th colspan="2">med. TTFT (ms)</th>
+        <th colspan="2">avg. Total Response Time (ms)</th>
+        <th colspan="2">med. Total Response Time (ms)</th>
+        <th colspan="2">avg. Tok/s</th>
+        <th colspan="2">med. Tok/s</th>
+      </tr>
+      <tr>
+        <th></th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
+        <th class="border-end-0"><i class="bi bi-thermometer-snow text-primary"></i> Cold</th>
+        <th class="border-start-0"><i class="bi bi-thermometer-sun text-warning"></i> Warm</th>
       </tr>
       </thead>
       <tbody>
 
         @for (element of builtInAiApis; track $index) {
+          @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
+          @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
           <tr>
-            <td class="text-start">{{ element.id }}</td>
-            <td class="text-primary">0.12s</td>
-            <td class="text-warning">0.05s</td>
+            <th class="text-start">{{ element.id }}</th>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.averageTimeToFirstToken| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.averageTimeToFirstToken| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.medianTimeToFirstToken| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.medianTimeToFirstToken| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.averageTotalResponseTime| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.averageTotalResponseTime| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.medianTotalResponseTime| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.medianTotalResponseTime| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
+            <td>
+              @if(coldSummaryResults) {
+                {{ coldSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
+              } @else {
+                ---
+              }
+              </td>
+            <td> @if(warmSummaryResults) {
+              {{ warmSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
+            } @else {
+              ---
+            }</td>
           </tr>
         }
 
-
       </tbody>
     </table>
-
+    </div>
     @for (element of builtInAiApis; track $index) {
 
       <h2 class="mt-5 display-6 fs-5">{{ element.id }}</h2>
@@ -52,53 +159,56 @@
                   <h6 class="fs-6"><i class="bi bi-gear-wide-connected"></i> {{ test.id }}</h6>
                 </div>
                 <div>
-                  @if(test.results.startType === "cold") {
+                  @if (test.results.startType === "cold") {
                     <i class="bi bi-thermometer-snow text-primary"></i>
                   } @else {
                     <i class="bi bi-thermometer-sun text-warning"></i>
                   }
                 </div>
-                                <!-- show status here -->
+                <!-- show status here -->
                 <div>
                   <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
-                  </div>
+                </div>
 
               </div>
 
               <table class="table table-borderless axon-test-highlights text-center mt-3">
                 <thead>
-                  <th></th>
-                  <th>TTFT</th>
-                  <th>Total Response Time</th>
-                  <th>Characters/second</th>
+                <th></th>
+                <th>TTFT</th>
+                <th>Total Response Time</th>
+                <th>Characters/second</th>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th>avg.</th>
-                    <td>{{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.2-2' }}</td>
-                    <td>{{ (test.results.averageTotalResponseTime) ?? "---" | number:'1.2-2' }}</td>
-                    <td>{{ (test.results.averageTokensPerSecond) ?? "---" | number:'1.2-2' }}</td>
-                  </tr>
-                  <tr>
-                    <th>median.</th>
-                    <td>{{ (test.results.medianTimeToFirstToken ?? "---") | number:'1.2-2'  }}</td>
-                    <td>{{ (test.results.medianTotalResponseTime ?? "---") | number:'1.2-2'  }}</td>
-                    <td>{{ (test.results.medianTokensPerSecond ?? "---") | number:'1.2-2'  }}</td>
-                  </tr>
+                <tr>
+                  <th>avg.</th>
+                  <td>{{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.2-2' }}</td>
+                  <td>{{ (test.results.averageTotalResponseTime) ?? "---" | number:'1.2-2' }}</td>
+                  <td>{{ (test.results.averageTokensPerSecond) ?? "---" | number:'1.2-2' }}</td>
+                </tr>
+                <tr>
+                  <th>median.</th>
+                  <td>{{ (test.results.medianTimeToFirstToken ?? "---") | number:'1.2-2' }}</td>
+                  <td>{{ (test.results.medianTotalResponseTime ?? "---") | number:'1.2-2' }}</td>
+                  <td>{{ (test.results.medianTokensPerSecond ?? "---") | number:'1.2-2' }}</td>
+                </tr>
                 </tbody>
               </table>
 
-              @let iterationsCollapsed = viewData[test.id].iterationsCollapsed || (viewData[test.id].iterationsCollapsed === undefined && test.results.status === 'Success');
+              @let
+              iterationsCollapsed = viewData[test.id].iterationsCollapsed || (viewData[test.id].iterationsCollapsed === undefined && test.results.status === 'Success');
 
               <div class="d-flex mt-5 align-items-center">
-                <small class="fs-6 flex-grow-1"><i class="bi bi-arrow-clockwise"></i> Iterations (total: {{ test.results.numberOfIterations }})</small>
-                  <button class="btn bg-dark-subtle btn-sm" (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
-                    @if(iterationsCollapsed) {
-                      <i class="bi bi-plus"></i> Expand iterations
-                    } @else {
-                      <i class="bi bi-dash"></i> Collapse iterations
-                    }
-                  </button>
+                <small class="fs-6 flex-grow-1"><i class="bi bi-arrow-clockwise"></i> Iterations
+                  (total: {{ test.results.numberOfIterations }})</small>
+                <button class="btn bg-dark-subtle btn-sm"
+                        (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
+                  @if (iterationsCollapsed) {
+                    <i class="bi bi-plus"></i> Expand iterations
+                  } @else {
+                    <i class="bi bi-dash"></i> Collapse iterations
+                  }
+                </button>
 
               </div>
 
@@ -107,29 +217,30 @@
                 <p class="text-secondary"><small>{{ test.results.input }}</small></p>
               </div>
 
-
               <table class="table table-borderless table-sm mt-3 axon-test-card">
                 <thead class="text-center text-body-emphasis">
-                  <tr>
-                    <th>#</th>
-                    <th>Status</th>
-                    <th>TTFT (ms)</th>
-                    <th>Total Response Time (ms)</th>
-                    <th>Characters/second</th>
-<!--                    <th>Output</th>-->
-                    <!-- Todo: Find a way to show the output without breaking the UI entirely -->
-                  </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Status</th>
+                  <th>TTFT (ms)</th>
+                  <th>Total Response Time (ms)</th>
+                  <th>Characters/second</th>
+                  <!--                    <th>Output</th>-->
+                  <!-- Todo: Find a way to show the output without breaking the UI entirely -->
+                </tr>
                 </thead>
 
                 <tbody class="table-group-divider  text-end" [class.collapse]="iterationsCollapsed">
                   @for (testIterationResult of test.results.testIterationResults; track $index) {
                     <tr>
                       <td class="text-center">{{ $index }}</td>
-                      <td><axon-test-status-badge [status]="testIterationResult.status"></axon-test-status-badge></td>
+                      <td>
+                        <axon-test-status-badge [status]="testIterationResult.status"></axon-test-status-badge>
+                      </td>
                       <td>{{ testIterationResult.timeToFirstToken | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.totalResponseTime | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.tokensPerSecond | number:'1.2-2' }}</td>
-<!--                      <td style="width: 50px;">{{ testIterationResult.output }} </td>-->
+                      <!--                      <td style="width: 50px;">{{ testIterationResult.output }} </td>-->
                       <!-- Todo: Find a way to show the output without breaking the UI entirely -->
                     </tr>
                   }
@@ -139,8 +250,9 @@
               <!-- Create another tbody and use it as a group to then say expand iterations and not just see/hide iterations -->
 
               <div class="d-grid mt-4">
-                <button class="btn bg-dark-subtle btn-sm" (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
-                  @if(iterationsCollapsed) {
+                <button class="btn bg-dark-subtle btn-sm"
+                        (click)="viewData[test.id].iterationsCollapsed === undefined? viewData[test.id].iterationsCollapsed = false : viewData[test.id].iterationsCollapsed = !viewData[test.id].iterationsCollapsed">
+                  @if (iterationsCollapsed) {
                     <i class="bi bi-chevron-right"></i> See iterations
                   } @else {
                     <i class="bi bi-chevron-up"></i> Hide iterations

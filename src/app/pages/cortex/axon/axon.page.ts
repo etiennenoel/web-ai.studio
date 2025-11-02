@@ -5,6 +5,7 @@ import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
 import {EnumUtils, ItemInterface} from '@magieno/common';
 import {AxonTestId} from './enums/axon-test-id.enum';
 import {AxonTestInterface} from './interfaces/axon-test.interface';
+import {AxonSummaryResultsInterface} from './interfaces/axon-summary-results.interface';
 
 @Component({
   selector: 'page-axon',
@@ -28,6 +29,10 @@ export class AxonPage {
 
   async start() {
     await this.axonTestSuiteExecutor.start();
+  }
+
+  getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
+    return this.axonTestSuiteExecutor.results.summary?.[builtInAIApi as BuiltInAiApi]?.[startType];
   }
 
   getTests(api: BuiltInAiApi) {

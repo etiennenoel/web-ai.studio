@@ -25,3 +25,25 @@
     font-weight: bold;
   }
 }
+
+.axon-summary-table {
+  outline: 1px solid var(--bs-gray-400);
+
+  thead {
+    th {
+      background-color: rgba(var(--bs-secondary-bg-rgb), 1) !important;
+    }
+
+    th:not(:first-child) {
+      border-left: 1px solid var(--bs-gray-400);
+      //color: var(--bs-gray-100)
+    }
+  }
+
+  tbody {
+    tr, td {
+      border-top: 1px solid var(--bs-gray-400);
+      line-height: 35px;
+    }
+  }
+}
