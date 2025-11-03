@@ -4,14 +4,20 @@ import {TestStatus} from '../../../enums/test-status.enum';
 import {AxonTestInterface} from './interfaces/axon-test.interface';
 import {
   LanguageDetectorShortStringColdStartAxonTest
-} from './tests/language-detector-short-string-cold-start.axon-test';
+} from './tests/language-detector/language-detector-short-string-cold-start.axon-test';
 import {AxonResultInterface} from './interfaces/axon-result.interface';
 import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
 import {MathematicalCalculations} from './util/mathematical-calculations';
 import {AxonTestIterationResultInterface} from './interfaces/axon-test-iteration-result.interface';
 import {
   LanguageDetectorShortStringWarmStartAxonTest
-} from './tests/language-detector-short-string-warm-start.axon-test';
+} from './tests/language-detector/language-detector-short-string-warm-start.axon-test';
+import {
+  TranslatorShortStringEnglishToFrenchColdStartAxonTest
+} from './tests/translator/translator-short-string-english-to-french-cold-start.axon-test';
+import {
+  TranslatorShortStringEnglishToFrenchWarmStartAxonTest
+} from './tests/translator/translator-short-string-english-to-french-warm-start.axon-test';
 
 @Injectable()
 export class AxonTestSuiteExecutor {
@@ -21,6 +27,8 @@ export class AxonTestSuiteExecutor {
   testsSuite: AxonTestId[] = [
     AxonTestId.LanguageDetectorShortStringColdStart,
     AxonTestId.LanguageDetectorShortStringWarmStart,
+    AxonTestId.TranslatorShortStringEnglishToFrenchColdStart,
+    AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart,
   ];
 
   results: AxonResultInterface;
@@ -28,11 +36,15 @@ export class AxonTestSuiteExecutor {
   constructor(
     private readonly languageDetectorShortStringColdStartAxonTest: LanguageDetectorShortStringColdStartAxonTest,
     private readonly languageDetectorShortStringWarmStartAxonTest: LanguageDetectorShortStringWarmStartAxonTest,
+    private readonly translatorShortStringEnglishToFrenchColdStartAxonTest: TranslatorShortStringEnglishToFrenchColdStartAxonTest,
+    private readonly translatorShortStringEnglishToFrenchWarmStartAxonTest: TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
   ) {
 
     this.testIdMap = {
       [AxonTestId.LanguageDetectorShortStringColdStart]: this.languageDetectorShortStringColdStartAxonTest,
       [AxonTestId.LanguageDetectorShortStringWarmStart]: this.languageDetectorShortStringWarmStartAxonTest,
+      [AxonTestId.TranslatorShortStringEnglishToFrenchColdStart]: this.translatorShortStringEnglishToFrenchColdStartAxonTest,
+      [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: this.translatorShortStringEnglishToFrenchWarmStartAxonTest,
     }
 
     this.results = {

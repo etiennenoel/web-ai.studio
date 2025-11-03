@@ -31,11 +31,17 @@ import { AxonPage } from './pages/cortex/axon/axon.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
 import {
   LanguageDetectorShortStringColdStartAxonTest
-} from './pages/cortex/axon/tests/language-detector-short-string-cold-start.axon-test';
+} from './pages/cortex/axon/tests/language-detector/language-detector-short-string-cold-start.axon-test';
 import { AxonTestStatusBadgeComponent } from './pages/cortex/axon/components/axon-test-status-badge/axon-test-status-badge.component';
 import {
   LanguageDetectorShortStringWarmStartAxonTest
-} from './pages/cortex/axon/tests/language-detector-short-string-warm-start.axon-test';
+} from './pages/cortex/axon/tests/language-detector/language-detector-short-string-warm-start.axon-test';
+import {
+  TranslatorShortStringEnglishToFrenchColdStartAxonTest
+} from './pages/cortex/axon/tests/translator/translator-short-string-english-to-french-cold-start.axon-test';
+import {
+  TranslatorShortStringEnglishToFrenchWarmStartAxonTest
+} from './pages/cortex/axon/tests/translator/translator-short-string-english-to-french-warm-start.axon-test';
 
 @NgModule({
   declarations: [
@@ -78,8 +84,13 @@ import {
     // Axon
     AxonTestSuiteExecutor,
 
+    // Language Detector
     LanguageDetectorShortStringColdStartAxonTest,
     LanguageDetectorShortStringWarmStartAxonTest,
+
+    // Translator
+    TranslatorShortStringEnglishToFrenchColdStartAxonTest,
+    TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
   ],
   bootstrap: [RootComponent]
 })

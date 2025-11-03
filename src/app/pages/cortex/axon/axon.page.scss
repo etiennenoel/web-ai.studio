@@ -45,5 +45,9 @@
       border-top: 1px solid var(--bs-gray-400);
       line-height: 35px;
     }
+
+    td:not(:first-child) {
+      border-left: 1px solid var(--bs-gray-400);
+    }
   }
 }

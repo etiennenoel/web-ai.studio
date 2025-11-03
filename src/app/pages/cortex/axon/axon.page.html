@@ -65,74 +65,74 @@
           @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
           <tr>
             <th class="text-start">{{ element.id }}</th>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.averageTimeToFirstToken| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.averageTimeToFirstToken| number:'1.2-2' }}
             } @else {
               ---
             }</td>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.medianTimeToFirstToken| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.medianTimeToFirstToken| number:'1.2-2' }}
             } @else {
               ---
             }</td>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.averageTotalResponseTime| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.averageTotalResponseTime| number:'1.2-2' }}
             } @else {
               ---
             }</td>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.medianTotalResponseTime| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.medianTotalResponseTime| number:'1.2-2' }}
             } @else {
               ---
             }</td>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
             } @else {
               ---
             }</td>
-            <td>
+            <td class="border-end-0">
               @if(coldSummaryResults) {
                 {{ coldSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
               } @else {
                 ---
               }
               </td>
-            <td> @if(warmSummaryResults) {
+            <td class="border-start-0"> @if(warmSummaryResults) {
               {{ warmSummaryResults.averageTokenPerSecond| number:'1.2-2' }}
             } @else {
               ---
@@ -148,7 +148,7 @@
       <h2 class="mt-5 display-6 fs-5">{{ element.id }}</h2>
       <hr>
 
-      <div class="d-flex">
+      <div class="d-flex gap-3">
         <!-- Retrieve all the tests for this specific API -->
 
         @for (test of this.getTests(getBuiltInAiAPIFromItemInterface(element)); track $index) {
@@ -177,7 +177,7 @@
                 <th></th>
                 <th>TTFT</th>
                 <th>Total Response Time</th>
-                <th>Characters/second</th>
+                <th>Tokens/s</th>
                 </thead>
                 <tbody>
                 <tr>
@@ -224,7 +224,7 @@
                   <th>Status</th>
                   <th>TTFT (ms)</th>
                   <th>Total Response Time (ms)</th>
-                  <th>Characters/second</th>
+                  <th>Tokens/second</th>
                   <!--                    <th>Output</th>-->
                   <!-- Todo: Find a way to show the output without breaking the UI entirely -->
                 </tr>

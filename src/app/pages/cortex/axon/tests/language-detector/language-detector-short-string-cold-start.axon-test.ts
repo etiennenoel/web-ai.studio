@@ -1,20 +1,20 @@
-import {AxonTestInterface} from '../interfaces/axon-test.interface';
-import {BuiltInAiApi} from '../../../../enums/built-in-ai-api.enum';
-import {AxonTestResultInterface} from '../interfaces/axon-test-result.interface';
+import {AxonTestInterface} from '../../interfaces/axon-test.interface';
+import {BuiltInAiApi} from '../../../../../enums/built-in-ai-api.enum';
+import {AxonTestResultInterface} from '../../interfaces/axon-test-result.interface';
 import {Injectable} from '@angular/core';
-import {AxonTestId} from '../enums/axon-test-id.enum';
-import {TestStatus} from '../../../../enums/test-status.enum';
-import {AxonTestResultCalculator} from '../util/axon-test-result-calculator';
+import {AxonTestId} from '../../enums/axon-test-id.enum';
+import {TestStatus} from '../../../../../enums/test-status.enum';
+import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 
 @Injectable()
-export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInterface {
-  id: AxonTestId = AxonTestId.LanguageDetectorShortStringWarmStart;
+export class LanguageDetectorShortStringColdStartAxonTest implements AxonTestInterface {
+  id: AxonTestId = AxonTestId.LanguageDetectorShortStringColdStart;
 
   results: AxonTestResultInterface = {
     id: this.id,
     status: TestStatus.Idle,
     api: BuiltInAiApi.LanguageDetector,
-    startType: "warm",
+    startType: "cold",
     numberOfIterations: 100,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",
@@ -33,16 +33,17 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
       });
     }
 
-    let start = performance.now()
-    const ld = await LanguageDetector.create({})
-    const creationTime = performance.now() - start;
-
     for (let iterationResult of this.results.testIterationResults) {
       iterationResult.status = TestStatus.Executing;
-      start = performance.now()
+
+      const start = performance.now()
+
+      const ld = await LanguageDetector.create({})
+
+      iterationResult.creationTime = performance.now() - start;
+
       const response = await ld.detect(this.results.input);
 
-      iterationResult.creationTime = creationTime;
       iterationResult.output = JSON.stringify(response);
       iterationResult.totalResponseTime = performance.now() - start;
       iterationResult.timeToFirstToken = iterationResult.totalResponseTime;

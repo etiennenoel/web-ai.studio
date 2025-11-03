@@ -22,6 +22,10 @@ export class AxonPage {
     },
     [AxonTestId.LanguageDetectorShortStringWarmStart]: {
     },
+    [AxonTestId.TranslatorShortStringEnglishToFrenchColdStart]: {
+    },
+    [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: {
+    },
   }
 
   constructor(
