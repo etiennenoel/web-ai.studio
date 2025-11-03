@@ -14,7 +14,7 @@ export class TranslatorShortStringEnglishToFrenchWarmStartAxonTest implements Ax
     id: this.id,
     status: TestStatus.Idle,
     api: BuiltInAiApi.Translator,
-    startType: "cold",
+    startType: "warm",
     numberOfIterations: 100,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",

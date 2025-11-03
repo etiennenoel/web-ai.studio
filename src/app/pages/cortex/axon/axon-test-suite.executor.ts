@@ -8,7 +8,6 @@ import {
 import {AxonResultInterface} from './interfaces/axon-result.interface';
 import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
 import {MathematicalCalculations} from './util/mathematical-calculations';
-import {AxonTestIterationResultInterface} from './interfaces/axon-test-iteration-result.interface';
 import {
   LanguageDetectorShortStringWarmStartAxonTest
 } from './tests/language-detector/language-detector-short-string-warm-start.axon-test';
@@ -18,6 +17,12 @@ import {
 import {
   TranslatorShortStringEnglishToFrenchWarmStartAxonTest
 } from './tests/translator/translator-short-string-english-to-french-warm-start.axon-test';
+import {
+  SummarizerLongNewsArticleColdStartAxonTest
+} from './tests/summarizer/summarizer-long-news-article-cold-start.axon-test';
+import {
+  SummarizerLongNewsArticleWarmStartAxonTest
+} from './tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
 
 @Injectable()
 export class AxonTestSuiteExecutor {
@@ -29,6 +34,8 @@ export class AxonTestSuiteExecutor {
     AxonTestId.LanguageDetectorShortStringWarmStart,
     AxonTestId.TranslatorShortStringEnglishToFrenchColdStart,
     AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart,
+    AxonTestId.SummarizerLongNewsArticleColdStart,
+    AxonTestId.SummarizerLongNewsArticleWarmStart,
   ];
 
   results: AxonResultInterface;
@@ -38,6 +45,8 @@ export class AxonTestSuiteExecutor {
     private readonly languageDetectorShortStringWarmStartAxonTest: LanguageDetectorShortStringWarmStartAxonTest,
     private readonly translatorShortStringEnglishToFrenchColdStartAxonTest: TranslatorShortStringEnglishToFrenchColdStartAxonTest,
     private readonly translatorShortStringEnglishToFrenchWarmStartAxonTest: TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
+    private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleWarmStartAxonTest,
+    private readonly summarizerLongNewsArticleWarmStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
   ) {
 
     this.testIdMap = {
@@ -45,6 +54,8 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.LanguageDetectorShortStringWarmStart]: this.languageDetectorShortStringWarmStartAxonTest,
       [AxonTestId.TranslatorShortStringEnglishToFrenchColdStart]: this.translatorShortStringEnglishToFrenchColdStartAxonTest,
       [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: this.translatorShortStringEnglishToFrenchWarmStartAxonTest,
+      [AxonTestId.SummarizerLongNewsArticleColdStart]: this.summarizerLongNewsArticleColdStartAxonTest,
+      [AxonTestId.SummarizerLongNewsArticleWarmStart]: this.summarizerLongNewsArticleWarmStartAxonTest,
     }
 
     this.results = {

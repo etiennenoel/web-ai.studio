@@ -42,6 +42,12 @@ import {
 import {
   TranslatorShortStringEnglishToFrenchWarmStartAxonTest
 } from './pages/cortex/axon/tests/translator/translator-short-string-english-to-french-warm-start.axon-test';
+import {
+  SummarizerLongNewsArticleColdStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-cold-start.axon-test';
+import {
+  SummarizerLongNewsArticleWarmStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
 
 @NgModule({
   declarations: [
@@ -91,6 +97,10 @@ import {
     // Translator
     TranslatorShortStringEnglishToFrenchColdStartAxonTest,
     TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
+
+    // Summarizer
+    SummarizerLongNewsArticleColdStartAxonTest,
+    SummarizerLongNewsArticleWarmStartAxonTest,
   ],
   bootstrap: [RootComponent]
 })

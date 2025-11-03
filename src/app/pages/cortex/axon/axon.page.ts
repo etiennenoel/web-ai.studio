@@ -26,6 +26,10 @@ export class AxonPage {
     },
     [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: {
     },
+    [AxonTestId.SummarizerLongNewsArticleColdStart]: {
+    },
+    [AxonTestId.SummarizerLongNewsArticleWarmStart]: {
+    },
   }
 
   constructor(
@@ -44,11 +48,12 @@ export class AxonPage {
   getTests(api: BuiltInAiApi) {
     return this.axonTestSuiteExecutor.testsSuite.filter(testId => {
       return this.axonTestSuiteExecutor.testIdMap[testId].results.api === api;
+    }).sort((a, b) => {
+      return a.localeCompare(b, "en");
     }).map(testId => {
       return this.axonTestSuiteExecutor.testIdMap[testId];
     });
   }
-
 
   getBuiltInAiAPIFromItemInterface(item: ItemInterface): BuiltInAiApi {
     return item.id as BuiltInAiApi;
