@@ -45,8 +45,8 @@ export class AxonTestSuiteExecutor {
     private readonly languageDetectorShortStringWarmStartAxonTest: LanguageDetectorShortStringWarmStartAxonTest,
     private readonly translatorShortStringEnglishToFrenchColdStartAxonTest: TranslatorShortStringEnglishToFrenchColdStartAxonTest,
     private readonly translatorShortStringEnglishToFrenchWarmStartAxonTest: TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
-    private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleWarmStartAxonTest,
-    private readonly summarizerLongNewsArticleWarmStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
+    private readonly summarizerLongNewsArticleWarmStartAxonTest: SummarizerLongNewsArticleWarmStartAxonTest,
+    private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
   ) {
 
     this.testIdMap = {
