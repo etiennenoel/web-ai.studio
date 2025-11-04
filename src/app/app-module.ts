@@ -48,6 +48,15 @@ import {
 import {
   SummarizerLongNewsArticleWarmStartAxonTest
 } from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
+import {
+  PromptTextFactAnalysisColdStartAxonTest
+} from './pages/cortex/axon/tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
+import {
+  PromptTextEthicalAndCreativeColdStartAxonTest
+} from './pages/cortex/axon/tests/prompt-text/prompt-text-ethical-and-creative-cold-start.axon-test';
+import {
+  PromptTextTechnicalChallengeStartAxonTest
+} from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
 
 @NgModule({
   declarations: [
@@ -101,6 +110,11 @@ import {
     // Summarizer
     SummarizerLongNewsArticleColdStartAxonTest,
     SummarizerLongNewsArticleWarmStartAxonTest,
+
+    // Prompt API Text
+    PromptTextFactAnalysisColdStartAxonTest,
+    PromptTextEthicalAndCreativeColdStartAxonTest,
+    PromptTextTechnicalChallengeStartAxonTest,
   ],
   bootstrap: [RootComponent]
 })

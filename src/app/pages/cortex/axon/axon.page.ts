@@ -30,6 +30,12 @@ export class AxonPage {
     },
     [AxonTestId.SummarizerLongNewsArticleWarmStart]: {
     },
+    [AxonTestId.PromptTextFactAnalysisColdStart]: {
+    },
+    [AxonTestId.PromptTextEthicalAndCreativeColdStart]: {
+    },
+    [AxonTestId.PromptTextTechnicalChallengeColdStart]: {
+    },
   }
 
   constructor(

@@ -23,6 +23,15 @@ import {
 import {
   SummarizerLongNewsArticleWarmStartAxonTest
 } from './tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
+import {
+  PromptTextFactAnalysisColdStartAxonTest
+} from './tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
+import {
+  PromptTextEthicalAndCreativeColdStartAxonTest
+} from './tests/prompt-text/prompt-text-ethical-and-creative-cold-start.axon-test';
+import {
+  PromptTextTechnicalChallengeStartAxonTest
+} from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
 
 @Injectable()
 export class AxonTestSuiteExecutor {
@@ -36,6 +45,9 @@ export class AxonTestSuiteExecutor {
     AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart,
     AxonTestId.SummarizerLongNewsArticleColdStart,
     AxonTestId.SummarizerLongNewsArticleWarmStart,
+    AxonTestId.PromptTextFactAnalysisColdStart,
+    AxonTestId.PromptTextEthicalAndCreativeColdStart,
+    AxonTestId.PromptTextTechnicalChallengeColdStart,
   ];
 
   results: AxonResultInterface;
@@ -47,6 +59,9 @@ export class AxonTestSuiteExecutor {
     private readonly translatorShortStringEnglishToFrenchWarmStartAxonTest: TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
     private readonly summarizerLongNewsArticleWarmStartAxonTest: SummarizerLongNewsArticleWarmStartAxonTest,
     private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
+    private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
+    private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
+    private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
   ) {
 
     this.testIdMap = {
@@ -56,6 +71,9 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: this.translatorShortStringEnglishToFrenchWarmStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleColdStart]: this.summarizerLongNewsArticleColdStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleWarmStart]: this.summarizerLongNewsArticleWarmStartAxonTest,
+      [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
+      [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
+      [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
     }
 
     this.results = {
