@@ -57,6 +57,7 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import { CodeModal } from './modals/code/code.modal';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,9 @@ import {
      CortexPage,
      AxonPage,
      AxonTestStatusBadgeComponent,
+
+    // Modals
+     CodeModal,
   ],
   imports: [
     BrowserModule,

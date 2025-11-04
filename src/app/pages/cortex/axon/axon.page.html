@@ -225,8 +225,7 @@
                   <th>TTFT (ms)</th>
                   <th>Total Response Time (ms)</th>
                   <th>Characters/second</th>
-                  <!--                    <th>Output</th>-->
-                  <!-- Todo: Find a way to show the output without breaking the UI entirely -->
+                                      <th>Output</th>
                 </tr>
                 </thead>
 
@@ -240,7 +239,7 @@
                       <td>{{ testIterationResult.timeToFirstToken | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.totalResponseTime | number:'1.2-2' }}</td>
                       <td>{{ testIterationResult.tokensPerSecond | number:'1.2-2' }}</td>
-                      <!--                      <td style="width: 50px;">{{ testIterationResult.output }} </td>-->
+                      <td style="width: 50px;"><button class="btn btn-soft" (click)="openOutputModal(testIterationResult.output ?? '')"><i class="bi bi-megaphone"></i></button> </td>
                       <!-- Todo: Find a way to show the output without breaking the UI entirely -->
                     </tr>
                   }

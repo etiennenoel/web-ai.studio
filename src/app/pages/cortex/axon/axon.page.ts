@@ -6,6 +6,8 @@ import {EnumUtils, ItemInterface} from '@magieno/common';
 import {AxonTestId} from './enums/axon-test-id.enum';
 import {AxonTestInterface} from './interfaces/axon-test.interface';
 import {AxonSummaryResultsInterface} from './interfaces/axon-summary-results.interface';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {CodeModal} from '../../../modals/code/code.modal';
 
 @Component({
   selector: 'page-axon',
@@ -40,6 +42,7 @@ export class AxonPage {
 
   constructor(
     protected readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,
+    protected readonly ngbModal: NgbModal
     ) {
   }
 
@@ -64,6 +67,22 @@ export class AxonPage {
   getBuiltInAiAPIFromItemInterface(item: ItemInterface): BuiltInAiApi {
     return item.id as BuiltInAiApi;
   }
+
+  openOutputModal(output: string) {
+    const modal = this.ngbModal.open(CodeModal, {
+      size: "xl"
+    });
+
+    (modal.componentInstance as CodeModal).code = output.replace(/\\\\/g, '\\') // 1. Unescape backslashes
+      .replace(/\\"/g, '"')   // 2. Unescape double quotes
+      .replace(/\\'/g, "'")   // 3. Unescape single quotes
+      .replace(/\\n/g, '\n')   // 4. Unescape newlines
+      .replace(/\\r/g, '\r')   // 5. Unescape carriage returns
+      .replace(/\\t/g, '\t')   // 6. Unescape tabs
+      .replace(/\\b/g, '\b')   // 7. Unescape backspaces
+      .replace(/\\f/g, '\f');  // 8. Unescape form feeds;
+  }
+
 
   protected readonly TestStatus = TestStatus;
 }
