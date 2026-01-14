@@ -1,0 +1,75 @@
+<section class="p-6 h-full flex flex-col overflow-y-auto">
+    <div class="flex justify-between items-center mb-6 flex-shrink-0 relative z-50">
+        <h2 class="text-xl font-semibold">Summarizer API</h2>
+                                            <app-api-status
+                                                [apiName]="'Summarizer'"
+                                                [statusText]="statusText"
+                                                [isAvailable]="isApiAvailable"
+                                                [isWarning]="isWarning"
+                                                [checks]="checks"
+                                                [errorHtml]="errorHtml">
+                                            </app-api-status>
+                                
+                        </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Input -->
+        <div class="flex flex-col gap-4">
+            <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
+                <label class="text-xs text-gray-400 font-bold mb-2 uppercase">Input Text</label>
+                <textarea [(ngModel)]="inputText" class="w-full h-32 bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 resize-none focus:border-blue-500 focus:outline-none font-mono" placeholder="Paste article content here to summarize..."></textarea>
+                
+                <div class="mt-4 flex gap-3 flex-wrap">
+                    <select [(ngModel)]="selectedType" class="bg-[#3c4043] text-gray-200 text-xs rounded px-3 py-2 border-r-[8px] border-transparent outline-none">
+                        <option value="tldr">Type: TL;DR</option>
+                        <option value="key-points">Type: Key Points</option>
+                        <option value="teaser">Type: Teaser</option>
+                        <option value="headline">Type: Headline</option>
+                    </select>
+                    <select [(ngModel)]="selectedFormat" class="bg-[#3c4043] text-gray-200 text-xs rounded px-3 py-2 border-r-[8px] border-transparent outline-none">
+                        <option value="plain-text">Format: Plain Text</option>
+                        <option value="markdown">Format: Markdown</option>
+                    </select>
+                    <button (click)="summarize()" [disabled]="isSummarizing" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid" [ngClass]="isSummarizing ? 'fa-circle-notch fa-spin' : 'fa-compress'"></i>
+                        <span class="ml-2">{{ isSummarizing ? 'Summarizing...' : 'Summarize' }}</span>
+                    </button>
+                </div>
+
+                <!-- Code Viewer -->
+                <div class="mt-4">
+                    <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-400 hover:text-white focus:outline-none">
+                        <span>Show Code</span>
+                        <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
+                    </button>
+                    <div *ngIf="isCodeViewerVisible" class="mt-2 bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
+                        <pre><code class="text-xs font-mono text-gray-300">{{codeSnippet}}</code></pre>
+                        <button (click)="copyCode()" class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Output -->
+         <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex flex-col h-full">
+             <div class="flex justify-between mb-2">
+                <label class="text-xs text-gray-400 font-bold uppercase">Result</label>
+                <span class="text-xs text-gray-500">Latency: {{latency}}</span>
+             </div>
+             <div class="flex-1 bg-[#202124] rounded border border-[#3c4043] p-4 text-sm text-gray-400 italic flex items-center justify-center overflow-auto max-h-64 lg:max-h-full">
+                 {{summaryResult}}
+             </div>
+         </div>
+    </div>
+    
+    <div *ngIf="showHistory" class="border-t border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Call History</h3>
+            <span class="text-xs text-gray-500">{{history.length}} items</span>
+        </div>
+        <div class="overflow-y-auto flex-1">
+             <app-history-list [history]="history" apiClassName="Summarizer" methodName="summarize"></app-history-list>
+        </div>
+    </div>
+</section>

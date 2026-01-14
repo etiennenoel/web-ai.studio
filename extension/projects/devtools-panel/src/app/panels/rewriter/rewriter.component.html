@@ -1,0 +1,66 @@
+<section class="p-6 h-full flex flex-col overflow-y-auto">
+    <div class="flex justify-between items-center mb-6 flex-shrink-0 relative z-50">
+        <h2 class="text-xl font-semibold">Rewriter API</h2>
+                                            <app-api-status
+                                                [apiName]="'Rewriter'"
+                                                [statusText]="statusText"
+                                                [isAvailable]="isApiAvailable"
+                                                [isWarning]="isWarning"
+                                                [checks]="checks"
+                                                [errorHtml]="errorHtml">
+                                            </app-api-status>
+                                
+                        </div>
+    
+    <div class="flex flex-col lg:flex-row gap-6 mb-6 h-[500px]">
+        <div class="flex-1 flex flex-col">
+            <textarea [(ngModel)]="inputText" (ngModelChange)="onInputChange()" class="flex-1 bg-[#202124] border border-[#5f6368] rounded p-4 text-sm text-white resize-none focus:outline-none font-mono" placeholder="Paste content to rewrite here..."></textarea>
+        </div>
+        
+        <div class="w-full lg:w-64 flex flex-col gap-3">
+            <div class="p-4 bg-[#292a2d] border border-[#3c4043] rounded">
+                <label class="block text-xs text-gray-400 font-bold mb-3 uppercase">Rewrite Action</label>
+                <div class="space-y-2">
+                    <button (click)="rewrite('shorter')" [disabled]="isRewriting" class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all disabled:opacity-50">
+                        <i class="fa-solid fa-compress w-6 text-blue-400"></i> Make Shorter
+                    </button>
+                    <button (click)="rewrite('longer')" [disabled]="isRewriting" class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all disabled:opacity-50">
+                        <i class="fa-solid fa-expand w-6 text-green-400"></i> Make Longer
+                    </button>
+                    <button (click)="rewrite('professional')" [disabled]="isRewriting" class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all disabled:opacity-50">
+                        <i class="fa-solid fa-briefcase w-6 text-purple-400"></i> More Professional
+                    </button>
+                    <button (click)="rewrite('casual')" [disabled]="isRewriting" class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all disabled:opacity-50">
+                        <i class="fa-solid fa-mug-hot w-6 text-orange-400"></i> More Casual
+                    </button>
+                </div>
+            </div>
+             <!-- Code Viewer -->
+            <div class="mt-4">
+                <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-400 hover:text-white focus:outline-none">
+                    <span>Show Code</span>
+                    <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
+                </button>
+                <div *ngIf="isCodeViewerVisible" class="mt-2 bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
+                    <pre><code class="text-xs font-mono text-gray-300">{{codeSnippet}}</code></pre>
+                    <button (click)="copyCode()" class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 bg-[#292a2d] border border-[#3c4043] rounded p-4 text-sm text-gray-300 font-mono overflow-y-auto whitespace-pre-wrap">
+            {{rewriterOutput}}
+        </div>
+    </div>
+    <div *ngIf="showHistory" class="mt-6 border-t border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Call History</h3>
+            <span class="text-xs text-gray-500">{{history.length}} items</span>
+        </div>
+        <div class="overflow-y-auto flex-1">
+             <app-history-list [history]="history" apiClassName="Rewriter" methodName="rewrite"></app-history-list>
+        </div>
+    </div>
+</section>

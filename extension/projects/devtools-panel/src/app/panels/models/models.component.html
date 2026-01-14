@@ -1,0 +1,39 @@
+<section class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold">Models Management</h2>
+    </div>
+
+    <div class="bg-[#292a2d] rounded border border-[#3c4043] overflow-hidden">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-[#35363a] text-gray-400 uppercase text-xs">
+                <tr>
+                    <th class="p-3 font-normal">Model Name</th>
+                    <th class="p-3 font-normal">Status</th>
+                    <th class="p-3 font-normal text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="font-mono text-xs text-gray-300">
+                <tr *ngFor="let model of models" class="border-b border-[#3c4043] last:border-0 hover:bg-[#2f3034]">
+                    <td class="p-3">{{model.name}}</td>
+                    <td class="p-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full" 
+                                  [ngClass]="model.status === 'available' ? 'bg-green-400' : (model.status === 'downloading' ? 'bg-blue-400 animate-pulse' : 'bg-gray-500')">
+                            </span>
+                            <span class="capitalize">{{model.status}}</span>
+                            <span *ngIf="model.status === 'downloading'" class="text-xs text-gray-500 ml-1">({{model.progress}}%)</span>
+                        </div>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button *ngIf="model.status === 'available'" (click)="deleteModel(model.name)" class="text-red-400 hover:text-red-300 transition-colors" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <button *ngIf="model.status === 'downloadable'" (click)="downloadModel(model.name)" class="text-blue-400 hover:text-blue-300 transition-colors" title="Download">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

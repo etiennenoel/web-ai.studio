@@ -1,0 +1,261 @@
+<div class="min-h-screen flex flex-col font-sans bg-[#202124] text-[#e8eaed]">
+
+    <!-- Header -->
+    <header class="border-b border-[#3c4043] bg-[#292a2d] sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="../assets/images/icon.png" class="w-8">
+                <h1 class="font-bold text-lg tracking-wide">WebAI <span
+                        class="text-gray-400 font-normal">Extension</span></h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded border border-blue-700">v{{ appVersion }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-1">
+        <section class="py-16 text-center px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="inline-block mb-4">
+                    <span
+                        class="bg-[#3c4043] text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-gray-600">
+                        <i class="fa-solid fa-sparkles mr-2 text-yellow-400"></i>New Update Installed
+                    </span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Debug the Chrome Built-in AI APIs<br><span
+                        class="gradient-text">Like a Pro</span></h2>
+                <p class="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+                    The ultimate DevTools extension for inspecting, debugging, and prototyping with Chrome's local
+                    Gemini Nano APIs. Monitor tokens, latency, and model status in real-time.
+                </p>
+
+
+                @if(this.downloadStatus() !== 'unknown') {
+                <!-- Gemini Nano Download Alert Box -->
+                <div
+                    class="max-w-2xl mx-auto mb-12  rounded-xl p-6 text-left relative overflow-hidden" [ngClass]="{
+                        'bg-blue-900/20 border border-blue-500/50': downloadStatus() === 'downloadable' || downloadStatus() === 'downloading',
+                        'bg-green-900/20 border border-green-500/50': downloadStatus() === 'available',
+                        'bg-red-900/20 border border-red-500/50': downloadStatus() === 'error',
+                    }">
+                    <!-- Background decoration -->
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4">
+                            @switch (downloadStatus()) {
+                            @case ("downloadable") {
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-400 ">
+                                <i class="fa-solid fa-download text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-1">Install Gemini Nano Locally</h3>
+                                <p class="text-gray-300 text-sm mb-4">
+                                    Get Started now and install Gemini Nano
+                                </p>
+                                <button (click)="onDownloadGeminiNanoClick()"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                                    Download Now (~2GB)
+                                </button>
+                            </div>
+                            }
+                            @case ("downloading") {
+
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-400">
+                                <i class="fa-solid fa-download text-xl fa-beat-fade"
+                                    style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div
+                                    class="flex justify-between text-xs text-blue-300 uppercase font-semibold tracking-wider">
+                                    <span>Downloading Model...</span>
+                                    <span>{{ downloadProgress() }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300 ease-out"
+                                        [style.width.%]="downloadProgress()"></div>
+                                </div>
+                                <p class="text-xs text-gray-400">Please do not close this tab.</p>
+                            </div>
+                            }
+                            @case ("available") {
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center  text-green-400">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 text-green-400">
+                                    <span class="font-semibold">Gemini Nano Installed Successfully!</span>
+                                </div>
+                            </div>
+                            }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Key Features Grid -->
+        <section class="py-12 bg-[#171717]">
+            <div class="max-w-5xl mx-auto px-6">
+                <h3 class="text-2xl font-bold mb-8 text-center">What's New in v{{ appVersion }}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Feature 1 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 text-blue-400">
+                            <i class="fa-solid fa-gauge-high text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Detailed Overview</h4>
+                        <p class="text-sm text-gray-400">Instantly check the status of all AI flags, downloaded model
+                            assets, and VRAM usage in one dashboard.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-green-900/30 rounded-lg flex items-center justify-center mb-4 text-green-400">
+                            <i class="fa-solid fa-layer-group text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Dedicated API Tabs</h4>
+                        <p class="text-sm text-gray-400">New standalone panels for Summarizer, Writer, Rewriter, and
+                            Proofreader APIs with dedicated prototyping tools.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 text-purple-400">
+                            <i class="fa-solid fa-terminal text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Prompt History</h4>
+                        <p class="text-sm text-gray-400">Track every prompt sent to the Built-In AI APIs. View latency,
+                            token usage, and replay requests with one click.</p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-amber-900/30 rounded-lg flex items-center justify-center mb-4 text-amber-400">
+                            <i class="fa-solid fa-language text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Translation Manager</h4>
+                        <p class="text-sm text-gray-400">Manage language packs directly. Download, check status, and
+                            test offline translations instantly.</p>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-red-900/30 rounded-lg flex items-center justify-center mb-4 text-red-400">
+                            <i class="fa-solid fa-bug text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Debug Tools</h4>
+                        <p class="text-sm text-gray-400">Prefill code snippets from history items to reproduce bugs or
+                            behavior in your own application code.</p>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div class="feature-card p-6 rounded-xl">
+                        <div
+                            class="h-10 w-10 bg-gray-700/30 rounded-lg flex items-center justify-center mb-4 text-gray-400">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Rewriter Playground</h4>
+                        <p class="text-sm text-gray-400">Test the new Rewriter API with quick actions: shorten,
+                            elaborate, or change tone to professional/casual.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Use -->
+        <section class="py-16 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-10 text-center">Getting Started</h3>
+
+                <div class="relative">
+                    <!-- Connector Line -->
+                    <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-[#3c4043] hidden md:block"></div>
+
+                    <div class="space-y-12">
+                        <!-- Step 1 -->
+                        <div class="flex flex-col md:flex-row gap-6 relative">
+                            <div
+                                class="w-12 h-12 step-circle rounded-full flex items-center justify-center font-bold text-xl z-10 flex-shrink-0 mx-auto md:mx-0">
+                                1</div>
+                            <div class="flex-1 bg-[#292a2d] p-6 rounded-lg border border-[#3c4043]">
+                                <h4 class="font-bold text-lg mb-2">Open Developer Tools</h4>
+                                <p class="text-gray-400 mb-4">Right-click anywhere on a webpage and select
+                                    <strong>Inspect</strong>, or use the keyboard shortcut.
+                                </p>
+                                <div class="flex gap-4 text-xs font-mono">
+                                    <span
+                                        class="bg-[#202124] px-3 py-1 rounded border border-[#5f6368] text-gray-300">F12</span>
+                                    <span class="text-gray-500 self-center">or</span>
+                                    <span
+                                        class="bg-[#202124] px-3 py-1 rounded border border-[#5f6368] text-gray-300">Ctrl
+                                        + Shift + I</span>
+                                    <span class="text-gray-500 self-center">or</span>
+                                    <span
+                                        class="bg-[#202124] px-3 py-1 rounded border border-[#5f6368] text-gray-300">Cmd
+                                        + Option + I</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex flex-col md:flex-row gap-6 relative">
+                            <div
+                                class="w-12 h-12 step-circle rounded-full flex items-center justify-center font-bold text-xl z-10 flex-shrink-0 mx-auto md:mx-0">
+                                2</div>
+                            <div class="flex-1 bg-[#292a2d] p-6 rounded-lg border border-[#3c4043]">
+                                <h4 class="font-bold text-lg mb-2">Locate the "WebAI" Panel</h4>
+                                <p class="text-gray-400">
+                                    Look for the <strong>WebAI</strong> tab in the top navigation bar of DevTools.
+                                    If you don't see it, click the double arrows <strong>(>>)</strong> to show more
+                                    tabs.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex flex-col md:flex-row gap-6 relative">
+                            <div
+                                class="w-12 h-12 step-circle rounded-full flex items-center justify-center font-bold text-xl z-10 flex-shrink-0 mx-auto md:mx-0">
+                                3</div>
+                            <div class="flex-1 bg-[#292a2d] p-6 rounded-lg border border-[#3c4043]">
+                                <h4 class="font-bold text-lg mb-2">Verify Environment</h4>
+                                <p class="text-gray-400">
+                                    Check the <strong>Overview</strong> tab to ensure Built-In AI APIs are available and
+                                    the required flags are enabled.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#171717] border-t border-[#3c4043] py-8">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-gray-500 text-sm">
+                &copy; 2026 WebAI Extension. Open Source.
+            </div>
+        </div>
+    </footer>
+
+</div>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAI DevTools Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* DevTools Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #202124; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a4c50; 
+            border-radius: 5px;
+            border: 2px solid #202124;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5f6368; 
+        }
+
+        /* Syntax Highlighting Mock */
+        .token-keyword { color: #ff7b72; }
+        .token-string { color: #a5d6ff; }
+        .token-function { color: #d2a8ff; }
+        .token-comment { color: #8b949e; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #202124; /* Chrome Dark Theme BG */
+            color: #e8eaed;
+        }
+        
+        .panel-section {
+            display: none;
+        }
+        .panel-section.active {
+            display: block;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-green { background-color: #4ade80; box-shadow: 0 0 5px #4ade80; }
+        .status-red { background-color: #ef4444; box-shadow: 0 0 5px #ef4444; }
+        .status-amber { background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+        
+        .nav-btn.active-nav {
+            background-color: #35363a;
+            color: #60a5fa; /* blue-400 */
+            border-left-color: #60a5fa;
+        }
+
+        /* Diagnostic Panel Styles */
+        .diag-check-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid #3c4043;
+        }
+        .diag-check-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-16 md:w-64 bg-[#292a2d] border-r border-[#3c4043] flex flex-col justify-between flex-shrink-0 z-20">
+        <div class="flex-1 overflow-y-auto">
+            <div class="h-12 flex items-center justify-center md:justify-start md:px-4 border-b border-[#3c4043] sticky top-0 bg-[#292a2d] z-10">
+                <i class="fa-solid fa-robot text-blue-400 text-xl"></i>
+                <span class="ml-3 font-bold text-sm hidden md:block text-gray-200">WebAI Panel</span>
+            </div>
+            
+            <nav class="mt-2 space-y-0.5">
+                <button onclick="switchTab('overview')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent active-nav" id="btn-overview">
+                    <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Overview</span>
+                </button>
+                
+                <div class="px-4 py-2 mt-2 mb-1 hidden md:block">
+                    <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">APIs</span>
+                </div>
+
+                <button onclick="switchTab('prompt')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-prompt">
+                    <i class="fa-solid fa-terminal w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Prompt API</span>
+                </button>
+                <button onclick="switchTab('summarizer')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-summarizer">
+                    <i class="fa-regular fa-file-lines w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Summarizer API</span>
+                </button>
+                <button onclick="switchTab('translator')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-translator">
+                    <i class="fa-solid fa-language w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Translator API</span>
+                </button>
+                <button onclick="switchTab('detector')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-detector">
+                    <i class="fa-solid fa-magnifying-glass w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Language Detector</span>
+                </button>
+                <button onclick="switchTab('proofreader')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-proofreader">
+                    <i class="fa-solid fa-check-double w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Proofreader API</span>
+                </button>
+                <button onclick="switchTab('writer')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-writer">
+                    <i class="fa-solid fa-pen-nib w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Writer API</span>
+                </button>
+                <button onclick="switchTab('rewriter')" class="nav-btn w-full flex items-center p-3 text-gray-400 hover:bg-[#35363a] hover:text-white transition-colors border-l-4 border-transparent" id="btn-rewriter">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i>
+                    <span class="ml-3 text-xs font-medium hidden md:block">Rewriter API</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-[#3c4043] bg-[#292a2d]">
+            <div class="text-xs text-gray-500 text-center md:text-left">
+                <span class="hidden md:inline">Extension v0.2.0</span>
+                <div class="mt-1 flex items-center justify-center md:justify-start gap-2">
+                    <div class="status-dot status-green"></div>
+                    <span class="hidden md:inline text-gray-400">Nano: Ready</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto relative bg-[#202124]">
+        
+        <!-- Toast Notification -->
+        <div id="toast" class="absolute top-4 right-4 bg-[#323232] border border-l-4 border-[#3c4043] text-white px-4 py-3 rounded shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-400"></i>
+            <span id="toast-msg" class="text-sm">Action Successful</span>
+        </div>
+
+        <!-- 1. OVERVIEW VIEW -->
+        <section id="overview" class="panel-section active p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">System Overview</h2>
+                <button class="text-xs bg-[#292a2d] border border-[#3c4043] hover:bg-[#35363a] px-3 py-1.5 rounded text-gray-300 transition-colors">
+                    <i class="fa-solid fa-rotate mr-1"></i> Refresh Flags
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Status Card 1 -->
+                <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400 text-xs font-mono uppercase">Global Status</span>
+                        <i class="fa-solid fa-check-circle text-green-400"></i>
+                    </div>
+                    <div class="text-2xl font-bold">Ready</div>
+                    <div class="text-xs text-gray-500 mt-1">window.ai available</div>
+                </div>
+
+                <!-- Status Card 2 -->
+                <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400 text-xs font-mono uppercase">Model Assets</span>
+                        <i class="fa-solid fa-hard-drive text-blue-400"></i>
+                    </div>
+                    <div class="text-2xl font-bold">Gemini Nano</div>
+                    <div class="text-xs text-gray-500 mt-1">Locally cached</div>
+                </div>
+
+                <!-- Status Card 3 -->
+                <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400 text-xs font-mono uppercase">Active Flags</span>
+                        <i class="fa-solid fa-flag text-green-400"></i>
+                    </div>
+                    <div class="text-2xl font-bold">5 / 7</div>
+                    <div class="text-xs text-gray-500 mt-1">APIs Enabled</div>
+                </div>
+
+                <!-- Status Card 4 -->
+                <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400 text-xs font-mono uppercase">VRAM Usage</span>
+                    </div>
+                    <div class="text-2xl font-bold">~1.2 GB</div>
+                    <div class="text-xs text-gray-500 mt-1">Shared GPU Memory</div>
+                </div>
+            </div>
+
+            <div class="bg-[#292a2d] rounded border border-[#3c4043] overflow-hidden">
+                <div class="bg-[#35363a] px-4 py-2 border-b border-[#3c4043]">
+                    <h3 class="text-sm font-bold">Feature Flags Configuration</h3>
+                </div>
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-[#3c4043]">
+                            <th class="p-3 font-normal">Feature Flag</th>
+                            <th class="p-3 font-normal">API</th>
+                            <th class="p-3 font-normal">State</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-mono text-xs">
+                        <tr class="border-b border-[#3c4043]">
+                            <td class="p-3 text-gray-300">prompt-api-for-gemini-nano</td>
+                            <td class="p-3 text-gray-500">Prompt API</td>
+                            <td class="p-3 text-green-400"><i class="fa-solid fa-check mr-2"></i>Enabled</td>
+                        </tr>
+                        <tr class="border-b border-[#3c4043]">
+                            <td class="p-3 text-gray-300">summarization-api-for-gemini-nano</td>
+                            <td class="p-3 text-gray-500">Summarizer API</td>
+                            <td class="p-3 text-green-400"><i class="fa-solid fa-check mr-2"></i>Enabled</td>
+                        </tr>
+                         <tr class="border-b border-[#3c4043]">
+                            <td class="p-3 text-gray-300">writer-api-for-gemini-nano</td>
+                            <td class="p-3 text-gray-500">Writer API</td>
+                            <td class="p-3 text-red-400"><i class="fa-solid fa-xmark mr-2"></i>Disabled</td>
+                        </tr>
+                         <tr class="border-b border-[#3c4043]">
+                            <td class="p-3 text-gray-300">rewriter-api-for-gemini-nano</td>
+                            <td class="p-3 text-gray-500">Rewriter API</td>
+                            <td class="p-3 text-green-400"><i class="fa-solid fa-check mr-2"></i>Enabled</td>
+                        </tr>
+                        <tr class="border-b border-[#3c4043]">
+                            <td class="p-3 text-gray-300">language-detection-api</td>
+                            <td class="p-3 text-gray-500">Detector API</td>
+                            <td class="p-3 text-green-400"><i class="fa-solid fa-check mr-2"></i>Enabled</td>
+                        </tr>
+                         <tr>
+                            <td class="p-3 text-gray-300">translation-api</td>
+                            <td class="p-3 text-gray-500">Translator API</td>
+                            <td class="p-3 text-amber-500"><i class="fa-solid fa-clock mr-2"></i>Downloading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2. PROMPT API VIEW -->
+        <section id="prompt" class="panel-section h-full flex flex-col">
+            <!-- Diagnostic Header (Injected by JS) -->
+            <div id="status-panel-prompt" class="p-4 bg-[#292a2d] border-b border-[#3c4043]"></div>
+
+            <div class="p-4 border-b border-[#3c4043] bg-[#292a2d] flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <h2 class="font-bold text-sm">Session History</h2>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <span class="text-xs text-gray-500 mr-2" id="history-count">0 items</span>
+                    <button class="bg-[#3c4043] hover:bg-[#4a4c50] text-gray-300 px-3 py-1 rounded text-xs transition-colors">
+                        <i class="fa-solid fa-download mr-1"></i> Export JSON
+                    </button>
+                    <button class="bg-[#3c4043] hover:bg-[#4a4c50] text-gray-300 px-3 py-1 rounded text-xs transition-colors">
+                        <i class="fa-solid fa-trash mr-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- Items injected via JS -->
+            </div>
+        </section>
+
+        <!-- 3. SUMMARIZER API VIEW -->
+        <section id="summarizer" class="panel-section p-6">
+            <div id="status-panel-summarizer" class="mb-6"></div>
+            
+            <h2 class="text-xl font-semibold mb-6">Summarizer Playground</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                <!-- Input -->
+                <div class="flex flex-col gap-4">
+                    <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
+                        <label class="text-xs text-gray-400 font-bold mb-2 uppercase">Input Text</label>
+                        <textarea class="w-full flex-1 bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 resize-none focus:border-blue-500 focus:outline-none font-mono" placeholder="Paste article content here to summarize..."></textarea>
+                        
+                        <div class="mt-4 flex gap-3">
+                            <select class="bg-[#3c4043] text-gray-200 text-xs rounded px-3 py-2 border-r-[8px] border-transparent outline-none">
+                                <option>Type: TL;DR</option>
+                                <option>Type: Key Points</option>
+                                <option>Type: Teaser</option>
+                                <option>Type: Headline</option>
+                            </select>
+                            <select class="bg-[#3c4043] text-gray-200 text-xs rounded px-3 py-2 border-r-[8px] border-transparent outline-none">
+                                <option>Format: Plain Text</option>
+                                <option>Format: Markdown</option>
+                            </select>
+                            <button class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors" onclick="showToast('Summary Generated')">
+                                <i class="fa-solid fa-compress mr-2"></i>Summarize
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Output -->
+                 <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex flex-col">
+                     <div class="flex justify-between mb-2">
+                        <label class="text-xs text-gray-400 font-bold uppercase">Result</label>
+                        <span class="text-xs text-gray-500">Latency: 0ms</span>
+                     </div>
+                     <div class="flex-1 bg-[#202124] rounded border border-[#3c4043] p-4 text-sm text-gray-400 italic flex items-center justify-center">
+                         Output will appear here...
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- 4. TRANSLATOR API VIEW -->
+        <section id="translator" class="panel-section p-6 h-full flex flex-col">
+            <div id="status-panel-translator" class="mb-6"></div>
+
+            <h2 class="text-xl font-semibold mb-6">Translator API</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+                <!-- Translation Tester -->
+                <div class="lg:col-span-1 flex flex-col gap-4">
+                     <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
+                        <h3 class="text-sm font-bold mb-3 border-b border-[#3c4043] pb-2">Quick Translate</h3>
+                        
+                        <div class="flex gap-2 mb-3">
+                            <select class="w-1/2 bg-[#3c4043] text-white text-xs p-2 rounded">
+                                <option>English (en)</option>
+                            </select>
+                            <i class="fa-solid fa-arrow-right text-gray-500 self-center"></i>
+                            <select class="w-1/2 bg-[#3c4043] text-white text-xs p-2 rounded">
+                                <option>Spanish (es)</option>
+                                <option>Japanese (jp)</option>
+                            </select>
+                        </div>
+
+                        <textarea class="w-full h-32 bg-[#202124] border border-[#5f6368] rounded p-2 text-xs text-white mb-3" placeholder="Enter text..."></textarea>
+                        <button class="bg-blue-600 text-white py-1.5 rounded text-xs mb-4" onclick="showToast('Translation executed')">Translate</button>
+
+                        <div class="flex-1 bg-[#202124] border border-[#3c4043] rounded p-2 text-xs text-gray-300">
+                            [Translation Output]
+                        </div>
+                     </div>
+                </div>
+
+                <!-- Packs Manager -->
+                <div class="lg:col-span-2 bg-[#292a2d] rounded border border-[#3c4043] overflow-hidden flex flex-col">
+                    <div class="bg-[#35363a] px-4 py-3 border-b border-[#3c4043] flex gap-2 items-center justify-between">
+                        <h3 class="text-sm font-bold">Installed Language Packs</h3>
+                        <input type="text" placeholder="Search packs..." class="bg-[#202124] border border-[#5f6368] rounded px-3 py-1 text-xs text-white w-48 focus:outline-none">
+                    </div>
+                    <div class="overflow-y-auto flex-1">
+                        <table class="w-full text-left text-sm">
+                            <thead class="sticky top-0 bg-[#292a2d]">
+                                <tr class="text-gray-500 border-b border-[#3c4043]">
+                                    <th class="p-3 font-normal">Language Pair</th>
+                                    <th class="p-3 font-normal">Status</th>
+                                    <th class="p-3 font-normal text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lang-list" class="font-mono text-xs">
+                                <!-- Langs injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. LANGUAGE DETECTOR VIEW -->
+        <section id="detector" class="panel-section p-6">
+            <div id="status-panel-detector" class="mb-6"></div>
+
+            <h2 class="text-xl font-semibold mb-6">Language Detector API</h2>
+
+            <div class="bg-[#292a2d] p-6 rounded border border-[#3c4043] max-w-4xl mx-auto">
+                <textarea class="w-full h-32 bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 mb-4 focus:border-blue-500 focus:outline-none" placeholder="Type or paste text to detect language..."></textarea>
+                <div class="flex justify-end mb-6">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-medium transition-colors" onclick="mockDetect()">
+                        Detect Language
+                    </button>
+                </div>
+
+                <div id="detection-result" class="hidden">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase mb-3">Confidence Scores</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-white font-bold">English (en)</span>
+                                <span class="text-green-400">98.5%</span>
+                            </div>
+                            <div class="w-full bg-[#3c4043] rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 98.5%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-400">French (fr)</span>
+                                <span class="text-gray-500">1.2%</span>
+                            </div>
+                            <div class="w-full bg-[#3c4043] rounded-full h-2">
+                                <div class="bg-gray-500 h-2 rounded-full" style="width: 1.2%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PROOFREADER API VIEW -->
+        <section id="proofreader" class="panel-section p-6">
+            <div id="status-panel-proofreader" class="mb-6"></div>
+
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-xl font-semibold">Proofreader API</h2>
+                <span class="bg-purple-900 text-purple-200 text-[10px] px-2 py-0.5 rounded border border-purple-700 uppercase tracking-wider">Experimental</span>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                     <div class="flex justify-between mb-2">
+                        <label class="text-xs text-gray-400 font-bold uppercase">Original Text</label>
+                     </div>
+                     <textarea class="w-full h-64 bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 resize-none font-mono" placeholder="Enter text with typos..."></textarea>
+                </div>
+                <div>
+                     <div class="flex justify-between mb-2">
+                        <label class="text-xs text-gray-400 font-bold uppercase">Proofread Result</label>
+                        <button class="text-xs text-blue-400 hover:underline">Apply Changes</button>
+                     </div>
+                     <div class="w-full h-64 bg-[#292a2d] border border-[#3c4043] rounded p-3 text-sm text-gray-400 font-mono italic">
+                        Waiting for input...
+                     </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-6">
+                <button class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-2 rounded text-sm font-medium transition-colors" onclick="showToast('Proofread initiated')">
+                    <i class="fa-solid fa-wand-magic mr-2"></i>Proofread
+                </button>
+            </div>
+        </section>
+
+        <!-- 7. WRITER API VIEW (SHOWING ERROR STATE) -->
+        <section id="writer" class="panel-section p-6">
+            <div id="status-panel-writer" class="mb-6"></div>
+
+            <h2 class="text-xl font-semibold mb-6">Writer API</h2>
+
+            <div class="max-w-4xl mx-auto bg-[#292a2d] border border-[#3c4043] rounded p-6 opacity-50 pointer-events-none">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Topic / Context</label>
+                        <textarea class="w-full h-24 bg-[#202124] border border-[#5f6368] rounded p-2 text-sm text-white focus:outline-none" placeholder="e.g. A formal email declining a job offer..."></textarea>
+                    </div>
+                     <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Shared Context (Optional)</label>
+                        <textarea class="w-full h-24 bg-[#202124] border border-[#5f6368] rounded p-2 text-sm text-white focus:outline-none" placeholder="Additional background info..."></textarea>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mb-6">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Tone</label>
+                        <select class="w-full bg-[#3c4043] text-white text-sm p-2 rounded border border-[#5f6368]">
+                            <option>Formal</option>
+                            <option>Neutral</option>
+                            <option>Casual</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                         <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Format</label>
+                        <select class="w-full bg-[#3c4043] text-white text-sm p-2 rounded border border-[#5f6368]">
+                            <option>Markdown</option>
+                            <option>Plain Text</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium mb-6">Write</button>
+            </div>
+        </section>
+
+        <!-- 8. REWRITER API VIEW -->
+        <section id="rewriter" class="panel-section p-6">
+            <div id="status-panel-rewriter" class="mb-6"></div>
+
+            <h2 class="text-xl font-semibold mb-6">Rewriter API</h2>
+            
+            <div class="flex flex-col lg:flex-row gap-6 h-[calc(100vh-150px)]">
+                <div class="flex-1 flex flex-col">
+                    <textarea class="flex-1 bg-[#202124] border border-[#5f6368] rounded p-4 text-sm text-white resize-none focus:outline-none font-mono" placeholder="Paste content to rewrite here..."></textarea>
+                </div>
+                
+                <div class="w-full lg:w-64 flex flex-col gap-3">
+                    <div class="p-4 bg-[#292a2d] border border-[#3c4043] rounded">
+                        <label class="block text-xs text-gray-400 font-bold mb-3 uppercase">Rewrite Action</label>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all" onclick="showToast('Rewriting: Shorter')">
+                                <i class="fa-solid fa-compress w-6 text-blue-400"></i> Make Shorter
+                            </button>
+                            <button class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all" onclick="showToast('Rewriting: Longer')">
+                                <i class="fa-solid fa-expand w-6 text-green-400"></i> Make Longer
+                            </button>
+                            <button class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all" onclick="showToast('Rewriting: Professional')">
+                                <i class="fa-solid fa-briefcase w-6 text-purple-400"></i> More Professional
+                            </button>
+                            <button class="w-full text-left px-3 py-2 bg-[#35363a] hover:bg-[#3c4043] rounded text-sm text-gray-200 border border-transparent hover:border-gray-500 transition-all" onclick="showToast('Rewriting: Casual')">
+                                <i class="fa-solid fa-mug-hot w-6 text-orange-400"></i> More Casual
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-[#292a2d] border border-[#3c4043] rounded p-4 text-sm text-gray-300 font-mono overflow-y-auto">
+                    <span class="text-gray-500 italic">// Rewritten result...</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Mock Data Generators ---
+        
+        const MOCK_HISTORY = [
+            {
+                id: 'req_1',
+                timestamp: '14:23:05',
+                prompt: 'Summarize this article about Quantum Computing.',
+                response: 'Quantum computing is a rapidly-emerging technology that harnesses the laws of quantum mechanics to solve problems too complex for classical computers...',
+                tokens: 45,
+                latency: '120ms',
+                status: 'success',
+                params: { temperature: 0.7, topK: 3 }
+            },
+            {
+                id: 'req_2',
+                timestamp: '14:24:12',
+                prompt: 'Write a JavaScript function to filter even numbers.',
+                response: '```javascript\nfunction filterEvens(arr) {\n  return arr.filter(n => n % 2 === 0);\n}\n```',
+                tokens: 120,
+                latency: '340ms',
+                status: 'success',
+                params: { temperature: 0.2, topK: 1 }
+            }
+        ];
+
+        const MOCK_LANGS = [
+            { code: 'en-es', label: 'English to Spanish', status: 'ready' },
+            { code: 'en-fr', label: 'English to French', status: 'downloading', progress: 45 },
+            { code: 'en-jp', label: 'English to Japanese', status: 'not-cached' },
+            { code: 'es-en', label: 'Spanish to English', status: 'ready' },
+        ];
+
+        // --- Status Logic ---
+
+        const API_STATUS = {
+            prompt: { 
+                state: 'ready', 
+                name: 'Prompt API', 
+                flag: 'prompt-api-for-gemini-nano', 
+                checks: { flag: true, model: true, api: true } 
+            },
+            summarizer: { 
+                state: 'ready', 
+                name: 'Summarizer API', 
+                flag: 'summarization-api-for-gemini-nano', 
+                checks: { flag: true, model: true, api: true } 
+            },
+            translator: { 
+                state: 'downloading', 
+                name: 'Translator API', 
+                flag: 'translation-api', 
+                checks: { flag: true, model: 'progress', api: true },
+                progress: 68
+            },
+            writer: { 
+                state: 'error', 
+                name: 'Writer API', 
+                flag: 'writer-api-for-gemini-nano', 
+                checks: { flag: false, model: false, api: false } 
+            },
+            rewriter: { 
+                state: 'ready', 
+                name: 'Rewriter API', 
+                flag: 'rewriter-api-for-gemini-nano', 
+                checks: { flag: true, model: true, api: true } 
+            },
+            detector: { 
+                state: 'ready', 
+                name: 'Language Detection API', 
+                flag: 'language-detection-api', 
+                checks: { flag: true, model: true, api: true } 
+            },
+            proofreader: { 
+                state: 'ready', 
+                name: 'Proofreader API', 
+                flag: 'proofreader-api', 
+                checks: { flag: true, model: true, api: true } 
+            }
+        };
+
+        function renderStatusPanel(apiId) {
+            const container = document.getElementById(`status-panel-${apiId}`);
+            if (!container) return;
+
+            const info = API_STATUS[apiId];
+            if (!info) return;
+
+            const isReady = info.state === 'ready';
+            const isError = info.state === 'error';
+            const isDownloading = info.state === 'downloading';
+
+            let mainColorClass = 'border-green-500';
+            let titleColor = 'text-green-400';
+            let icon = '<i class="fa-solid fa-circle-check text-green-400 text-xl"></i>';
+            let statusText = 'API Available';
+            let statusDesc = 'All checks passed. You can use this API.';
+
+            if (isError) {
+                mainColorClass = 'border-red-500';
+                titleColor = 'text-red-400';
+                icon = '<i class="fa-solid fa-circle-exclamation text-red-400 text-xl"></i>';
+                statusText = 'API Unavailable';
+                statusDesc = 'Critical requirements are missing. See troubleshooting below.';
+            } else if (isDownloading) {
+                mainColorClass = 'border-amber-500';
+                titleColor = 'text-amber-400';
+                icon = '<i class="fa-solid fa-circle-notch fa-spin text-amber-400 text-xl"></i>';
+                statusText = 'Downloading Model';
+                statusDesc = `Background download in progress (${info.progress}%).`;
+            }
+
+            // Checklist HTML Generation
+            const checkIcon = (pass) => {
+                if(pass === true) return '<i class="fa-solid fa-check text-green-400"></i>';
+                if(pass === 'progress') return '<i class="fa-solid fa-spinner fa-spin text-amber-400"></i>';
+                return '<i class="fa-solid fa-xmark text-red-400"></i>';
+            };
+
+            const checksHtml = `
+                <div class="diag-check-item">
+                    <span class="text-gray-400">Feature Flag: <code class="text-xs bg-[#202124] px-1 rounded text-gray-300 ml-1">${info.flag}</code></span>
+                    ${checkIcon(info.checks.flag)}
+                </div>
+                <div class="diag-check-item">
+                    <span class="text-gray-400">Model Assets (Nano)</span>
+                    ${checkIcon(info.checks.model)}
+                </div>
+                <div class="diag-check-item">
+                    <span class="text-gray-400">Window Object (window.ai.${apiId})</span>
+                    ${checkIcon(info.checks.api)}
+                </div>
+            `;
+
+            // Troubleshooting Block
+            let troubleshootHtml = '';
+            if (!isReady) {
+                troubleshootHtml = `
+                    <div class="mt-4 p-3 bg-[#3c2424] border border-red-900/50 rounded">
+                        <h4 class="text-xs font-bold text-red-200 uppercase mb-2"><i class="fa-solid fa-screwdriver-wrench mr-1"></i> Troubleshooting Steps</h4>
+                        <ol class="list-decimal list-inside text-xs text-red-100 space-y-1">
+                            ${!info.checks.flag ? `<li>Navigate to <code class="bg-black/30 px-1 rounded border border-red-900/30">chrome://flags</code></li>
+                            <li>Search for <strong>${info.flag}</strong> and set to "Enabled"</li>` : ''}
+                            ${!info.checks.model ? `<li>Model download pending. Ensure you have free disk space.</li>
+                            <li>Call <code class="bg-black/30 px-1 rounded border border-red-900/30">await window.ai.tryDownload()</code> in console.</li>` : ''}
+                            <li>Restart Chrome completely after changes.</li>
+                        </ol>
+                         <div class="mt-3 flex gap-2">
+                            <button class="bg-red-900/40 hover:bg-red-900/60 text-red-100 text-[10px] px-2 py-1 rounded border border-red-800 transition-colors">Open Flags</button>
+                            <button class="bg-red-900/40 hover:bg-red-900/60 text-red-100 text-[10px] px-2 py-1 rounded border border-red-800 transition-colors">Retry Check</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Mock "Preview Error" for ready state
+            let mockErrorDesign = '';
+            if (isReady) {
+                mockErrorDesign = `
+                    <div class="mt-6 pt-4 border-t border-dashed border-[#3c4043] opacity-75">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold mb-2">Design Preview: Error State (If unavailable)</p>
+                        <div class="p-3 bg-[#3c2424] border border-red-900/50 rounded">
+                            <h4 class="text-xs font-bold text-red-200 uppercase mb-2"><i class="fa-solid fa-screwdriver-wrench mr-1"></i> Troubleshooting Steps</h4>
+                            <ol class="list-decimal list-inside text-xs text-red-100 space-y-1">
+                                <li>Navigate to <code class="bg-black/30 px-1 rounded border border-red-900/30">chrome://flags</code></li>
+                                <li>Search for <strong>${info.flag}</strong> and set to "Enabled"</li>
+                                <li>Model download pending. Ensure you have free disk space (>2GB).</li>
+                                <li>Relaunch Chrome to apply changes.</li>
+                            </ol>
+                            <div class="mt-3 flex gap-2">
+                                <button class="bg-red-900/40 hover:bg-red-900/60 text-red-100 text-[10px] px-2 py-1 rounded border border-red-800 transition-colors">Open Flags</button>
+                                <button class="bg-red-900/40 hover:bg-red-900/60 text-red-100 text-[10px] px-2 py-1 rounded border border-red-800 transition-colors">Retry Check</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Compact View for Ready State
+            if (isReady && apiId !== 'writer') { 
+                 container.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-green-400"></i>
+                            <div>
+                                <h3 class="font-bold text-sm text-gray-200">${statusText}</h3>
+                                <p class="text-[10px] text-gray-500">All checks passed: Flag, Model, API.</p>
+                            </div>
+                        </div>
+                        <button class="text-xs text-gray-500 hover:text-white underline" onclick="toggleFullDiag('${apiId}')">View Details</button>
+                    </div>
+                    <div id="full-diag-${apiId}" class="hidden mt-4 pt-3 border-t border-[#3c4043]">
+                         <div class="space-y-1 text-xs">
+                            ${checksHtml}
+                        </div>
+                    </div>
+                    ${mockErrorDesign}
+                 `;
+            } else {
+                // Expanded View for Error/Downloading
+                container.classList.add('border-l-4', mainColorClass, 'rounded');
+                container.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-base ${titleColor}">${statusText}</h3>
+                            <p class="text-xs text-gray-400 mt-1">${statusDesc}</p>
+                        </div>
+                        ${icon}
+                    </div>
+                    
+                    <div class="space-y-1 text-xs bg-[#202124] p-3 rounded border border-[#3c4043]">
+                        ${checksHtml}
+                    </div>
+
+                    ${troubleshootHtml}
+                `;
+            }
+        }
+        
+        function toggleFullDiag(apiId) {
+            const el = document.getElementById(`full-diag-${apiId}`);
+            if(el) el.classList.toggle('hidden');
+        }
+
+        // --- View Logic ---
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if(activeBtn) activeBtn.classList.add('active-nav');
+
+            document.querySelectorAll('.panel-section').forEach(sec => sec.classList.remove('active'));
+            const section = document.getElementById(tabId);
+            if(section) {
+                section.classList.add('active');
+                // Render status when entering tab
+                renderStatusPanel(tabId);
+            }
+        }
+
+        // --- History Renderer ---
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            document.getElementById('history-count').textContent = `${MOCK_HISTORY.length} items`;
+            
+            container.innerHTML = MOCK_HISTORY.map(item => {
+                const isError = item.status === 'error';
+                const statusColor = isError ? 'text-red-400' : 'text-green-400';
+                const borderColor = isError ? 'border-red-900' : 'border-[#3c4043]';
+                
+                const codeSnippet = `
+<span class="token-comment">// Configuration</span>
+const params = {
+  temperature: <span class="token-function">${item.params.temperature}</span>,
+  topK: <span class="token-function">${item.params.topK || 'undefined'}</span>
+};
+
+<span class="token-comment">// Execution</span>
+const session = await <span class="token-string">window.ai.createTextSession</span>(params);
+const result = await session.<span class="token-function">prompt</span>(<span class="token-string">"${item.prompt}"</span>);
+console.log(result);`.trim();
+
+                return `
+                <div class="bg-[#292a2d] border ${borderColor} rounded group">
+                    <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-[#2f3034]" onclick="toggleDetails('${item.id}')">
+                        <div class="flex items-center gap-4 overflow-hidden">
+                            <span class="text-xs font-mono text-gray-500 w-16 flex-shrink-0">${item.timestamp}</span>
+                            <div class="flex flex-col overflow-hidden">
+                                <span class="text-sm font-medium truncate text-gray-200">${item.prompt}</span>
+                                <span class="text-xs text-gray-500 truncate">${isError ? 'Error' : item.response.substring(0, 60) + '...'}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 pl-2">
+                            <span class="text-xs font-mono text-gray-400 bg-[#202124] px-2 py-1 rounded">${item.latency}</span>
+                            <i class="fa-solid fa-circle ${statusColor} text-[8px]"></i>
+                            <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform duration-200" id="icon-${item.id}"></i>
+                        </div>
+                    </div>
+                    <div id="details-${item.id}" class="hidden border-t border-[#3c4043] bg-[#202124] p-4">
+                         <div class="text-sm text-gray-300 font-mono whitespace-pre-wrap">${item.response}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleDetails(id) {
+            const detailEl = document.getElementById(`details-${id}`);
+            const iconEl = document.getElementById(`icon-${id}`);
+            if (detailEl.classList.contains('hidden')) {
+                detailEl.classList.remove('hidden');
+                iconEl.classList.add('rotate-180');
+            } else {
+                detailEl.classList.add('hidden');
+                iconEl.classList.remove('rotate-180');
+            }
+        }
+
+        // --- Translator Renderer ---
+
+        function renderTranslator() {
+            const container = document.getElementById('lang-list');
+            container.innerHTML = MOCK_LANGS.map(lang => {
+                let statusBadge = lang.status === 'ready' ? 
+                    `<span class="bg-[#1e3a2a] text-[#4ade80] px-2 py-0.5 rounded text-[10px] border border-[#14532d]">INSTALLED</span>` : 
+                    `<span class="text-gray-500 text-[10px]">NOT CACHED</span>`;
+                return `
+                <tr class="border-b border-[#3c4043]">
+                    <td class="p-3"><span class="text-gray-200 font-bold">${lang.code}</span> <span class="text-gray-500 text-[10px] ml-2">${lang.label}</span></td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3 text-right"><button class="text-gray-400 hover:text-white"><i class="fa-solid fa-ellipsis"></i></button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => toast.classList.add('translate-x-full'), 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('overview');
+            renderHistory();
+            renderTranslator();
+            // Pre-render status for Prompt to ensure it shows up immediately
+            renderStatusPanel('prompt');
+        });
+
+    </script>
+</body>
+</html>

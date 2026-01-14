@@ -1,0 +1,121 @@
+<section class="h-full flex flex-col bg-[#202124] text-gray-300">
+    <!-- Header -->
+    <div class="p-4 border-b border-[#3c4043] flex justify-between items-center bg-[#292a2d] shadow-sm z-20">
+        <div class="flex items-center gap-2">
+            <h2 class="text-lg font-semibold text-gray-100">Prompt API Playground</h2>
+        </div>
+        <app-api-status
+            [apiName]="'Prompt'"
+            [statusText]="statusText"
+            [isAvailable]="isApiAvailable"
+            [isWarning]="isWarning"
+            [checks]="checks"
+            [errorHtml]="errorHtml">
+        </app-api-status>
+    </div>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Main Playground Area -->
+        <div class="flex-1 flex flex-col min-w-0">
+            
+            <!-- Configuration & Inputs -->
+            <div class="p-4 border-b border-[#3c4043] space-y-4 overflow-y-auto bg-[#202124]" style="max-height: 60%;">
+                
+                <!-- System Prompt -->
+                <div class="space-y-1">
+                    <div class="flex justify-between">
+                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">System Prompt</label>
+                    </div>
+                    <textarea [(ngModel)]="systemPrompt" (ngModelChange)="onInputChange()" rows="2" 
+                        class="w-full bg-[#292a2d] border border-[#3c4043] rounded p-2 text-sm text-gray-200 focus:border-blue-500 focus:outline-none resize-none transition-colors placeholder-gray-600"
+                        placeholder="Optional: e.g. You are a helpful assistant..."></textarea>
+                </div>
+
+                <!-- Params Row -->
+                <div class="flex gap-4 p-3 bg-[#292a2d] rounded border border-[#3c4043]">
+                    <div class="flex-1 space-y-2">
+                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Temperature <span class="text-gray-500 normal-case">(0.0 - 2.0)</span></label>
+                        <input type="number" [(ngModel)]="temperature" (ngModelChange)="onInputChange()" step="0.1" min="0" max="2" placeholder="Default"
+                             class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Top K <span class="text-gray-500 normal-case">(>= 1)</span></label>
+                        <input type="number" [(ngModel)]="topK" (ngModelChange)="onInputChange()" step="1" min="1" placeholder="Default"
+                             class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                 <!-- User Prompt -->
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">User Prompt</label>
+                    <textarea [(ngModel)]="promptText" (ngModelChange)="onInputChange()" rows="4" 
+                        class="w-full bg-[#292a2d] border border-[#3c4043] rounded p-2 text-sm text-gray-200 focus:border-blue-500 focus:outline-none resize-y transition-colors placeholder-gray-600"
+                        placeholder="Enter your prompt here..."></textarea>
+                </div>
+                
+                <div class="flex justify-end pt-2">
+                    <button (click)="runPrompt()" [disabled]="isBusy || !promptText.trim()"
+                        class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded shadow-sm text-sm font-medium transition-all flex items-center gap-2">
+                        <i *ngIf="isBusy" class="fa-solid fa-circle-notch fa-spin"></i>
+                        <span>{{ isBusy ? 'Running...' : 'Run Prompt' }}</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Output Area -->
+            <div class="flex-1 flex flex-col min-h-0 bg-[#1e1e1e]">
+                <div class="flex border-b border-[#3c4043] bg-[#292a2d]">
+                    <div class="px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-400 border-b-2 border-transparent select-none">Output</div>
+                </div>
+                
+                <div class="flex-1 p-4 overflow-y-auto font-mono text-sm text-gray-300 whitespace-pre-wrap leading-relaxed relative group">
+                     <button *ngIf="response" class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-[#3c4043] hover:bg-[#4a4c50] text-gray-300 px-2 py-1 rounded text-xs"
+                        (click)="response = ''">
+                        Clear
+                     </button>
+
+                    <div *ngIf="response">{{ response }}</div>
+                    <div *ngIf="!response && !isBusy" class="text-gray-600 italic text-center mt-10">
+                        <i class="fa-regular fa-comment-dots text-2xl mb-2 block opacity-50"></i>
+                        Run a prompt to see the output...
+                    </div>
+                    <div *ngIf="executionTime" class="mt-4 pt-4 border-t border-gray-800 text-xs text-green-400 flex items-center gap-1">
+                        <i class="fa-solid fa-clock"></i> Execution time: {{ executionTime }}
+                    </div>
+                </div>
+                 
+                 <!-- Code Snippet -->
+                 <div class="bg-[#292a2d] border-t border-[#3c4043]">
+                    <details class="group">
+                        <summary class="p-2 text-xs text-gray-400 cursor-pointer hover:text-white select-none flex items-center gap-2 bg-[#252629]">
+                            <i class="fa-solid fa-chevron-right group-open:rotate-90 transition-transform"></i>
+                            Show Code
+                        </summary>
+                        <div class="p-3 bg-[#1e1e1e]">
+                            <pre class="text-xs text-green-400 overflow-x-auto font-mono whitespace-pre">{{ generatedCode }}</pre>
+                        </div>
+                    </details>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: History -->
+        <div *ngIf="showHistory" class="w-80 border-l border-[#3c4043] flex flex-col bg-[#292a2d] z-10">
+            <div class="p-3 border-b border-[#3c4043] flex justify-between items-center bg-[#292a2d]">
+                 <h3 class="text-xs font-bold uppercase tracking-wide text-gray-400">History</h3>
+                 <div class="flex gap-1">
+                    <button (click)="exportJson()" class="p-1.5 text-gray-400 hover:text-white hover:bg-[#3c4043] rounded transition-colors" title="Export">
+                        <i class="fa-solid fa-download text-xs"></i>
+                    </button>
+                    <button (click)="clearHistory()" class="p-1.5 text-gray-400 hover:text-red-400 hover:bg-[#3c4043] rounded transition-colors" title="Clear">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                 </div>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                 <app-history-list [history]="history" apiClassName="LanguageModel" methodName="prompt"></app-history-list>
+            </div>
+        </div>
+    </div>
+</section>

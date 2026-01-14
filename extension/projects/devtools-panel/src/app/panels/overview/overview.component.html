@@ -1,0 +1,152 @@
+<section class="panel-section active p-6 h-full max-h-full flex flex-col overflow-hidden">
+  <div class="flex justify-between items-center mb-6 flex-shrink-0">
+      <h2 class="text-xl font-semibold">Dashboard</h2>
+      <div class="flex gap-2">
+          <button (click)="refresh()" class="text-xs bg-[#292a2d] border border-[#3c4043] hover:bg-[#35363a] px-3 py-1.5 rounded text-gray-300 transition-colors">
+              <i class="fa-solid fa-rotate mr-1"></i> Refresh
+          </button>
+      </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6 flex-1 overflow-hidden min-h-0 max-h-full">
+      <!-- Left Column: Main Content -->
+      <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-2 max-h-full">
+
+          <!-- System Health Row -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Base Model -->
+              <app-model-download-card></app-model-download-card>
+
+              <!-- VRAM Usage -->
+              <!-- <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                  <div class="flex justify-between items-start mb-2">
+                      <span class="text-gray-400 text-xs font-mono uppercase">VRAM Usage</span>
+                      <i class="fa-solid fa-memory text-purple-400"></i>
+                  </div>
+                  <div class="text-lg font-bold">{{vramUsage}}</div>
+                  <div class="text-xs text-gray-500 mt-1">Shared GPU Memory</div>
+              </div> -->
+
+              <!-- Storage -->
+              <!-- <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+                  <div class="flex justify-between items-start mb-2">
+                      <span class="text-gray-400 text-xs font-mono uppercase">Storage</span>
+                      <i class="fa-solid fa-hard-drive text-amber-400"></i>
+                  </div>
+                  <div class="text-lg font-bold">{{storageTotal}}</div>
+                  <div class="text-xs text-gray-500 mt-1 flex justify-between">
+                      <span>Models: <span>{{storageModels}}</span></span>
+                      <span>Packs: <span>{{storagePacks}}</span></span>
+                  </div>
+              </div> -->
+          </div>
+
+          <!-- API Capabilities Grid -->
+          <div>
+              <h3 class="text-sm font-bold text-gray-400 uppercase mb-3">API Capabilities</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div *ngFor="let cap of apiCapabilities" (click)="navigateToTab(cap.panelTabId)" class="bg-[#292a2d] border border-[#3c4043] rounded p-4 cursor-pointer hover:bg-[#35363a] transition-all group flex flex-col justify-between">
+                      <div>
+                          <div class="flex justify-between items-start mb-3">
+                              <div class="w-8 h-8 rounded bg-[#202124] flex items-center justify-center border border-[#3c4043] group-hover:border-gray-500">
+                                  <i [class]="cap.icon + ' text-gray-300'"></i>
+                              </div>
+                              <span class="text-[10px] px-2 py-0.5 rounded border uppercase font-bold tracking-wider" [ngClass]="getBadgeClass(cap.status)">
+                                {{getBadgeText(cap)}}
+                              </span>
+                          </div>
+                          <h3 class="font-bold text-gray-200 mb-1">{{cap.name}}</h3>
+                          <p class="text-xs text-gray-500 line-clamp-2">{{cap.description}}</p>
+                      </div>
+
+                      <!-- Download Actions -->
+                      <div class="mt-3 pt-3 border-t border-[#3c4043]">
+                        <div *ngIf="activeDownloads.has(cap.id); else downloadBtn" class="flex flex-col gap-2">
+                             <div class="flex justify-between items-center text-xs text-gray-400">
+                                <span>Downloading...</span>
+                                <span>{{activeDownloads.get(cap.id)?.progress}}%</span>
+                             </div>
+                             <div class="w-full bg-[#202124] rounded-full h-1.5">
+                                <div class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" [style.width.%]="activeDownloads.get(cap.id)?.progress"></div>
+                             </div>
+                             <button (click)="$event.stopPropagation(); handleAbort(cap.id)" class="self-end text-[10px] text-red-400 hover:text-red-300">Cancel</button>
+                        </div>
+                        <ng-template #downloadBtn>
+                            <div *ngIf="cap.status === 'downloadable' || cap.status === 'after-download'" class="flex justify-end">
+                                <button (click)="$event.stopPropagation(); handleDownload(cap.id)" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded flex items-center gap-2 transition-colors">
+                                    <i class="fa-solid fa-download"></i> Setup
+                                </button>
+                            </div>
+                        </ng-template>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Recent Activity -->
+<!--          <div>-->
+<!--              <h3 class="text-sm font-bold text-gray-400 uppercase mb-3">Recent Activity</h3>-->
+<!--              <div class="bg-[#292a2d] border border-[#3c4043] rounded overflow-hidden">-->
+<!--                  <div *ngIf="recentActivities.length === 0" class="text-center text-gray-500 text-xs py-4">No recent activity.</div>-->
+<!--                  <div *ngFor="let act of recentActivities" class="p-3 hover:bg-[#35363a] rounded cursor-pointer transition-colors border border-transparent hover:border-[#3c4043]">-->
+<!--                    <div class="flex items-start gap-3">-->
+<!--                        <div class="mt-0.5"><i [class]="act.apiIcon + ' text-xs'" [ngClass]="act.status === 'success' ? 'text-green-400' : 'text-red-400'"></i></div>-->
+<!--                        <div>-->
+<!--                            <p class="text-xs text-gray-300 line-clamp-2 mb-1">{{act.description}}</p>-->
+<!--                            <span class="text-[10px] text-gray-500 font-mono">{{act.timestamp}}</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--              </div>-->
+<!--          </div>-->
+      </div>
+
+      <!-- Right Column: Playground -->
+<!--      <div [class.hidden]="isPlaygroundCollapsed" class="w-full lg:w-96 flex flex-col gap-4 flex-shrink-0 transition-all duration-300 h-96 lg:h-full max-h-full overflow-hidden" style="height: calc(100vh - 100px);">-->
+<!--          <div class="bg-[#292a2d] border border-[#3c4043] rounded flex flex-col h-full overflow-hidden shadow-lg min-h-0 max-h-full">-->
+<!--               &lt;!&ndash; Header &ndash;&gt;-->
+<!--               <div class="p-3 border-b border-[#3c4043] bg-[#35363a] flex justify-between items-center">-->
+<!--                   <h3 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-sparkles text-yellow-400"></i> Chat</h3>-->
+<!--                   <div class="flex gap-2">-->
+<!--                       <button (click)="clearPlayground()" class="text-xs text-gray-400 hover:text-white p-1 rounded hover:bg-[#3c4043] transition-colors" title="Clear History">-->
+<!--                          <i class="fa-solid fa-trash"></i>-->
+<!--                       </button>-->
+<!--                       <button (click)="togglePlayground()" class="text-xs text-gray-400 hover:text-white p-1 rounded hover:bg-[#3c4043] transition-colors" title="Collapse">-->
+<!--                          <i class="fa-solid fa-chevron-right"></i>-->
+<!--                       </button>-->
+<!--                   </div>-->
+<!--               </div>-->
+<!--               -->
+<!--               &lt;!&ndash; Response Area &ndash;&gt;-->
+<!--               <div class="flex-1 p-4 overflow-y-auto space-y-4 bg-[#202124] min-h-0">-->
+<!--                   <div *ngIf="chatHistory.length === 0" class="h-full flex flex-col items-center justify-center text-gray-500 gap-2 opacity-50">-->
+<!--                      <i class="fa-regular fa-comments text-4xl mb-2"></i>-->
+<!--                      <span class="text-xs">Start a conversation...</span>-->
+<!--                   </div>-->
+
+<!--                   <div *ngFor="let msg of chatHistory" class="flex animate-fade-in" [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">-->
+<!--                      <div class="max-w-[85%] px-4 py-2 text-sm shadow-sm border border-transparent"-->
+<!--                           [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-l-lg rounded-tr-lg' : (msg.isError ? 'bg-red-900/50 text-red-200 border-red-800 rounded-r-lg rounded-tl-lg' : 'bg-[#35363a] text-gray-200 rounded-r-lg rounded-tl-lg')">-->
+<!--                          {{msg.text}}-->
+<!--                      </div>-->
+<!--                   </div>-->
+<!--               </div>-->
+<!--  -->
+<!--               &lt;!&ndash; Input Area &ndash;&gt;-->
+<!--               <div class="p-3 border-t border-[#3c4043] bg-[#292a2d]">-->
+<!--                   <div class="flex gap-2">-->
+<!--                       <input [(ngModel)]="quickPrompt" (keydown.enter)="handleQuickPrompt()" type="text" placeholder="Type a prompt..." class="bg-[#202124] border border-[#5f6368] rounded px-3 py-2 text-xs text-white flex-1 focus:outline-none focus:border-blue-500 font-mono">-->
+<!--                       <button (click)="handleQuickPrompt()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors text-xs">-->
+<!--                          <i class="fa-solid fa-paper-plane"></i>-->
+<!--                       </button>-->
+<!--                   </div>-->
+<!--               </div>-->
+<!--          </div>-->
+<!--      </div>-->
+
+      <!-- Expand Trigger -->
+      <button *ngIf="isPlaygroundCollapsed" (click)="togglePlayground()" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#292a2d] border border-[#3c4043] border-r-0 rounded-l p-2 text-gray-400 hover:text-white shadow-lg z-50">
+          <i class="fa-solid fa-chevron-left"></i>
+      </button>
+  </div>
+</section>

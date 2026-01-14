@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* DevTools Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #202124; 
+}
+::-webkit-scrollbar-thumb {
+    background: #4a4c50; 
+    border-radius: 5px;
+    border: 2px solid #202124;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5f6368; 
+}
+
+/* Syntax Highlighting Mock */
+.token-keyword { color: #ff7b72; }
+.token-string { color: #a5d6ff; }
+.token-function { color: #d2a8ff; }
+.token-comment { color: #8b949e; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #202124; /* Chrome Dark Theme BG */
+    color: #e8eaed;
+    margin: 0;
+}
+
+.status-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-green { background-color: #4ade80; box-shadow: 0 0 5px #4ade80; }
+.status-red { background-color: #ef4444; box-shadow: 0 0 5px #ef4444; }
+.status-amber { background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+
+/* Common Badge Styles */
+.badge-available {
+    background-color: #064e3b; /* green-900 */
+    color: #86efac; /* green-300 */
+    border: 1px solid #14532d; /* green-800 */
+}
+.badge-downloading {
+    background-color: #451a03; /* amber-950 */
+    color: #fcd34d; /* amber-300 */
+    border: 1px solid #78350f; /* amber-900 */
+}

@@ -1,0 +1,15 @@
+.status-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-green { background-color: #4ade80; box-shadow: 0 0 5px #4ade80; }
+.status-red { background-color: #ef4444; box-shadow: 0 0 5px #ef4444; }
+.status-amber { background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+
+.nav-btn.active-nav {
+    background-color: #35363a;
+    color: #60a5fa; /* blue-400 */
+    border-left-color: #60a5fa;
+}
