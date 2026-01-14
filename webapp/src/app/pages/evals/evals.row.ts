@@ -30,6 +30,12 @@ export class EvalsRow {
   })
   input: string = "";
 
+  @advancedFormControl({
+    type: FormControlTypeEnum.Input,
+    fieldType: FieldType.String,
+  })
+  images: string[] = [];
+
   status: InferenceStatusEnum = InferenceStatusEnum.Idle;
 
   output: string = "";
