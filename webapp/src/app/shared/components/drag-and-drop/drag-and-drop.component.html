@@ -1,0 +1,9 @@
+<div class="drop-zone border rounded p-4 text-center bg-light" 
+     (dragover)="onDragOver($event)" 
+     (drop)="onDrop($event)"
+     (click)="fileInput.click()"
+     style="cursor: pointer; border-style: dashed !important;">
+  <i class="bi bi-cloud-upload display-4 text-muted"></i>
+  <p class="mt-2 mb-0 lead text-muted">Drag & Drop files here or click to select</p>
+  <input #fileInput type="file" multiple class="d-none" (change)="onFileSelected($event)">
+</div>

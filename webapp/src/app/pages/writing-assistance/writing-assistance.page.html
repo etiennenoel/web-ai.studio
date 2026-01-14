@@ -22,24 +22,22 @@
   <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
     <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
 
-      @if (this.manager().state() !== InferenceStateEnum.Initial) {
-        <magieno-conversation class="flex-grow-1"
-                              [conversation]="this.manager().conversation()"
-                              [state]="this.manager().state()"
-                              style="height: calc(100vh - 190px); overflow:auto;"
-        ></magieno-conversation>
+      @if (output()) {
+        <div class="card p-3 flex-grow-1" style="height: calc(100vh - 190px); overflow:auto;">
+          <div [innerHTML]="output() | render_markdown | async"></div>
+        </div>
       }
 
-      @if (this.manager().state() === InferenceStateEnum.Initial) {
+      @if (!output()) {
         <h1 class="display-4 text-center">Web AI Studio</h1>
       }
 
-      <magieno-writing-assistance-input
-        (apiSelection)="this.apiSelected($event)"
+      <app-writing-assistance-input
+        (apiSelection)="apiSelected($event)"
         (run)="run($event)"
-        [(state)]="this.state"
+        [state]="state"
         (cancel)="onCancel()"
-      ></magieno-writing-assistance-input>
+      ></app-writing-assistance-input>
 
     </div>
   </div>

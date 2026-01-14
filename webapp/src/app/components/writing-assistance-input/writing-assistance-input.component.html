@@ -1,0 +1,18 @@
+<div class="card p-3">
+  <div class="mb-3">
+    <label class="form-label">Select API</label>
+    <select class="form-select" [ngModel]="selectedApi" (ngModelChange)="onApiChange($event)">
+      @for (api of apis; track api) {
+        <option [value]="api">{{ api }}</option>
+      }
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Input</label>
+    <textarea class="form-control" rows="5" [(ngModel)]="input"></textarea>
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="onCancel()" *ngIf="state === 'Disabled'">Cancel</button>
+    <button class="btn btn-primary" (click)="onRun()" [disabled]="state === 'Disabled'">Run</button>
+  </div>
+</div>

@@ -2,11 +2,13 @@ import {Component, Inject, OnDestroy, OnInit, PLATFORM_ID, DOCUMENT} from '@angu
 import {ActivatedRoute, Router} from '@angular/router';
 import {isPlatformServer} from '@angular/common';
 import {Title} from '@angular/platform-browser';
-import {ConversationManager, PromptManager, InferenceStateEnum, PromptInputStateEnum, PromptRunOptions} from '@magieno/angular-ai';
+import {ConversationManager} from '../../core/services/conversation.manager';
+import {PromptRunOptions} from '../../core/models/prompt-run.options';
+import {InferenceStateEnum} from '../../core/enums/inference-state.enum';
+import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {BasePage} from '../base-page';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
-
 
 @Component({
   selector: 'page-chat',
@@ -80,8 +82,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     codeModalComponent.componentInstance.updateCode();
   }
 
-  async onRun(options: PromptRunOptions) {
-    await this.conversationManager.run(options);
+  async onRun(prompt: string) {
+    await this.conversationManager.run(prompt);
     this.state = PromptInputStateEnum.Ready;
   }
 
@@ -92,7 +94,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   async triggerDownload() {
     const self = this;
 
-    const session = await LanguageModel.create({
+    // @ts-ignore
+    const session = await window.ai.languageModel.create({
       expectedInputs: [
         { type: "text", languages: ["en"] },
         { type: "audio", languages: ["en"] },
@@ -117,7 +120,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     }
 
     try {
-      this.languageModelAvailability = await LanguageModel.availability({
+      // @ts-ignore
+      this.languageModelAvailability = await window.ai.languageModel.availability({
         expectedInputs: [
           { type: "text", languages: ["en"] },
           { type: "audio", languages: ["en"] },

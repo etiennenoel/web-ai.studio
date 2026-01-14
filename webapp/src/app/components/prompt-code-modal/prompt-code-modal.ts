@@ -1,8 +1,9 @@
 import {Component, DOCUMENT, Inject, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FormControl} from '@angular/forms';
-import {MagienoBaseComponent} from '@magieno/angular-core';
-import {PromptManager, PromptRunOptions} from '@magieno/angular-ai';
+import {BaseComponent} from '../base.component';
+import {PromptManager} from '../../core/services/prompt.manager';
+import {PromptRunOptions} from '../../core/models/prompt-run.options';
 
 @Component({
   selector: 'app-prompt-code-modal',
@@ -10,7 +11,7 @@ import {PromptManager, PromptRunOptions} from '@magieno/angular-ai';
   templateUrl: './prompt-code-modal.html',
   styleUrl: './prompt-code-modal.scss'
 })
-export class PromptCodeModal extends MagienoBaseComponent implements OnInit{
+export class PromptCodeModal extends BaseComponent implements OnInit{
   @Input()
   options: PromptRunOptions = new PromptRunOptions();
 
