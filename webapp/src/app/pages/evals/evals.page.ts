@@ -90,14 +90,20 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async runPrompt(context: string, input: string, images: string[], callback: (chunk: string) => void): Promise<string> {
-    const session = await LanguageModel.create({
+    const sessionCreationOptions: any = {
       initialPrompts: [
         {
           role: "system",
           content: context,
         }
       ]
-    });
+    };
+
+    if(images && images.length > 0) {
+      sessionCreationOptions["expectedInputs"] = [{type: "image"}];
+    }
+
+    const session = await LanguageModel.create(sessionCreationOptions);
 
     let promptInput: any = input;
     if (images && images.length > 0) {
@@ -108,7 +114,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       }
     }
 
-    const response = session.promptStreaming(promptInput, {})
+    const response = session.promptStreaming([{"role":"user","content":promptInput}], {})
 
     let fullResponse = "";
 
