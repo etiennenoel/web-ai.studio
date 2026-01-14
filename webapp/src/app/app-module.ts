@@ -25,7 +25,6 @@ import { BrowserModule, provideClientHydration, withEventReplay } from '@angular
 import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
-import {MagienoAdvancedFormsModule} from '@magieno/angular-advanced-forms';
 import { CortexPage } from './pages/cortex/cortex.page';
 import { AxonPage } from './pages/cortex/axon/axon.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
@@ -93,7 +92,6 @@ import { CodeModal } from './modals/code/code.modal';
     MagienoAIModule,
     NgbTooltipModule,
     NgbOffcanvasModule,
-    MagienoAdvancedFormsModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
