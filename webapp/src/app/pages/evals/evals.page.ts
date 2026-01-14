@@ -2,9 +2,7 @@ import {Component, DOCUMENT, Inject, OnDestroy, OnInit, PLATFORM_ID} from '@angu
 import {ActivatedRoute, Router} from '@angular/router';
 import {Title} from '@angular/platform-browser';
 import {BasePage} from '../base-page';
-import {AdvancedForm, AdvancedFormArray, FormFactory} from '@magieno/angular-advanced-forms';
-import {EvalsRunOptions} from './evals-run.options';
-import {EvalsRow} from './evals.row';
+import {FormBuilder, FormGroup, FormArray, FormControl, Validators, AbstractControl} from '@angular/forms';
 import {InferenceStatusEnum} from '../../enums/inference-status.enum';
 import {ApiEnum} from './api.enum';
 import {EvalsExecutionEnum} from '../../enums/evals-execution.enum';
@@ -17,7 +15,7 @@ import {EvalsExecutionEnum} from '../../enums/evals-execution.enum';
 })
 export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
-  form: AdvancedForm<EvalsRunOptions>;
+  form: FormGroup;
 
   statusMessage?: string;
 
@@ -25,8 +23,11 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   previewImageSrc: string | null = null;
 
+  showResetConfirmation: boolean = false;
+  pendingAudioFiles: File[] = [];
+
   constructor(
-    private readonly formFactory: FormFactory,
+    private readonly fb: FormBuilder,
     router: Router,
     route: ActivatedRoute,
     @Inject(DOCUMENT) document: Document,
@@ -36,40 +37,60 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     super(document, title)
 
     this.setTitle("Evals")
-    this.form = this.formFactory.create(new EvalsRunOptions());
+    this.form = this.fb.group({
+      rows: this.fb.array([this.createRow()])
+    });
   }
 
   override async ngOnInit() {
     super.ngOnInit();
   }
 
-  get rowsAdvancedFormArray(): AdvancedFormArray<EvalsRow> {
-    return this.form.formElements.rows as AdvancedFormArray<EvalsRow>;
+  get rows(): FormArray {
+    return this.form.get('rows') as FormArray;
+  }
+
+  createRow(data?: {context?: string, input?: string, api?: ApiEnum, images?: string[], audio?: string[]}): FormGroup {
+    return this.fb.group({
+      api: [data?.api || ApiEnum.Prompt],
+      context: [data?.context || ''],
+      input: [data?.input || ''],
+      images: [data?.images || []],
+      audio: [data?.audio || []],
+      status: [InferenceStatusEnum.Idle],
+      output: ['']
+    });
   }
 
   async run() {
     this.status = EvalsExecutionEnum.InProgress;
 
-    for(let i = 0; i < this.rowsAdvancedFormArray.formGroups.length; i++) {
-      const formRow = this.rowsAdvancedFormArray.formGroups[i];
+    for(let i = 0; i < this.rows.length; i++) {
+      const formRow = this.rows.at(i) as FormGroup;
 
-      formRow.value.status = InferenceStatusEnum.InProgress;
+      formRow.patchValue({status: InferenceStatusEnum.InProgress});
 
-      switch (formRow.value.api) {
-        case ApiEnum.Summarizer:
-          await this.runSummarizer(formRow.value.context, formRow.value.input, (chunk: string) => {
-            formRow.value.output += chunk;
-          })
-          break;
+      try {
+        switch (formRow.value.api) {
+          case ApiEnum.Summarizer:
+            await this.runSummarizer(formRow.value.context, formRow.value.input, (chunk: string) => {
+              const currentOutput = formRow.value.output || '';
+              formRow.patchValue({output: currentOutput + chunk});
+            })
+            break;
 
-        case ApiEnum.Prompt:
-          await this.runPrompt(formRow.value.context, formRow.value.input, formRow.value.images, (chunk: string) => {
-            formRow.value.output += chunk;
-          })
-          break;
+          case ApiEnum.Prompt:
+            await this.runPrompt(formRow.value.context, formRow.value.input, formRow.value.images, formRow.value.audio, (chunk: string) => {
+              const currentOutput = formRow.value.output || '';
+              formRow.patchValue({output: currentOutput + chunk});
+            })
+            break;
+        }
+        formRow.patchValue({status: InferenceStatusEnum.Success});
+      } catch (e) {
+        console.error(e);
+        formRow.patchValue({status: InferenceStatusEnum.Error});
       }
-
-      formRow.value.status = InferenceStatusEnum.Success;
     }
 
     this.status = EvalsExecutionEnum.Success;
@@ -89,28 +110,41 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     return fullResponse;
   }
 
-  async runPrompt(context: string, input: string, images: string[], callback: (chunk: string) => void): Promise<string> {
+  async runPrompt(context: string, input: string, images: string[], audio: string[], callback: (chunk: string) => void): Promise<string> {
     const sessionCreationOptions: any = {
       initialPrompts: [
         {
           role: "system",
           content: context,
         }
-      ]
+      ],
+      expectedInputs: []
     };
 
     if(images && images.length > 0) {
-      sessionCreationOptions["expectedInputs"] = [{type: "image"}];
+      sessionCreationOptions.expectedInputs.push({type: "image"});
+    }
+
+    if(audio && audio.length > 0) {
+      sessionCreationOptions.expectedInputs.push({type: "audio"});
     }
 
     const session = await LanguageModel.create(sessionCreationOptions);
 
     let promptInput: any = input;
-    if (images && images.length > 0) {
+    if ((images && images.length > 0) || (audio && audio.length > 0)) {
       promptInput = [{ type: "text", value: input }];
-      for (const img of images) {
-        const blob = await (await fetch(img)).blob();
-        promptInput.push({ type: "image", value: blob });
+      if (images) {
+        for (const img of images) {
+          const blob = await (await fetch(img)).blob();
+          promptInput.push({ type: "image", value: blob });
+        }
+      }
+      if (audio) {
+        for (const aud of audio) {
+          const blob = await (await fetch(aud)).blob();
+          promptInput.push({ type: "audio", value: blob });
+        }
       }
     }
 
@@ -126,6 +160,45 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     return fullResponse;
   }
 
+  public onAudioFilesDropped(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+      this.pendingAudioFiles = Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('audio/'));
+      
+      // Check if there is any data in the first row or if there are multiple rows
+      const firstRow = this.rows.at(0).value;
+      const hasData = firstRow.context || firstRow.input || firstRow.images.length > 0 || firstRow.audio.length > 0;
+      
+      if (this.rows.length > 1 || hasData) {
+         this.showResetConfirmation = true;
+      } else {
+        this.processAudioFiles();
+      }
+    }
+  }
+
+  public processAudioFiles() {
+    this.rows.clear();
+
+    this.pendingAudioFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        this.rows.push(this.createRow({audio: [base64]}));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    this.pendingAudioFiles = [];
+    this.showResetConfirmation = false;
+  }
+
+  public cancelReset() {
+    this.pendingAudioFiles = [];
+    this.showResetConfirmation = false;
+  }
+
   public onPaste(event: ClipboardEvent, rowIndex: number): void {
     const clipboardData = event.clipboardData;
     const items = clipboardData?.items;
@@ -139,7 +212,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
             const reader = new FileReader();
             reader.onload = (e) => {
               const base64 = e.target?.result as string;
-              const formRow = this.rowsAdvancedFormArray.formGroups[rowIndex];
+              const formRow = this.rows.at(rowIndex);
               const currentImages = formRow.value.images || [];
               formRow.patchValue({images: [...currentImages, base64]});
             };
@@ -158,9 +231,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       const table = doc.querySelector('table');
 
       if (table) {
-        const rows = Array.from(table.querySelectorAll('tr'));
+        const tableRows = Array.from(table.querySelectorAll('tr'));
         const lines: {context: string, input: string, api: string, images: string[]}[] = [];
-        rows.forEach(row => {
+        tableRows.forEach(row => {
           const firstCell = row.querySelector('td, th'); 
           let context = "";
           let input = "";
@@ -195,20 +268,24 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
         });
 
         if (lines.length > 0) {
-          const evalsRunOptions = new EvalsRunOptions();
-
-          // For subsequent lines, insert new FormGroups
           for (let i = 0; i < lines.length; i++) {
-            const evalsRow = new EvalsRow();
-            evalsRow.context = lines[i].context;
-            evalsRow.input = lines[i].input;
-            evalsRow.api = lines[i].api as ApiEnum;
-            evalsRow.images = lines[i].images;
-
-            evalsRunOptions.rows.push(evalsRow)
+            if (i < this.rows.length) {
+              const formRow = this.rows.at(i);
+              formRow.patchValue({
+                context: lines[i].context,
+                input: lines[i].input,
+                api: lines[i].api as ApiEnum,
+                images: lines[i].images
+              });
+            } else {
+              this.rows.push(this.createRow({
+                context: lines[i].context,
+                input: lines[i].input,
+                api: lines[i].api as ApiEnum,
+                images: lines[i].images
+              }));
+            }
           }
-
-          this.form.setValue(evalsRunOptions);
         }
         return; 
       }
@@ -219,8 +296,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      const formRow = this.rowsAdvancedFormArray.formGroups[rowIndex];
-      const currentImages = formRow.value.images || [];
+      const formRow = this.rows.at(rowIndex);
       
       for (let i = 0; i < event.dataTransfer.files.length; i++) {
         const file = event.dataTransfer.files[i];
@@ -228,10 +304,16 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           const reader = new FileReader();
           reader.onload = (e) => {
             const base64 = e.target?.result as string;
-            // Append to array, need to be careful with async loop, but for UI it's mostly fine
-            // Better to accumulate and patch once, but this is simple enough
-            const newImages = this.rowsAdvancedFormArray.formGroups[rowIndex].value.images || [];
-            this.rowsAdvancedFormArray.formGroups[rowIndex].patchValue({images: [...newImages, base64]});
+            const newImages = formRow.value.images || [];
+            formRow.patchValue({images: [...newImages, base64]});
+          };
+          reader.readAsDataURL(file);
+        } else if (file.type.startsWith('audio/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target?.result as string;
+            const newAudio = formRow.value.audio || [];
+            formRow.patchValue({audio: [...newAudio, base64]});
           };
           reader.readAsDataURL(file);
         }
@@ -247,8 +329,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   public selectImage(event: Event, rowIndex: number) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      const formRow = this.rowsAdvancedFormArray.formGroups[rowIndex];
-      const currentImages = formRow.value.images || [];
+      const formRow = this.rows.at(rowIndex);
 
       for (let i = 0; i < input.files.length; i++) {
         const file = input.files[i];
@@ -256,8 +337,28 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           const reader = new FileReader();
           reader.onload = (e) => {
             const base64 = e.target?.result as string;
-            const newImages = this.rowsAdvancedFormArray.formGroups[rowIndex].value.images || [];
-            this.rowsAdvancedFormArray.formGroups[rowIndex].patchValue({images: [...newImages, base64]});
+            const newImages = formRow.value.images || [];
+            formRow.patchValue({images: [...newImages, base64]});
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  }
+
+  public selectAudio(event: Event, rowIndex: number) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const formRow = this.rows.at(rowIndex);
+
+      for (let i = 0; i < input.files.length; i++) {
+        const file = input.files[i];
+        if (file.type.startsWith('audio/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target?.result as string;
+            const newAudio = formRow.value.audio || [];
+            formRow.patchValue({audio: [...newAudio, base64]});
           };
           reader.readAsDataURL(file);
         }
@@ -266,10 +367,17 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   public removeImage(rowIndex: number, imageIndex: number) {
-    const formRow = this.rowsAdvancedFormArray.formGroups[rowIndex];
+    const formRow = this.rows.at(rowIndex);
     const currentImages = formRow.value.images || [];
     currentImages.splice(imageIndex, 1);
     formRow.patchValue({images: currentImages});
+  }
+
+  public removeAudio(rowIndex: number, audioIndex: number) {
+    const formRow = this.rows.at(rowIndex);
+    const currentAudio = formRow.value.audio || [];
+    currentAudio.splice(audioIndex, 1);
+    formRow.patchValue({audio: currentAudio});
   }
 
   public previewImage(imageSrc: string) {
@@ -280,6 +388,15 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     this.previewImageSrc = null;
   }
 
+  public removeRow(index: number) {
+    this.rows.removeAt(index);
+  }
+
+  public addRow() {
+    this.rows.push(this.createRow());
+  }
+
   protected readonly InferenceStatusEnum = InferenceStatusEnum;
   protected readonly EvalsExecutionEnum = EvalsExecutionEnum;
+  protected readonly ApiEnum = ApiEnum;
 }

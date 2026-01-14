@@ -30,11 +30,9 @@ export class EvalsRow {
   })
   input: string = "";
 
-  @advancedFormControl({
-    type: FormControlTypeEnum.Input,
-    fieldType: FieldType.String,
-  })
   images: string[] = [];
+
+  audio: string[] = [];
 
   status: InferenceStatusEnum = InferenceStatusEnum.Idle;
 
