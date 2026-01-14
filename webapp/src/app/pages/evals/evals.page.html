@@ -45,6 +45,7 @@
       <tr>
         <th style="min-width: 250px;">Context</th>
         <th style="min-width: 250px;">Input</th>
+        <th style="min-width: 250px;">Images</th>
         <th>API</th>
         <th>Status</th>
 <!--        <th>Performance</th>-->
@@ -60,6 +61,23 @@
           </td>
           <td>
             <magieno-textarea [showTitle]="false" [showInfoIcon]="false" [advancedFormControl]="formRow.formElements.input | asAdvancedFormControl"></magieno-textarea>
+          </td>
+          <td (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
+            <div class="border rounded p-2 text-center mb-2" style="border-style: dashed !important; cursor: pointer;" (click)="fileInput.click()">
+              <i class="bi bi-cloud-upload display-6"></i>
+              <p class="m-0 small text-muted">Click or Drag Images</p>
+              <input #fileInput type="file" multiple accept="image/*" class="d-none" (change)="selectImage($event, $index)">
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              @for (image of formRow.value.images; track $index) {
+                <div class="position-relative d-inline-block">
+                  <img [src]="image" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: zoom-in;" (click)="previewImage(image)">
+                  <button class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle" style="width: 18px; height: 18px; line-height: 14px; transform: translate(30%, -30%); font-size: 10px;" (click)="removeImage($index, $index); $event.stopPropagation()">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              }
+            </div>
           </td>
           <td>
             <magieno-select [advancedFormControl]="formRow.formElements.api | asAdvancedFormControl"></magieno-select>
@@ -84,3 +102,18 @@
   </table>
 </div>
 </div>
+
+@if (previewImageSrc) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);" (click)="closePreview()">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-transparent border-0 text-center">
+        <div class="modal-body p-0">
+          <img [src]="previewImageSrc" class="img-fluid rounded" style="max-height: 90vh;" (click)="$event.stopPropagation()">
+          <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle" (click)="closePreview()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
