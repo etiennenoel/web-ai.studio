@@ -1,6 +1,6 @@
 import {ChatPage} from './pages/chat/chat.page';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {NgbCarouselModule, NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarouselModule, NgbDropdownModule, NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -91,6 +91,7 @@ import {AttachmentModalComponent} from './components/prompt-input/attachment-mod
     NgbTooltipModule,
     NgbOffcanvasModule,
     NgbCarouselModule,
+    NgbDropdownModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

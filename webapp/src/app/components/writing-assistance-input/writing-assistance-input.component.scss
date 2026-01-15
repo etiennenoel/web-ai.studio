@@ -1,3 +1,55 @@
-:host {
-  display: block;
+// Add your component-specific styles here
+
+.api-selector {
+  .active {
+    color: var(--bs-primary);
+    background-color: var(--bs-dark-bg-subtle);
+  }
+}
+
+.btn-soft {
+  border: none;
+  transition: none;
+  background-color: transparent;
+
+  &:hover {
+    background-color: var(--bs-dark-bg-subtle);
+    border: none;
+  }
+
+  &.disabled, &:disabled, &.active, &:active, &.show {
+    border: none;
+  }
+}
+
+.btn-settings {
+  position: relative;
+  .badge-settings {
+    border: none;
+    display: none;
+  }
+
+  &.active {
+    .badge-settings {
+      display: block;
+      left: 75% !important;
+      top: 25% !important;
+    }
+  }
+
+}
+
+
+:host ::ng-deep .bg-warning {
+  .tooltip-inner {
+    background-color: var(--bs-warning);
+    color: var(--bs-black);
+  }
+
+  .tooltip-arrow {
+    &::before {
+      border-top-color: var(--bs-warning) !important;
+    }
+
+  }
 }
