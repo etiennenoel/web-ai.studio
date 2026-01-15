@@ -1,4 +1,5 @@
 export enum PromptInputStateEnum {
   Ready = 'Ready',
-  Disabled = 'Disabled'
+  Disabled = 'Disabled',
+  Inferencing = 'Inferencing'
 }

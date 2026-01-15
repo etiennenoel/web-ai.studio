@@ -62,6 +62,7 @@
             ],
             "polyfills": [
               "zone.js",
+              "@angular/localize/init"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",

@@ -1,3 +1,110 @@
-:host {
-  display: block;
+// Add your component-specific styles here
+.preview-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  padding: 15px;
+
+}
+
+.preview-item {
+  border: 1px solid var(--bs-secondary-border-subtle);
+  border-radius: 15px;
+  position: relative;
+  max-width: 300px;
+  overflow: clip;
+  width: 300px;
+
+  img, video, audio, .pdf-preview {
+    width: 300px;
+    height: 300px;
+    object-fit: contain; // Added for better preview
+  }
+
+  .preview-title {
+    background-color: var(--bs-dark-bg-subtle);
+    padding: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .legend {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+
+
+
+.btn-soft {
+  transition: none;
+  background-color: transparent; // Ensure it starts transparent
+  border: none;
+
+  &:hover {
+    background-color: var(--bs-dark-bg-subtle);
+  }
+
+  &.disabled, &:disabled, &.active, &:active, &.show {
+    border: none;
+    // background-color: var(--bs-dark-bg-subtle); // Optional: keep active state visible
+  }
+}
+
+.drag-over {
+  .card {
+    border: 2px dotted var(--bs-primary) !important;
+  }
+}
+
+.btn-settings {
+  position: relative; // Needed for absolute positioning of badge
+
+  .badge-settings {
+    border: none;
+    display: none;
+  }
+
+  &.active {
+    .badge-settings {
+      display: block;
+      left: 75% !important;
+      top: 25% !important;
+    }
+  }
+
+}
+
+
+:host ::ng-deep .bg-warning {
+  .tooltip-inner {
+    background-color: var(--bs-warning);
+    color: var(--bs-black);
+  }
+
+  .tooltip-arrow {
+    &::before {
+      border-top-color: var(--bs-warning) !important;
+    }
+
+  }
 }
