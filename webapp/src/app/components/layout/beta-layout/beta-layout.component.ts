@@ -23,7 +23,7 @@ export class BetaLayoutComponent implements AfterViewInit {
     private elementRef: ElementRef
   ) {
     if (isPlatformBrowser(this.platformId)) {
-      this.checkTimeAndSetTheme();
+      this.initTheme();
     }
   }
 
@@ -59,28 +59,45 @@ export class BetaLayoutComponent implements AfterViewInit {
       this.refreshIcons();
   }
 
+  initTheme() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const modeParam = urlParams.get('mode') || urlParams.get('theme'); // Support both
+
+    if (modeParam === 'dark' || modeParam === 'light') {
+        this.theme = modeParam;
+        localStorage.setItem('webai_theme', modeParam);
+    } else if (modeParam === 'auto') {
+        localStorage.removeItem('webai_theme'); // Clear preference to use system
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            this.theme = 'dark';
+        } else {
+            this.theme = 'light';
+        }
+    } else {
+        const storedTheme = localStorage.getItem('webai_theme');
+        if (storedTheme) {
+          this.theme = storedTheme;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          this.theme = 'dark';
+        } else {
+          this.theme = 'light';
+        }
+    }
+    this.applyTheme();
+  }
+
   toggleTheme() {
     this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('webai_theme', this.theme);
+    this.applyTheme();
+  }
+
+  applyTheme() {
     if (isPlatformBrowser(this.platformId)) {
       if (this.theme === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
-      }
-    }
-  }
-
-  checkTimeAndSetTheme() {
-    const hour = new Date().getHours();
-    if (hour >= 6 && hour < 18) {
-      this.theme = 'light';
-      if (isPlatformBrowser(this.platformId)) {
-        document.documentElement.classList.remove('dark');
-      }
-    } else {
-      this.theme = 'dark';
-      if (isPlatformBrowser(this.platformId)) {
-        document.documentElement.classList.add('dark');
       }
     }
   }
