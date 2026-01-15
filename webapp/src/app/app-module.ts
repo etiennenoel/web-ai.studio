@@ -1,6 +1,6 @@
 import {ChatPage} from './pages/chat/chat.page';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarouselModule, NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -55,6 +55,7 @@ import {ChatComponent} from './components/chat/chat.component';
 import {PromptInputComponent} from './components/prompt-input/prompt-input.component';
 import {CodeEditorComponent} from './shared/components/code-editor/code-editor.component';
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
+import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import {WritingAssistanceInputComponent} from './components/writing-assistance-i
      PromptInputComponent,
      CodeEditorComponent,
      WritingAssistanceInputComponent,
+     AttachmentModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,6 +90,7 @@ import {WritingAssistanceInputComponent} from './components/writing-assistance-i
     FormsModule,
     NgbTooltipModule,
     NgbOffcanvasModule,
+    NgbCarouselModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

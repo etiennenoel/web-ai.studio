@@ -1,0 +1,11 @@
+:host ::ng-deep {
+  &.carousel-indicators {
+    background-color: black;
+    border-radius: 15px;
+    padding: 10px;
+  }
+
+  &.carousel-control-prev:hover, &.carousel-control-next:hover {
+    background-color: rgba(0,0,0,0.2);
+  }
+}
