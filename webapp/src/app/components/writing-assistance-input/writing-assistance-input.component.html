@@ -1,15 +1,121 @@
 <div class="card p-3">
+  <!-- API Selection -->
   <div class="mb-3">
-    <label class="form-label">Select API</label>
+    <label class="form-label fw-bold">Select API</label>
     <select class="form-select" [ngModel]="selectedApi" (ngModelChange)="onApiChange($event)">
       @for (api of apis; track api) {
         <option [value]="api">{{ api }}</option>
       }
     </select>
   </div>
+
+  <!-- Common Options -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label" title="Shared context is used to initialize the model.">Shared Context (Creation)</label>
+      <input type="text" class="form-control" [(ngModel)]="options.sharedContext" placeholder="E.g., An article from the Daily News...">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" title="Context is passed with the run call.">Context (Run)</label>
+      <input type="text" class="form-control" [(ngModel)]="options.context" placeholder="E.g., Written on 2024-01-01...">
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Summarizer Options -->
+  @if (selectedApi === WritingAssistanceApiEnum.SummarizerApi) {
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Type</label>
+        <select class="form-select" [(ngModel)]="options.summarizerType">
+          @for (type of SummarizerTypeEnum | keyvalue; track type.key) {
+            <option [value]="type.value">{{ type.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Format</label>
+        <select class="form-select" [(ngModel)]="options.summarizerFormat">
+          @for (format of SummarizerFormatEnum | keyvalue; track format.key) {
+            <option [value]="format.value">{{ format.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Length</label>
+        <select class="form-select" [(ngModel)]="options.summarizerLength">
+          @for (len of SummarizerLengthEnum | keyvalue; track len.key) {
+            <option [value]="len.value">{{ len.value }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  <!-- Writer Options -->
+  @if (selectedApi === WritingAssistanceApiEnum.WriterApi) {
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Tone</label>
+        <select class="form-select" [(ngModel)]="options.writerTone">
+          @for (tone of WriterToneEnum | keyvalue; track tone.key) {
+            <option [value]="tone.value">{{ tone.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Format</label>
+        <select class="form-select" [(ngModel)]="options.writerFormat">
+          @for (format of WriterFormatEnum | keyvalue; track format.key) {
+            <option [value]="format.value">{{ format.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Length</label>
+        <select class="form-select" [(ngModel)]="options.writerLength">
+          @for (len of WriterLengthEnum | keyvalue; track len.key) {
+            <option [value]="len.value">{{ len.value }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  <!-- Rewriter Options -->
+  @if (selectedApi === WritingAssistanceApiEnum.RewriterApi) {
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Tone</label>
+        <select class="form-select" [(ngModel)]="options.rewriterTone">
+          @for (tone of RewriterToneEnum | keyvalue; track tone.key) {
+            <option [value]="tone.value">{{ tone.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Format</label>
+        <select class="form-select" [(ngModel)]="options.rewriterFormat">
+          @for (format of RewriterFormatEnum | keyvalue; track format.key) {
+            <option [value]="format.value">{{ format.value }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Length</label>
+        <select class="form-select" [(ngModel)]="options.rewriterLength">
+          @for (len of RewriterLengthEnum | keyvalue; track len.key) {
+            <option [value]="len.value">{{ len.value }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
   <div class="mb-3">
-    <label class="form-label">Input</label>
-    <textarea class="form-control" rows="5" [(ngModel)]="input"></textarea>
+    <label class="form-label fw-bold">Input Text</label>
+    <textarea class="form-control" rows="5" [(ngModel)]="input" placeholder="Enter text to process..."></textarea>
   </div>
   <div class="d-flex justify-content-end gap-2">
     <button class="btn btn-secondary" (click)="onCancel()" *ngIf="state === 'Disabled'">Cancel</button>

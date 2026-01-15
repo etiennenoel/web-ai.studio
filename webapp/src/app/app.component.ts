@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  template: '<magieno-webai-studio-layout></magieno-webai-studio-layout>',
+  template: '<router-outlet></router-outlet>',
   standalone: false
 })
 export class AppComponent {}

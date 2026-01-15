@@ -9,6 +9,7 @@ import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {BasePage} from '../base-page';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
+import {PromptInputEvent} from '../../components/prompt-input/prompt-input.component';
 
 declare const LanguageModel: any;
 
@@ -84,8 +85,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     codeModalComponent.componentInstance.updateCode();
   }
 
-  async onRun(prompt: string) {
-    await this.conversationManager.run(prompt);
+  async onRun(event: PromptInputEvent) {
+    await this.conversationManager.run(event.prompt);
     this.state = PromptInputStateEnum.Ready;
   }
 

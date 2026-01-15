@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { WritingAssistanceApiEnum } from '../enums/writing-assistance-api.enum';
+import { WritingAssistanceOptions } from '../models/writing-assistance-options.model';
 
 declare const Summarizer: any;
 declare const Writer: any;
@@ -28,32 +29,83 @@ export class WritingAssistanceService {
     }
   }
 
-  async run(api: WritingAssistanceApiEnum, input: string, options?: any): Promise<string> {
+  async runStreaming(api: WritingAssistanceApiEnum, input: string, options: WritingAssistanceOptions, onChunk: (chunk: string, full: string) => void): Promise<string> {
     if (this.session) {
-      this.session.destroy();
+      try {
+        this.session.destroy();
+      } catch (e) {
+        console.warn('Error destroying session', e);
+      }
     }
 
     try {
+      let stream: ReadableStream;
+      const context = options.context;
+      const sharedContext = options.sharedContext;
+
       if (api === WritingAssistanceApiEnum.SummarizerApi) {
-        this.session = await Summarizer.create(options);
-        return await this.session.summarize(input);
+        this.session = await Summarizer.create({
+          sharedContext,
+          type: options.summarizerType,
+          format: options.summarizerFormat,
+          length: options.summarizerLength
+        });
+        stream = await this.session.summarizeStreaming(input, { context });
       } else if (api === WritingAssistanceApiEnum.WriterApi) {
-        this.session = await Writer.create(options);
-        return await this.session.write(input);
+        this.session = await Writer.create({
+          sharedContext,
+          tone: options.writerTone,
+          format: options.writerFormat,
+          length: options.writerLength
+        });
+        stream = await this.session.writeStreaming(input, { context });
       } else if (api === WritingAssistanceApiEnum.RewriterApi) {
-        this.session = await Rewriter.create(options);
-        return await this.session.rewrite(input, options);
+        this.session = await Rewriter.create({
+          sharedContext,
+          tone: options.rewriterTone,
+          format: options.rewriterFormat,
+          length: options.rewriterLength
+        });
+        stream = await this.session.rewriteStreaming(input, { context });
+      } else {
+        throw new Error('Unknown API');
       }
+
+      let fullText = '';
+      const reader = stream.getReader();
+      
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          fullText += value;
+          onChunk(value, fullText);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+
+      return fullText;
+
     } catch (e) {
       console.error(e);
       throw e;
     }
-    return '';
+  }
+
+  async run(api: WritingAssistanceApiEnum, input: string, options: WritingAssistanceOptions): Promise<string> {
+     // Fallback to streaming implementation but just return final result if needed, 
+     // but to match existing non-streaming signature:
+     return this.runStreaming(api, input, options, () => {});
   }
 
   cancel() {
     if (this.session) {
-      this.session.destroy();
+      try {
+        this.session.destroy();
+      } catch (e) {
+        console.warn('Error destroying session', e);
+      }
       this.session = null;
     }
   }

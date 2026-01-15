@@ -3,6 +3,7 @@ import {isPlatformServer} from '@angular/common';
 import {WritingAssistanceService} from '../../core/services/writing-assistance.service';
 import {WritingAssistanceApiEnum} from '../../core/enums/writing-assistance-api.enum';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
+import {WritingAssistanceOptions} from '../../core/models/writing-assistance-options.model';
 
 @Component({
   selector: 'webai-studio-writing-assistance',
@@ -36,13 +37,16 @@ export class WritingAssistancePage implements OnInit {
     await this.checkAvailability(api);
   }
 
-  async run(input: string) {
+  async run(event: { input: string, options: WritingAssistanceOptions }) {
     this.state = PromptInputStateEnum.Disabled;
+    this.output.set('');
     try {
-      const result = await this.writingAssistanceService.run(this.api, input);
-      this.output.set(result);
+      await this.writingAssistanceService.runStreaming(this.api, event.input, event.options, (chunk, full) => {
+        this.output.set(full);
+      });
     } catch (e) {
       console.error(e);
+      this.output.set('Error: ' + e);
     } finally {
       this.state = PromptInputStateEnum.Ready;
     }

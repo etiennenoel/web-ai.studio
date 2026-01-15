@@ -2,6 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PromptInputStateEnum } from '../../core/enums/prompt-input-state.enum';
 import { PromptRunOptions } from '../../core/models/prompt-run.options';
 
+export interface PromptInputEvent {
+  prompt: string;
+  attachments: File[];
+}
+
 @Component({
   selector: 'app-prompt-input',
   templateUrl: './prompt-input.component.html',
@@ -10,17 +15,25 @@ import { PromptRunOptions } from '../../core/models/prompt-run.options';
 })
 export class PromptInputComponent {
   @Input() state: PromptInputStateEnum = PromptInputStateEnum.Ready;
-  @Output() run = new EventEmitter<string>();
+  @Output() run = new EventEmitter<PromptInputEvent>();
   @Output() cancel = new EventEmitter<void>();
   @Output() optionsChange = new EventEmitter<PromptRunOptions>();
 
   prompt: string = '';
   options: PromptRunOptions = new PromptRunOptions();
+  
+  showOptions = false;
+  isRecording = false;
+  attachments: File[] = [];
 
   onRun() {
-    if (this.prompt.trim()) {
-      this.run.emit(this.prompt);
+    if (this.prompt.trim() || this.attachments.length > 0) {
+      this.run.emit({
+        prompt: this.prompt,
+        attachments: this.attachments
+      });
       this.prompt = '';
+      this.attachments = [];
     }
   }
 
@@ -29,6 +42,39 @@ export class PromptInputComponent {
   }
 
   toggleOptions() {
-    // Implement options toggle logic if needed, or emit optionsChange
+    this.showOptions = !this.showOptions;
+  }
+
+  updateOptions() {
+    this.optionsChange.emit(this.options);
+  }
+
+  toggleRecording() {
+    this.isRecording = !this.isRecording;
+    // TODO: Implement actual recording logic
+    if (this.isRecording) {
+      console.log('Recording started...');
+    } else {
+      console.log('Recording stopped.');
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.attachments = [...this.attachments, ...Array.from(input.files)];
+    }
+    input.value = '';
+  }
+
+  removeAttachment(index: number) {
+    this.attachments.splice(index, 1);
+  }
+
+  onEnter(event: any) {
+    if (!event.shiftKey) {
+      event.preventDefault();
+      this.onRun();
+    }
   }
 }
