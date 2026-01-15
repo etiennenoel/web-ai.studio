@@ -2,12 +2,13 @@ import {Component, NgZone} from '@angular/core';
 import {AxonTestSuiteExecutor} from './axon-test-suite.executor';
 import {TestStatus} from '../../../enums/test-status.enum';
 import {BuiltInAiApi} from '../../../enums/built-in-ai-api.enum';
-import {EnumUtils, ItemInterface} from '@magieno/common';
 import {AxonTestId} from './enums/axon-test-id.enum';
 import {AxonTestInterface} from './interfaces/axon-test.interface';
 import {AxonSummaryResultsInterface} from './interfaces/axon-summary-results.interface';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CodeModal} from '../../../modals/code/code.modal';
+import {EnumUtils} from '../../../core/utils/enum.utils';
+import {ItemInterface} from '../../../core/interfaces/item.interface';
 
 @Component({
   selector: 'page-axon',

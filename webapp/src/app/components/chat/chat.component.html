@@ -1,0 +1,11 @@
+<div class="chat-container d-flex flex-column gap-3 p-3">
+  @for (message of messages; track $index) {
+    <div class="d-flex" [class.justify-content-end]="message.role === 'user'">
+      <div class="card" [class.bg-primary]="message.role === 'user'" [class.text-white]="message.role === 'user'" style="max-width: 80%;">
+        <div class="card-body p-2">
+          <div [innerHTML]="message.content"></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

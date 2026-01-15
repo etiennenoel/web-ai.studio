@@ -1,13 +1,5 @@
 import {ChatPage} from './pages/chat/chat.page';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {DragDropModule} from '@angular/cdk/drag-drop';
-import {MagienoDragAndDropComponent} from '@magieno/angular-drag-and-drop';
-import {MagienoBootstrapDropdownComponent} from '@magieno/angular-bootstrap-dropdown';
-import {MagienoCodeEditorModule} from '@magieno/angular-code-editor';
-import {MagienoCoreModule, RootComponent} from '@magieno/angular-core';
-import {MagienoMediaModule} from '@magieno/angular-media';
-import {MagienoAdvancedTableComponent} from '@magieno/angular-advanced-table';
-import {MagienoAIModule} from '@magieno/angular-ai';
 import {NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -57,9 +49,16 @@ import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
 import { CodeModal } from './modals/code/code.modal';
+import {AppComponent} from './app.component';
+import {MarkdownPipe} from './shared/pipes/markdown.pipe';
+import {ChatComponent} from './components/chat/chat.component';
+import {PromptInputComponent} from './components/prompt-input/prompt-input.component';
+import {CodeEditorComponent} from './shared/components/code-editor/code-editor.component';
+import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
 
 @NgModule({
   declarations: [
+    AppComponent,
     ChatPage,
     LayoutComponent,
     HeaderComponent,
@@ -76,20 +75,17 @@ import { CodeModal } from './modals/code/code.modal';
 
     // Modals
      CodeModal,
+     MarkdownPipe,
+     ChatComponent,
+     PromptInputComponent,
+     CodeEditorComponent,
+     WritingAssistanceInputComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    DragDropModule,
-    MagienoDragAndDropComponent,
-    MagienoBootstrapDropdownComponent,
-    MagienoCodeEditorModule,
-    MagienoCoreModule,
-    MagienoMediaModule,
-    MagienoAdvancedTableComponent,
-    MagienoAIModule,
     NgbTooltipModule,
     NgbOffcanvasModule,
   ],
@@ -118,6 +114,6 @@ import { CodeModal } from './modals/code/code.modal';
     PromptTextEthicalAndCreativeColdStartAxonTest,
     PromptTextTechnicalChallengeStartAxonTest,
   ],
-  bootstrap: [RootComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

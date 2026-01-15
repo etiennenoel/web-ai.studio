@@ -48,26 +48,25 @@
   <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
     <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
 
-      @if (this.conversationManager.state() !== InferenceStateEnum.Initial) {
-        <magieno-conversation class="flex-grow-1"
-                              [conversation]="this.conversationManager.conversation()"
-                              [state]="this.conversationManager.state()"
-                              style="height: calc(100vh - 190px); overflow:auto;overflow-anchor: none;"
-                              autoScroll
-        ></magieno-conversation>
+      @if ((conversationManager.status$ | async) !== InferenceStateEnum.Initial) {
+        <app-chat class="flex-grow-1"
+                  [messages]="(conversationManager.messages$ | async) || []"
+                  style="height: calc(100vh - 190px); overflow:auto;overflow-anchor: none;"
+                  autoScroll
+        ></app-chat>
       }
 
-      @if (this.conversationManager.state() === InferenceStateEnum.Initial) {
+      @if ((conversationManager.status$ | async) === InferenceStateEnum.Initial) {
         <h1 class="display-4 text-center">Web AI Studio</h1>
       }
 
-      <magieno-prompt-input
-        [class.sticky-bottom]="this.conversationManager.state() !== InferenceStateEnum.Initial"
-        [(state)]="state"
+      <app-prompt-input
+        [class.sticky-bottom]="(conversationManager.status$ | async) !== InferenceStateEnum.Initial"
+        [state]="state"
         (run)="onRun($event)"
         (cancel)="onCancel()"
         (optionsChange)="onOptionsChange($event)"
-      ></magieno-prompt-input>
+      ></app-prompt-input>
 
     </div>
   </div>

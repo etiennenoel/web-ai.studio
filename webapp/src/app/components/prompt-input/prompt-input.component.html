@@ -1,0 +1,64 @@
+<div class="card shadow-sm">
+  <!-- Options Panel -->
+  <div class="card-body bg-light border-bottom" *ngIf="showOptions">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label small fw-bold">System Prompt</label>
+        <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="options.systemPrompt" (change)="updateOptions()" placeholder="You are a helpful assistant..."></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-bold">Temperature: {{options.temperature}}</label>
+        <input type="range" class="form-range" min="0" max="2" step="0.1" [(ngModel)]="options.temperature" (change)="updateOptions()">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-bold">Top K</label>
+        <input type="number" class="form-control form-control-sm" [(ngModel)]="options.topK" (change)="updateOptions()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Attachments List -->
+  <div class="card-body border-bottom p-2" *ngIf="attachments.length > 0">
+    <div class="d-flex flex-wrap gap-2">
+      <div *ngFor="let file of attachments; let i = index" class="badge bg-secondary text-white d-flex align-items-center gap-2">
+        <span class="text-truncate" style="max-width: 150px;">{{file.name}}</span>
+        <button type="button" class="btn-close btn-close-white" aria-label="Remove" (click)="removeAttachment(i)" style="font-size: 0.5rem;"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="card-body p-2">
+    <textarea class="form-control border-0 shadow-none" 
+              rows="3" 
+              [(ngModel)]="prompt" 
+              (keydown.enter)="onEnter($event)" 
+              placeholder="Type your message here..."
+              style="resize: none;"></textarea>
+    
+    <div class="d-flex justify-content-between align-items-center mt-2">
+      <div class="d-flex gap-1">
+        <button class="btn btn-light btn-sm rounded-circle" (click)="fileInput.click()" title="Attach file">
+          <i class="bi bi-paperclip"></i>
+        </button>
+        <button class="btn btn-light btn-sm rounded-circle" (click)="toggleRecording()" [class.text-danger]="isRecording" title="Voice input">
+          <i class="bi bi-mic" [class.bi-mic-fill]="isRecording"></i>
+        </button>
+        <button class="btn btn-light btn-sm rounded-circle" (click)="toggleOptions()" [class.active]="showOptions" title="Settings">
+          <i class="bi bi-sliders"></i>
+        </button>
+      </div>
+
+      <div>
+        <button *ngIf="state === 'Ready'" class="btn btn-primary btn-sm rounded-pill px-3" (click)="onRun()" [disabled]="!prompt.trim() && attachments.length === 0">
+          <i class="bi bi-send-fill me-1"></i> Send
+        </button>
+        <button *ngIf="state === 'Disabled'" class="btn btn-danger btn-sm rounded-pill px-3" (click)="onCancel()">
+          <i class="bi bi-stop-circle-fill me-1"></i> Stop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <input #fileInput type="file" multiple class="d-none" (change)="onFileSelected($event)">
+</div>

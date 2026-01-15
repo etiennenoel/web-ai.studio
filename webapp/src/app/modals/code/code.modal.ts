@@ -1,5 +1,4 @@
 import {Component, Inject, Input, PLATFORM_ID} from '@angular/core';
-import {CodeEditorActionsCoordinator} from '@magieno/angular-code-editor';
 
 @Component({
   selector: 'modal-code',
@@ -10,8 +9,6 @@ import {CodeEditorActionsCoordinator} from '@magieno/angular-code-editor';
 export class CodeModal {
   @Input()
   code: string = "";
-
-  coordinator = new CodeEditorActionsCoordinator();
 
   constructor(@Inject(PLATFORM_ID) private readonly platformId: Object) {
   }

@@ -2,11 +2,16 @@ import {Component, Inject, OnDestroy, OnInit, PLATFORM_ID, DOCUMENT} from '@angu
 import {ActivatedRoute, Router} from '@angular/router';
 import {isPlatformServer} from '@angular/common';
 import {Title} from '@angular/platform-browser';
-import {ConversationManager, PromptManager, InferenceStateEnum, PromptInputStateEnum, PromptRunOptions} from '@magieno/angular-ai';
+import {ConversationManager} from '../../core/services/conversation.manager';
+import {PromptRunOptions} from '../../core/models/prompt-run.options';
+import {InferenceStateEnum} from '../../core/enums/inference-state.enum';
+import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {BasePage} from '../base-page';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
+import {PromptInputEvent} from '../../components/prompt-input/prompt-input.component';
 
+declare const LanguageModel: any;
 
 @Component({
   selector: 'page-chat',
@@ -80,8 +85,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     codeModalComponent.componentInstance.updateCode();
   }
 
-  async onRun(options: PromptRunOptions) {
-    await this.conversationManager.run(options);
+  async onRun(event: PromptInputEvent) {
+    await this.conversationManager.run(event.prompt);
     this.state = PromptInputStateEnum.Ready;
   }
 
