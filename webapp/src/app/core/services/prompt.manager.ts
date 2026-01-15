@@ -19,10 +19,10 @@ export class PromptManager {
 
   getCode(options: PromptRunOptions, isStream: boolean, language: "typescript" | "javascript"): string {
     // Basic implementation for demonstration
-    const declaration = language === 'typescript' ? 'const session = await window.ai.languageModel.create({' : 'const session = await window.ai.languageModel.create({';
+    const declaration = language === 'typescript' ? 'const session = await LanguageModel.create({' : 'const session = await LanguageModel.create({';
     return `
 // Check availability
-const availability = await window.ai.languageModel.availability();
+const availability = await LanguageModel.availability();
 
 if (availability !== "no") {
   ${declaration}

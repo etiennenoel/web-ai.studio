@@ -10,6 +10,8 @@ import {BasePage} from '../base-page';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
 
+declare const LanguageModel: any;
+
 @Component({
   selector: 'page-chat',
   templateUrl: './chat.page.html',
@@ -94,8 +96,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   async triggerDownload() {
     const self = this;
 
-    // @ts-ignore
-    const session = await window.ai.languageModel.create({
+    const session = await LanguageModel.create({
       expectedInputs: [
         { type: "text", languages: ["en"] },
         { type: "audio", languages: ["en"] },
@@ -120,8 +121,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     }
 
     try {
-      // @ts-ignore
-      this.languageModelAvailability = await window.ai.languageModel.availability({
+      this.languageModelAvailability = await LanguageModel.availability({
         expectedInputs: [
           { type: "text", languages: ["en"] },
           { type: "audio", languages: ["en"] },

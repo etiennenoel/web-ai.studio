@@ -3,6 +3,8 @@ import { BehaviorSubject } from 'rxjs';
 import { PromptRunOptions } from '../models/prompt-run.options';
 import { InferenceStateEnum } from '../enums/inference-state.enum';
 
+declare const LanguageModel: any;
+
 export interface Message {
   role: 'user' | 'model' | 'system';
   content: string;
@@ -30,10 +32,8 @@ export class ConversationManager {
     }
 
     try {
-      // @ts-ignore
-      if (window.ai && window.ai.languageModel) {
-         // @ts-ignore
-        this.session = await window.ai.languageModel.create({
+      if ('LanguageModel' in self) {
+        this.session = await LanguageModel.create({
           systemPrompt: options.systemPrompt,
           temperature: options.temperature,
           topK: options.topK
