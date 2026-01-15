@@ -56,12 +56,14 @@ import {PromptInputComponent} from './components/prompt-input/prompt-input.compo
 import {CodeEditorComponent} from './shared/components/code-editor/code-editor.component';
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
 import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
+import {BetaLayoutComponent} from './components/layout/beta-layout/beta-layout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ChatPage,
     LayoutComponent,
+    BetaLayoutComponent,
     HeaderComponent,
     SidebarComponent,
     TranslationPage,

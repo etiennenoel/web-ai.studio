@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DesignService } from '../../core/services/design.service';
 
 @Component({
   selector: 'magieno-webai-studio-layout',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-
+  constructor(public designService: DesignService) {}
 }

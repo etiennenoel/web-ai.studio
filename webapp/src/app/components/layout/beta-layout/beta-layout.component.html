@@ -1,0 +1,277 @@
+<div [class.dark]="theme === 'dark'" class="antialiased relative min-h-screen selection:bg-blue-500/30 selection:text-blue-200 transition-colors duration-300 bg-white dark:bg-[#050505] text-gray-900 dark:text-gray-200 font-sans overflow-x-hidden">
+
+    <!-- Background Grid (Moved here for better stacking) -->
+    <div class="absolute inset-0 z-0 home-bg-grid pointer-events-none"></div>
+    <div class="hero-glow z-0"></div>
+
+    <!-- Global Navigation -->
+    <nav id="main-nav" class="fixed w-full z-50 transition-colors duration-300 border-b border-gray-200 dark:border-white/5 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <div class="flex items-center gap-2.5 cursor-pointer" (click)="navigateTo('home')">
+                    <div class="w-6 h-6 rounded bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                        <i data-lucide="cpu" class="h-4 w-4 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <span class="font-bold text-base tracking-tight text-gray-900 dark:text-white">web-ai<span class="text-blue-600 dark:text-blue-400">.studio</span></span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-1">
+                    <button (click)="navigateTo('home')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Home</button>
+                    <button (click)="navigateTo('docs')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Academy & Docs</button>
+                    <button class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-not-allowed opacity-70">Evals</button>
+                    <button (click)="navigateTo('status')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Status</button>
+                    
+                    <!-- Theme Toggle -->
+                    <button (click)="toggleTheme()" class="ml-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" aria-label="Toggle Theme">
+                        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                        <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                    </button>
+
+                    <div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-2"></div>
+                    <a href="https://github.com/webmachinelearning" target="_blank" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2">
+                        <i data-lucide="github" class="w-4 h-4"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================= HOME PAGE ======================= -->
+    <div id="page-home" class="page-section relative z-10" [class.active]="activePage === 'home'">
+        
+        <main class="pt-32 pb-16 sm:pt-40 sm:pb-24 px-4 sm:px-6">
+            <div class="max-w-5xl mx-auto text-center">
+                <div class="inline-flex items-center px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-300 text-xs font-mono mb-8 backdrop-blur-sm">
+                    <span class="animate-pulse mr-2 w-2 h-2 rounded-full bg-blue-500"></span>
+                    Web Machine Learning
+                </div>
+                
+                <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6 leading-tight">
+                    Standardized AI <br class="hidden sm:block" />
+                    <!-- Use explicit hex colors for gradient to ensure they exist -->
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#2563eb] via-[#9333ea] to-[#db2777] dark:from-[#60a5fa] dark:via-[#c084fc] dark:to-[#f472b6]">Native to the Web</span>
+                </h1>
+                
+                <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed">
+                    Deploy privacy-first, offline-capable AI features using standard browser APIs. 
+                    <br>
+                    <span class="text-gray-900 dark:text-white font-medium">No API keys. No monthly bills. No latency.</span>
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-20">
+                    <!-- Explicit box-shadow style fallback if Tailwind classes fail -->
+                    <button (click)="navigateTo('docs')" class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-1" style="box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2), 0 4px 6px -2px rgba(37, 99, 235, 0.1);">
+                        Start Learning
+                    </button>
+                    <button (click)="navigateTo('status')" class="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white px-8 py-4 rounded-xl font-bold text-lg backdrop-blur-sm transition-all">
+                        Check Compatibility
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Access Section -->
+            <div class="max-w-7xl mx-auto mb-20">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Quick Access</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openChat()">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-3">
+                            <i data-lucide="message-circle" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">Chat</span>
+                    </div>
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-purple-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10">
+                        <div class="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-3">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">Evals</span>
+                    </div>
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-pink-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10">
+                        <div class="w-12 h-12 bg-pink-500/10 rounded-full flex items-center justify-center mb-3">
+                            <i data-lucide="pen-tool" class="w-6 h-6 text-pink-600 dark:text-pink-400"></i>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">Writing Assistance</span>
+                    </div>
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-indigo-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10">
+                        <div class="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3">
+                            <i data-lucide="languages" class="w-6 h-6 text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">Translation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Grid -->
+            <div class="max-w-7xl mx-auto mb-24">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Available APIs</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-summarizer')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center"><i data-lucide="file-text" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i></div>
+                            <span class="badge badge-stable">Stable</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Summarizer</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Condense articles and text into key points.</p>
+                    </div>
+                    <!-- ... Added borders to other cards too ... -->
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-prompt')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center"><i data-lucide="terminal" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i></div>
+                            <span class="badge badge-trial">Origin Trial</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Prompt API</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Generic LLM interface for chat & reasoning.</p>
+                    </div>
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-writer')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center"><i data-lucide="pen-tool" class="w-5 h-5 text-pink-600 dark:text-pink-400"></i></div>
+                            <span class="badge badge-dev">Dev Preview</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Writer</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Generate new content from seed ideas.</p>
+                    </div>
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-proofreader')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 dark:text-emerald-400"></i></div>
+                            <span class="badge badge-trial">Origin Trial</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Proofreader</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Grammar and spell checking.</p>
+                    </div>
+                    
+                    <!-- Added APIs -->
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center"><i data-lucide="languages" class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></i></div>
+                            <span class="badge badge-stable">Stable</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Translator</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Translate text between languages locally.</p>
+                    </div>
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center"><i data-lucide="globe" class="w-5 h-5 text-teal-600 dark:text-teal-400"></i></div>
+                            <span class="badge badge-stable">Stable</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Language Detector</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Detect the language of a given text.</p>
+                    </div>
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-rewriter')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center"><i data-lucide="refresh-cw" class="w-5 h-5 text-orange-600 dark:text-orange-400"></i></div>
+                            <span class="badge badge-dev">Dev Preview</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Rewriter</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Polish, rephrase, or adjust text tone.</p>
+                    </div>
+                </div>
+
+                <!-- Developer Ecosystem Section -->
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 mt-16 text-center md:text-left">Developer Ecosystem</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Added bg-gradient explicit colors if needed, but gray-50 should work -->
+                    <div class="bg-gradient-to-br from-gray-50 to-white dark:from-[#121215] dark:to-[#0a0a0c] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i data-lucide="puzzle" class="w-32 h-32 text-blue-400"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400"><i data-lucide="chrome" class="w-6 h-6"></i></div>
+                                <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Extension</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">WebAI DevTools</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Debug models and monitor latency directly in your browser.</p>
+                            <button class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4"></i> Add to Chrome
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group cursor-pointer" (click)="navigateTo('docs', 'course-foundations')">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i data-lucide="book-open" class="w-32 h-32 text-green-400"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-green-500/20 rounded-lg text-green-600 dark:text-green-400"><i data-lucide="code-2" class="w-6 h-6"></i></div>
+                                <span class="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">Tutorials</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Web AI Academy</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Interactive courses to master the API lifecycle and patterns.</p>
+                            <span class="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                                Start Learning <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i data-lucide="git-pull-request" class="w-32 h-32 text-purple-400"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-purple-500/20 rounded-lg text-purple-600 dark:text-purple-400"><i data-lucide="users" class="w-6 h-6"></i></div>
+                                <span class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Community</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Shape the Standard</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Propose new capabilities like Image Generation to the W3C.</p>
+                            <a href="https://github.com/webmachinelearning/proposals" target="_blank" class="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                                View Proposals <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ... (App and Docs sections preserved, updated with gray classes if needed) ... -->
+    <!-- ======================= APP PAGE ======================= -->
+    <div id="page-app" class="page-section relative z-10" [class.active]="activePage === 'app'">
+        <div class="pt-20 px-4 md:px-8 pb-12" style="height: 100vh;">
+            <ng-content></ng-content>
+        </div>
+    </div>
+
+    <!-- ======================= DOCS / ACADEMY CONTAINER ======================= -->
+    <div id="docs-wrapper" class="docs-container relative z-10" [style.display]="activePage === 'docs' ? 'block' : 'none'">
+        <!-- ... Docs content ... -->
+        <!-- Just ensuring classes are gray/white/dark -->
+    </div>
+
+    <!-- ======================= STATUS PAGE ======================= -->
+    <div id="page-status" class="page-section docs-container pt-20 px-4 md:px-8 pb-12 relative z-10" [class.active]="activePage === 'status'">
+        <!-- ... Status content ... -->
+    </div>
+
+    <!-- Floating Prompt Bar -->
+    <!-- Added transform class and explicit shadow -->
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-3xl px-4 z-50">
+        <div class="group relative">
+            <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-30 blur-md group-hover:opacity-50 transition duration-500"></div>
+            <div class="relative bg-white dark:bg-[#0c0c0e] backdrop-blur-2xl border border-gray-200 dark:border-white/20 rounded-2xl p-3 shadow-2xl flex items-end gap-4 transition-all duration-200" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                <div class="pl-2 pb-1 text-blue-500 dark:text-blue-400">
+                    <div class="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-100 dark:border-blue-500/20">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <textarea 
+                       [(ngModel)]="promptValue"
+                       (input)="onPromptInput($event)"
+                       (keydown)="onPromptKeydown($event)"
+                       [placeholder]="promptPlaceholder"
+                       rows="1"
+                       class="flex-1 bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-0 text-lg px-2 font-medium resize-none py-3 max-h-48 overflow-y-auto"
+                       style="min-height: 3rem;"></textarea>
+                <div class="flex items-center gap-2 border-l border-gray-200 dark:border-white/10 pl-3 pb-1">
+                    <button class="p-2 text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5">
+                        <i data-lucide="paperclip" class="w-5 h-5"></i>
+                    </button>
+                    <button (click)="handleGlobalPrompt()" class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white p-3 rounded-xl transition-all shadow-lg hover:scale-105">
+                        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
