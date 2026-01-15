@@ -1,7 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import "tailwindcss";
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+    --bg-home: #050505;
+    --bg-docs: #0c0c0e;
+    --sidebar-bg: #08080a;
+    --border-color: #27272a;
+    --card-border: rgba(229, 231, 235, 0.5);
+    --card-bg: linear-gradient(to bottom right, #f9fafb, #ffffff);
+}
+
+.dark {
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-bg: linear-gradient(to bottom right, #121215, #0a0a0c);
+}
 
 .code {
   background-color: $primary-bg-subtle;
@@ -50,3 +67,127 @@ body {
     border: 1px solid transparent !important;
   }
 }
+
+/* --- Shared Docs & UI Styles (Migrated from Beta Layout) --- */
+
+/* Glass Effect - Dynamic */
+.card-glass {
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    /* Light Mode Default */
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.card-glass:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode Glass */
+.dark .card-glass {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+}
+.dark .card-glass:hover {
+    transform: translateY(-2px); 
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; border: 1px solid transparent; }
+.badge-stable { background: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2); }
+.badge-trial { background: rgba(251, 191, 36, 0.1); color: #d97706; border-color: rgba(251, 191, 36, 0.2); }
+.badge-dev { background: rgba(244, 114, 182, 0.1); color: #db2777; border-color: rgba(244, 114, 182, 0.2); }
+
+/* Docs Styles */
+.docs-content h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em; color: #18181b; }
+.dark .docs-content h1 { color: white; }
+
+.docs-content h2 { font-size: 1.5rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1rem; padding-bottom: 0.5rem; color: #27272a; border-bottom: 1px solid #e4e4e7; }
+.dark .docs-content h2 { color: #f4f4f5; border-bottom: 1px solid #27272a; }
+
+.docs-content h3 { font-size: 1.125rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #3f3f46; }
+.dark .docs-content h3 { color: #e4e4e7; }
+
+.docs-content h4 { font-size: 0.75rem; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; margin-bottom: 0.5rem; }
+
+.docs-content p { line-height: 1.75; margin-bottom: 1.25rem; font-size: 1rem; color: #52525b; }
+.dark .docs-content p { color: #a1a1aa; }
+
+.docs-content code { padding: 0.2em 0.4em; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: #f4f4f5; color: #18181b; border: 1px solid #e4e4e7; }
+.dark .docs-content code { background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; }
+
+.docs-content pre { padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; margin-bottom: 2rem; background: #f4f4f5; border: 1px solid #e4e4e7; }
+.dark .docs-content pre { background: #18181b; border: 1px solid #27272a; }
+
+.docs-content pre code { background: transparent; padding: 0; border: none; font-size: 0.9em; color: #27272a; }
+.dark .docs-content pre code { color: #e4e4e7; }
+
+/* Method Styling */
+.method-block { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px dashed #e4e4e7; }
+.dark .method-block { border-color: #27272a; }
+.method-block:last-child { border-bottom: none; }
+
+.method-sig { font-family: 'JetBrains Mono', monospace; color: #2563eb; font-size: 1.1rem; margin-bottom: 0.5rem; display: block; border-left: 3px solid #3b82f6; padding-left: 1rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0 4px 4px 0; background: rgba(59, 130, 246, 0.05); }
+.dark .method-sig { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+
+/* Tables */
+.docs-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid #e4e4e7; border-radius: 0.5rem; overflow: hidden; font-size: 0.875rem; }
+.dark .docs-table { border-color: #27272a; }
+
+.docs-table th { text-align: left; padding: 0.75rem 1rem; font-weight: 600; background: #f4f4f5; color: #18181b; border-bottom: 1px solid #e4e4e7; }
+.dark .docs-table th { background: #1f1f22; color: #fff; border-bottom: 1px solid #27272a; }
+
+.docs-table td { padding: 0.75rem 1rem; vertical-align: top; border-bottom: 1px solid #e4e4e7; color: #52525b; }
+.dark .docs-table td { border-bottom: 1px solid #27272a; color: #a1a1aa; }
+
+.table-type { color: #ec4899; font-family: 'JetBrains Mono', monospace; font-size: 0.8em; }
+.table-name { color: #3b82f6; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+/* Demos */
+.demo-box { border-radius: 0.75rem; overflow: hidden; margin-top: 1rem; margin-bottom: 2rem; border: 1px solid #e4e4e7; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.dark .demo-box { background: #0f0f11; border-color: #27272a; }
+
+.demo-header { padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e4e4e7; background: #f4f4f5; }
+.dark .demo-header { background: #18181b; border-color: #27272a; }
+
+.demo-content { padding: 1.5rem; }
+
+/* Course Cards */
+.course-card {
+    border-radius: 1rem; padding: 1.5rem; transition: all 0.3s ease; cursor: pointer; position: relative; overflow: hidden; border: 1px solid #e4e4e7; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.course-card:hover { border-color: #3b82f6; transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+.dark .course-card { background: #18181b; border-color: #27272a; }
+.dark .course-card:hover { border-color: #3b82f6; transform: translateY(-4px); }
+
+.course-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); opacity: 0; transition: opacity 0.3s; }
+.course-card:hover::before { opacity: 1; }
+
+/* Syntax & Utility */
+.syntax-keyword { color: #a626a4; } .dark .syntax-keyword { color: #c678dd; }
+.syntax-function { color: #4078f2; } .dark .syntax-function { color: #61afef; }
+.syntax-string { color: #50a14f; } .dark .syntax-string { color: #98c379; }
+.syntax-class { color: #c18401; } .dark .syntax-class { color: #e5c07b; }
+.syntax-comment { color: #a0a1a7; font-style: italic; } .dark .syntax-comment { color: #7f848e; }
+.syntax-prop { color: #e45649; } .dark .syntax-prop { color: #e06c75; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.page-section { display: none; }
+.page-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Dashboard */
+.dashboard-panel { border: 1px solid #e4e4e7; border-radius: 0.5rem; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.dark .dashboard-panel { background: #18181b; border-color: #27272a; }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.dot-green { background: #22c55e; }
+.dot-red { background: #ef4444; }
+.dot-gray { background: #9ca3af; }

@@ -17,7 +17,7 @@
                 
                 <div class="hidden md:flex items-center space-x-1">
                     <button (click)="navigateTo('home')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Home</button>
-                    <button (click)="navigateTo('docs')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Academy & Docs</button>
+                    <button (click)="openPage('docs')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Academy & Docs</button>
                     <button class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-not-allowed opacity-70">Evals</button>
                     <button (click)="navigateTo('status')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Status</button>
                     
@@ -58,7 +58,7 @@
                 </p>
                 
                 <div class="flex flex-col sm:flex-row justify-center gap-4 mb-20">
-                    <button (click)="navigateTo('docs')" class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-1" style="box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.1);">
+                    <button (click)="openPage('docs')" class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-1" style="box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.1);">
                         Start Learning
                     </button>
                     <button (click)="navigateTo('status')" class="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white px-8 py-4 rounded-xl font-bold text-lg backdrop-blur-sm transition-all">
@@ -71,25 +71,25 @@
             <div class="max-w-7xl mx-auto mb-20">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Quick Access</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openChat()" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('chat')" style="border: 1px solid var(--card-border);">
                         <div class="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-3">
                             <i data-lucide="message-circle" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
                         </div>
                         <span class="font-bold text-gray-900 dark:text-white text-sm">Chat</span>
                     </div>
-                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-purple-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-purple-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('evals')" style="border: 1px solid var(--card-border);">
                         <div class="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-3">
                             <i data-lucide="bar-chart-2" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
                         </div>
                         <span class="font-bold text-gray-900 dark:text-white text-sm">Evals</span>
                     </div>
-                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-pink-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-pink-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('writing-assistance')" style="border: 1px solid var(--card-border);">
                         <div class="w-12 h-12 bg-pink-500/10 rounded-full flex items-center justify-center mb-3">
                             <i data-lucide="pen-tool" class="w-6 h-6 text-pink-600 dark:text-pink-400"></i>
                         </div>
                         <span class="font-bold text-gray-900 dark:text-white text-sm">Writing Assistance</span>
                     </div>
-                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-indigo-500 cursor-not-allowed opacity-80 border border-gray-200 dark:border-white/10" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-indigo-500 cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('translation')" style="border: 1px solid var(--card-border);">
                         <div class="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mb-3">
                             <i data-lucide="languages" class="w-6 h-6 text-indigo-600 dark:text-indigo-400"></i>
                         </div>
@@ -102,7 +102,7 @@
             <div class="max-w-7xl mx-auto mb-24">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Available APIs</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-summarizer')" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('docs/ref-summarizer')" style="border: 1px solid var(--card-border);">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center"><i data-lucide="file-text" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i></div>
                             <span class="badge badge-stable">Stable</span>
@@ -110,7 +110,7 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Summarizer</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Condense articles and text into key points.</p>
                     </div>
-                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-prompt')" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('docs/ref-prompt')" style="border: 1px solid var(--card-border);">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center"><i data-lucide="terminal" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i></div>
                             <span class="badge badge-trial">Origin Trial</span>
@@ -118,7 +118,7 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Prompt API</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Generic LLM interface for chat & reasoning.</p>
                     </div>
-                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-writer')" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('docs/ref-writer')" style="border: 1px solid var(--card-border);">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center"><i data-lucide="pen-tool" class="w-5 h-5 text-pink-600 dark:text-pink-400"></i></div>
                             <span class="badge badge-dev">Dev Preview</span>
@@ -126,7 +126,7 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Writer</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Generate new content from seed ideas.</p>
                     </div>
-                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-proofreader')" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('docs/ref-proofreader')" style="border: 1px solid var(--card-border);">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 dark:text-emerald-400"></i></div>
                             <span class="badge badge-trial">Origin Trial</span>
@@ -151,7 +151,7 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Language Detector</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Detect the language of a given text.</p>
                     </div>
-                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="navigateTo('docs', 'ref-rewriter')" style="border: 1px solid var(--card-border);">
+                    <div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10" (click)="openPage('docs/ref-rewriter')" style="border: 1px solid var(--card-border);">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center"><i data-lucide="refresh-cw" class="w-5 h-5 text-orange-600 dark:text-orange-400"></i></div>
                             <span class="badge badge-dev">Dev Preview</span>
@@ -181,7 +181,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group cursor-pointer" (click)="navigateTo('docs', 'course-foundations')" style="border: 1px solid var(--card-border);">
+                    <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group cursor-pointer" (click)="openPage('docs/course-foundations')" style="border: 1px solid var(--card-border);">
                         <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
                             <i data-lucide="book-open" class="w-32 h-32 text-green-400"></i>
                         </div>
@@ -223,159 +223,6 @@
     <div id="page-app" class="page-section relative z-10" [class.active]="activePage === 'app'">
         <div class="pt-20 px-4 md:px-8 pb-12" style="height: 100vh;">
             <ng-content></ng-content>
-        </div>
-    </div>
-
-    <!-- ======================= DOCS / ACADEMY CONTAINER ======================= -->
-    <div id="docs-wrapper" class="docs-container relative z-10" [style.display]="activePage === 'docs' ? 'block' : 'none'">
-        <div class="flex flex-col md:flex-row min-h-screen pt-14">
-            
-            <!-- Sidebar -->
-            <aside class="hidden md:block w-72 fixed h-full docs-sidebar pt-8 overflow-y-auto">
-                <div class="px-6">
-                    <h5 class="text-xs font-bold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-4">Web AI Academy</h5>
-                    <ul class="space-y-1 text-sm mb-8">
-                        <li><button (click)="switchDoc('intro')" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Welcome</button></li>
-                        <li><button (click)="switchDoc('course-foundations')" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 1: Foundations</button></li>
-                        <li><button (click)="switchDoc('course-chatbot')" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 2: Chatbots</button></li>
-                        <li><button (click)="switchDoc('course-tools')" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 3: Content Tools</button></li>
-                    </ul>
-
-                    <h5 class="text-xs font-bold text-zinc-500 dark:text-gray-500 uppercase tracking-wider mb-4">API Reference</h5>
-                    <ul class="space-y-1 text-sm mb-8">
-                        <li><button (click)="switchDoc('ref-prompt')" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">LanguageModel</button></li>
-                        <li><button (click)="switchDoc('ref-summarizer')" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Summarizer</button></li>
-                        <li><button (click)="switchDoc('ref-writer')" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Writer</button></li>
-                        <li><button (click)="switchDoc('ref-rewriter')" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Rewriter</button></li>
-                        <li><button (click)="switchDoc('ref-proofreader')" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Proofreader</button></li>
-                    </ul>
-                </div>
-            </aside>
-
-            <!-- Content Area -->
-            <div class="md:pl-72 w-full">
-                
-                <!-- ACADEMY LANDING -->
-                <div id="view-intro" class="max-w-5xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'intro'">
-                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Web AI Academy</h1>
-                    <p class="text-xl text-gray-600 dark:text-gray-400 mb-12">
-                        Learn how to build next-generation web applications using local AI.
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="course-card" (click)="switchDoc('course-foundations')">
-                            <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">1. Foundations</h3>
-                            <p class="text-zinc-600 dark:text-gray-400 text-sm mb-4">The lifecycle of local AI.</p>
-                            <span class="text-blue-600 dark:text-blue-400 text-xs font-mono font-bold uppercase">Start &rarr;</span>
-                        </div>
-                        <div class="course-card" (click)="switchDoc('course-chatbot')">
-                            <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">2. Building Chatbots</h3>
-                            <p class="text-zinc-600 dark:text-gray-400 text-sm mb-4">Master streaming and context.</p>
-                            <span class="text-blue-600 dark:text-blue-400 text-xs font-mono font-bold uppercase">Start &rarr;</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- COURSE 1: FOUNDATIONS -->
-                <div id="view-course-foundations" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'course-foundations'">
-                    <span class="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider">Web AI Academy</span>
-                    <h1 class="mt-2">Course 1: The AI Lifecycle</h1>
-                    <p class="lead">Understanding the 4 stages of the AI lifecycle.</p>
-
-                    <h2>Stage 1: Availability Check</h2>
-                    <pre><code><span class="syntax-keyword">const</span> status = <span class="syntax-keyword">await</span> window.LanguageModel.<span class="syntax-function">availability</span>();</code></pre>
-
-                    <h2>Stage 2: Session Creation</h2>
-                    <pre><code><span class="syntax-keyword">const</span> session = <span class="syntax-keyword">await</span> window.LanguageModel.<span class="syntax-function">create</span>();</code></pre>
-
-                    <h2>Stage 4: Destruction</h2>
-                    <pre><code>session.<span class="syntax-function">destroy</span>();</code></pre>
-                </div>
-
-                <!-- REFERENCE: LanguageModel -->
-                <div id="view-ref-prompt" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'ref-prompt'">
-                    <div class="flex items-center justify-between mb-6">
-                        <span class="badge badge-trial">Reference: Origin Trial</span>
-                    </div>
-                    <h1>LanguageModel API</h1>
-                    
-                    <h2>Method: <code>availability()</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Type</th><th>Description</th></tr></thead>
-                        <tbody>
-                            <tr><td><span class="table-type">Promise&lt;string&gt;</span></td><td><code>"available"</code> | <code>"downloadable"</code> | <code>"unavailable"</code></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h2>Method: <code>create(options)</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Name</th><th>Type</th></tr></thead>
-                        <tbody>
-                            <tr><td>systemPrompt</td><td><span class="table-type">string</span></td></tr>
-                            <tr><td>temperature</td><td><span class="table-type">number</span></td></tr>
-                            <tr><td>topK</td><td><span class="table-type">number</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- REFERENCE: Summarizer -->
-                <div id="view-ref-summarizer" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'ref-summarizer'">
-                    <div class="flex items-center justify-between mb-6">
-                        <span class="badge badge-stable">Reference: Stable</span>
-                    </div>
-                    <h1>Summarizer API</h1>
-                    <h2>Method: <code>create(options)</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Name</th><th>Values</th></tr></thead>
-                        <tbody>
-                            <tr><td>type</td><td><code>tl;dr</code>, <code>key-points</code>, <code>teaser</code>, <code>headline</code></td></tr>
-                            <tr><td>length</td><td><code>short</code>, <code>medium</code>, <code>long</code></td></tr>
-                            <tr><td>format</td><td><code>plain-text</code>, <code>markdown</code></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- REFERENCE: Writer -->
-                <div id="view-ref-writer" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'ref-writer'">
-                    <h1>Writer API</h1>
-                    <h2>Method: <code>create(options)</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Name</th><th>Values</th></tr></thead>
-                        <tbody>
-                            <tr><td>tone</td><td><code>formal</code>, <code>neutral</code>, <code>casual</code></td></tr>
-                            <tr><td>length</td><td><code>short</code>, <code>medium</code>, <code>long</code></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- REFERENCE: Rewriter -->
-                <div id="view-ref-rewriter" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'ref-rewriter'">
-                    <h1>Rewriter API</h1>
-                    <h2>Method: <code>create(options)</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Name</th><th>Values</th></tr></thead>
-                        <tbody>
-                            <tr><td>tone</td><td><code>formal</code>, <code>neutral</code>, <code>casual</code></td></tr>
-                            <tr><td>length</td><td><code>short</code>, <code>medium</code>, <code>long</code></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- REFERENCE: Proofreader -->
-                <div id="view-ref-proofreader" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'ref-proofreader'">
-                    <h1>Proofreader API</h1>
-                    <h2>Method: <code>availability()</code></h2>
-                    <table class="docs-table">
-                        <thead><tr><th>Type</th><th>Values</th></tr></thead>
-                        <tbody>
-                            <tr><td><span class="table-type">Promise&lt;string&gt;</span></td><td><code>"available"</code>, <code>"downloadable"</code>, <code>"unavailable"</code></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Placeholders -->
-                <div id="view-course-chatbot" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'course-chatbot'"><h1>Chatbots</h1><p>Coming soon.</p></div>
-                <div id="view-course-tools" class="max-w-4xl mx-auto px-6 py-12 docs-content page-section" [class.active]="activeDoc === 'course-tools'"><h1>Content Tools</h1><p>Coming soon.</p></div>
-            </div>
         </div>
     </div>
 

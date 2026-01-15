@@ -1,7 +1,9 @@
-@if (designService.isBeta) {
+@if (designService.isBeta && isHomePage) {
   <app-beta-layout>
     <router-outlet></router-outlet>
   </app-beta-layout>
+} @else if (isDocsPage) {
+  <router-outlet></router-outlet>
 } @else {
   <div class="layout d-flex">
     <webai-studio-sidebar class="offcanvas offcanvas-start"></webai-studio-sidebar>

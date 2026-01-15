@@ -1,5 +1,6 @@
-import { Component, Inject, PLATFORM_ID, ViewEncapsulation, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, ViewEncapsulation, AfterViewInit, ElementRef, OnInit } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { DesignService } from '../../../core/services/design.service';
 import { createIcons, icons } from 'lucide';
 
@@ -10,9 +11,8 @@ import { createIcons, icons } from 'lucide';
   standalone: false,
   encapsulation: ViewEncapsulation.ShadowDom
 })
-export class BetaLayoutComponent implements AfterViewInit {
+export class BetaLayoutComponent implements AfterViewInit, OnInit {
   activePage = 'home';
-  activeDoc = 'intro';
   theme = 'dark';
   promptValue = '';
   promptPlaceholder = 'Ask the on-device model anything...';
@@ -20,11 +20,19 @@ export class BetaLayoutComponent implements AfterViewInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     public designService: DesignService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private router: Router
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.initTheme();
     }
+  }
+
+  ngOnInit() {
+      const path = this.router.url.split('?')[0];
+      if (path !== '/') {
+          this.activePage = 'app';
+      }
   }
 
   ngAfterViewInit() {
@@ -43,20 +51,12 @@ export class BetaLayoutComponent implements AfterViewInit {
     });
   }
 
-  navigateTo(pageId: string, docId: string | null = null) {
+  navigateTo(pageId: string) {
     this.activePage = pageId;
-    if (pageId === 'docs') {
-        this.activeDoc = docId || 'intro';
-    }
     if (isPlatformBrowser(this.platformId)) {
         window.scrollTo(0, 0);
     }
     this.refreshIcons();
-  }
-
-  switchDoc(docId: string) {
-      this.activeDoc = docId;
-      this.refreshIcons();
   }
 
   initTheme() {
@@ -108,6 +108,12 @@ export class BetaLayoutComponent implements AfterViewInit {
   
   openChat() {
       this.activePage = 'app';
+      this.router.navigate(['/']);
+  }
+
+  openPage(path: string) {
+      this.activePage = 'app';
+      this.router.navigate([path]);
   }
 
   handleGlobalPrompt() {

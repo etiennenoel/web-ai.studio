@@ -22,6 +22,13 @@ const routes: Routes = [  {
       }
     },
     {
+      path: "chat",
+      component: ChatPage,
+      data: {
+        route: RouteEnum.Translation
+      }
+    },
+    {
       path: "translation",
       component: TranslationPage,
       data: {
@@ -55,6 +62,10 @@ const routes: Routes = [  {
       data: {
         route: RouteEnum.Axon
       }
+    },
+    {
+      path: 'docs',
+      loadChildren: () => import('./pages/docs/docs.module').then(m => m.DocsModule)
     }
   ]
 }];

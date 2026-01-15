@@ -1,0 +1,29 @@
+<div class="flex flex-col md:flex-row min-h-screen pt-14 bg-white dark:bg-[#050505] text-gray-900 dark:text-gray-200">
+    
+    <!-- Sidebar -->
+    <aside class="hidden md:block w-72 fixed h-full docs-sidebar pt-8 overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-[#050505] z-40">
+        <div class="px-6">
+            <h5 class="text-xs font-bold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-4">Web AI Academy</h5>
+            <ul class="space-y-1 text-sm mb-8">
+                <li><a routerLink="/docs/intro" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Welcome</a></li>
+                <li><a routerLink="/docs/course-foundations" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 1: Foundations</a></li>
+                <li><a routerLink="/docs/course-chatbot" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 2: Chatbots</a></li>
+                <li><a routerLink="/docs/course-tools" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left font-medium">Course 3: Content Tools</a></li>
+            </ul>
+
+            <h5 class="text-xs font-bold text-zinc-500 dark:text-gray-500 uppercase tracking-wider mb-4">API Reference</h5>
+            <ul class="space-y-1 text-sm mb-8">
+                <li><a routerLink="/docs/ref-prompt" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">LanguageModel</a></li>
+                <li><a routerLink="/docs/ref-summarizer" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Summarizer</a></li>
+                <li><a routerLink="/docs/ref-writer" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Writer</a></li>
+                <li><a routerLink="/docs/ref-rewriter" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Rewriter</a></li>
+                <li><a routerLink="/docs/ref-proofreader" routerLinkActive="text-blue-600 dark:text-white font-bold" class="text-zinc-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white py-2 block w-full text-left">Proofreader</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Content Area -->
+    <div class="md:pl-72 w-full pt-8">
+        <router-outlet></router-outlet>
+    </div>
+</div>
