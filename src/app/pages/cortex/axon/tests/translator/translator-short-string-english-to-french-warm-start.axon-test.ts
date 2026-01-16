@@ -18,9 +18,29 @@ export class TranslatorShortStringEnglishToFrenchWarmStartAxonTest implements Ax
     numberOfIterations: 100,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",
+    apiAvailability: "unknown",
   };
 
+  creationOptions = {
+    sourceLanguage: "en",
+    targetLanguage: "fr"
+  };
+
+  async apiStatus(): Promise<Availability | "unknown"> {
+    return Translator.availability(this.creationOptions);
+  }
+
   async setup(): Promise<void> {
+    try {
+      this.results.apiAvailability = await this.apiStatus();
+
+      const ld = await Translator.create(this.creationOptions)
+    } catch (e) {
+      this.results.status = TestStatus.Error;
+    }
+  }
+
+  async preRun(): Promise<void> {
     this.results.status = TestStatus.Executing;
     this.results.testIterationResults = [];
   }
@@ -34,10 +54,7 @@ export class TranslatorShortStringEnglishToFrenchWarmStartAxonTest implements Ax
     }
 
     let start = performance.now()
-    const translator = await Translator.create({
-      sourceLanguage: "en",
-      targetLanguage: "fr"
-    })
+    const translator = await Translator.create(this.creationOptions)
     const creationTime = performance.now() - start;
 
     for (let iterationResult of this.results.testIterationResults) {

@@ -6,7 +6,14 @@ export interface AxonTestInterface {
 
   results: AxonTestResultInterface;
 
-  setup(): Promise<void>;
+  apiStatus(): Promise<Availability | "unknown">;
+
+  /**
+   * This method setups the API to be usable by the tests.
+   */
+  setup(): Promise<void>
+
+  preRun(): Promise<void>;
 
   run(): Promise<AxonTestResultInterface>;
 

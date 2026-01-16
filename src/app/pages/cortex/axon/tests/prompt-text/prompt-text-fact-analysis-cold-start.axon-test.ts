@@ -43,9 +43,31 @@ export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterfac
       "\n" +
       "Final Instruction:\n" +
       "Conclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+    apiAvailability: "unknown",
   };
 
+  creationOptions: LanguageModelCreateOptions = {
+    expectedOutputs: [{
+      type: "text",
+      languages: ["en"]
+    }]
+  }
+
+  async apiStatus(): Promise<Availability | "unknown"> {
+    return LanguageModel.availability(this.creationOptions);
+  }
+
   async setup(): Promise<void> {
+    try {
+      this.results.apiAvailability = await this.apiStatus();
+
+      const ld = await LanguageModel.create(this.creationOptions)
+    } catch (e) {
+      this.results.status = TestStatus.Error;
+    }
+  }
+
+  async preRun(): Promise<void> {
     this.results.status = TestStatus.Executing;
     this.results.testIterationResults = [];
   }
@@ -63,12 +85,7 @@ export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterfac
 
       const start = performance.now()
 
-      const session = await LanguageModel.create({
-        expectedOutputs: [{
-          type: "text",
-          languages: ["en"]
-        }]
-      })
+      const session = await LanguageModel.create(this.creationOptions)
 
       iterationResult.creationTime = performance.now() - start;
 

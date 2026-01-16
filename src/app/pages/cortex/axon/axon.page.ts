@@ -19,7 +19,7 @@ export class AxonPage {
 
   builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
 
-  viewData: { [id in AxonTestId]: {iterationsCollapsed?:boolean} } = {
+  viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {
     },
     [AxonTestId.LanguageDetectorShortStringWarmStart]: {
@@ -38,6 +38,9 @@ export class AxonPage {
     },
     [AxonTestId.PromptTextTechnicalChallengeColdStart]: {
     },
+    "pretests": {
+
+    }
   }
 
   constructor(
@@ -47,7 +50,16 @@ export class AxonPage {
   }
 
   async start() {
-    await this.axonTestSuiteExecutor.start();
+    await this.axonTestSuiteExecutor.setup();
+
+    this.viewData.pretests.iterationsCollapsed = true;
+
+    // Once everything passes, we can start the tests.
+    //await this.axonTestSuiteExecutor.start();
+  }
+
+  forceSetup(testId: AxonTestId): Promise<void> {
+    return this.axonTestSuiteExecutor.forceSetup(testId);
   }
 
   getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {

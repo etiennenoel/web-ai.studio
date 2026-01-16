@@ -18,9 +18,31 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
     numberOfIterations: 3,
     testIterationResults: [],
     input: "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+    apiAvailability: "unknown",
   };
 
+  creationOptions: SummarizerCreateOptions = {
+    length: "medium",
+    format: "plain-text",
+    type: "key-points",
+    outputLanguage: "en"
+  }
+
+  async apiStatus(): Promise<Availability | "unknown"> {
+    return Summarizer.availability(this.creationOptions);
+  }
+
   async setup(): Promise<void> {
+    try {
+      this.results.apiAvailability = await this.apiStatus();
+
+      const ld = await Summarizer.create(this.creationOptions)
+    } catch (e) {
+      this.results.status = TestStatus.Error;
+    }
+  }
+
+  async preRun(): Promise<void> {
     this.results.status = TestStatus.Executing;
     this.results.testIterationResults = [];
   }
