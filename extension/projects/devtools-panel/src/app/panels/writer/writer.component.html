@@ -1,0 +1,87 @@
+<section class="p-6 h-full flex flex-col overflow-y-auto">
+    <div class="flex justify-between items-center mb-6 flex-shrink-0 relative z-50">
+        <h2 class="text-xl font-semibold">Writer API</h2>
+                                            <app-api-status
+                                                [apiName]="'Writer'"
+                                                [statusText]="statusText"
+                                                [isAvailable]="isApiAvailable"
+                                                [isWarning]="isWarning"
+                                                [checks]="checks"
+                                                [errorHtml]="errorHtml">
+                                            </app-api-status>
+                                
+                        </div>
+
+    <div class="max-w-4xl mx-auto bg-[#292a2d] border border-[#3c4043] rounded p-6 mb-6 w-full">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div>
+                <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Topic / Context</label>
+                <textarea [(ngModel)]="topic" class="w-full h-24 bg-[#202124] border border-[#5f6368] rounded p-2 text-sm text-white focus:outline-none" placeholder="e.g. A formal email declining a job offer..."></textarea>
+            </div>
+             <div>
+                <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Shared Context (Optional)</label>
+                <textarea [(ngModel)]="sharedContext" class="w-full h-24 bg-[#202124] border border-[#5f6368] rounded p-2 text-sm text-white focus:outline-none" placeholder="Additional background info..."></textarea>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex-1">
+                <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Tone</label>
+                <select [(ngModel)]="selectedTone" class="w-full bg-[#3c4043] text-white text-sm p-2 rounded border border-[#5f6368]">
+                    <option value="formal">Formal</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="casual">Casual</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                 <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Format</label>
+                <select [(ngModel)]="selectedFormat" class="w-full bg-[#3c4043] text-white text-sm p-2 rounded border border-[#5f6368]">
+                    <option value="markdown">Markdown</option>
+                    <option value="plain-text">Plain Text</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                 <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Length</label>
+                <select [(ngModel)]="selectedLength" class="w-full bg-[#3c4043] text-white text-sm p-2 rounded border border-[#5f6368]">
+                    <option value="medium">Medium</option>
+                    <option value="short">Short</option>
+                    <option value="long">Long</option>
+                </select>
+            </div>
+        </div>
+
+        <button (click)="write()" [disabled]="isWriting" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ isWriting ? 'Writing...' : 'Write' }}
+        </button>
+
+        <div class="border-t border-[#3c4043] pt-4">
+            <label class="block text-xs text-gray-400 font-bold mb-2 uppercase">Generated Output</label>
+            <div class="bg-[#202124] p-4 rounded min-h-[150px] text-gray-300 text-sm font-mono whitespace-pre-wrap">
+                {{writerOutput}}
+            </div>
+             <!-- Code Viewer -->
+            <div class="mt-4">
+                <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-400 hover:text-white focus:outline-none">
+                    <span>Show Code</span>
+                    <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
+                </button>
+                <div *ngIf="isCodeViewerVisible" class="mt-2 bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
+                    <pre><code class="text-xs font-mono text-gray-300">{{codeSnippet}}</code></pre>
+                    <button (click)="copyCode()" class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="showHistory" class="mt-6 border-t border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Call History</h3>
+            <span class="text-xs text-gray-500">{{history.length}} items</span>
+        </div>
+        <div class="overflow-y-auto flex-1">
+             <app-history-list [history]="history" apiClassName="Writer" methodName="write"></app-history-list>
+        </div>
+    </div>
+</section>

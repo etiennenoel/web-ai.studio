@@ -1,0 +1,37 @@
+<div class="inline-flex items-center gap-2 cursor-pointer relative z-10" (click)="toggleDetails()">
+  <i class="fa-solid" [ngClass]="{
+    'fa-check-circle text-green-400': isAvailable && !isWarning,
+    'fa-exclamation-circle text-orange-400': isWarning,
+    'fa-times-circle text-red-400': !isAvailable && !isWarning
+  }"></i>
+  <h3 class="font-bold text-sm inline-flex items-center" [ngClass]="{
+    'text-gray-200': !isWarning,
+    'text-orange-400': isWarning
+  }">
+    {{ statusText }}
+    <i class="fa-solid fa-chevron-down text-xs ml-2 transform transition-transform duration-200" [ngClass]="{'rotate-180': isExpanded}"></i>
+  </h3>
+
+  <div *ngIf="isExpanded" class="absolute top-full right-0 mt-2 z-20 p-4 rounded-lg border border-[#3c4043] bg-[#202124] min-w-[300px]">
+    <div class="space-y-1 text-xs" *ngIf="checks && checks.length > 0">
+      <div class="flex justify-between items-center py-1" *ngFor="let check of checks">
+        <span class="text-gray-400" [innerHTML]="check.titleHtml"></span>
+        <i class="fa-solid" [ngClass]="check.success ? 'fa-check text-green-400' : 'fa-times text-red-400'"></i>
+      </div>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="!isAvailable && !isWarning && errorHtml" class="p-3 bg-[#3c2424] border border-red-900/50 rounded mt-4">
+      <div class="text-xs text-red-100" [innerHTML]="errorHtml"></div>
+    </div>
+
+    <!-- Warning State -->
+    <div *ngIf="isWarning && errorHtml" class="p-3 bg-[#3c3424] border border-orange-900/50 rounded mt-4">
+        <div class="text-xs text-orange-100" [innerHTML]="errorHtml"></div>
+    </div>
+
+    <div *ngIf="(!checks || checks.length === 0) && !errorHtml" class="text-xs text-gray-500 mt-2">
+      No detailed check information available.
+    </div>
+  </div>
+</div>

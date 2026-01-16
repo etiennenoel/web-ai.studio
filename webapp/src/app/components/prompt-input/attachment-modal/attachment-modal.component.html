@@ -1,0 +1,104 @@
+<div class="modal-header">
+  <h4 class="modal-title">Attachment Preview</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body d-flex gap-4 justify-content-center">
+
+  @if (attachment.type === AttachmentTypeEnum.Image || attachment.type === AttachmentTypeEnum.Pdf) {
+    <ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" style="width: 768px; height: 768px;">
+      @for (image of imageSafeUrls; track $index) {
+        <ng-template ngbSlide>
+          <h6 class="text-center">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
+          <img [src]="image" style="width: 768px; height: 768px; object-fit: contain;">
+        </ng-template>
+      }
+    </ngb-carousel>
+
+    <div>
+      @if (this.isAttachmentReadyForPrompt === false) {
+
+        @if(attachment.type === AttachmentTypeEnum.Image) {
+        <div class="alert alert-warning" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Resolution issue</strong>.
+
+          <p>Your image doesn't have the expected resolution and will be resized into a square.</p>
+
+          <table class="table table-warning">
+            <thead>
+            <tr>
+              <th></th>
+              <th>Width(px)</th>
+              <th>Height(px)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Expected</td>
+              <td>768px</td>
+              <td>768px</td>
+            </tr>
+            <tr>
+              <td>Your image</td>
+              <td><strong>{{ this.imageResolution?.width }}px</strong></td>
+              <td><strong>{{ this.imageResolution?.height }}px</strong></td>
+            </tr>
+            </tbody>
+          </table>
+
+
+          <div>To solve this issue, either:
+            <ul>
+              <li>Use an image that matches the expected resolution</li>
+              <li>Select a framing algorithm below (it will be applied on the image before passing it to the prompt
+                API.
+              </li>
+            </ul>
+          </div>
+        </div>
+        } @else if(attachment.type === AttachmentTypeEnum.Pdf) {
+          <div class="alert alert-warning" role="alert">
+            <strong><i class="bi bi-exclamation-triangle"></i> Resolution issue</strong>.
+
+            <p>Your pdf contains pages that don't have have the expected resolution (768px by 768px) and each page will be resized into a square.</p>
+
+            <div>To avoid this, either:
+              <ul>
+                <li>Make sure that each page has the expected 768px by 768px resolution</li>
+                <li>Select a framing algorithm below (it will be applied on each page before passing it to the prompt
+                  API).
+                </li>
+              </ul>
+            </div>
+          </div>
+        }
+
+        <h3>Framing algorithm</h3>
+
+        <div class="btn-group mt-3" role="group" aria-label="Framing Algorithm">
+          <input type="radio" class="btn-check" name="framingAlgorithm" id="no-framing"
+                 [value]="FramingAlgorithm.NoFraming"
+                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.NoFraming"
+                 (change)="onAlgorithmChange(FramingAlgorithm.NoFraming)" autocomplete="off">
+          <label class="btn btn-outline-primary" for="no-framing">No Framing</label>
+
+          <input type="radio" class="btn-check" name="framingAlgorithm" id="padding"
+                 [value]="FramingAlgorithm.Padding"
+                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.Padding"
+                 (change)="onAlgorithmChange(FramingAlgorithm.Padding)" autocomplete="off">
+          <label class="btn btn-outline-primary" for="padding">Padding</label>
+
+          <input type="radio" class="btn-check" name="framingAlgorithm" id="tiling"
+                 [value]="FramingAlgorithm.Tiling"
+                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.Tiling"
+                 (change)="onAlgorithmChange(FramingAlgorithm.Tiling)" autocomplete="off">
+          <label class="btn btn-outline-primary" for="tiling">Tiling</label>
+        </div>
+
+      }
+    </div>
+  }
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" (click)="activeModal.close('Close click')">Save</button>
+</div>

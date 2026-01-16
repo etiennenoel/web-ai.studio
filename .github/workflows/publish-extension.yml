@@ -1,0 +1,53 @@
+name: Publish Chrome Extension
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'extension/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./extension
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: './extension/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and Package
+        run: npm run package
+
+      - name: Zip Extension
+        run: |
+          cd release
+          zip -r ../chrome-webai-extension.zip .
+
+      - name: Upload Extension to Chrome Web Store
+        uses: passiverecords/chrome-extension-upload-action@v1
+        with:
+          file-path: extension/chrome-webai-extension.zip
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          app-id: ${{ secrets.CHROME_APP_ID }}
+          publish: true
+
+      - name: Upload Extension Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-webai-extension
+          path: extension/chrome-webai-extension.zip

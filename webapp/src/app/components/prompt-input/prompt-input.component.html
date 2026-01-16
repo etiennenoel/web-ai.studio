@@ -1,0 +1,172 @@
+<div class="w-100 flex-column d-flex justify-content-center"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+  [class.drag-over]="isDragging">
+  <div class="card bg-body-secondary border-0">
+    <div class="card-body d-flex align-items-end gap-2">
+
+      <textarea
+        [(ngModel)]="promptText"
+        (keydown.meta.enter)="onRunClick()"
+        (keydown.control.enter)="onRunClick()"
+        (paste)="onPaste($event)"
+        class="form-control border-0 bg-transparent shadow-none flex-grow-1"
+        placeholder="Start typing a prompt"
+        style="field-sizing: content; resize: none; max-height: 300px;"
+      ></textarea>
+
+    <div class="dropdown">
+      <button class="btn btn-soft" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+        [disabled]="state === PromptInputStateEnum.Inferencing">
+        <i class="bi bi-plus-circle"></i>
+      </button>
+      <ul class="dropdown-menu">
+          <li>
+            <button class="dropdown-item" href="#" (click)="openFileUpload()"><i class="bi bi-upload me-2"></i> Upload
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item" href="#" (click)="openCamera()"><i class="bi bi-camera me-2"></i> Camera
+        </button>
+      </li>
+      <li>
+        <button class="dropdown-item" href="#" (click)="recordAudio()"><i class="bi bi-mic me-2"></i> Record Audio
+      </button>
+    </li>
+    <li>
+      <button class="dropdown-item" href="#" (click)="takeScreenshot()"><i class="bi bi-display me-2"></i>
+      Screenshot
+    </button>
+  </li>
+</ul>
+</div>
+<div class="dropdown">
+  <button class="btn btn-settings btn-soft"
+    [class.text-success]="settingsActive"
+    [class.badge-settings]="settingsActive"
+    [class.active]="settingsActive"
+    [disabled]="state === PromptInputStateEnum.Inferencing"
+    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-sliders2"></i>
+    <span
+      class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
+      <span class="visually-hidden">New alerts</span>
+    </span>
+  </button>
+  <ul class="dropdown-menu" style="width:350px;">
+
+    <li><h6 class="dropdown-header">Run Settings</h6></li>
+
+    <li class="ms-3 me-3">
+      <span>Temperature: {{options.temperature}}</span>
+      <div class="d-flex align-items-center gap-5">
+        <input type="range" class="form-range flex-grow-1"
+            [(ngModel)]="options.temperature"
+            [min]="0"
+            [max]="maxTemperature"
+            [step]="0.1"
+            (change)="onOptionsChange()">
+        <input type="number" class="form-control" style="width: 70px;"
+            [(ngModel)]="options.temperature"
+            [min]="0"
+            [max]="maxTemperature"
+            [step]="0.1"
+            (change)="onOptionsChange()">
+      </div>
+
+    </li>
+
+    <li class="ms-3 me-3 mt-3">
+      <span>TopK: {{options.topK}}</span>
+      <div class="d-flex align-items-center gap-5">
+        <input type="range" class="form-range flex-grow-1"
+            [(ngModel)]="options.topK"
+            [min]="0"
+            [max]="maxTopK"
+            [step]="1"
+            (change)="onOptionsChange()">
+        <input type="number" class="form-control" style="width: 70px;"
+            [(ngModel)]="options.topK"
+            [min]="0"
+            [max]="maxTopK"
+            [step]="1"
+            (change)="onOptionsChange()">
+      </div>
+
+    </li>
+
+    <li>
+      <hr class="dropdown-divider">
+    </li>
+    <li><h6 class="dropdown-header">Tools</h6></li>
+
+    <li class="ms-3 me-3 d-flex align-items-center gap-3">
+      <div class="form-check form-switch flex-grow-1">
+        <input class="form-check-input" type="checkbox" role="switch" id="structuredOutputSwitch"
+            [(ngModel)]="options.structuredOutputEnabled" (change)="onOptionsChange()">
+        <label class="form-check-label" for="structuredOutputSwitch">Structured Output</label>
+      </div>
+      <button class="btn btn-sm btn-soft btn-white bg-primary-subtle"
+        [disabled]="!options.structuredOutputEnabled"
+        (click)="editStructuredOutput()">Edit
+      </button>
+    </li>
+</ul>
+</div>
+ @switch (state) {
+  @case (PromptInputStateEnum.Ready) {
+    <button class="btn btn-primary d-flex gap-3 position-relative" (click)="onRunClick()" placement="top"
+      [ngbTooltip]="runBtnTooltip" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">Run <i
+    class="bi bi-lightning-charge-fill"></i>
+    @if(attachmentWarnings) {
+      <span class="position-absolute top-0 start-100 translate-middle p-2 bg-warning border border-light rounded-circle">
+        <span class="visually-hidden">New alerts</span>
+      </span>
+    }
+
+  </button>
+}
+ @case (PromptInputStateEnum.Inferencing) {
+  <button class="btn btn-danger d-flex gap-3" (click)="onStopClick()">
+    <i class="bi bi-stop-circle-fill"></i> Stop
+  </button>
+}
+}
+</div>
+ @if (attachments.length > 0) {
+  <div class="preview-container">
+    @for (attachment of attachments; track $index) {
+      <div class="preview-item">
+        @switch (attachment.type) {
+          @case (AttachmentTypeEnum.Image) {
+            <img [src]="attachment.safeUrl" (click)="openAttachmentModal(attachment)" style="cursor: pointer;"/>
+          }
+          @case (AttachmentTypeEnum.Audio) {
+            <audio [src]="attachment.safeUrl" controls></audio>
+          }
+          @case (AttachmentTypeEnum.Pdf) {
+            <div class="pdf-preview d-flex justify-content-center" (click)="openAttachmentModal(attachment)" style="cursor: pointer;">
+              <i class="bi bi-file-earmark-pdf align-self-center" style="font-size: 100px;"></i>
+            </div>
+          }
+          @default {
+            <div>Unsupported file type</div>
+          }
+        }
+        <div class="preview-title d-flex">
+          <div class="legend flex-grow-1">{{ attachment.file?.name }}</div>
+          @if( (attachment.type === AttachmentTypeEnum.Image || attachment.type === AttachmentTypeEnum.Pdf) && !attachmentReadyForPromptMap.get(attachment.id)) {
+            @if(attachment.framingAlgorithm === FramingAlgorithm.NoFraming) {
+              <span class="d-flex badge text-bg-warning gap-1 align-items-center"><i class="bi bi-exclamation-triangle-fill"></i> Resolution</span>
+            } @else {
+              <span class="d-flex badge text-bg-success gap-1 align-items-center"><i class="bi bi-check"></i> {{ attachment.framingAlgorithm }}</span>
+            }
+          }
+        </div>
+        <button class="remove-btn" (click)="removeAttachment($index)"><i class="bi bi-x-lg"></i></button>
+      </div>
+    }
+  </div>
+}
+</div>

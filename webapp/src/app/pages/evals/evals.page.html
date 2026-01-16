@@ -1,0 +1,171 @@
+<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+  <webai-studio-header title="Evals">
+
+    <div class="d-flex align-items-center mt-5 ms-3 me-3">
+      <h2 class="h6 flex-grow-1">Evals</h2>
+
+    </div>
+  </webai-studio-header>
+
+
+<div class="container-fluid flex-grow-1" style="    height: calc(100vh - 120px);">
+
+  <div class="alert alert-primary">
+    <h2 class="display-6">How to Use?</h2>
+    <h5><i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets?</h5>
+    <div>
+      <ol>
+        <li>(Optional) Drop audio files to create new rows.</li>
+        <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy">Copy the template</a></li>
+        <li>Fill the rows in the spreadsheet.</li>
+        <li>Copy your spreadsheet (without the header columns) and paste it in the first input in the first row, named "Context". It will merge with existing rows (e.g. created from audio files).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="d-grid">
+    <button class="btn btn-primary btn-lg" (click)="run()"><i class="bi bi-lightning"></i> Run Evals</button>
+  </div>
+
+  <div class="border rounded p-4 text-center mt-4 mb-4 bg-light" style="border-style: dashed !important; cursor: pointer;" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
+    <i class="bi bi-mic display-4 text-muted"></i>
+    <p class="mt-2 mb-0 lead text-muted">Drop audio files here to create rows</p>
+  </div>
+
+  @if(status !== EvalsExecutionEnum.Idle) {
+    <div class="alert"
+         [class.alert-danger]="status === EvalsExecutionEnum.Error"
+         [class.alert-primary]="status === EvalsExecutionEnum.InProgress"
+    >
+      @if(status === EvalsExecutionEnum.InProgress) {
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      }
+      <div>{{ this.statusMessage }}</div>
+    </div>
+  }
+
+  <form [formGroup]="form">
+    <table class="table mt-5">
+      <thead>
+        <tr>
+          <th style="min-width: 250px;">Context</th>
+          <th style="min-width: 250px;">Input</th>
+          <th style="min-width: 250px;">Images</th>
+          <th style="min-width: 250px;">Audio</th>
+          <th>API</th>
+          <th>Status</th>
+  <!--        <th>Performance</th>-->
+          <th>Output</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="rows">
+        @for (formRow of rows.controls; track $index) {
+          <tr [formGroupName]="$index">
+            <td>
+              <textarea class="form-control" rows="3" formControlName="context" (paste)="onPaste($event, $index)"></textarea>
+            </td>
+            <td>
+              <textarea class="form-control" rows="3" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
+            </td>
+            <td (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
+              <div class="border rounded p-2 text-center mb-2" style="border-style: dashed !important; cursor: pointer;" (click)="fileInput.click()">
+                <i class="bi bi-cloud-upload display-6"></i>
+                <p class="m-0 small text-muted">Click or Drag Images</p>
+                <input #fileInput type="file" multiple accept="image/*" class="d-none" (change)="selectImage($event, $index)">
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                @for (image of formRow.value.images; track $index) {
+                  <div class="position-relative d-inline-block">
+                    <img [src]="image" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: zoom-in;" (click)="previewImage(image)">
+                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle" style="width: 18px; height: 18px; line-height: 14px; transform: translate(30%, -30%); font-size: 10px;" (click)="removeImage($index, $index); $event.stopPropagation()">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </td>
+            <td (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
+              <div class="border rounded p-2 text-center mb-2" style="border-style: dashed !important; cursor: pointer;" (click)="audioInput.click()">
+                <i class="bi bi-mic display-6"></i>
+                <p class="m-0 small text-muted">Click or Drag Audio</p>
+                <input #audioInput type="file" multiple accept="audio/*" class="d-none" (change)="selectAudio($event, $index)">
+              </div>
+              <div class="d-flex flex-column gap-2">
+                @for (audio of formRow.value.audio; track $index) {
+                  <div class="position-relative border rounded p-1 d-flex align-items-center bg-light">
+                    <audio [src]="audio" controls class="w-100" style="height: 30px;"></audio>
+                    <button class="btn btn-sm btn-danger ms-2 p-0 rounded-circle" style="width: 20px; height: 20px; line-height: 16px;" (click)="removeAudio($index, $index)">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </td>
+            <td>
+              <select class="form-select" formControlName="api">
+                <option [value]="'Summarizer'">Summarizer</option>
+                <option [value]="'Prompt'">Prompt</option>
+              </select>
+            </td>
+            <td><span
+              class="badge"
+                [class.text-bg-secondary]="formRow.value.status === InferenceStatusEnum.Idle"
+                [class.text-bg-primary]="formRow.value.status === InferenceStatusEnum.InProgress"
+                [class.text-bg-success]="formRow.value.status === InferenceStatusEnum.Success"
+                [class.text-bg-danger]="formRow.value.status === InferenceStatusEnum.Error"
+              >{{ formRow.value.status }}</span></td>
+  <!--          <td></td>-->
+            <td>
+              {{ formRow.value.output }}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="removeRow($index)"><i class="bi bi-trash3"></i></button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="text-center mt-3 mb-5">
+      <button class="btn btn-outline-primary" (click)="addRow()"><i class="bi bi-plus-lg"></i> Add Row</button>
+    </div>
+  </form>
+</div>
+</div>
+
+@if (showResetConfirmation) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset Rows?</h5>
+          <button type="button" class="btn-close" (click)="cancelReset()"></button>
+        </div>
+        <div class="modal-body">
+          <p>Dropping audio files will reset the existing rows. Are you sure you want to continue?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelReset()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="processAudioFiles()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (previewImageSrc) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);" (click)="closePreview()">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-transparent border-0 text-center">
+        <div class="modal-body p-0">
+          <img [src]="previewImageSrc" class="img-fluid rounded" style="max-height: 90vh;" (click)="$event.stopPropagation()">
+          <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle" (click)="closePreview()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

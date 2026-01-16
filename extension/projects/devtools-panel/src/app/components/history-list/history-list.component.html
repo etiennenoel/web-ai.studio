@@ -1,0 +1,46 @@
+<div class="space-y-4">
+  <div *ngFor="let item of history" class="bg-[#292a2d] border rounded group" [ngClass]="item.status === 'error' ? 'border-red-900' : 'border-[#3c4043]'">
+    <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-[#2f3034] transition-colors" (click)="toggleDetails(item.id)">
+        <div class="flex items-center gap-4 overflow-hidden">
+            <span class="text-xs font-mono text-gray-500 w-16 flex-shrink-0">{{item.timestamp}}</span>
+            <div class="flex flex-col overflow-hidden">
+                <span class="text-sm font-medium truncate text-gray-200">{{item.prompt}}</span>
+                <span class="text-xs text-gray-500 truncate">{{item.status === 'error' ? 'Error during execution' : (item.response | slice:0:60) + '...'}}</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 pl-2">
+            <span class="text-xs font-mono text-gray-400 bg-[#202124] px-2 py-1 rounded">{{item.latency}}</span>
+            <i class="fa-solid fa-circle text-[8px]" [ngClass]="item.status === 'error' ? 'text-red-400' : 'text-green-400'"></i>
+            <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform duration-200" [class.rotate-180]="isExpanded(item.id)"></i>
+        </div>
+    </div>
+    <div *ngIf="isExpanded(item.id)" class="border-t border-[#3c4043] bg-[#202124]">
+        <div class="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Input Prompt</label>
+                    <div class="mt-1 text-sm text-gray-300 p-2 bg-[#292a2d] rounded border border-[#3c4043] font-mono">{{item.prompt}}</div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Model Output</label>
+                    <div class="mt-1 text-sm p-2 bg-[#292a2d] rounded border border-[#3c4043] whitespace-pre-wrap font-mono max-h-40 overflow-y-auto" [ngClass]="item.status === 'error' ? 'text-red-400' : 'text-gray-300'">{{item.response}}</div>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <button class="text-xs flex items-center gap-1 text-red-400 hover:text-red-300" (click)="reportBug(item.id)">
+                        <i class="fa-solid fa-bug"></i> Report Bug
+                    </button>
+                </div>
+            </div>
+            <div class="relative">
+                <label class="text-xs text-gray-500 uppercase font-bold tracking-wider">Reproduce Code</label>
+                <div class="mt-1 bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
+                    <pre class="text-xs font-mono text-gray-300"><code>{{generateCodeSnippet(item)}}</code></pre>
+                    <button class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded" (click)="copyCode(generateCodeSnippet(item))">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

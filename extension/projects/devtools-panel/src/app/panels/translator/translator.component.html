@@ -1,0 +1,295 @@
+<section class="p-6 h-full flex flex-col overflow-y-auto">
+    <div class="flex justify-between items-center mb-6 flex-shrink-0 relative w-full z-50">
+        <h2 class="text-xl font-semibold">Translator API</h2>
+                                            <app-api-status
+                                                [apiName]="'Translator'"
+                                                [statusText]="statusText"
+                                                [isAvailable]="isApiAvailable"
+                                                [isWarning]="isWarning"
+                                                [checks]="checks"
+                                                [errorHtml]="errorHtml">
+                                            </app-api-status>
+                                
+                        </div>
+
+        <div class="p-3 bg-[#202124] rounded border border-[#3c4043] mb-4">
+            <div class="flex items-center cursor-pointer justify-between" (click)="toggleLanguagePackStatus()">
+                <h4 class="text-xs font-bold text-gray-200 uppercase inline-flex items-center">
+                    <i class="fa-solid fa-language mr-2"></i> Language Packs
+                </h4>
+                <i class="fa-solid fa-chevron-down text-xs text-gray-400 transform transition-transform duration-200" 
+                   [ngClass]="{'rotate-180': isLanguagePackStatusExpanded}"></i>
+            </div>
+
+                                                <div *ngIf="isLanguagePackStatusExpanded" class="mt-3 grid grid-cols-3 gap-2 text-xs">
+
+                                                    <div *ngFor="let pack of languagePacksStatus" class="flex flex-col p-2 rounded relative overflow-hidden transition-all"
+
+                                                        [ngClass]="{
+
+                                                            'bg-green-700/20 text-green-200 border border-green-700/30': pack.status === 'available',
+
+                                                            'bg-orange-700/20 text-orange-200 border border-orange-700/30 cursor-pointer hover:bg-orange-700/30': pack.status === 'downloadable',
+
+                                                            'bg-blue-700/20 text-blue-200 border border-blue-700/30': pack.status === 'downloading',
+
+                                                            'bg-red-700/20 text-red-200 border border-red-700/30': pack.status === 'unavailable' || pack.status === 'error'
+
+                                                        }"
+
+                                                        (click)="pack.status === 'downloadable' ? downloadLanguagePack(pack) : null">
+
+                                                        
+
+                                                        <div class="flex items-center justify-between relative z-10">
+
+                                                            <div class="flex items-center gap-2">
+
+                                                                <i class="fa-solid"
+
+                                                                    [ngClass]="{
+
+                                                                        'fa-check-circle': pack.status === 'available',
+
+                                                                        'fa-cloud-arrow-down': pack.status === 'downloadable',
+
+                                                                        'fa-spinner fa-spin': pack.status === 'downloading',
+
+                                                                        'fa-times-circle': pack.status === 'unavailable' || pack.status === 'error'
+
+                                                                    }"></i>
+
+                                                                <span class="font-mono flex items-center">
+
+                                                                    {{ pack.sourceLanguage }} 
+
+                                                                    <i class="fa-solid fa-arrow-right-arrow-left text-[8px] mx-1 opacity-60"></i> 
+
+                                                                    {{ pack.targetLanguage }}
+
+                                                                </span>
+
+                                                            </div>
+
+                                                            <div class="flex items-center gap-2">
+
+                                                                <span *ngIf="pack.status === 'downloading' && pack.progress !== undefined" class="text-[10px] opacity-80">{{ pack.progress }}%</span>
+
+                                                                <button *ngIf="pack.status === 'downloadable'" class="bg-transparent text-orange-200 hover:text-orange-100 p-1 rounded-sm -mr-1">Download</button>
+
+                                                                <button *ngIf="pack.status === 'downloading'" (click)="$event.stopPropagation(); cancelLanguagePackDownload(pack)" class="bg-transparent text-blue-200 hover:text-blue-100 p-1 rounded-sm -mr-1">Cancel</button>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                        
+
+                                                        <!-- Progress Bar for Downloading -->
+
+                                                        <div *ngIf="pack.status === 'downloading'" class="absolute bottom-0 left-0 h-1 bg-blue-500/50 w-full">
+
+                                                            <div class="h-full bg-blue-400 transition-all duration-300" [style.width.%]="pack.progress || 0"></div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                    
+
+                                </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-[400px]">
+        <div class="flex flex-col gap-4">
+            <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
+                <div class="flex justify-between mb-2">
+                    <label class="text-xs text-gray-400 font-bold uppercase">Source Text</label>
+                    <select [(ngModel)]="sourceLanguage" (ngModelChange)="checkSelectedPairStatus(); cdr.detectChanges();" class="bg-[#3c4043] text-gray-200 text-xs rounded px-2 py-1 border border-transparent focus:border-blue-500 outline-none">
+                        <option *ngFor="let lang of uniqueSourceLanguages" [value]="lang.code">{{ lang.name }} ({{ lang.code }})</option>
+                    </select>
+                </div>
+                <textarea [(ngModel)]="inputText" class="flex-1 w-full bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 resize-none focus:border-blue-500 focus:outline-none font-mono" placeholder="Type text to translate..."></textarea>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
+                <div class="flex justify-between mb-2">
+                    <label class="text-xs text-gray-400 font-bold uppercase">Translation</label>
+                    <div class="flex items-center gap-2">
+                        <select [(ngModel)]="targetLanguage" (ngModelChange)="checkSelectedPairStatus(); cdr.detectChanges();" class="bg-[#3c4043] text-gray-200 text-xs rounded px-2 py-1 border border-transparent focus:border-blue-500 outline-none">
+                            <option *ngFor="let lang of uniqueTargetLanguages" [value]="lang.code">{{ lang.name }} ({{ lang.code }})</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 w-full bg-[#202124] border border-[#3c4043] rounded p-3 text-sm text-gray-300 font-mono overflow-y-auto whitespace-pre-wrap">
+                    {{translationResult}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+                            <div class="flex justify-center mb-3">
+
+                                <!-- Loading Badge -->
+
+                                <div *ngIf="isLoadingAvailability" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3c4043] border border-gray-600">
+
+                                    <i class="fa-solid fa-spinner fa-spin text-gray-400 text-xs"></i>
+
+                                                    <span class="text-xs font-mono bg-black/20 rounded px-1.5 py-0.5 text-gray-300">{{ getLanguageDisplayName(sourceLanguage) }} ({{ sourceLanguage | uppercase }})</span>
+
+                                                    <i class="fa-solid fa-arrow-right-arrow-left text-[8px] text-gray-500"></i>
+
+                                                    <span class="text-xs font-mono bg-black/20 rounded px-1.5 py-0.5 text-gray-300">{{ getLanguageDisplayName(targetLanguage) }} ({{ targetLanguage | uppercase }})</span>
+
+                                                    <span class="text-xs font-semibold text-gray-300 ml-1">Checking...</span>
+
+                                                </div>
+
+                                    
+
+                                                <!-- Status Badge -->
+
+                                                <div *ngIf="!isLoadingAvailability && selectedPairStatusMessage" 
+
+                                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full border transition-colors duration-300"
+
+                                                     [ngClass]="{
+
+                                                         'bg-green-900/30 border-green-700/50': selectedPairStatus === 'available',
+
+                                                         'bg-orange-900/30 border-orange-700/50': selectedPairStatus === 'downloadable',
+
+                                                         'bg-blue-900/30 border-blue-700/50': selectedPairStatus === 'downloading',
+
+                                                         'bg-red-900/30 border-red-700/50': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                     }">
+
+                                                    <i class="fa-solid text-xs"
+
+                                                       [ngClass]="{
+
+                                                           'fa-check-circle text-green-400': selectedPairStatus === 'available',
+
+                                                           'fa-cloud-arrow-down text-orange-400': selectedPairStatus === 'downloadable',
+
+                                                           'fa-spinner fa-spin text-blue-400': selectedPairStatus === 'downloading',
+
+                                                           'fa-ban text-red-400': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                       }"></i>
+
+                                                    
+
+                                                    <div class="flex items-center gap-1.5">
+
+                                                        <span class="text-xs font-mono bg-black/20 rounded px-1.5 py-0.5"
+
+                                                              [ngClass]="{
+
+                                                                  'text-green-200': selectedPairStatus === 'available',
+
+                                                                  'text-orange-200': selectedPairStatus === 'downloadable',
+
+                                                                  'text-blue-200': selectedPairStatus === 'downloading',
+
+                                                                  'text-red-200': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                              }">{{ getLanguageDisplayName(sourceLanguage) }} ({{ sourceLanguage | uppercase }})</span>
+
+                                                        <i class="fa-solid fa-arrow-right-arrow-left text-[8px] opacity-60"
+
+                                                           [ngClass]="{
+
+                                                               'text-green-200': selectedPairStatus === 'available',
+
+                                                               'text-orange-200': selectedPairStatus === 'downloadable',
+
+                                                               'text-blue-200': selectedPairStatus === 'downloading',
+
+                                                               'text-red-200': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                           }"></i>
+
+                                                        <span class="text-xs font-mono bg-black/20 rounded px-1.5 py-0.5"
+
+                                                              [ngClass]="{
+
+                                                                  'text-green-200': selectedPairStatus === 'available',
+
+                                                                  'text-orange-200': selectedPairStatus === 'downloadable',
+
+                                                                  'text-blue-200': selectedPairStatus === 'downloading',
+
+                                                                  'text-red-200': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                              }">{{ getLanguageDisplayName(targetLanguage) }} ({{ targetLanguage | uppercase }})</span>
+
+                                                    </div>
+
+                                    
+
+                                                    <span class="text-xs font-semibold ml-1"
+
+                                                          [ngClass]="{
+
+                                                              'text-green-200': selectedPairStatus === 'available',
+
+                                                              'text-orange-200': selectedPairStatus === 'downloadable',
+
+                                                              'text-blue-200': selectedPairStatus === 'downloading',
+
+                                                              'text-red-200': selectedPairStatus === 'unavailable' || selectedPairStatus === 'error'
+
+                                                          }">
+
+                                                        {{ selectedPairStatusMessage }}
+
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                    
+
+                    
+
+            
+            <div class="flex justify-center mb-6">
+                            <button 
+                                (click)="translate()"
+                                [disabled]="!inputText.trim() || isTranslating"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <i class="fa-solid fa-language mr-2"></i>{{ isTranslating ? 'Translating...' : 'Translate' }}
+                            </button>    </div>
+
+    <!-- Code Viewer -->
+    <div class="mb-6">
+        <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-400 hover:text-white focus:outline-none mb-2">
+            <span>Show Code</span>
+            <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
+        </button>
+        <div *ngIf="isCodeViewerVisible" class="bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
+            <pre><code class="text-xs font-mono text-gray-300">{{codeSnippet}}</code></pre>
+            <button (click)="copyCode()" class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded">
+                <i class="fa-regular fa-copy"></i>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="showHistory" class="mt-6 border-t border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Call History</h3>
+            <span class="text-xs text-gray-500">{{history.length}} items</span>
+        </div>
+        <div class="overflow-y-auto flex-1">
+             <app-history-list [history]="history" apiClassName="Translator" methodName="translate"></app-history-list>
+        </div>
+    </div>
+</section>

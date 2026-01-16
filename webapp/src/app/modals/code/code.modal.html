@@ -1,0 +1,12 @@
+<div class="p-4"><h6>Raw</h6>
+  <hr>
+
+  <app-code-editor
+    [code]="code"
+  ></app-code-editor>
+
+  <h6 class="mt-4">Preview</h6>
+  <hr>
+
+  <div class="card p-3" [innerHTML]="code | render_markdown | async"></div>
+</div>

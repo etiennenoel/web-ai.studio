@@ -1,0 +1,44 @@
+<div class="bg-[#292a2d] p-4 rounded border border-[#3c4043]">
+  <div class="flex justify-between items-start mb-2">
+    <span class="text-gray-400 text-xs font-mono uppercase">Gemini Nano</span>
+    <i class="fa-solid fa-microchip text-blue-400"></i>
+  </div>
+
+  @if (status() === 'unknown') {
+    <div class="flex items-center gap-2 mt-4">
+      <i class="fa-solid fa-spinner fa-spin text-blue-400"></i>
+      <span class="text-sm font-medium text-gray-300">Loading status...</span>
+    </div>
+  } @else if (status() === 'downloadable') {
+    <div class="mt-4">
+      <button (click)="onDownloadClick()" class="inline-flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500">
+        Download Model
+      </button>
+    </div>
+  } @else if (status() === 'downloading') {
+    <div class="mt-4">
+      <div class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-800 ring-1 ring-inset ring-blue-600/20 mb-2">
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse mr-2"></span>
+        Downloading...
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="relative w-full h-2 bg-gray-600 rounded-full">
+          <div class="absolute h-full bg-blue-500 rounded-full" [style.width]="progress() + '%'"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-300">{{progress()}}%</span>
+      </div>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="mt-4">
+      <div class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-800 ring-1 ring-inset ring-red-600/20">
+        <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse mr-2"></span>
+        Error downloading model.
+      </div>
+    </div>
+  } @else if (status() === 'available') {
+    <div class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-600/20 mt-4">
+      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span>
+      <span>Available</span>
+    </div>
+  }
+</div>

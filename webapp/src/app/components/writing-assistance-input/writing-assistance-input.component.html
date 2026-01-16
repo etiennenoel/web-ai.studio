@@ -1,0 +1,169 @@
+<div class="w-100 flex-column d-flex justify-content-center">
+  <div class="card bg-body-secondary border-0">
+    <div class="card-body d-flex align-items-end gap-2">
+
+      <textarea
+        [(ngModel)]="input"
+        (keydown.meta.enter)="onRunClick()"
+        (keydown.control.enter)="onRunClick()"
+        class="form-control border-0 bg-transparent shadow-none flex-grow-1"
+        placeholder="Enter your text here"
+        style="field-sizing: content; resize: none; max-height: 300px;"
+      ></textarea>
+
+      @switch (api) {
+        @case(WritingAssistanceApiEnum.SummarizerApi) {
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerType">
+             <option [ngValue]="undefined" disabled>Select Type</option>
+             @for (type of SummarizerTypeEnum | keyvalue; track type.key) {
+                <option [value]="type.value">{{ type.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerLength">
+             <option [ngValue]="undefined" disabled>Select Length</option>
+             @for (len of SummarizerLengthEnum | keyvalue; track len.key) {
+                <option [value]="len.value">{{ len.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerFormat">
+             <option [ngValue]="undefined" disabled>Select Format</option>
+             @for (format of SummarizerFormatEnum | keyvalue; track format.key) {
+                <option [value]="format.value">{{ format.value }}</option>
+             }
+          </select>
+        }
+        @case(WritingAssistanceApiEnum.WriterApi) {
+           <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerTone">
+             <option [ngValue]="undefined" disabled>Select Tone</option>
+             @for (tone of WriterToneEnum | keyvalue; track tone.key) {
+                <option [value]="tone.value">{{ tone.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerLength">
+             <option [ngValue]="undefined" disabled>Select Length</option>
+             @for (len of WriterLengthEnum | keyvalue; track len.key) {
+                <option [value]="len.value">{{ len.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerFormat">
+             <option [ngValue]="undefined" disabled>Select Format</option>
+             @for (format of WriterFormatEnum | keyvalue; track format.key) {
+                <option [value]="format.value">{{ format.value }}</option>
+             }
+          </select>
+        }
+        @case(WritingAssistanceApiEnum.RewriterApi) {
+           <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterTone">
+             <option [ngValue]="undefined" disabled>Select Tone</option>
+             @for (tone of RewriterToneEnum | keyvalue; track tone.key) {
+                <option [value]="tone.value">{{ tone.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterLength">
+             <option [ngValue]="undefined" disabled>Select Length</option>
+             @for (len of RewriterLengthEnum | keyvalue; track len.key) {
+                <option [value]="len.value">{{ len.value }}</option>
+             }
+          </select>
+
+          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterFormat">
+             <option [ngValue]="undefined" disabled>Select Format</option>
+             @for (format of RewriterFormatEnum | keyvalue; track format.key) {
+                <option [value]="format.value">{{ format.value }}</option>
+             }
+          </select>
+        }
+      }
+      <div class="d-inline-block" ngbDropdown [autoClose]="'outside'">
+        <button class="btn btn-settings btn-soft"
+                [class.text-success]="settingsActive"
+                [class.badge-settings]="settingsActive"
+                [class.active]="settingsActive"
+                [disabled]="state === PromptInputStateEnum.Inferencing"
+                type="button" ngbDropdownToggle aria-expanded="false">
+          <i class="bi bi-sliders2"></i>
+          <span
+            class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
+            <span class="visually-hidden">New alerts</span>
+          </span>
+        </button>
+        <ul class="dropdown-menu p-3" ngbDropdownMenu style="width:350px;">
+          <li class="mb-2">
+            <label class="form-label small">Output Language</label>
+            <select class="form-select form-select-sm" [(ngModel)]="options.outputLanguage">
+                <option [ngValue]="undefined">Default</option>
+                @for (lang of LocaleEnum | keyvalue; track lang.key) {
+                    <option [value]="lang.value">{{ lang.key }}</option>
+                }
+            </select>
+          </li>
+
+          <li class="mb-2">
+            <label class="form-label small">Expected Input Languages</label>
+            <select class="form-select form-select-sm" multiple [(ngModel)]="options.expectedInputLanguages">
+                @for (lang of LocaleEnum | keyvalue; track lang.key) {
+                    <option [value]="lang.value">{{ lang.key }}</option>
+                }
+            </select>
+          </li>
+
+          <li class="mb-2">
+            <label class="form-label small">Expected Context Languages</label>
+            <select class="form-select form-select-sm" multiple [(ngModel)]="options.expectedContextLanguages">
+                @for (lang of LocaleEnum | keyvalue; track lang.key) {
+                    <option [value]="lang.value">{{ lang.key }}</option>
+                }
+            </select>
+          </li>
+
+          <li class="mb-2">
+            <label class="form-label small">Context</label>
+            <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="options.context"></textarea>
+          </li>
+        </ul>
+      </div>
+      @switch (state) {
+        @case (PromptInputStateEnum.Ready) {
+          <button class="btn btn-primary d-flex gap-3 position-relative" (click)="onRunClick()" placement="top"
+                  [ngbTooltip]="runBtnTooltip">
+            @switch (this.api) {
+              @case (WritingAssistanceApiEnum.SummarizerApi) {
+                Summarize
+              }
+              @case (WritingAssistanceApiEnum.WriterApi) {
+                Write
+              }
+              @case (WritingAssistanceApiEnum.RewriterApi) {
+                Rewrite
+              }
+            }
+            <i
+            class="bi bi-lightning-charge-fill"></i>
+          </button>
+        }
+        @case (PromptInputStateEnum.Inferencing) {
+          <button class="btn btn-danger d-flex gap-3" (click)="onStopClick()">
+            <i class="bi bi-stop-circle-fill"></i> Stop
+          </button>
+        }
+      }
+    </div>
+
+    <div class="p-2 api-selector d-flex gap-2">
+      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.SummarizerApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.SummarizerApi)">
+        <i class="bi bi-text-paragraph"></i> Summarizer
+      </button>
+      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.WriterApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.WriterApi)">
+        <i class="bi bi-pencil-square"></i> Writer
+      </button>
+      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.RewriterApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.RewriterApi)">
+        <i class="bi bi-arrow-clockwise"></i> Rewriter
+      </button>
+    </div>
+  </div>
+</div>
