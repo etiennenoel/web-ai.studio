@@ -9,10 +9,12 @@ on:
     branches: [ "master" ]
     paths:
       - 'webapp/**'
+      - '.github/**'
   pull_request:
     branches: [ "master" ]
     paths:
       - 'webapp/**'
+      - '.github/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
