@@ -57,6 +57,8 @@ import {CodeEditorComponent} from './shared/components/code-editor/code-editor.c
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
 import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
 import {BetaLayoutComponent} from './components/layout/beta-layout/beta-layout.component';
+import {QuickAccessCardComponent} from './components/layout/beta-layout/quick-access-card/quick-access-card.component';
+import {AvailableApiCardComponent} from './components/layout/beta-layout/available-api-card/available-api-card.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +86,8 @@ import {BetaLayoutComponent} from './components/layout/beta-layout/beta-layout.c
      CodeEditorComponent,
      WritingAssistanceInputComponent,
      AttachmentModalComponent,
+     QuickAccessCardComponent,
+     AvailableApiCardComponent,
   ],
   imports: [
     BrowserModule,

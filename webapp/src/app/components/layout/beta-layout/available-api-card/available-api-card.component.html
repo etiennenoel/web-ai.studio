@@ -1,0 +1,33 @@
+<div class="card-glass p-6 rounded-2xl relative group cursor-pointer border border-gray-200 dark:border-white/10 hover:border-blue-500 dark:border-white/10 bg-white dark:bg-slate-800 transition-all transform hover:-translate-y-1  hover:border-blue-500">
+    <div class="flex justify-between items-start mb-4">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+             [ngClass]="{
+                'bg-purple-500/20': themeColor === 'purple',
+                'bg-blue-500/20': themeColor === 'blue',
+                'bg-pink-500/20': themeColor === 'pink',
+                'bg-emerald-500/20': themeColor === 'emerald',
+                'bg-indigo-500/20': themeColor === 'indigo',
+                'bg-teal-500/20': themeColor === 'teal',
+                'bg-orange-500/20': themeColor === 'orange'
+             }">
+            <i [attr.data-lucide]="icon" class="w-5 h-5"
+               [ngClass]="{
+                 'text-purple-600 dark:text-purple-400': themeColor === 'purple',
+                 'text-blue-600 dark:text-blue-400': themeColor === 'blue',
+                 'text-pink-600 dark:text-pink-400': themeColor === 'pink',
+                 'text-emerald-600 dark:text-emerald-400': themeColor === 'emerald',
+                 'text-indigo-600 dark:text-indigo-400': themeColor === 'indigo',
+                 'text-teal-600 dark:text-teal-400': themeColor === 'teal',
+                 'text-orange-600 dark:text-orange-400': themeColor === 'orange'
+               }"></i>
+        </div>
+        <span class="badge"
+              [ngClass]="{
+                'badge-stable': statusType === 'stable',
+                'badge-trial': statusType === 'trial',
+                'badge-dev': statusType === 'dev'
+              }">{{ statusLabel }}</span>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ title }}</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-400">{{ description }}</p>
+</div>

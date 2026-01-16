@@ -1,0 +1,26 @@
+/* Glass Effect - Dynamic */
+.card-glass {
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+/* Dark Mode Glass */
+.dark .card-glass {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dark .card-glass:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+}
+/* Light Mode Glass */
+html:not(.dark) .card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+html:not(.dark) .card-glass:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}

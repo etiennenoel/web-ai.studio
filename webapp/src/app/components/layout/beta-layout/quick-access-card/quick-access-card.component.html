@@ -1,0 +1,18 @@
+<div class="card-glass p-6 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500 cursor-pointer border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-800 transition-all transform hover:-translate-y-1">
+    <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+         [ngClass]="{
+           'bg-blue-500/10': themeColor === 'blue',
+           'bg-purple-500/10': themeColor === 'purple',
+           'bg-pink-500/10': themeColor === 'pink',
+           'bg-indigo-500/10': themeColor === 'indigo'
+         }">
+        <i [attr.data-lucide]="icon" class="w-6 h-6"
+           [ngClass]="{
+             'text-blue-600 dark:text-blue-400': themeColor === 'blue',
+             'text-purple-600 dark:text-purple-400': themeColor === 'purple',
+             'text-pink-600 dark:text-pink-400': themeColor === 'pink',
+             'text-indigo-600 dark:text-indigo-400': themeColor === 'indigo'
+           }"></i>
+    </div>
+    <span class="font-bold text-gray-900 dark:text-white text-sm">{{ title }}</span>
+</div>
