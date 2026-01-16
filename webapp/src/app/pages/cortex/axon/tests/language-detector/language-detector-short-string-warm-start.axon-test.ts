@@ -18,9 +18,24 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
     numberOfIterations: 100,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",
+    apiAvailability: "unknown",
   };
 
+  async apiStatus(): Promise<Availability | "unknown"> {
+    return LanguageDetector.availability();
+  }
+
   async setup(): Promise<void> {
+    try {
+      this.results.apiAvailability = await this.apiStatus();
+
+      const ld = await LanguageDetector.create({})
+    } catch (e) {
+      this.results.status = TestStatus.Error;
+    }
+  }
+
+  async preRun(): Promise<void> {
     this.results.status = TestStatus.Executing;
     this.results.testIterationResults = [];
   }

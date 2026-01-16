@@ -32,6 +32,7 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import {AxonPreTestResultInterface} from './interfaces/axon-pre-test-result.interface';
 
 @Injectable()
 export class AxonTestSuiteExecutor {
@@ -51,6 +52,8 @@ export class AxonTestSuiteExecutor {
   ];
 
   results: AxonResultInterface;
+
+  preTestsStatus = TestStatus.Idle;
 
   constructor(
     private readonly languageDetectorShortStringColdStartAxonTest: LanguageDetectorShortStringColdStartAxonTest,
@@ -82,30 +85,73 @@ export class AxonTestSuiteExecutor {
     };
   }
 
+  async forceSetup(testId: AxonTestId): Promise<void> {
+    await this.testIdMap[testId].setup();
+  }
+
+  async setup(): Promise<void> {
+    this.results.testsResults = [];
+    this.preTestsStatus = TestStatus.Executing;
+
+    for (const testSuite of this.testsSuite) {
+      const test = this.testIdMap[testSuite];
+
+      // Push the results
+      this.results.testsResults.push(test.results);
+    }
+
+
+    return new Promise(async (resolve, reject) => {
+      // Check the status for each API.
+      for (const testSuite of this.testsSuite) {
+        const test = this.testIdMap[testSuite];
+
+        await test.setup();
+      }
+
+      // Check if all setup are in a final state: "available" or "unavailable"
+      if (!this.results.testsResults.find(test => {
+        return test.apiAvailability === "downloadable" || test.apiAvailability === "downloading";
+      })) {
+        this.preTestsStatus = TestStatus.Success;
+
+        return resolve();
+      }
+
+      await new Promise<void>( (resolve1) => {
+        setTimeout(async () => {
+          await this.setup();
+          return resolve1();
+        }, 3000);
+      })
+
+      return resolve();
+
+    })
+  }
+
   async start(): Promise<void> {
     this.results.status = TestStatus.Executing
 
     for (const testSuite of this.testsSuite) {
       const test = this.testIdMap[testSuite];
 
-      await test.setup();
+      await test.preRun();
       await test.run();
       await test.postRun();
-
-      this.results.testsResults.push(test.results);
     }
 
     // Compile the data
     // @ts-expect-error
     this.results.summary = {};
 
-    for(const builtInAiAPI of Object.values(BuiltInAiApi)) {
+    for (const builtInAiAPI of Object.values(BuiltInAiApi)) {
       // @ts-expect-error
       this.results.summary[builtInAiAPI] = {
         "cold": {},
         "warm": {},
       }
-      for(const startType of ["warm", "cold"]) {
+      for (const startType of ["warm", "cold"]) {
         const items = this.results.testsResults.filter(value => {
           return value.api === builtInAiAPI && value.startType == startType;
         }).map(item => item.testIterationResults).flat(1)
