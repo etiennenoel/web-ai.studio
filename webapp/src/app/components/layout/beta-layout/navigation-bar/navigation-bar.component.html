@@ -1,0 +1,30 @@
+<nav id="main-nav" class="fixed w-full z-50 transition-colors duration-300 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl" style="border-bottom: 1px solid rgba(128, 128, 128, 0.2);">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-14">
+            <div class="flex items-center gap-2.5 cursor-pointer" (click)="onNavigate('home')">
+                <div class="w-6 h-6 rounded bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <i data-lucide="cpu" class="h-4 w-4 text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <span class="font-bold text-base tracking-tight text-gray-900 dark:text-white">web-ai<span class="text-blue-600 dark:text-blue-400">.studio</span></span>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-1">
+                <button (click)="onNavigate('home')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Home</button>
+                <button (click)="onOpenPage('docs')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Academy & Docs</button>
+                <button class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-not-allowed opacity-70">Evals</button>
+                <button (click)="onNavigate('status')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Status</button>
+
+                <!-- Theme Toggle -->
+                <button (click)="onToggleTheme()" class="ml-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" aria-label="Toggle Theme">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+
+                <div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-2"></div>
+                <a href="https://github.com/webmachinelearning" target="_blank" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2">
+                    <i data-lucide="github" class="w-4 h-4"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

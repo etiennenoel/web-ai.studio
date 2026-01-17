@@ -5,36 +5,11 @@
     <div class="hero-glow z-0"></div>
 
     <!-- Global Navigation -->
-    <nav id="main-nav" class="fixed w-full z-50 transition-colors duration-300 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl" style="border-bottom: 1px solid rgba(128, 128, 128, 0.2);">
-        <div class="w-full px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-14">
-                <div class="flex items-center gap-2.5 cursor-pointer" (click)="navigateTo('home')">
-                    <div class="w-6 h-6 rounded bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                        <i data-lucide="cpu" class="h-4 w-4 text-blue-600 dark:text-blue-400"></i>
-                    </div>
-                    <span class="font-bold text-base tracking-tight text-gray-900 dark:text-white">web-ai<span class="text-blue-600 dark:text-blue-400">.studio</span></span>
-                </div>
-
-                <div class="hidden md:flex items-center space-x-1">
-                    <button (click)="navigateTo('home')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Home</button>
-                    <button (click)="openPage('docs')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Academy & Docs</button>
-                    <button class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-not-allowed opacity-70">Evals</button>
-                    <button (click)="navigateTo('status')" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Status</button>
-
-                    <!-- Theme Toggle -->
-                    <button (click)="toggleTheme()" class="ml-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" aria-label="Toggle Theme">
-                        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-                        <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
-                    </button>
-
-                    <div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-2"></div>
-                    <a href="https://github.com/webmachinelearning" target="_blank" class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2">
-                        <i data-lucide="github" class="w-4 h-4"></i> GitHub
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <app-navigation-bar
+            [activePage]="activePage"
+            (navigate)="navigateTo($event)"
+            (openPage)="openPage($event)">
+    </app-navigation-bar>
 
     <!-- ======================= HOME PAGE ======================= -->
     <div id="page-home" class="page-section relative z-10" [class.active]="activePage === 'home'">
@@ -67,7 +42,7 @@
                 </div>
             </div>
 
-            <!-- Quick Access Section -->
+            <!-- <editor-fold desc="Quick Access Section"> -->
             <div class="max-w-7xl mx-auto mb-20">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Quick Access</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -100,8 +75,9 @@
                     </app-quick-access-card>
                 </div>
             </div>
+          <!-- </editor-fold> -->
 
-            <!-- API Grid -->
+            <!-- <editor-fold desc="API Grid"> -->
             <div class="max-w-7xl mx-auto mb-24">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Available APIs</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -229,6 +205,7 @@
                     </div>
                 </div>
             </div>
+            <!-- </editor-fold> -->
         </main>
     </div>
 

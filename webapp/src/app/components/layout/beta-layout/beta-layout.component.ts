@@ -1,8 +1,10 @@
-import { Component, Inject, PLATFORM_ID, ViewEncapsulation, AfterViewInit, ElementRef, OnInit } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, ViewEncapsulation, AfterViewInit, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { DesignService } from '../../../core/services/design.service';
 import { createIcons, icons } from 'lucide';
+import { ThemeManager } from '../../../core/services/theme.manager';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-beta-layout',
@@ -11,21 +13,23 @@ import { createIcons, icons } from 'lucide';
   standalone: false,
   encapsulation: ViewEncapsulation.ShadowDom
 })
-export class BetaLayoutComponent implements AfterViewInit, OnInit {
+export class BetaLayoutComponent implements AfterViewInit, OnInit, OnDestroy {
   activePage = 'home';
   theme = 'dark';
   promptValue = '';
   promptPlaceholder = 'Ask the on-device model anything...';
+  private themeSubscription: Subscription;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     public designService: DesignService,
     private elementRef: ElementRef,
-    private router: Router
+    private router: Router,
+    private themeManager: ThemeManager,
   ) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.initTheme();
-    }
+    this.themeSubscription = this.themeManager.theme$.subscribe(theme => {
+      this.theme = theme;
+    });
   }
 
   ngOnInit() {
@@ -33,6 +37,12 @@ export class BetaLayoutComponent implements AfterViewInit, OnInit {
       if (path !== '/') {
           this.activePage = 'app';
       }
+  }
+
+  ngOnDestroy() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit() {
@@ -59,53 +69,10 @@ export class BetaLayoutComponent implements AfterViewInit, OnInit {
     this.refreshIcons();
   }
 
-  initTheme() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const modeParam = urlParams.get('mode') || urlParams.get('theme'); // Support both
-
-    if (modeParam === 'dark' || modeParam === 'light') {
-        this.theme = modeParam;
-        localStorage.setItem('webai_theme', modeParam);
-    } else if (modeParam === 'auto') {
-        localStorage.removeItem('webai_theme'); // Clear preference to use system
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            this.theme = 'dark';
-        } else {
-            this.theme = 'light';
-        }
-    } else {
-        const storedTheme = localStorage.getItem('webai_theme');
-        if (storedTheme) {
-          this.theme = storedTheme;
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          this.theme = 'dark';
-        } else {
-          this.theme = 'light';
-        }
-    }
-    this.applyTheme();
-  }
-
-  toggleTheme() {
-    this.theme = this.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('webai_theme', this.theme);
-    this.applyTheme();
-  }
-
-  applyTheme() {
-    if (isPlatformBrowser(this.platformId)) {
-      if (this.theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }
-
   runDiagnostics() {
     console.log('Running diagnostics...');
   }
-  
+
   openChat() {
       this.activePage = 'app';
       this.router.navigate(['/']);

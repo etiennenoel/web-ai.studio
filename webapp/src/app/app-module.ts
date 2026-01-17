@@ -59,6 +59,7 @@ import {AttachmentModalComponent} from './components/prompt-input/attachment-mod
 import {BetaLayoutComponent} from './components/layout/beta-layout/beta-layout.component';
 import {QuickAccessCardComponent} from './components/layout/beta-layout/quick-access-card/quick-access-card.component';
 import {AvailableApiCardComponent} from './components/layout/beta-layout/available-api-card/available-api-card.component';
+import {NavigationBarComponent} from './components/layout/beta-layout/navigation-bar/navigation-bar.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,7 @@ import {AvailableApiCardComponent} from './components/layout/beta-layout/availab
      AttachmentModalComponent,
      QuickAccessCardComponent,
      AvailableApiCardComponent,
+     NavigationBarComponent,
   ],
   imports: [
     BrowserModule,
