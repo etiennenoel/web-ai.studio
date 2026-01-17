@@ -5,11 +5,7 @@
     <div class="hero-glow z-0"></div>
 
     <!-- Global Navigation -->
-    <app-navigation-bar
-            [activePage]="activePage"
-            (navigate)="navigateTo($event)"
-            (openPage)="openPage($event)">
-    </app-navigation-bar>
+    <app-navigation-bar></app-navigation-bar>
 
     <!-- ======================= HOME PAGE ======================= -->
     <div id="page-home" class="page-section relative z-10" [class.active]="activePage === 'home'">

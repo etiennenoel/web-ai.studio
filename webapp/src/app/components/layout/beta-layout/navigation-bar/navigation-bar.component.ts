@@ -8,20 +8,10 @@ import {ThemeManager} from '../../../../core/services/theme.manager';
 })
 export class NavigationBarComponent {
   @Input() activePage: string = 'home';
-  @Output() navigate = new EventEmitter<string>();
-  @Output() openPage = new EventEmitter<string>();
 
   constructor(
     private themeManager: ThemeManager,
   ) {
-  }
-
-  onNavigate(page: string) {
-    this.navigate.emit(page);
-  }
-
-  onOpenPage(page: string) {
-    this.openPage.emit(page);
   }
 
   onToggleTheme() {
