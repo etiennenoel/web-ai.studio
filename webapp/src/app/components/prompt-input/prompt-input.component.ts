@@ -118,6 +118,11 @@ export class PromptInputComponent implements OnInit {
     options.prompt = this.promptText; 
     
     this.run.emit(options);
+
+    this.promptText = '';
+    this.attachments = [];
+    this.attachmentWarnings = false;
+    this.attachmentReadyForPromptMap.clear();
     
     this.onOptionsChange();
   }
