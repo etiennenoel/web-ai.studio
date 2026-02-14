@@ -44,18 +44,37 @@ export class ConversationManager {
     }
   }
 
-  async run(prompt: string) {
+  async run(options: PromptRunOptions) {
     if (!this.session) {
       console.error('No session available');
       return;
     }
 
-    this.addMessage({ role: 'user', content: prompt });
+    this.addMessage({ role: 'user', content: options.prompt });
     this._status.next(InferenceStateEnum.InProgress);
 
     try {
-      const response = await this.session.prompt(prompt);
-      this.addMessage({ role: 'model', content: response });
+      if (options.stream) {
+        let fullResponse = '';
+        this.addMessage({ role: 'model', content: '' }); // Add empty message for streaming
+
+        const stream = this.session.promptStreaming(options.prompt);
+        
+        for await (const chunk of stream) {
+          fullResponse += chunk;
+          // Update the last message with the new chunk
+          const currentMessages = this._messages.value;
+          const lastMessage = currentMessages[currentMessages.length - 1];
+          if (lastMessage && lastMessage.role === 'model') {
+            lastMessage.content = fullResponse;
+            this._messages.next([...currentMessages]); // Trigger update
+          }
+        }
+      } else {
+        const response = await this.session.prompt(options.prompt);
+        this.addMessage({ role: 'model', content: response });
+      }
+
       this._status.next(InferenceStateEnum.Success);
     } catch (e) {
       console.error('Prompt failed', e);

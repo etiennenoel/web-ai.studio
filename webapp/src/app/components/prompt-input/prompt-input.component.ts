@@ -72,7 +72,8 @@ export class PromptInputComponent implements OnInit {
   get settingsActive() {
     return this.options.structuredOutputEnabled === true ||
       this.options.temperature !== this.defaultTemperature ||
-      this.options.topK !== this.defaultTopK;
+      this.options.topK !== this.defaultTopK ||
+      this.options.stream !== true;
   }
 
   async ngOnInit() {

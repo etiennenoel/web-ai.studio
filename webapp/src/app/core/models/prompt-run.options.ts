@@ -8,4 +8,5 @@ export class PromptRunOptions {
   structuredOutputEnabled: boolean = false;
   structuredOutputJsonSchema: string = '';
   prompt: string = '';
+  stream: boolean = true;
 }
