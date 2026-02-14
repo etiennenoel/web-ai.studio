@@ -75,10 +75,9 @@ export class PromptComponent implements OnInit {
       
       const stream = session.promptStreaming(this.promptText);
       
-      let fullResponse = '';
+      let previousChunk = '';
       for await (const chunk of stream) {
-        fullResponse += chunk;
-        this.response = fullResponse;
+        this.response += chunk;
         this.cdr.detectChanges();
       }
 
@@ -92,8 +91,8 @@ export class PromptComponent implements OnInit {
           timestamp: new Date().toLocaleTimeString(),
           prompt: this.promptText,
           systemPrompt: this.systemPrompt,
-          response: fullResponse,
-          tokens: fullResponse.length,
+          response: this.response,
+          tokens: this.response.length,
           latency: this.executionTime,
           status: 'success',
           params: {

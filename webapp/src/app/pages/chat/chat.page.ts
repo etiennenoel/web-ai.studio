@@ -85,7 +85,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async onRun(options: PromptRunOptions) {
-    await this.conversationManager.run(options.prompt);
+    await this.conversationManager.run(options);
     this.state = PromptInputStateEnum.Ready;
   }
 
