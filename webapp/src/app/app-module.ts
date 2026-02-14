@@ -14,6 +14,7 @@ import {
   provideZonelessChangeDetection
 } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
@@ -56,6 +57,7 @@ import {PromptInputComponent} from './components/prompt-input/prompt-input.compo
 import {CodeEditorComponent} from './shared/components/code-editor/code-editor.component';
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
 import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
+import {LatencyLoaderComponent} from './components/latency-loader/latency-loader.component';
 
 @NgModule({
   declarations: [
@@ -92,10 +94,12 @@ import {AttachmentModalComponent} from './components/prompt-input/attachment-mod
     NgbOffcanvasModule,
     NgbCarouselModule,
     NgbDropdownModule,
+    LatencyLoaderComponent,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideClientHydration(withEventReplay()),
+    provideHttpClient(withFetch()),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
     // Axon

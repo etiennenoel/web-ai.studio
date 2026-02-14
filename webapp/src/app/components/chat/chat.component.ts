@@ -9,4 +9,5 @@ import { Message } from '../../core/services/conversation.manager';
 })
 export class ChatComponent {
   @Input() messages: Message[] = [];
+  @Input() status: string | null = null;
 }
