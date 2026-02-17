@@ -11,7 +11,7 @@ import {
   NgModule,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
-  provideZonelessChangeDetection
+  provideZonelessChangeDetection, isDevMode
 } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch } from '@angular/common/http';
@@ -58,6 +58,7 @@ import {CodeEditorComponent} from './shared/components/code-editor/code-editor.c
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
 import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
 import {LatencyLoaderComponent} from './components/latency-loader/latency-loader.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,12 @@ import {LatencyLoaderComponent} from './components/latency-loader/latency-loader
     NgbCarouselModule,
     NgbDropdownModule,
     LatencyLoaderComponent,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
