@@ -97,26 +97,30 @@
           </li>
         </ul>
       </div>
-      @switch (state) {
-      @case (PromptInputStateEnum.Ready) {
-      <button class="btn btn-primary d-flex gap-3 position-relative" (click)="onRunClick()" placement="top"
-        [ngbTooltip]="runBtnTooltip" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">Run <i
-          class="bi bi-lightning-charge-fill"></i>
+      <button class="btn btn-primary d-flex gap-3 position-relative btn-state-aware" (click)="onRunClick()" [ngClass]="{
+          'btn-stop': buttonState === 'Stop',
+          'btn-interject': buttonState === 'Interject'
+        }" [ngbTooltip]="runBtnTooltip" placement="top" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">
+
+        <i class="bi" [ngClass]="{
+          'bi-lightning-charge-fill': buttonState === 'Idle',
+          'bi-stop-circle-fill': buttonState === 'Stop',
+          'bi-arrow-return-left': buttonState === 'Interject'
+        }"></i>
+
+        <span class="label-wrapper">
+          <span class="btn-label" [class.visible]="buttonState === 'Idle'">Run</span>
+          <span class="btn-label" [class.visible]="buttonState === 'Stop'">Stop</span>
+          <span class="btn-label" [class.visible]="buttonState === 'Interject'">Interject</span>
+        </span>
+
         @if(attachmentWarnings) {
         <span
           class="position-absolute top-0 start-100 translate-middle p-2 bg-warning border border-light rounded-circle">
           <span class="visually-hidden">New alerts</span>
         </span>
         }
-
       </button>
-      }
-      @case (PromptInputStateEnum.Inferencing) {
-      <button class="btn btn-danger d-flex gap-3" (click)="onStopClick()">
-        <i class="bi bi-stop-circle-fill"></i> Stop
-      </button>
-      }
-      }
     </div>
     @if (attachments.length > 0) {
     <div class="preview-container">

@@ -16,7 +16,10 @@
   overflow: clip;
   width: 300px;
 
-  img, video, audio, .pdf-preview {
+  img,
+  video,
+  audio,
+  .pdf-preview {
     width: 300px;
     height: 300px;
     object-fit: contain; // Added for better preview
@@ -64,7 +67,11 @@
     background-color: var(--bs-dark-bg-subtle);
   }
 
-  &.disabled, &:disabled, &.active, &:active, &.show {
+  &.disabled,
+  &:disabled,
+  &.active,
+  &:active,
+  &.show {
     border: none;
     // background-color: var(--bs-dark-bg-subtle); // Optional: keep active state visible
   }
@@ -106,5 +113,81 @@
       border-top-color: var(--bs-warning) !important;
     }
 
+  }
+}
+
+.btn-state-aware {
+  transition: background-color 0.25s ease-in-out, transform 0.1s ease-in-out;
+  overflow: hidden; // For label slide/fade
+  min-width: 120px; // Prevent width jumping
+  justify-content: center;
+
+  // Idle State (Default is btn-primary in HTML)
+
+  // Stop State
+  &.btn-stop {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+
+    &:hover {
+      background-color: var(--bs-danger-bg-subtle);
+      color: var(--bs-danger);
+    }
+  }
+
+  // Interject State
+  &.btn-interject {
+    background-color: var(--bs-warning);
+    border-color: var(--bs-warning);
+    color: var(--bs-black); // Better contrast on orange/warning
+    animation: pulse 0.3s ease-in-out;
+
+    &:hover {
+      background-color: var(--bs-warning-bg-subtle);
+    }
+  }
+
+  .label-wrapper {
+    position: relative;
+    height: 1.5em; // Fixed height
+    width: 60px; // Fixed width to check
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0); // Start slightly lower
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    pointer-events: none;
+    white-space: nowrap; // Prevent wrapping
+
+    &.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    // Entering state (from bottom)
+    &:not(.visible) {
+      transform: translate(-50%, 50%); // Slide down when exiting? Or slide up.
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }

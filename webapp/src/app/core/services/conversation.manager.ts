@@ -21,6 +21,7 @@ export class ConversationManager {
   public status$ = this._status.asObservable();
 
   private session: any;
+  private abortController: AbortController | null = null;
 
   async createAndLoadSession(options: PromptRunOptions) {
     if (this.session) {
@@ -50,15 +51,24 @@ export class ConversationManager {
       return;
     }
 
+    // Cancel any ongoing request
+    if (this.abortController) {
+      this.cancel();
+    }
+
     this.addMessage({ role: 'user', content: options.prompt });
     this._status.next(InferenceStateEnum.InProgress);
+
+    this.abortController = new AbortController();
 
     try {
       if (options.stream) {
         let fullResponse = '';
         this.addMessage({ role: 'model', content: '' }); // Add empty message for streaming
 
-        const stream = this.session.promptStreaming(options.prompt);
+        const stream = this.session.promptStreaming(options.prompt, {
+          signal: this.abortController.signal
+        });
         
         for await (const chunk of stream) {
           fullResponse += chunk;
@@ -71,20 +81,30 @@ export class ConversationManager {
           }
         }
       } else {
-        const response = await this.session.prompt(options.prompt);
+        const response = await this.session.prompt(options.prompt, {
+          signal: this.abortController.signal
+        });
         this.addMessage({ role: 'model', content: response });
       }
 
       this._status.next(InferenceStateEnum.Success);
-    } catch (e) {
-      console.error('Prompt failed', e);
-      this._status.next(InferenceStateEnum.Error);
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        console.log('Prompt aborted');
+      } else {
+        console.error('Prompt failed', e);
+        this._status.next(InferenceStateEnum.Error);
+      }
+    } finally {
+      this.abortController = null;
     }
   }
 
   cancel() {
-    // Cancellation logic if supported by API (using AbortController)
-    // For now, just reset status
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
     this._status.next(InferenceStateEnum.Idle);
   }
 

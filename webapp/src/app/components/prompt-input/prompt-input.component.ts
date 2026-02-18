@@ -20,6 +20,8 @@ import {AttachmentModalComponent} from './attachment-modal/attachment-modal.comp
 
 declare const LanguageModel: any;
 
+export type ButtonState = 'Idle' | 'Stop' | 'Interject';
+
 @Component({
   selector: 'app-prompt-input',
   templateUrl: './prompt-input.component.html',
@@ -59,6 +61,14 @@ export class PromptInputComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer,
               @Inject(PLATFORM_ID) private readonly platformId: Object,
               private modalService: NgbModal) {
+  }
+
+  get buttonState(): ButtonState {
+    if (this.state === PromptInputStateEnum.Inferencing) {
+      const hasInput = this.promptText.trim().length > 0 || this.attachments.length > 0;
+      return hasInput ? 'Interject' : 'Stop';
+    }
+    return 'Idle';
   }
 
   get runBtnTooltip() {
@@ -112,7 +122,15 @@ export class PromptInputComponent implements OnInit {
   }
 
   async onRunClick() {
-    if (this.state === PromptInputStateEnum.Inferencing) return;
+    const btnState = this.buttonState;
+
+    if (btnState === 'Stop') {
+      this.cancel.emit();
+      this.promptText = ''; // Clear potentially empty/whitespace prompt if any
+      return;
+    }
+
+    // Interject or Idle -> Run
     
     // Hack: Add prompt to options for transport if not present
     const options: any = await this.getOptions();
