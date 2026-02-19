@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit, PLATFORM_ID, DOCUMENT} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID, DOCUMENT} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {isPlatformServer} from '@angular/common';
 import {Title} from '@angular/platform-browser';
@@ -34,7 +34,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
     title: Title,
     public readonly conversationManager: ConversationManager,
-
+    private readonly cdr: ChangeDetectorRef,
     private readonly ngbModal: NgbModal,
   ) {
     super(document, title)
@@ -52,6 +52,13 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     }
 
     this.conversationManager.createAndLoadSession(this.options);
+    
+    this.conversationManager.status$.subscribe(status => {
+      this.state = status === InferenceStateEnum.InProgress 
+        ? PromptInputStateEnum.Inferencing 
+        : PromptInputStateEnum.Ready;
+      this.cdr.detectChanges();
+    });
   }
 
   onOptionsChange(options: PromptRunOptions) {
@@ -86,7 +93,6 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   async onRun(options: PromptRunOptions) {
     await this.conversationManager.run(options);
-    this.state = PromptInputStateEnum.Ready;
   }
 
   onCancel() {
