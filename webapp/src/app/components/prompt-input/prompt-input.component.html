@@ -14,19 +14,23 @@
         </button>
         <ul class="dropdown-menu">
           <li>
-            <button class="dropdown-item" href="#" (click)="openFileUpload()"><i class="bi bi-upload me-2"></i> Upload
+            <button class="dropdown-item" href="#" (click)="openFileUpload()"
+              [disabled]="!capabilities.image && !capabilities.audio"><i class="bi bi-upload me-2"></i> Upload
             </button>
           </li>
           <li>
-            <button class="dropdown-item" href="#" (click)="openCamera()"><i class="bi bi-camera me-2"></i> Camera
+            <button class="dropdown-item" href="#" (click)="openCamera()" [disabled]="!capabilities.image"><i
+                class="bi bi-camera me-2"></i> Camera
             </button>
           </li>
           <li>
-            <button class="dropdown-item" href="#" (click)="recordAudio()"><i class="bi bi-mic me-2"></i> Record Audio
+            <button class="dropdown-item" href="#" (click)="recordAudio()" [disabled]="!capabilities.audio"><i
+                class="bi bi-mic me-2"></i> Record Audio
             </button>
           </li>
           <li>
-            <button class="dropdown-item" href="#" (click)="takeScreenshot()"><i class="bi bi-display me-2"></i>
+            <button class="dropdown-item" href="#" (click)="takeScreenshot()" [disabled]="!capabilities.image"><i
+                class="bi bi-display me-2"></i>
               Screenshot
             </button>
           </li>
@@ -97,7 +101,8 @@
           </li>
         </ul>
       </div>
-      <button class="btn btn-primary d-flex gap-3 position-relative btn-state-aware" (click)="onRunClick()" [ngClass]="{
+      <button class="btn btn-primary d-flex gap-3 position-relative btn-state-aware" (click)="onRunClick()"
+        [disabled]="!capabilities.available" [ngClass]="{
           'btn-stop': buttonState === 'Stop',
           'btn-interject': buttonState === 'Interject'
         }" [ngbTooltip]="runBtnTooltip" placement="top" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">

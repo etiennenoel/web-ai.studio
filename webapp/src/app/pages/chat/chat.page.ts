@@ -22,6 +22,18 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
 
   languageModelAvailability?: "unavailable" | "downloadable" | "downloading" | "available" | "loading..." = "loading...";
+  capabilities = { available: false, audio: false, image: false, text: false };
+
+  get capabilityTooltip(): string {
+    if (!this.capabilities.available) {
+      return 'No capabilities available';
+    }
+    const caps = [];
+    if (this.capabilities.text) caps.push('Text');
+    if (this.capabilities.image) caps.push('Image');
+    if (this.capabilities.audio) caps.push('Audio');
+    return `Available capabilities: ${caps.join(', ')}`;
+  }
 
   progress: number = 0;
 
@@ -103,11 +115,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     const self = this;
 
     const session = await LanguageModel.create({
-      expectedInputs: [
-        { type: "text", languages: ["en"] },
-        { type: "audio", languages: ["en"] },
-        { type: "image", languages: ["en"] },
-      ],
+      expectedInputs: this.options.expectedInputs || [{ type: "text", languages: ["en"] }],
       monitor(m: any) {
         m.addEventListener("downloadprogress", (e: any) => {
           console.log(`Downloaded ${e.loaded * 100}%`);
@@ -126,17 +134,65 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      this.languageModelAvailability = await LanguageModel.availability({
-        expectedInputs: [
-          { type: "text", languages: ["en"] },
-          { type: "audio", languages: ["en"] },
-          { type: "image", languages: ["en"] },
-        ]
-      });
-    } catch (e) {
-      this.languageModelAvailability = "unavailable";
+    const testCapabilities = async (inputs: any[]) => {
+      try {
+        return await LanguageModel.availability({ expectedInputs: inputs });
+      } catch (e) {
+        return "unavailable";
+      }
+    };
+
+    // 1. Multimodal (Text + Audio + Image)
+    let availability = await testCapabilities([
+      { type: "text", languages: ["en"] },
+      { type: "audio", languages: ["en"] },
+      { type: "image", languages: ["en"] },
+    ]);
+
+    if (availability !== "unavailable") {
+      this.languageModelAvailability = availability;
+      this.capabilities = { available: true, audio: true, image: true, text: true };
+      this.updateOptionsExpectedInputs();
+      return;
     }
+
+    // 2. Visual-only (Text + Image)
+    availability = await testCapabilities([
+      { type: "text", languages: ["en"] },
+      { type: "image", languages: ["en"] },
+    ]);
+
+    if (availability !== "unavailable") {
+      this.languageModelAvailability = availability;
+      this.capabilities = { available: true, audio: false, image: true, text: true };
+      this.updateOptionsExpectedInputs();
+      return;
+    }
+
+    // 3. Text-only (Text)
+    availability = await testCapabilities([
+      { type: "text", languages: ["en"] },
+    ]);
+
+    if (availability !== "unavailable") {
+      this.languageModelAvailability = availability;
+      this.capabilities = { available: true, audio: false, image: false, text: true };
+      this.updateOptionsExpectedInputs();
+      return;
+    }
+
+    // completely unavailable
+    this.languageModelAvailability = "unavailable";
+    this.capabilities = { available: false, audio: false, image: false, text: false };
+    this.updateOptionsExpectedInputs();
+  }
+
+  updateOptionsExpectedInputs() {
+    const expectedInputs = [{ type: "text", languages: ["en"] }];
+    if (this.capabilities.audio) expectedInputs.push({ type: "audio", languages: ["en"] });
+    if (this.capabilities.image) expectedInputs.push({ type: "image", languages: ["en"] });
+    
+    this.options.expectedInputs = expectedInputs;
   }
 
   protected readonly InferenceStateEnum = InferenceStateEnum;
