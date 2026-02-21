@@ -2,14 +2,23 @@
   @for (message of messages; track $index) {
   <div class="d-flex" [class.justify-content-end]="message.role === 'user'">
     <div class="card" [class.bg-primary]="message.role === 'user'" [class.text-white]="message.role === 'user'"
-      style="max-width: 80%;">
+      [class.w-100]="message.role !== 'user'" style="max-width: 80%;">
       <div class="card-body p-2">
-        <div [innerHTML]="message.content"></div>
+        @if (message.role !== 'user' && !message.content && status === 'InProgress' && $index === messages.length - 1) {
+        <app-latency-loader></app-latency-loader>
+        }
+        <app-markdown-renderer [content]="message.content"></app-markdown-renderer>
       </div>
     </div>
   </div>
   }
   @if (status === 'InProgress' && messages.length > 0 && messages[messages.length - 1].role === 'user') {
-  <app-latency-loader></app-latency-loader>
+  <div class="d-flex">
+    <div class="card w-100" style="max-width: 80%;">
+      <div class="card-body p-2">
+        <app-latency-loader></app-latency-loader>
+      </div>
+    </div>
+  </div>
   }
 </div>
