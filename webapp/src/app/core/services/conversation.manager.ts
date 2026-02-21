@@ -37,7 +37,8 @@ export class ConversationManager {
         this.session = await LanguageModel.create({
           systemPrompt: options.systemPrompt,
           temperature: options.temperature,
-          topK: options.topK
+          topK: options.topK,
+          expectedInputs: options.expectedInputs,
         });
       }
     } catch (e) {

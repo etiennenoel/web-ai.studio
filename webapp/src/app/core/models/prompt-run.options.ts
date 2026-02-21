@@ -9,4 +9,5 @@ export class PromptRunOptions {
   structuredOutputJsonSchema: string = '';
   prompt: string = '';
   stream: boolean = true;
+  expectedInputs?: any[];
 }

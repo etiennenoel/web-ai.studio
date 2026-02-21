@@ -47,6 +47,9 @@ export class PromptInputComponent implements OnInit {
   @Input()
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
 
+  @Input()
+  capabilities = { available: false, audio: false, image: false, text: false };
+
   defaultTemperature = 0.7; // Default based on model
   maxTemperature = 2;
   maxTopK = 128;
@@ -122,6 +125,10 @@ export class PromptInputComponent implements OnInit {
   }
 
   async onRunClick() {
+    if (!this.capabilities.available) {
+      return;
+    }
+
     const btnState = this.buttonState;
 
     if (btnState === 'Stop') {
@@ -154,11 +161,16 @@ export class PromptInputComponent implements OnInit {
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      if (item.kind === 'file' && (item.type.startsWith('image/') || item.type.startsWith('audio/') || item.type.startsWith('application/pdf'))) {
-        const file = item.getAsFile();
-        if (file) {
-          this.addAttachment(file);
-          event.preventDefault();
+      if (item.kind === 'file') {
+        const isImageOrPdf = item.type.startsWith('image/') || item.type.startsWith('application/pdf');
+        const isAudio = item.type.startsWith('audio/');
+        
+        if ((isImageOrPdf && this.capabilities.image) || (isAudio && this.capabilities.audio)) {
+          const file = item.getAsFile();
+          if (file) {
+            this.addAttachment(file);
+            event.preventDefault();
+          }
         }
       }
     }
@@ -173,7 +185,12 @@ export class PromptInputComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files) {
       for (const file of Array.from(input.files)) {
-        this.addAttachment(file);
+        const isImageOrPdf = file.type.startsWith('image/') || file.type.startsWith('application/pdf');
+        const isAudio = file.type.startsWith('audio/');
+        
+        if ((isImageOrPdf && this.capabilities.image) || (isAudio && this.capabilities.audio)) {
+          this.addAttachment(file);
+        }
       }
     }
     this.onOptionsChange();
@@ -232,7 +249,10 @@ export class PromptInputComponent implements OnInit {
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        if (file.type.startsWith('image/') || file.type.startsWith('audio/') || file.type.startsWith('application/pdf')) {
+        const isImageOrPdf = file.type.startsWith('image/') || file.type.startsWith('application/pdf');
+        const isAudio = file.type.startsWith('audio/');
+        
+        if ((isImageOrPdf && this.capabilities.image) || (isAudio && this.capabilities.audio)) {
           this.addAttachment(file);
         }
       }

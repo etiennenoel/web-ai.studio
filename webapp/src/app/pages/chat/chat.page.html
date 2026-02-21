@@ -1,17 +1,18 @@
 <div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
-  <webai-studio-header title="Chat Prompt">
+  <webai-studio-header>
 
     <div class="d-flex align-items-center mt-5 ms-3 me-3">
       <h2 class="h6 flex-grow-1">Chat</h2>
       <div class="d-flex align-items-center gap-2">
         <div class="d-flex align-items-center gap-2">
           <div><small>Local LLM status:</small></div>
-          <div><span class="badge text-bg-secondary"
+          <div><span class="badge text-bg-secondary cursor-pointer"
               [class.text-bg-warning]="this.languageModelAvailability === 'loading...'"
               [class.text-bg-secondary]="this.languageModelAvailability === 'downloadable'"
               [class.text-bg-danger]="this.languageModelAvailability === 'unavailable'"
               [class.text-bg-success]="this.languageModelAvailability === 'available'"
-              [class.text-bg-primary]="this.languageModelAvailability === 'downloading'">{{
+              [class.text-bg-primary]="this.languageModelAvailability === 'downloading'" placement="bottom"
+              [ngbTooltip]="capabilityTooltip">{{
               this.languageModelAvailability }}</span>
           </div>
         </div>
@@ -59,7 +60,7 @@
       }
 
       <app-prompt-input [class.sticky-bottom]="(conversationManager.status$ | async) !== InferenceStateEnum.Initial"
-        [state]="state" (run)="onRun($event)" (cancel)="onCancel()"
+        [state]="state" [capabilities]="capabilities" (run)="onRun($event)" (cancel)="onCancel()"
         (optionsChange)="onOptionsChange($event)"></app-prompt-input>
 
     </div>
