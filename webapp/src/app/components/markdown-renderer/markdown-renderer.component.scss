@@ -1,0 +1,140 @@
+/* Basic styling for markdown elements relying on Bootstrap where possible */
+:host {
+    display: block;
+}
+
+.markdown-body {
+    ::ng-deep {
+
+        line-height: 1.6;
+        /* Lock line height to prevent font metric jitter from bold/italic switches */
+
+        /* Enforce a strict vertical rhythm using only bottom margins to prevent height jumps when marked transitions elements (e.g., from <p> to <pre>) */
+        *:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        ul,
+        ol,
+        blockquote {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .code-block-wrapper {
+            display: grid;
+            margin: 0 1.5rem 1rem 1.5rem;
+            /* Top 0, right/left indent, bottom 1rem to match vertical rhythm */
+            max-height: 60vh;
+            /* Allow large blocks, but eventually scroll */
+            overflow: auto;
+            /* Handle both X and Y scrolling on the wrapper */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #1e1e1e;
+            /* Move background to wrapper so sticky button has a solid backdrop */
+
+            >* {
+                grid-area: 1 / 1;
+            }
+
+            pre {
+                /* Deep rich dark background for code */
+                padding: 1rem;
+                padding-right: 3rem;
+                /* Extra padding so text doesn't hide under the button */
+                /* Subtle indicator line */
+                border-left: 4px solid var(--bs-primary);
+                margin: 0;
+                /* Reset margin since wrapper has it */
+            }
+
+            .copy-btn {
+                justify-self: end;
+                align-self: start;
+                position: sticky;
+                top: 0.5rem;
+                /* Stick to the top as they scroll down */
+                right: 0.5rem;
+                /* Keep it in the top right corner */
+                margin: 0.5rem;
+                /* Padding from the literal edge of the pre block */
+                z-index: 10;
+                /* Keep it above the text */
+
+                opacity: 0;
+                /* By default, transition to off-state is slow (0.8s) for color, but instant for active pop */
+                transition: opacity 0.2s ease-in-out, background-color 0.8s ease, border-color 0.8s ease, transform 0.1s;
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #fff;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                }
+
+                &.btn-success {
+                    background-color: var(--bs-success);
+                    border-color: var(--bs-success);
+                    opacity: 1;
+                    /* Keep visible while copied state is active */
+                    /* Fast transition into the copied state */
+                    transition: opacity 0.2s ease-in-out, background-color 0.1s ease, border-color 0.1s ease, transform 0.1s;
+                }
+            }
+
+            &:hover .copy-btn {
+                opacity: 1;
+            }
+        }
+
+        code {
+            font-size: 0.875em;
+            color: #e2e8f0;
+            /* Light gray/blue for better contrast in dark blocks */
+            word-wrap: break-word;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        // Scoped to avoid affecting block codes
+        :not(pre)>code {
+            color: #d63384;
+            /* Soft pink for inline code */
+            background-color: var(--bs-gray-200);
+            /* Light background for light mode */
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+
+        pre code {
+            color: inherit;
+            background-color: transparent;
+            padding: 0;
+            word-wrap: normal;
+        }
+
+        blockquote {
+            padding: 0.5rem 1rem;
+            font-size: 1.15rem;
+            border-left: 0.25rem solid var(--bs-gray-500);
+            color: var(--bs-gray-400);
+        }
+
+        ul,
+        ol {
+            padding-left: 2rem;
+        }
+
+    }
+}

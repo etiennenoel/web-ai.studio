@@ -53,6 +53,7 @@ import { CodeModal } from './modals/code/code.modal';
 import {AppComponent} from './app.component';
 import {MarkdownPipe} from './shared/pipes/markdown.pipe';
 import {ChatComponent} from './components/chat/chat.component';
+import {MarkdownRendererComponent} from './components/markdown-renderer/markdown-renderer.component';
 import {PromptInputComponent} from './components/prompt-input/prompt-input.component';
 import {CodeEditorComponent} from './shared/components/code-editor/code-editor.component';
 import {WritingAssistanceInputComponent} from './components/writing-assistance-input/writing-assistance-input.component';
@@ -80,6 +81,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     // Modals
      CodeModal,
      MarkdownPipe,
+     MarkdownRendererComponent,
      ChatComponent,
      PromptInputComponent,
      CodeEditorComponent,

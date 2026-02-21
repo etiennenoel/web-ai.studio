@@ -9,22 +9,19 @@ import { LoadingLabel } from '../../core/models/loading-label.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="card border-0 shadow-sm" style="max-width: 80%; width: fit-content; background: var(--bs-tertiary-bg);">
-      <div class="card-body p-3 d-flex align-items-center gap-3">
-        
-        <div class="typing-indicator d-flex gap-1 align-items-center">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        
-        <div class="content-wrapper" aria-live="polite">
-          @if (currentLabel; as label) {
-            <div class="latency-text fade-in-out">
-              {{ isInitialState() ? 'Processing.' : label.text }}
-            </div>
-          }
-        </div>
+    <div class="d-flex align-items-center gap-3 my-1">
+      <div class="typing-indicator d-flex gap-1 align-items-center">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      
+      <div class="content-wrapper" aria-live="polite">
+        @if (currentLabel; as label) {
+          <div class="latency-text fade-in-out">
+            {{ isInitialState() ? 'Processing.' : label.text }}
+          </div>
+        }
       </div>
     </div>
   `,
