@@ -37,7 +37,19 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   progress: number = 0;
 
+  defaultTemperature = 0.7; // Default based on model
+  maxTemperature = 2;
+  maxTopK = 128;
+  defaultTopK = 40;
+
   options: PromptRunOptions = new PromptRunOptions();
+
+  get settingsActive() {
+    return this.options.structuredOutputEnabled === true ||
+      this.options.temperature !== this.defaultTemperature ||
+      this.options.topK !== this.defaultTopK ||
+      this.options.stream !== true;
+  }
 
   constructor(
     router: Router,
@@ -109,6 +121,18 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   onCancel() {
     this.conversationManager.cancel();
+  }
+
+  onNewChat() {
+    this.conversationManager.resetSession(this.options);
+  }
+
+  editStructuredOutput() {
+     const schema = prompt("Enter JSON Schema:", this.options.structuredOutputJsonSchema);
+     if (schema !== null) {
+         this.options.structuredOutputJsonSchema = schema;
+         this.onOptionsChange(this.options);
+     }
   }
 
   async triggerDownload() {
