@@ -60,7 +60,8 @@ export class ConversationManager {
     this.addMessage({ role: 'user', content: options.prompt });
     this._status.next(InferenceStateEnum.InProgress);
 
-    this.abortController = new AbortController();
+    const currentAbortController = new AbortController();
+    this.abortController = currentAbortController;
 
     try {
       if (options.stream) {
@@ -68,10 +69,11 @@ export class ConversationManager {
         this.addMessage({ role: 'model', content: '' }); // Add empty message for streaming
 
         const stream = this.session.promptStreaming(options.prompt, {
-          signal: this.abortController.signal
+          signal: currentAbortController.signal
         });
         
         for await (const chunk of stream) {
+          if (this.abortController !== currentAbortController) return;
           fullResponse += chunk;
           // Update the last message with the new chunk
           const currentMessages = this._messages.value;
@@ -83,21 +85,28 @@ export class ConversationManager {
         }
       } else {
         const response = await this.session.prompt(options.prompt, {
-          signal: this.abortController.signal
+          signal: currentAbortController.signal
         });
+        if (this.abortController !== currentAbortController) return;
         this.addMessage({ role: 'model', content: response });
       }
 
-      this._status.next(InferenceStateEnum.Success);
+      if (this.abortController === currentAbortController) {
+        this._status.next(InferenceStateEnum.Success);
+      }
     } catch (e: any) {
-      if (e.name === 'AbortError') {
-        console.log('Prompt aborted');
-      } else {
-        console.error('Prompt failed', e);
-        this._status.next(InferenceStateEnum.Error);
+      if (this.abortController === currentAbortController) {
+        if (e.name === 'AbortError') {
+          console.log('Prompt aborted');
+        } else {
+          console.error('Prompt failed', e);
+          this._status.next(InferenceStateEnum.Error);
+        }
       }
     } finally {
-      this.abortController = null;
+      if (this.abortController === currentAbortController) {
+        this.abortController = null;
+      }
     }
   }
 
