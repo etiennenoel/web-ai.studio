@@ -1,10 +1,13 @@
 <div class="container-fluid">
-  <div class="mt-3">
-  <button class="btn btn-soft sidebar-icon" (click)="openSidebar()"><i class="bi bi-list"></i></button>
+  <div class="d-flex align-items-center mt-3 mb-2 gap-3">
+    <button class="btn btn-soft sidebar-icon" (click)="openSidebar()"><i class="bi bi-list"></i></button>
+    <div class="flex-grow-1 header-title-container">
+      <ng-content select="[header-title-row]"></ng-content>
+    </div>
   </div>
 
   <ng-content></ng-content>
 
-  <hr class=" ms-3 me-3">
+  <hr class="ms-3 me-3">
 </div>
 

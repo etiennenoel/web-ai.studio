@@ -50,11 +50,6 @@ export class PromptInputComponent implements OnInit {
   @Input()
   capabilities = { available: false, audio: false, image: false, text: false };
 
-  defaultTemperature = 0.7; // Default based on model
-  maxTemperature = 2;
-  maxTopK = 128;
-  defaultTopK = 40;
-  
   attachmentReadyForPromptMap = new Map<string, boolean>();
   
   protected readonly PromptInputStateEnum = PromptInputStateEnum;
@@ -80,13 +75,6 @@ export class PromptInputComponent implements OnInit {
     }
 
     return "Press ctrl/cmd+enter";
-  }
-
-  get settingsActive() {
-    return this.options.structuredOutputEnabled === true ||
-      this.options.temperature !== this.defaultTemperature ||
-      this.options.topK !== this.defaultTopK ||
-      this.options.stream !== true;
   }
 
   async ngOnInit() {
@@ -215,13 +203,6 @@ export class PromptInputComponent implements OnInit {
   
   takeScreenshot() {
       alert("Screenshot not implemented in this demo.");
-  }
-
-  editStructuredOutput() {
-     const schema = prompt("Enter JSON Schema:", this.options.structuredOutputJsonSchema);
-     if (schema !== null) {
-         this.options.structuredOutputJsonSchema = schema;
-     }
   }
 
   removeAttachment(index: number) {

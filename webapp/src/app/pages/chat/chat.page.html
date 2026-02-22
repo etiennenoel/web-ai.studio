@@ -1,8 +1,8 @@
 <div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
   <webai-studio-header>
 
-    <div class="d-flex align-items-center mt-5 ms-3 me-3">
-      <h2 class="h6 flex-grow-1">Chat</h2>
+    <div header-title-row class="d-flex align-items-center me-3 w-100">
+      <h2 class="h6 flex-grow-1 m-0">Chat</h2>
       <div class="d-flex align-items-center gap-2">
         <div class="d-flex align-items-center gap-2">
           <div><small>Local LLM status:</small></div>
@@ -16,6 +16,78 @@
               this.languageModelAvailability }}</span>
           </div>
         </div>
+
+        <button class="btn btn-soft" (click)="onNewChat()"
+          [disabled]="(conversationManager.status$ | async) === InferenceStateEnum.Initial" ngbTooltip="New chat"
+          placement="bottom">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+
+        <div class="dropdown">
+          <button class="btn btn-settings btn-soft" [class.text-success]="settingsActive"
+            [class.badge-settings]="settingsActive" [class.active]="settingsActive" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-sliders2"></i>
+            <span
+              class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
+              <span class="visually-hidden">New alerts</span>
+            </span>
+          </button>
+          <ul class="dropdown-menu" style="width:350px;">
+
+            <li>
+              <h6 class="dropdown-header">Run Settings</h6>
+            </li>
+            <li class="ms-3 me-3 d-flex align-items-center gap-5">
+              <label class="form-check-label flex-grow-1" for="streamOutputSwitch">Stream response</label>
+              <div class="form-check form-switch ps-2 m-0" style="width: 70px; min-height: auto;">
+                <input class="form-check-input m-0" type="checkbox" role="switch" id="streamOutputSwitch"
+                  [(ngModel)]="options.stream" (change)="onOptionsChange(options)" style="width: 40px;">
+              </div>
+            </li>
+
+            <li class="ms-3 me-3 mt-3">
+              <span>Temperature: {{options.temperature}}</span>
+              <div class="d-flex align-items-center gap-5">
+                <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.temperature" [min]="0"
+                  [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
+                <input type="number" class="form-control" style="width: 70px;" [(ngModel)]="options.temperature"
+                  [min]="0" [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
+              </div>
+
+            </li>
+
+            <li class="ms-3 me-3 mt-3">
+              <span>TopK: {{options.topK}}</span>
+              <div class="d-flex align-items-center gap-5">
+                <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="0" [max]="maxTopK"
+                  [step]="1" (change)="onOptionsChange(options)">
+                <input type="number" class="form-control" style="width: 70px;" [(ngModel)]="options.topK" [min]="0"
+                  [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
+              </div>
+
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <h6 class="dropdown-header">Tools</h6>
+            </li>
+
+            <li class="ms-3 me-3 d-flex align-items-center gap-3">
+              <div class="form-check form-switch flex-grow-1">
+                <input class="form-check-input" type="checkbox" role="switch" id="structuredOutputSwitch"
+                  [(ngModel)]="options.structuredOutputEnabled" (change)="onOptionsChange(options)">
+                <label class="form-check-label" for="structuredOutputSwitch">Structured Output</label>
+              </div>
+              <button class="btn btn-sm btn-soft btn-white bg-primary-subtle"
+                [disabled]="!options.structuredOutputEnabled" (click)="editStructuredOutput()">Edit
+              </button>
+            </li>
+          </ul>
+        </div>
+
         <button class="btn btn-soft" (click)="openCodeModal()"
           ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
             class="bi bi-code-square"></i> Get code</button>

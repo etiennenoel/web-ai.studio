@@ -126,4 +126,11 @@ export class ConversationManager {
   clear() {
     this._messages.next([]);
   }
+
+  async resetSession(options: PromptRunOptions) {
+    this.cancel();
+    this._messages.next([]);
+    this._status.next(InferenceStateEnum.Initial);
+    await this.createAndLoadSession(options);
+  }
 }
