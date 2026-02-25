@@ -23,69 +23,16 @@
           <i class="bi bi-plus-lg"></i>
         </button>
 
-        <div class="dropdown">
+        <div>
           <button class="btn btn-settings btn-soft" [class.text-success]="settingsActive"
             [class.badge-settings]="settingsActive" [class.active]="settingsActive" type="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
+            data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
             <i class="bi bi-sliders2"></i>
             <span
               class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
               <span class="visually-hidden">New alerts</span>
             </span>
           </button>
-          <ul class="dropdown-menu" style="width:350px;">
-
-            <li>
-              <h6 class="dropdown-header">Run Settings</h6>
-            </li>
-            <li class="ms-3 me-3 d-flex align-items-center gap-5">
-              <label class="form-check-label flex-grow-1" for="streamOutputSwitch">Stream response</label>
-              <div class="form-check form-switch ps-2 m-0" style="width: 70px; min-height: auto;">
-                <input class="form-check-input m-0" type="checkbox" role="switch" id="streamOutputSwitch"
-                  [(ngModel)]="options.stream" (change)="onOptionsChange(options)" style="width: 40px;">
-              </div>
-            </li>
-
-            <li class="ms-3 me-3 mt-3">
-              <span>Temperature: {{options.temperature}}</span>
-              <div class="d-flex align-items-center gap-5">
-                <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.temperature" [min]="0"
-                  [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
-                <input type="number" class="form-control" style="width: 70px;" [(ngModel)]="options.temperature"
-                  [min]="0" [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
-              </div>
-
-            </li>
-
-            <li class="ms-3 me-3 mt-3">
-              <span>TopK: {{options.topK}}</span>
-              <div class="d-flex align-items-center gap-5">
-                <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="0" [max]="maxTopK"
-                  [step]="1" (change)="onOptionsChange(options)">
-                <input type="number" class="form-control" style="width: 70px;" [(ngModel)]="options.topK" [min]="0"
-                  [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
-              </div>
-
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li>
-              <h6 class="dropdown-header">Tools</h6>
-            </li>
-
-            <li class="ms-3 me-3 d-flex align-items-center gap-3">
-              <div class="form-check form-switch flex-grow-1">
-                <input class="form-check-input" type="checkbox" role="switch" id="structuredOutputSwitch"
-                  [(ngModel)]="options.structuredOutputEnabled" (change)="onOptionsChange(options)">
-                <label class="form-check-label" for="structuredOutputSwitch">Structured Output</label>
-              </div>
-              <button class="btn btn-sm btn-soft btn-white bg-primary-subtle"
-                [disabled]="!options.structuredOutputEnabled" (click)="editStructuredOutput()">Edit
-              </button>
-            </li>
-          </ul>
         </div>
 
         <button class="btn btn-soft" (click)="openCodeModal()"
@@ -135,6 +82,68 @@
         [state]="state" [capabilities]="capabilities" (run)="onRun($event)" (cancel)="onCancel()"
         (optionsChange)="onOptionsChange($event)"></app-prompt-input>
 
+    </div>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="settingsOffcanvasLabel">Run Settings</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="mb-4">
+      <h6 class="text-uppercase fw-bold text-secondary mb-3" style="letter-spacing: 0.05em; font-size: 0.95rem;">
+        Generation</h6>
+      <div class="d-flex align-items-center gap-5 mb-3">
+        <label class="form-check-label flex-grow-1" for="streamOutputSwitch">Stream response</label>
+        <div class="form-check form-switch ps-2 m-0" style="width: 70px; min-height: auto;">
+          <input class="form-check-input m-0" type="checkbox" role="switch" id="streamOutputSwitch"
+            [(ngModel)]="options.stream" (change)="onOptionsChange(options)" style="width: 40px;">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between">
+          <label class="form-label mb-1">Temperature</label>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.temperature" [min]="0"
+            [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
+          <input type="number" class="form-control form-control-sm" style="width: 70px;"
+            [(ngModel)]="options.temperature" [min]="0" [max]="maxTemperature" [step]="0.1"
+            (change)="onOptionsChange(options)">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between">
+          <label class="form-label mb-1">TopK</label>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="0" [max]="maxTopK"
+            [step]="1" (change)="onOptionsChange(options)">
+          <input type="number" class="form-control form-control-sm" style="width: 70px;" [(ngModel)]="options.topK"
+            [min]="0" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div>
+      <h6 class="text-uppercase fw-bold text-secondary mb-3" style="letter-spacing: 0.05em; font-size: 0.95rem;">Tools
+      </h6>
+      <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch flex-grow-1">
+          <input class="form-check-input" type="checkbox" role="switch" id="structuredOutputSwitch"
+            [(ngModel)]="options.structuredOutputEnabled" (change)="onOptionsChange(options)">
+          <label class="form-check-label" for="structuredOutputSwitch">Structured Output</label>
+        </div>
+        <button class="btn btn-sm btn-soft btn-white bg-primary-subtle" [disabled]="!options.structuredOutputEnabled"
+          (click)="editStructuredOutput()">Edit
+        </button>
+      </div>
     </div>
   </div>
 </div>
