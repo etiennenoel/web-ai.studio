@@ -23,8 +23,18 @@ export class PromptComponent implements OnInit {
   // Inputs
   systemPrompt = '';
   promptText = '';
-  temperature: number | null = null;
-  topK: number | null = null;
+  temperature: number = 1;
+  topK: number = 3;
+
+  defaultTemperature: number = 1;
+  defaultTopK: number = 3;
+  maxTemperature: number = 2;
+  maxTopK: number = 128;
+
+  get isNonDefaultParams(): boolean {
+    return Number(this.temperature) !== Number(this.defaultTemperature) || 
+           Number(this.topK) !== Number(this.defaultTopK);
+  }
 
   // Output
   response = '';
@@ -55,13 +65,48 @@ export class PromptComponent implements OnInit {
 
   ngOnInit() {
     this.checkApiStatus();
+    this.loadSettings();
+
     if (this.showHistory) {
       this.loadHistory();
     }
     this.updateGeneratedCode(); // Initial code generation
   }
 
+  async loadSettings() {
+    try {
+      const params = await this.promptManager.getParams();
+      if (params) {
+        this.defaultTemperature = params.defaultTemperature ?? 1;
+        this.maxTemperature = params.maxTemperature ?? 2;
+        this.defaultTopK = params.defaultTopK ?? 3;
+        this.maxTopK = params.maxTopK ?? 128;
+      }
+    } catch (e) {
+      console.warn("Could not load LanguageModel params", e);
+    }
+
+    const savedTemp = localStorage.getItem('webai-extension-temperature');
+    const savedTopK = localStorage.getItem('webai-extension-topk');
+
+    this.temperature = savedTemp !== null ? parseFloat(savedTemp) : this.defaultTemperature;
+    this.topK = savedTopK !== null ? parseInt(savedTopK, 10) : this.defaultTopK;
+  }
+
+  saveSettings() {
+    localStorage.setItem('webai-extension-temperature', this.temperature.toString());
+    localStorage.setItem('webai-extension-topk', this.topK.toString());
+  }
+
+  resetSettings() {
+    this.temperature = this.defaultTemperature;
+    this.topK = this.defaultTopK;
+    this.saveSettings();
+    this.updateGeneratedCode();
+  }
+
   onInputChange() {
+    this.saveSettings();
     this.updateGeneratedCode();
   }
 

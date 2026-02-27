@@ -89,6 +89,12 @@
 <div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="settingsOffcanvasLabel">Run Settings</h5>
+    <div class="ms-auto me-2">
+      @if (settingsActive) {
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="resetSettings()"><i
+          class="bi bi-arrow-counterclockwise"></i> Reset</button>
+      }
+    </div>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">

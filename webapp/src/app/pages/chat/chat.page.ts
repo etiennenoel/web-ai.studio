@@ -37,17 +37,17 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   progress: number = 0;
 
-  defaultTemperature = 0.7; // Default based on model
+  defaultTemperature = 1; // Default fallback
   maxTemperature = 2;
   maxTopK = 128;
-  defaultTopK = 40;
+  defaultTopK = 3;
 
   options: PromptRunOptions = new PromptRunOptions();
 
   get settingsActive() {
     return this.options.structuredOutputEnabled === true ||
-      this.options.temperature !== this.defaultTemperature ||
-      this.options.topK !== this.defaultTopK ||
+      Number(this.options.temperature) !== Number(this.defaultTemperature) ||
+      Number(this.options.topK) !== Number(this.defaultTopK) ||
       this.options.stream !== true;
   }
 
@@ -75,6 +75,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
       return;
     }
 
+    await this.loadSettings();
+
     this.conversationManager.createAndLoadSession(this.options);
     
     this.conversationManager.status$.subscribe(status => {
@@ -83,6 +85,52 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
         : PromptInputStateEnum.Ready;
       this.cdr.detectChanges();
     });
+  }
+
+  async loadSettings() {
+    if (isPlatformServer(this.platformId)) {
+      return;
+    }
+
+    try {
+      if ('LanguageModel' in window) {
+        const params = await LanguageModel.params();
+        if (params) {
+          this.defaultTemperature = params.defaultTemperature || 1;
+          this.maxTemperature = params.maxTemperature || 2;
+          this.defaultTopK = params.defaultTopK || 3;
+          this.maxTopK = params.maxTopK || 128;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load LanguageModel params", e);
+    }
+
+    const savedTemp = localStorage.getItem('webai-studio-temperature');
+    const savedTopK = localStorage.getItem('webai-studio-topk');
+    const savedStream = localStorage.getItem('webai-studio-stream');
+
+    this.options.temperature = savedTemp !== null ? parseFloat(savedTemp) : this.defaultTemperature;
+    this.options.topK = savedTopK !== null ? parseInt(savedTopK, 10) : this.defaultTopK;
+    this.options.stream = savedStream !== null ? savedStream === 'true' : true;
+  }
+
+  saveSettings() {
+    if (isPlatformServer(this.platformId)) {
+      return;
+    }
+    localStorage.setItem('webai-studio-temperature', this.options.temperature.toString());
+    localStorage.setItem('webai-studio-topk', this.options.topK.toString());
+    localStorage.setItem('webai-studio-stream', this.options.stream.toString());
+  }
+
+  resetSettings() {
+    this.options.temperature = this.defaultTemperature;
+    this.options.topK = this.defaultTopK;
+    this.options.stream = true;
+    this.options.structuredOutputEnabled = false;
+    this.saveSettings();
+    this.onOptionsChange(this.options);
   }
 
   onOptionsChange(options: PromptRunOptions) {
@@ -104,6 +152,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     }
 
     this.options = options;
+    this.saveSettings();
     this.conversationManager.createAndLoadSession(options);
   }
 
