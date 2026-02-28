@@ -2,8 +2,8 @@ import { Attachment } from "../interfaces/attachment.interface";
 
 export class PromptRunOptions {
   systemPrompt: string = '';
-  temperature: number = 0.7;
-  topK: number = 40;
+  temperature: number = 1;
+  topK: number = 3;
   attachments: Attachment[] = [];
   structuredOutputEnabled: boolean = false;
   structuredOutputJsonSchema: string = '';

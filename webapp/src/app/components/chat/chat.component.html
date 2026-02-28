@@ -1,5 +1,13 @@
 <div class="chat-container d-flex flex-column gap-3 p-3">
   @for (message of messages; track $index) {
+
+  @if (message.role === 'system') {
+  <div class="d-flex justify-content-center my-2">
+    <span class="badge rounded-pill text-bg-light text-secondary border fw-normal px-3 py-2" style="font-size: 0.85rem">
+      <i class="bi bi-info-circle me-1"></i> {{ message.content }}
+    </span>
+  </div>
+  } @else {
   <div class="d-flex" [class.justify-content-end]="message.role === 'user'">
     <div class="card" [class.bg-primary]="message.role === 'user'" [class.text-white]="message.role === 'user'"
       [class.w-100]="message.role !== 'user'" style="max-width: 80%;">
@@ -11,6 +19,8 @@
       </div>
     </div>
   </div>
+  }
+
   }
   @if (status === 'InProgress' && messages.length > 0 && messages[messages.length - 1].role === 'user') {
   <div class="d-flex">

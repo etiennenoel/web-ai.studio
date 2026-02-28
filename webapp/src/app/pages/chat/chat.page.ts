@@ -37,17 +37,17 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   progress: number = 0;
 
-  defaultTemperature = 0.7; // Default based on model
+  defaultTemperature = 1; // Default fallback
   maxTemperature = 2;
   maxTopK = 128;
-  defaultTopK = 40;
+  defaultTopK = 3;
 
   options: PromptRunOptions = new PromptRunOptions();
 
   get settingsActive() {
     return this.options.structuredOutputEnabled === true ||
-      this.options.temperature !== this.defaultTemperature ||
-      this.options.topK !== this.defaultTopK ||
+      Number(this.options.temperature) !== Number(this.defaultTemperature) ||
+      Number(this.options.topK) !== Number(this.defaultTopK) ||
       this.options.stream !== true;
   }
 
@@ -75,6 +75,8 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
       return;
     }
 
+    await this.loadSettings();
+
     this.conversationManager.createAndLoadSession(this.options);
     
     this.conversationManager.status$.subscribe(status => {
@@ -85,26 +87,71 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     });
   }
 
-  onOptionsChange(options: PromptRunOptions) {
-    if(this.options === options) {
-      let isEqual = true;
-      // cheeck if all the properties are equal first
-      for (const key in options) {
-        if (options.hasOwnProperty(key)) {
-          if (options[key as keyof PromptRunOptions] !== this.options[key as keyof PromptRunOptions]) {
-            isEqual = false;
-            break;
-          }
-        }
-      }
-
-      if (isEqual) {
-        return;
-      }
+  async loadSettings() {
+    if (isPlatformServer(this.platformId)) {
+      return;
     }
 
+    try {
+      if ('LanguageModel' in window) {
+        const params = await LanguageModel.params();
+        if (params) {
+          this.defaultTemperature = params.defaultTemperature || 1;
+          this.maxTemperature = params.maxTemperature || 2;
+          this.defaultTopK = params.defaultTopK || 3;
+          this.maxTopK = params.maxTopK || 128;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load LanguageModel params", e);
+    }
+
+    this.options.temperature = this.defaultTemperature;
+    this.options.topK = this.defaultTopK;
+    this.options.stream = true;
+
+    this.lastOptionsRunStr = JSON.stringify({
+      stream: this.options.stream,
+      temperature: this.options.temperature,
+      topK: this.options.topK,
+      structuredOutputEnabled: this.options.structuredOutputEnabled,
+      structuredOutputJsonSchema: this.options.structuredOutputJsonSchema
+    });
+    this.pendingOptionsStr = this.lastOptionsRunStr;
+  }
+
+  resetSettings() {
+    this.options.temperature = this.defaultTemperature;
+    this.options.topK = this.defaultTopK;
+    this.options.stream = true;
+    this.options.structuredOutputEnabled = false;
+    this.onOptionsChange(this.options);
+  }
+
+  private lastOptionsRunStr = '';
+  private pendingOptionsStr = '';
+
+  onOptionsChange(options: PromptRunOptions) {
+    const currentSettings = JSON.stringify({
+      stream: options.stream,
+      temperature: options.temperature,
+      topK: options.topK,
+      structuredOutputEnabled: options.structuredOutputEnabled,
+      structuredOutputJsonSchema: options.structuredOutputJsonSchema
+    });
+
+    this.pendingOptionsStr = currentSettings;
     this.options = options;
-    this.conversationManager.createAndLoadSession(options);
+  }
+
+  applyPendingSettings() {
+    if (this.lastOptionsRunStr === this.pendingOptionsStr) {
+      return;
+    }
+    
+    this.lastOptionsRunStr = this.pendingOptionsStr;
+    this.conversationManager.addSystemDelimiter("Run settings changed. Started a new context.");
+    this.conversationManager.createAndLoadSession(this.options);
   }
 
   openCodeModal() {

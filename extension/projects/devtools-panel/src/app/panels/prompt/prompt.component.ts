@@ -23,8 +23,18 @@ export class PromptComponent implements OnInit {
   // Inputs
   systemPrompt = '';
   promptText = '';
-  temperature: number | null = null;
-  topK: number | null = null;
+  temperature: number = 1;
+  topK: number = 3;
+
+  defaultTemperature: number = 1;
+  defaultTopK: number = 3;
+  maxTemperature: number = 2;
+  maxTopK: number = 128;
+
+  get isNonDefaultParams(): boolean {
+    return Number(this.temperature) !== Number(this.defaultTemperature) || 
+           Number(this.topK) !== Number(this.defaultTopK);
+  }
 
   // Output
   response = '';
@@ -53,12 +63,37 @@ export class PromptComponent implements OnInit {
     @Inject(FEATURE_FLAGS) private featureFlags: FeatureFlags
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.checkApiStatus();
+    await this.loadSettings();
+
     if (this.showHistory) {
       this.loadHistory();
     }
     this.updateGeneratedCode(); // Initial code generation
+  }
+
+  async loadSettings() {
+    try {
+      const params = await this.promptManager.getParams();
+      if (params) {
+        this.defaultTemperature = params.defaultTemperature ?? 1;
+        this.maxTemperature = params.maxTemperature ?? 2;
+        this.defaultTopK = params.defaultTopK ?? 3;
+        this.maxTopK = params.maxTopK ?? 128;
+      }
+    } catch (e) {
+      console.warn("Could not load LanguageModel params", e);
+    }
+
+    this.temperature = this.defaultTemperature;
+    this.topK = this.defaultTopK;
+  }
+
+  resetSettings() {
+    this.temperature = this.defaultTemperature;
+    this.topK = this.defaultTopK;
+    this.updateGeneratedCode();
   }
 
   onInputChange() {
@@ -111,8 +146,8 @@ export class PromptComponent implements OnInit {
             { role: 'system', content: this.systemPrompt }
         ];
       }
-      if (this.temperature !== null) options.temperature = this.temperature;
-      if (this.topK !== null) options.topK = this.topK;
+      if (this.temperature !== null) options.temperature = Number(this.temperature);
+      if (this.topK !== null) options.topK = Number(this.topK);
 
       const session = await this.promptManager.createSession(options);
       

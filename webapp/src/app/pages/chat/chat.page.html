@@ -86,9 +86,16 @@
   </div>
 </div>
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+<div #settingsOffcanvas class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas"
+  aria-labelledby="settingsOffcanvasLabel" (hidden.bs.offcanvas)="applyPendingSettings()">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="settingsOffcanvasLabel">Run Settings</h5>
+    <div class="ms-auto me-2">
+      @if (settingsActive) {
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="resetSettings()"><i
+          class="bi bi-arrow-counterclockwise"></i> Reset</button>
+      }
+    </div>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -121,10 +128,10 @@
           <label class="form-label mb-1">TopK</label>
         </div>
         <div class="d-flex align-items-center gap-3">
-          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="0" [max]="maxTopK"
+          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="1" [max]="maxTopK"
             [step]="1" (change)="onOptionsChange(options)">
           <input type="number" class="form-control form-control-sm" style="width: 70px;" [(ngModel)]="options.topK"
-            [min]="0" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
+            [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
         </div>
       </div>
     </div>

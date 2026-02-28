@@ -27,20 +27,33 @@
                 </div>
 
                 <!-- Params Row -->
-                <div class="flex gap-4 p-3 bg-[#292a2d] rounded border border-[#3c4043]">
-                    <div class="flex-1 space-y-2">
-                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Temperature <span
-                                class="text-gray-500 normal-case">(0.0 - 2.0)</span></label>
-                        <input type="number" [(ngModel)]="temperature" (ngModelChange)="onInputChange()" step="0.1"
-                            min="0" max="2" placeholder="Default"
-                            class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                <div class="flex flex-col gap-2 p-3 bg-[#292a2d] rounded border border-[#3c4043]">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</span>
+                            <div *ngIf="isNonDefaultParams" class="w-2 h-2 rounded-full bg-green-500"
+                                title="Non-default settings active"></div>
+                        </div>
+                        <button *ngIf="isNonDefaultParams" (click)="resetSettings()"
+                            class="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </button>
                     </div>
-                    <div class="flex-1 space-y-2">
-                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Top K <span
-                                class="text-gray-500 normal-case">(>= 1)</span></label>
-                        <input type="number" [(ngModel)]="topK" (ngModelChange)="onInputChange()" step="1" min="1"
-                            placeholder="Default"
-                            class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                    <div class="flex gap-4">
+                        <div class="flex-1 space-y-2">
+                            <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Temperature <span
+                                    class="text-gray-500 normal-case">(0.0 - {{maxTemperature}})</span></label>
+                            <input type="number" [(ngModel)]="temperature" (ngModelChange)="onInputChange()" step="0.1"
+                                min="0" [max]="maxTemperature" placeholder="Default"
+                                class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Top K <span
+                                    class="text-gray-500 normal-case">(1 - {{maxTopK}})</span></label>
+                            <input type="number" [(ngModel)]="topK" (ngModelChange)="onInputChange()" step="1" min="1"
+                                [max]="maxTopK" placeholder="Default"
+                                class="w-full bg-[#202124] border border-[#3c4043] rounded p-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none">
+                        </div>
                     </div>
                 </div>
 

@@ -22,6 +22,14 @@ export class PromptManager {
     return await window.LanguageModel.create(options);
   }
 
+  async getParams(): Promise<any> {
+    if (!('LanguageModel' in window)) {
+      return null;
+    }
+    // @ts-ignore
+    return await window.LanguageModel.params();
+  }
+
   getCodeSnippet(options: any, promptText: string): string {
     const optionsStr = Object.keys(options).length > 0 ? JSON.stringify(options, null, 2) : '';
     let code = `const session = await LanguageModel.create(${optionsStr});\n`;
