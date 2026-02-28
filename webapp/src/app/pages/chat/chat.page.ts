@@ -106,22 +106,18 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
       console.warn("Could not load LanguageModel params", e);
     }
 
-    const savedTemp = localStorage.getItem('webai-studio-temperature');
-    const savedTopK = localStorage.getItem('webai-studio-topk');
-    const savedStream = localStorage.getItem('webai-studio-stream');
+    this.options.temperature = this.defaultTemperature;
+    this.options.topK = this.defaultTopK;
+    this.options.stream = true;
 
-    this.options.temperature = savedTemp !== null ? parseFloat(savedTemp) : this.defaultTemperature;
-    this.options.topK = savedTopK !== null ? parseInt(savedTopK, 10) : this.defaultTopK;
-    this.options.stream = savedStream !== null ? savedStream === 'true' : true;
-  }
-
-  saveSettings() {
-    if (isPlatformServer(this.platformId)) {
-      return;
-    }
-    localStorage.setItem('webai-studio-temperature', this.options.temperature.toString());
-    localStorage.setItem('webai-studio-topk', this.options.topK.toString());
-    localStorage.setItem('webai-studio-stream', this.options.stream.toString());
+    this.lastOptionsRunStr = JSON.stringify({
+      stream: this.options.stream,
+      temperature: this.options.temperature,
+      topK: this.options.topK,
+      structuredOutputEnabled: this.options.structuredOutputEnabled,
+      structuredOutputJsonSchema: this.options.structuredOutputJsonSchema
+    });
+    this.pendingOptionsStr = this.lastOptionsRunStr;
   }
 
   resetSettings() {
@@ -129,31 +125,33 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     this.options.topK = this.defaultTopK;
     this.options.stream = true;
     this.options.structuredOutputEnabled = false;
-    this.saveSettings();
     this.onOptionsChange(this.options);
   }
 
+  private lastOptionsRunStr = '';
+  private pendingOptionsStr = '';
+
   onOptionsChange(options: PromptRunOptions) {
-    if(this.options === options) {
-      let isEqual = true;
-      // cheeck if all the properties are equal first
-      for (const key in options) {
-        if (options.hasOwnProperty(key)) {
-          if (options[key as keyof PromptRunOptions] !== this.options[key as keyof PromptRunOptions]) {
-            isEqual = false;
-            break;
-          }
-        }
-      }
+    const currentSettings = JSON.stringify({
+      stream: options.stream,
+      temperature: options.temperature,
+      topK: options.topK,
+      structuredOutputEnabled: options.structuredOutputEnabled,
+      structuredOutputJsonSchema: options.structuredOutputJsonSchema
+    });
 
-      if (isEqual) {
-        return;
-      }
-    }
-
+    this.pendingOptionsStr = currentSettings;
     this.options = options;
-    this.saveSettings();
-    this.conversationManager.createAndLoadSession(options);
+  }
+
+  applyPendingSettings() {
+    if (this.lastOptionsRunStr === this.pendingOptionsStr) {
+      return;
+    }
+    
+    this.lastOptionsRunStr = this.pendingOptionsStr;
+    this.conversationManager.addSystemDelimiter("Run settings changed. Started a new context.");
+    this.conversationManager.createAndLoadSession(this.options);
   }
 
   openCodeModal() {

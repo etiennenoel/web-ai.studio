@@ -63,9 +63,9 @@ export class PromptComponent implements OnInit {
     @Inject(FEATURE_FLAGS) private featureFlags: FeatureFlags
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.checkApiStatus();
-    this.loadSettings();
+    await this.loadSettings();
 
     if (this.showHistory) {
       this.loadHistory();
@@ -86,27 +86,17 @@ export class PromptComponent implements OnInit {
       console.warn("Could not load LanguageModel params", e);
     }
 
-    const savedTemp = localStorage.getItem('webai-extension-temperature');
-    const savedTopK = localStorage.getItem('webai-extension-topk');
-
-    this.temperature = savedTemp !== null ? parseFloat(savedTemp) : this.defaultTemperature;
-    this.topK = savedTopK !== null ? parseInt(savedTopK, 10) : this.defaultTopK;
-  }
-
-  saveSettings() {
-    localStorage.setItem('webai-extension-temperature', this.temperature.toString());
-    localStorage.setItem('webai-extension-topk', this.topK.toString());
+    this.temperature = this.defaultTemperature;
+    this.topK = this.defaultTopK;
   }
 
   resetSettings() {
     this.temperature = this.defaultTemperature;
     this.topK = this.defaultTopK;
-    this.saveSettings();
     this.updateGeneratedCode();
   }
 
   onInputChange() {
-    this.saveSettings();
     this.updateGeneratedCode();
   }
 
@@ -156,8 +146,8 @@ export class PromptComponent implements OnInit {
             { role: 'system', content: this.systemPrompt }
         ];
       }
-      if (this.temperature !== null) options.temperature = this.temperature;
-      if (this.topK !== null) options.topK = this.topK;
+      if (this.temperature !== null) options.temperature = Number(this.temperature);
+      if (this.topK !== null) options.topK = Number(this.topK);
 
       const session = await this.promptManager.createSession(options);
       
