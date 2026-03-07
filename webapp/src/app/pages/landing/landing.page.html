@@ -1,0 +1,191 @@
+<main class="pt-32 pb-16 sm:pt-40 sm:pb-24 px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto text-center">
+        <div class="inline-flex items-center px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-300 text-xs font-mono mb-8 backdrop-blur-sm">
+            <span class="animate-pulse mr-2 w-2 h-2 rounded-full bg-blue-500"></span>
+            Web Machine Learning
+        </div>
+
+        <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6 leading-tight">
+            Standardized AI <br class="hidden sm:block" />
+            <span style="background: linear-gradient(to right, #2563eb, #9333ea, #db2777); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block;">Native to the Web</span>
+        </h1>
+
+        <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed">
+            Deploy privacy-first, offline-capable AI features using standard browser APIs.
+            <br>
+            <span class="text-gray-900 dark:text-white font-medium">No API keys. No monthly bills. No latency.</span>
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-20">
+            <button (click)="openPage('docs')" class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-1" style="box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -2px rgba(37, 99, 235, 0.1);">
+                Start Learning
+            </button>
+            <button (click)="navigateTo('status')" class="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white px-8 py-4 rounded-xl font-bold text-lg backdrop-blur-sm transition-all">
+                Check Compatibility
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div class="max-w-7xl mx-auto mb-20">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Quick Access</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <app-quick-access-card
+                    title="Chat"
+                    icon="message-circle"
+                    themeColor="blue"
+                    (click)="openPage('chat')">
+            </app-quick-access-card>
+
+            <app-quick-access-card
+                    title="Evals"
+                    icon="bar-chart-2"
+                    themeColor="purple"
+                    (click)="openPage('evals')">
+            </app-quick-access-card>
+
+            <app-quick-access-card
+                    title="Writing Assistance"
+                    icon="pen-tool"
+                    themeColor="pink"
+                    (click)="openPage('writing-assistance')">
+            </app-quick-access-card>
+
+            <app-quick-access-card
+                    title="Translation"
+                    icon="languages"
+                    themeColor="indigo"
+                    (click)="openPage('translation')">
+            </app-quick-access-card>
+        </div>
+    </div>
+
+    <!-- API Grid -->
+    <div class="max-w-7xl mx-auto mb-24">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center md:text-left">Available APIs</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <app-available-api-card
+                    title="Summarizer"
+                    description="Condense articles and text into key points."
+                    icon="file-text"
+                    statusLabel="Stable"
+                    statusType="stable"
+                    themeColor="purple"
+                    (click)="openPage('docs/ref-summarizer')">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Prompt API"
+                    description="Generic LLM interface for chat & reasoning."
+                    icon="terminal"
+                    statusLabel="Origin Trial"
+                    statusType="trial"
+                    themeColor="blue"
+                    (click)="openPage('docs/ref-prompt')">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Writer"
+                    description="Generate new content from seed ideas."
+                    icon="pen-tool"
+                    statusLabel="Dev Preview"
+                    statusType="dev"
+                    themeColor="pink"
+                    (click)="openPage('docs/ref-writer')">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Proofreader"
+                    description="Grammar and spell checking."
+                    icon="check-circle"
+                    statusLabel="Origin Trial"
+                    statusType="trial"
+                    themeColor="emerald"
+                    (click)="openPage('docs/ref-proofreader')">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Translator"
+                    description="Translate text between languages locally."
+                    icon="languages"
+                    statusLabel="Stable"
+                    statusType="stable"
+                    themeColor="indigo">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Language Detector"
+                    description="Detect the language of a given text."
+                    icon="globe"
+                    statusLabel="Stable"
+                    statusType="stable"
+                    themeColor="teal">
+            </app-available-api-card>
+
+            <app-available-api-card
+                    title="Rewriter"
+                    description="Polish, rephrase, or adjust text tone."
+                    icon="refresh-cw"
+                    statusLabel="Dev Preview"
+                    statusType="dev"
+                    themeColor="orange"
+                    (click)="openPage('docs/ref-rewriter')">
+            </app-available-api-card>
+        </div>
+
+        <!-- Developer Ecosystem Section -->
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 mt-16 text-center md:text-left">Developer Ecosystem</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group" style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i data-lucide="puzzle" class="w-32 h-32 text-blue-400"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400"><i data-lucide="chrome" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Extension</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">WebAI DevTools</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Debug models and monitor latency directly in your browser.</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i> Add to Chrome
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group cursor-pointer" (click)="openPage('docs/course-foundations')" style="border: 1px solid var(--card-border);">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i data-lucide="book-open" class="w-32 h-32 text-green-400"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-green-500/20 rounded-lg text-green-600 dark:text-green-400"><i data-lucide="code-2" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">Tutorials</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Web AI Academy</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Interactive courses to master the API lifecycle and patterns.</p>
+                    <span class="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        Start Learning <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-[#0c0c0e] border border-gray-200 dark:border-white/10 rounded-2xl p-8 relative overflow-hidden group" style="border: 1px solid var(--card-border);">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i data-lucide="git-pull-request" class="w-32 h-32 text-purple-400"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-purple-500/20 rounded-lg text-purple-600 dark:text-purple-400"><i data-lucide="users" class="w-6 h-6"></i></div>
+                        <span class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Community</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Shape the Standard</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Propose new capabilities like Image Generation to the W3C.</p>
+                    <a href="https://github.com/webmachinelearning/proposals" target="_blank" class="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        View Proposals <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
