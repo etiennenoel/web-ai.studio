@@ -1,5 +1,4 @@
 name: Extension
-run-name: ${{ github.event_name == 'push' && 'Publish Extension' || 'Build Extension' }}
 
 on:
   push:
@@ -14,6 +13,7 @@ on:
 
 jobs:
   build-and-package:
+    name: ${{ github.event_name == 'push' && 'Publish Extension' || 'Build Extension' }}
     runs-on: ubuntu-latest
     
     defaults:
