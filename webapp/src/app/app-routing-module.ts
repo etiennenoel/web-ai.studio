@@ -9,6 +9,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
 import {AxonPage} from './pages/cortex/axon/axon.page';
+import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
 
 const routes: Routes = [  {
   path: "",
@@ -54,6 +55,13 @@ const routes: Routes = [  {
       component: AxonPage,
       data: {
         route: RouteEnum.Axon
+      }
+    },
+    {
+      path: "privacy-policy",
+      component: PrivacyPolicyPage,
+      data: {
+        route: RouteEnum.PrivacyPolicy
       }
     }
   ]

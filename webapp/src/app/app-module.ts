@@ -60,6 +60,7 @@ import {WritingAssistanceInputComponent} from './components/writing-assistance-i
 import {AttachmentModalComponent} from './components/prompt-input/attachment-modal/attachment-modal.component';
 import {LatencyLoaderComponent} from './components/latency-loader/latency-loader.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     TranslationPage,
     WritingAssistancePage,
     EvalsPage,
+    PrivacyPolicyPage,
     PromptCodeModal,
 
     AutoScrollDirective,

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Chrome WebAI Extension",
-  "description": "Extension to help developers with their Built-In AI APIs.",
-  "version": "0.2.1",
+  "name": "WebAI Extension",
+  "description": "Unlock Chrome’s Built-In AI. Monitor local model readiness, inspect APIs, and debug your on-device AI natively in DevTools.",
+  "version": "0.2.2",
   "action": {
     "default_popup": "",
     "default_icon": "assets/images/icon.png"
