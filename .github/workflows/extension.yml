@@ -1,19 +1,21 @@
 name: Extension
-run-name: ${{ github.event_name == 'push' && 'Publish Extension' || 'Build Extension' }}
 
 on:
   push:
     branches: [ "master" ]
     paths:
       - 'extension/**'
+      - '.github/workflows/extension.yml'
   pull_request:
     branches: [ "master" ]
     paths:
       - 'extension/**'
+      - '.github/workflows/extension.yml'
   workflow_dispatch:
 
 jobs:
   build-and-package:
+    name: ${{ github.event_name == 'push' && 'Publish Extension' || 'Build Extension' }}
     runs-on: ubuntu-latest
     
     defaults:
@@ -43,13 +45,13 @@ jobs:
 
       - name: Upload Extension to Chrome Web Store
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: passiverecords/chrome-extension-upload-action@v1
+        uses: mnao305/chrome-extension-upload@v5.0.0
         with:
           file-path: extension/chrome-webai-extension.zip
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
           client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
           refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          app-id: ${{ secrets.WEBAI_CHROME_EXTENSION__ID }}
+          extension-id: ${{ secrets.WEBAI_CHROME_EXTENSION_ID }}
           publish: true
 
       - name: Upload Extension Artifact
