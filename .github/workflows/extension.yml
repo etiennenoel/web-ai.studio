@@ -5,12 +5,12 @@ on:
     branches: [ "master" ]
     paths:
       - 'extension/**'
-      - '.github/extension.yml'
+      - '.github/workflows/extension.yml'
   pull_request:
     branches: [ "master" ]
     paths:
       - 'extension/**'
-      - '.github/extension.yml'
+      - '.github/workflows/extension.yml'
   workflow_dispatch:
 
 jobs:
