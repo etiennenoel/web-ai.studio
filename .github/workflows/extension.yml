@@ -1,7 +1,12 @@
-name: Publish Chrome Extension
+name: Extension
+run-name: ${{ github.event_name == 'push' && 'Publish Extension' || 'Build Extension' }}
 
 on:
   push:
+    branches: [ "master" ]
+    paths:
+      - 'extension/**'
+  pull_request:
     branches: [ "master" ]
     paths:
       - 'extension/**'
@@ -37,6 +42,7 @@ jobs:
           zip -r ../chrome-webai-extension.zip .
 
       - name: Upload Extension to Chrome Web Store
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: passiverecords/chrome-extension-upload-action@v1
         with:
           file-path: extension/chrome-webai-extension.zip
