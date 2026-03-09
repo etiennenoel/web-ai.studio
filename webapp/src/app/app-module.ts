@@ -6,7 +6,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { TranslationPage } from './pages/translation/translation.page';
 import { WritingAssistancePage } from './pages/writing-assistance/writing-assistance.page';
-import { EvalsPage } from './pages/evals/evals.page';
+
 import {
   NgModule,
   provideBrowserGlobalErrorListeners,
@@ -19,7 +19,6 @@ import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import { CortexPage } from './pages/cortex/cortex.page';
-import { AxonPage } from './pages/cortex/axon/axon.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
 import {
   LanguageDetectorShortStringColdStartAxonTest
@@ -71,13 +70,11 @@ import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
     SidebarComponent,
     TranslationPage,
     WritingAssistancePage,
-    EvalsPage,
     PrivacyPolicyPage,
     PromptCodeModal,
 
     AutoScrollDirective,
      CortexPage,
-     AxonPage,
      AxonTestStatusBadgeComponent,
 
     // Modals
