@@ -1,21 +1,35 @@
-<span class="badge rounded-pill d-flex flex-row align-items-center gap-1 ps-2 pe-2"
-      [class.text-bg-danger]="status === TestStatus.Fail"
-      [class.text-bg-primary]="status === TestStatus.Executing"
-      [class.text-bg-secondary]="status === TestStatus.Idle"
-      [class.text-bg-success]="status === TestStatus.Success">
-                  @if(status === TestStatus.Fail) {
-                    <i class="bi bi-x-circle"></i>
-                  }
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
+      [class.bg-red-50]="status === TestStatus.Fail"
+      [class.text-red-700]="status === TestStatus.Fail"
+      [class.border-red-200]="status === TestStatus.Fail"
+      
+      [class.bg-blue-50]="status === TestStatus.Executing"
+      [class.text-blue-700]="status === TestStatus.Executing"
+      [class.border-blue-200]="status === TestStatus.Executing"
+      
+      [class.bg-gray-100]="status === TestStatus.Idle"
+      [class.text-gray-600]="status === TestStatus.Idle"
+      [class.border-gray-200]="status === TestStatus.Idle"
+      
+      [class.bg-green-50]="status === TestStatus.Success"
+      [class.text-green-700]="status === TestStatus.Success"
+      [class.border-green-200]="status === TestStatus.Success">
+      
+  @if(status === TestStatus.Fail) {
+    <i class="bi bi-x-circle"></i>
+  }
   @if(status === TestStatus.Executing) {
-    <div class="spinner-border spinner-border-sm" role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
+    <svg class="animate-spin h-3.5 w-3.5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
   }
   @if(status === TestStatus.Idle) {
     <i class="bi bi-clock"></i>
   }
   @if(status === TestStatus.Success) {
-    <i class="bi bi-check"></i>
+    <i class="bi bi-check-circle"></i>
   }
 
-  {{ status }}</span>
+  <span>{{ status }}</span>
+</span>
