@@ -10,6 +10,8 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptTextFactAnalysisColdStart;
 
+  systemInput = "Adopt the combined persona of a skeptical 19th-century philosopher and a pragmatic modern-day software engineer.";
+
   results: AxonTestResultInterface = {
     id: this.id,
     status: TestStatus.Idle,
@@ -18,8 +20,6 @@ export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterfac
     numberOfIterations: 3,
     testIterationResults: [],
     input: "Analyze the following scenario and provide a structured response.\n" +
-      "\n" +
-      "Persona: Adopt the combined persona of a skeptical 19th-century philosopher and a pragmatic modern-day software engineer.\n" +
       "\n" +
       "Core Task:\n" +
       "\n" +
@@ -46,11 +46,12 @@ export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterfac
     apiAvailability: "unknown",
   };
 
-  creationOptions: LanguageModelCreateOptions = {
+  creationOptions: any = {
     expectedOutputs: [{
       type: "text",
       languages: ["en"]
-    }]
+    }],
+    initialPrompts: [{role: "system", content: this.systemInput}]
   }
 
   async apiStatus(): Promise<Availability | "unknown"> {

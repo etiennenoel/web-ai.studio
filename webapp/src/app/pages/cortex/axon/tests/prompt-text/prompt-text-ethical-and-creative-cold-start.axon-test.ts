@@ -10,6 +10,8 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 export class PromptTextEthicalAndCreativeColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptTextEthicalAndCreativeColdStart;
 
+  systemInput = "Adopt the persona of a pragmatic ethicist with a poetic streak.";
+
   results: AxonTestResultInterface = {
     id: this.id,
     status: TestStatus.Idle,
@@ -18,8 +20,6 @@ export class PromptTextEthicalAndCreativeColdStartAxonTest implements AxonTestIn
     numberOfIterations: 3,
     testIterationResults: [],
     input: "Provide a structured response to the following creative and factual challenge.\n" +
-      "\n" +
-      "Persona: Adopt the persona of a pragmatic ethicist with a poetic streak.\n" +
       "\n" +
       "Core Tasks:\n" +
       "\n" +
@@ -42,11 +42,12 @@ export class PromptTextEthicalAndCreativeColdStartAxonTest implements AxonTestIn
     apiAvailability: "unknown",
   };
 
-  creationOptions: LanguageModelCreateOptions = {
+  creationOptions: any = {
     expectedOutputs: [{
       type: "text",
       languages: ["en"]
-    }]
+    }],
+    initialPrompts: [{role: "system", content: this.systemInput}]
   }
 
   async apiStatus(): Promise<Availability | "unknown"> {
