@@ -136,7 +136,7 @@
   }
 
   @if (this.axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-    <!-- Overall Summary -->
+    <!-- Master Performance Table -->
     <div class="mb-12">
       <div class="flex items-center gap-3 mb-6 px-2">
         <div class="bg-blue-100 text-blue-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
@@ -148,32 +148,32 @@
           <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50/80 border-b-2 border-gray-200">
               <tr>
-                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 uppercase tracking-wider bg-gray-100 border-r border-gray-200 align-bottom w-1/5">API Category</th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider border-r border-gray-200 bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider border-r border-gray-200 bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider border-r border-gray-200 bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider border-r border-gray-200 bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider border-r border-gray-200 bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
-                <th scope="col" colspan="2" class="px-3 py-1.5 !text-right font-bold text-gray-600 uppercase tracking-wider bg-white pr-6"><div class="flex items-center justify-center gap-2"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
+                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 uppercase tracking-wider bg-gray-100 border-r border-gray-200 align-bottom w-1/4 min-w-[300px]">API Category / Test Name</th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
               </tr>
               <tr class="divide-x divide-gray-200 border-t border-gray-100 text-xs shadow-sm">
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-3 py-2 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-3 py-2 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-6"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -184,288 +184,234 @@
                   @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
                   @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
                   @let progress = getApiProgress(api);
-                  <tr class="hover:bg-gray-50 transition-colors divide-x divide-gray-200 group">
-                    <td class="px-3 py-2 whitespace-nowrap text-sm font-bold text-gray-900 !text-left bg-gray-50 group-hover:bg-blue-50/50 border-r border-gray-200 transition-colors">
-                      <div class="flex items-center gap-3 mb-1.5">
-                        <div class="p-1.5 rounded-md bg-white border border-gray-200 text-gray-500 shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 transition-colors"><i class="bi text-lg" [ngClass]="getIconForApi(api)"></i></div>
-                        {{ element.id }}
-                      </div>
-                      <div class="flex items-center gap-1.5 mt-1 ml-1 text-xs">
-                        <span class="text-gray-400 font-normal mr-1">{{ progress.completed }}/{{ progress.total }} Tests</span>
-                        @if (progress.passed > 0) {
-                          <span class="inline-flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200" title="Passed">
-                            <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
-                          </span>
-                        }
-                        @if (progress.failed > 0) {
-                          <span class="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-red-200" title="Failed">
-                            <i class="bi bi-x-circle-fill"></i> {{ progress.failed }}
-                          </span>
-                        }
-                        @if (progress.executing > 0) {
-                          <span class="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-700 bg-yellow-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-yellow-200" title="Executing">
-                            <svg class="animate-spin h-3 w-3 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            {{ progress.executing }}
-                          </span>
-                        }
+                  @let isCollapsed = isApiCollapsed(api, progress);
+                  
+                  <!-- API Category Header Row -->
+                  <tr class="transition-colors divide-x divide-gray-200 group cursor-pointer" 
+                      [class.bg-yellow-50]="progress.executing > 0"
+                      [class.hover:bg-yellow-100]="progress.executing > 0"
+                      [class.bg-gray-50]="progress.executing === 0"
+                      [class.hover:bg-blue-50]="progress.executing === 0"
+                      (click)="toggleApi(api, progress)">
+                    <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-gray-900 !text-left border-r border-gray-200 transition-colors">
+                      <div class="flex items-center gap-3">
+                        <div class="p-1.5 rounded-md bg-white border border-gray-200 text-gray-500 shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 transition-colors"
+                             [class.text-yellow-600]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0">
+                             <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
+                        </div>
+                        <div class="flex-1">
+                          <div class="flex items-center justify-between gap-4">
+                            <span>{{ element.id }}</span>
+                            <i class="bi text-gray-400" [class.bi-chevron-up]="!isCollapsed" [class.bi-chevron-down]="isCollapsed"></i>
+                          </div>
+                          <div class="flex items-center gap-1.5 mt-1 text-[10px]">
+                            <span class="text-gray-500 font-normal mr-1">{{ progress.completed }}/{{ progress.total }} Tests</span>
+                            @if (progress.passed > 0) {
+                              <span class="inline-flex items-center gap-1 font-bold text-green-700 bg-green-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200" title="Passed">
+                                <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
+                              </span>
+                            }
+                            @if (progress.failed > 0) {
+                              <span class="inline-flex items-center gap-1 font-bold text-red-700 bg-red-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-red-200" title="Failed">
+                                <i class="bi bi-x-circle-fill"></i> {{ progress.failed }}
+                              </span>
+                            }
+                            @if (progress.executing > 0) {
+                              <span class="inline-flex items-center gap-1 font-bold text-yellow-700 bg-yellow-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-yellow-200" title="Executing">
+                                <svg class="animate-spin h-3 w-3 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                {{ progress.executing }}
+                              </span>
+                            }
+                          </div>
+                        </div>
                       </div>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults" class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
                     </td>
                     
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
                     </td>
-                    <td class="px-3 py-4 pr-6 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
                     </td>
                   </tr>
+
+                  <!-- Expanded Tests List within the Master Table -->
+                  @if (!isCollapsed) {
+                    <tr class="bg-gray-50/80 shadow-inner">
+                      <td colspan="13" class="p-0 border-b-4 border-gray-200">
+                        <div class="px-4 py-4 pl-12">
+                          <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Tests in {{ element.id }}</h4>
+                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 bg-white">
+                            <table class="min-w-full divide-y divide-gray-200">
+                              <thead class="bg-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-wider !text-left">
+                                <tr>
+                                  <th scope="col" class="px-3 py-2">Test ID</th>
+                                  <th scope="col" class="px-3 py-2 !text-center w-24">Type</th>
+                                  <th scope="col" class="px-3 py-2 !text-center">Status</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Avg TTFT</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Avg Total</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Input Chars</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Avg Speed</th>
+                                  <th scope="col" class="px-3 py-2 w-10"></th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-gray-100">
+                                @for (test of tests; track $index) {
+                                  @let isTestExpanded = !isTestCollapsed(test);
+                                  <tr class="hover:bg-gray-50 transition-colors cursor-pointer group"
+                                      [class.bg-yellow-50]="test.results.status === TestStatus.Executing"
+                                      (click)="toggleTest(test.id)">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-left">
+                                      <div class="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ test.id }}</div>
+                                      <div class="text-[10px] text-gray-400 truncate max-w-sm font-mono mt-0.5">{{ test.results.input }}</div>
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center">
+                                      @if (test.results.startType === 'cold') {
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wider border border-blue-200"><i class="bi bi-thermometer-snow mr-1"></i>Cold</span>
+                                      } @else {
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 uppercase tracking-wider border border-orange-200"><i class="bi bi-thermometer-sun mr-1"></i>Warm</span>
+                                      }
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center">
+                                      <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                      {{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                      {{ (test.results.averageTotalResponseTime ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                      {{ test.results.input.length | number:'1.0-0' }}
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 font-medium">
+                                      {{ (test.results.averageTokensPerSecond ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-emerald-600/60 font-normal">c/s</span>
+                                    </td>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500">
+                                      <i class="bi text-sm transition-transform" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
+                                    </td>
+                                  </tr>
+                                  
+                                  @if (isTestExpanded) {
+                                    <tr class="bg-gray-50 border-b border-gray-200 shadow-inner">
+                                      <td colspan="8" class="p-0">
+                                        <div class="px-6 py-4 border-l-4 border-blue-500" (click)="$event.stopPropagation()">
+                                          <div class="mb-4">
+                                            <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                              <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
+                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">{{ test.results.input.length | number:'1.0-0' }} chars</span>
+                                            </h4>
+                                            <div class="bg-white border border-gray-200 rounded p-3 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
+                                              {{ test.results.input }}
+                                            </div>
+                                          </div>
+                                          
+                                          <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                            <i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})
+                                          </h4>
+                                          <div class="overflow-hidden rounded border border-gray-200 shadow-sm bg-white">
+                                            <table class="min-w-full divide-y divide-gray-200 text-xs !text-center">
+                                              <thead class="bg-gray-100">
+                                                <tr>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 w-8 border-r border-gray-200">#</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600">Status</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">TTFT</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Total Time</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Speed</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Output Chars</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 w-16">Output</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody class="divide-y divide-gray-100">
+                                                @for (iter of test.results.testIterationResults; track $index) {
+                                                  <tr class="hover:bg-gray-50 transition-colors" [class.bg-yellow-50]="iter.status === TestStatus.Executing">
+                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center text-gray-500 font-bold bg-gray-50 border-r border-gray-200">{{ $index + 1 }}</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center">
+                                                      <axon-test-status-badge [status]="iter.status"></axon-test-status-badge>
+                                                    </td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.timeToFirstToken | number:'1.0-0' }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.totalResponseTime | number:'1.0-0' }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.tokensPerSecond | number:'1.0-0' }} c/s</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center">
+                                                      <button class="inline-flex items-center justify-center px-2 py-1 rounded text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200" 
+                                                              title="Toggle Output"
+                                                              [disabled]="!iter.output"
+                                                              (click)="toggleOutput(test.id, $index)">
+                                                        @if (!viewData[test.id].expandedOutputs?.[$index]) {
+                                                          <i class="bi bi-file-text mr-1"></i> View
+                                                        } @else {
+                                                          <i class="bi bi-chevron-up mr-1"></i> Hide
+                                                        }
+                                                      </button>
+                                                    </td>
+                                                  </tr>
+                                                  @if (viewData[test.id].expandedOutputs?.[$index]) {
+                                                    <tr class="bg-gray-900 border-b border-gray-200">
+                                                      <td colspan="7" class="p-4 !text-left">
+                                                        <div class="text-[10px] font-mono text-gray-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
+                                                          {{ unescapeOutput(iter.output ?? '') }}
+                                                        </div>
+                                                      </td>
+                                                    </tr>
+                                                  }
+                                                }
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  }
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
                 }
               }
             </tbody>
           </table>
         </div>
       </div>
-    </div>
-
-    <!-- Grouped API Tests -->
-    <div class="space-y-8">
-      @for (element of builtInAiApis; track $index) {
-        @let api = getBuiltInAiAPIFromItemInterface(element);
-        @let tests = getTests(api);
-        
-        @if (tests.length > 0) {
-          @let progress = getApiProgress(api);
-          @let isCollapsed = isApiCollapsed(api, progress);
-          
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300"
-               [class.ring-2]="currentExecutingTest?.results?.api === api"
-               [class.ring-blue-400]="currentExecutingTest?.results?.api === api"
-               [class.shadow-lg]="currentExecutingTest?.results?.api === api"
-               [class.scale-[1.01]]="currentExecutingTest?.results?.api === api">
-            <!-- API Header (Clickable) -->
-            <button class="w-full px-6 py-4 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors focus:outline-none group" 
-                    (click)="toggleApi(api, progress)">
-              <div class="flex items-center gap-6">
-                <h2 class="text-2xl font-extrabold text-gray-900 m-0 flex items-center gap-3">
-                  <i class="bi text-blue-600 group-hover:scale-110 transition-transform" [ngClass]="getIconForApi(api)"></i> {{ element.id }}
-                </h2>
-                
-                <div class="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-                  <div class="w-32 bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
-                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" [style.width]="progress.percentage + '%'"></div>
-                  </div>
-                  <span class="text-xs font-bold text-gray-600 tracking-wide">{{ progress.completed }}/{{ progress.total }} Tests</span>
-                  @if (progress.passed > 0 || progress.failed > 0 || progress.executing > 0) {
-                    <div class="flex items-center gap-2 border-l border-gray-300 pl-3 ml-1">
-                      @if (progress.passed > 0) {
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded uppercase tracking-wider shadow-sm border border-green-200" title="Passed">
-                          <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
-                        </span>
-                      }
-                      @if (progress.failed > 0) {
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded uppercase tracking-wider shadow-sm border border-red-200" title="Failed">
-                          <i class="bi bi-x-circle-fill"></i> {{ progress.failed }}
-                        </span>
-                      }
-                      @if (progress.executing > 0) {
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded uppercase tracking-wider shadow-sm border border-yellow-200" title="Executing">
-                          <svg class="animate-spin h-3 w-3 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                          {{ progress.executing }}
-                        </span>
-                      }
-                    </div>
-                  }
-                </div>
-              </div>
-              <div class="flex items-center gap-5 text-gray-400">
-                @if (currentExecutingTest?.results?.api === api) {
-                  <span class="text-sm font-bold text-yellow-700 flex items-center gap-2 animate-pulse bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-200">
-                    <i class="bi bi-play-circle-fill"></i> Executing...
-                  </span>
-                }
-                <div class="p-2 rounded-full group-hover:bg-gray-200 transition-colors">
-                  <i class="bi text-xl font-bold text-gray-500" [class.bi-chevron-down]="isCollapsed" [class.bi-chevron-up]="!isCollapsed"></i>
-                </div>
-              </div>
-            </button>
-            
-            <!-- Tests List (Table) -->
-            <div class="border-t border-gray-100 bg-white" [class.hidden]="isCollapsed">
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider !text-left">
-                    <tr>
-                      <th scope="col" class="px-6 py-4">Test Name</th>
-                      <th scope="col" class="px-4 py-2.5 !text-center">Status</th>
-                      <th scope="col" class="px-4 py-2.5 !text-right">Avg TTFT</th>
-                      <th scope="col" class="px-4 py-2.5 !text-right">Avg Total</th>
-                      <th scope="col" class="px-4 py-2.5 !text-right">Input Chars</th>
-                      <th scope="col" class="px-4 py-2.5 !text-right">Avg Speed</th>
-                      <th scope="col" class="px-4 py-2.5 w-10"></th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-100">
-                    @for (test of tests; track $index) {
-                      @let isTestExpanded = !isTestCollapsed(test);
-                      
-                      <!-- Test Row -->
-                      <tr class="hover:bg-gray-50 transition-colors cursor-pointer group" 
-                          [class.bg-yellow-50]="test.results.status === TestStatus.Executing"
-                          (click)="toggleTest(test.id)">
-                        <td class="px-4 py-2 whitespace-nowrap">
-                          <div class="flex items-center gap-4">
-                            <span class="inline-flex items-center justify-center p-3 rounded-xl bg-gray-50 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors"
-                                  [class.bg-yellow-100]="test.results.status === TestStatus.Executing"
-                                  [class.text-yellow-600]="test.results.status === TestStatus.Executing">
-                              <i class="bi text-xl" [ngClass]="getIconForApi(api)"></i>
-                            </span>
-                            <div>
-                              <div class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-1">
-                                {{ test.id }}
-                                @if (test.results.startType === 'cold') {
-                                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wider shadow-sm border border-blue-200">Cold</span>
-                                } @else {
-                                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 uppercase tracking-wider shadow-sm border border-orange-200">Warm</span>
-                                }
-                              </div>
-                              <div class="text-xs text-gray-400 truncate max-w-lg font-mono">{{ test.results.input }}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-center">
-                          <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-right text-sm font-bold font-mono text-gray-700">
-                          {{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.0-0' }} <span class="text-xs text-gray-400 font-normal">ms</span>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-right text-sm font-bold font-mono text-gray-700">
-                          {{ (test.results.averageTotalResponseTime ?? "---") | number:'1.0-0' }} <span class="text-xs text-gray-400 font-normal">ms</span>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-right text-sm font-bold font-mono text-gray-700">
-                          {{ test.results.input.length | number:'1.0-0' }}
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-right text-sm font-bold font-mono text-gray-700">
-                          {{ (test.results.averageTokensPerSecond ?? "---") | number:'1.0-0' }} <span class="text-xs text-gray-400 font-normal">c/s</span>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500">
-                          <i class="bi text-lg transition-transform" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
-                        </td>
-                      </tr>
-                      
-                      <!-- Expanded Iterations Detail -->
-                      @if (isTestExpanded) {
-                        <tr class="bg-gray-50 border-b-2 border-gray-200 shadow-inner">
-                          <td colspan="6" class="p-0">
-                            <div class="px-6 py-4 border-l-4 border-blue-500" (click)="$event.stopPropagation()">
-                              <div class="mb-6">
-                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                  <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
-                                  <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">{{ test.results.input.length | number:'1.0-0' }} chars</span>
-                                </h4>
-                                <div class="bg-white border border-gray-200 rounded-lg p-4 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
-                                  {{ test.results.input }}
-                                </div>
-                              </div>
-                              
-                              <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                                <i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})
-                              </h4>
-                              <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white">
-                                <table class="min-w-full divide-y divide-gray-200 text-xs !text-center">
-                                  <thead class="bg-gray-100">
-                                    <tr>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 w-12 border-r border-gray-200">#</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600">Status</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 !text-right">TTFT</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 !text-right">Total Time</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 !text-right">Speed</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 !text-right">Output Chars</th>
-                                      <th scope="col" class="px-3 py-1.5 font-bold text-gray-600 w-20">Output</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody class="divide-y divide-gray-100">
-                                    @for (iter of test.results.testIterationResults; track $index) {
-                                      <tr class="hover:bg-gray-50 transition-colors" [class.bg-yellow-50]="iter.status === TestStatus.Executing">
-                                        <td class="px-3 py-1.5 whitespace-nowrap !text-center text-gray-500 font-bold bg-gray-50 border-r border-gray-200">{{ $index + 1 }}</td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap !text-center">
-                                          <axon-test-status-badge [status]="iter.status"></axon-test-status-badge>
-                                        </td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.timeToFirstToken | number:'1.0-0' }} ms</td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.totalResponseTime | number:'1.0-0' }} ms</td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.tokensPerSecond | number:'1.0-0' }} c/s</td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
-                                        <td class="px-3 py-1.5 whitespace-nowrap !text-center">
-                                          <button class="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200" 
-                                                  title="Toggle Output"
-                                                  [disabled]="!iter.output"
-                                                  (click)="toggleOutput(test.id, $index)">
-                                            @if (!viewData[test.id].expandedOutputs?.[$index]) {
-                                              <i class="bi bi-file-text mr-1"></i> View
-                                            } @else {
-                                              <i class="bi bi-chevron-up mr-1"></i> Hide
-                                            }
-                                          </button>
-                                        </td>
-                                      </tr>
-                                      @if (viewData[test.id].expandedOutputs?.[$index]) {
-                                        <tr class="bg-gray-900 border-b border-gray-200">
-                                          <td colspan="6" class="p-5 !text-left">
-                                            <div class="text-xs font-mono text-gray-300 whitespace-pre-wrap break-words max-h-96 overflow-y-auto custom-scrollbar leading-relaxed">
-                                              {{ unescapeOutput(iter.output ?? '') }}
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      }
-                                    }
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      }
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        }
-      }
     </div>
   }
 </div>
