@@ -36,8 +36,8 @@ export class ConversationManager {
       if ('LanguageModel' in self) {
         this.session = await LanguageModel.create({
           systemPrompt: options.systemPrompt,
-          temperature: options.temperature,
-          topK: options.topK,
+          temperature: Number(options.temperature),
+          topK: Number(options.topK),
           expectedInputs: options.expectedInputs,
         });
       }
@@ -132,5 +132,12 @@ export class ConversationManager {
     this._messages.next([]);
     this._status.next(InferenceStateEnum.Initial);
     await this.createAndLoadSession(options);
+  }
+
+  addSystemDelimiter(content: string) {
+    const currentMessages = this._messages.value;
+    if (currentMessages.length > 0) {
+      this.addMessage({ role: 'system', content });
+    }
   }
 }
