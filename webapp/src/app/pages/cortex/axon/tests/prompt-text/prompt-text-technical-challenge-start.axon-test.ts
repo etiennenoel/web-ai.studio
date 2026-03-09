@@ -10,6 +10,8 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptTextTechnicalChallengeColdStart;
 
+  systemInput = "Adopt the persona of a senior software engineer conducting a code review. Your feedback should be direct and practical.";
+
   results: AxonTestResultInterface = {
     id: this.id,
     status: TestStatus.Idle,
@@ -18,8 +20,6 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
     numberOfIterations: 3,
     testIterationResults: [],
     input: "Provide a structured response to the following technical challenge.\n" +
-      "\n" +
-      "Persona: Adopt the persona of a senior software engineer conducting a code review. Your feedback should be direct and practical.\n" +
       "\n" +
       "Core Tasks:\n" +
       "\n" +
@@ -42,11 +42,12 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
     apiAvailability: "unknown",
   };
 
-  creationOptions: LanguageModelCreateOptions = {
+  creationOptions: any = {
     expectedOutputs: [{
       type: "text",
       languages: ["en"]
-    }]
+    }],
+    initialPrompts: [{role: "system", content: this.systemInput}]
   }
 
   async apiStatus(): Promise<Availability | "unknown"> {

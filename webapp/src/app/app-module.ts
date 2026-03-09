@@ -60,6 +60,8 @@ import {AttachmentModalComponent} from './components/prompt-input/attachment-mod
 import {LatencyLoaderComponent} from './components/latency-loader/latency-loader.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
+import { BugsPage } from './pages/bugs/bugs.page';
+import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 
 @NgModule({
   declarations: [
@@ -71,6 +73,8 @@ import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
     TranslationPage,
     WritingAssistancePage,
     PrivacyPolicyPage,
+    FirstCreateShouldFullyLoadTheModelPage,
+    BugsPage,
     PromptCodeModal,
 
     AutoScrollDirective,

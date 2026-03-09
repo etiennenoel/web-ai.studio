@@ -8,6 +8,8 @@ import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
 import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
+import {BugsPage} from './pages/bugs/bugs.page';
+import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 
 const routes: Routes = [
   {
@@ -15,6 +17,20 @@ const routes: Routes = [
     component: CortexPage,
     data: {
       route: RouteEnum.Cortex
+    }
+  },
+  {
+    path: "bugs",
+    component: BugsPage,
+    data: {
+      route: RouteEnum.Bugs
+    }
+  },
+  {
+    path: "bugs/first-create-should-fully-load-the-model",
+    component: FirstCreateShouldFullyLoadTheModelPage,
+    data: {
+      route: RouteEnum.Bugs
     }
   },
   {

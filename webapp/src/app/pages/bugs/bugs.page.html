@@ -1,0 +1,59 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div class="flex-1">
+      <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Bugs Directory</h1>
+      <p class="text-lg text-gray-500 max-w-3xl">List of known bugs, statuses, and reproduction pages.</p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl shadow-sm border border-gray-200 mb-12">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 font-medium text-gray-500 uppercase tracking-wider">Bug Title</th>
+            <th scope="col" class="px-6 py-3 font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 font-medium text-gray-500 uppercase tracking-wider">CRBug</th>
+            <th scope="col" class="px-6 py-3 font-medium text-gray-500 uppercase tracking-wider">Repro Link</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @for (bug of bugs; track bug.slug) {
+            <tr class="hover:bg-gray-50 transition-colors cursor-pointer group" [routerLink]="bug.reproPath">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 group-hover:text-blue-600">
+                {{ bug.title }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class.bg-green-100]="bug.status === 'Fixed'"
+                  [class.text-green-800]="bug.status === 'Fixed'"
+                  [class.bg-red-100]="bug.status === 'Open'"
+                  [class.text-red-800]="bug.status === 'Open'"
+                  [class.bg-yellow-100]="bug.status === 'Investigating'"
+                  [class.text-yellow-800]="bug.status === 'Investigating'"
+                  [class.bg-gray-100]="bug.status === 'WontFix'"
+                  [class.text-gray-800]="bug.status === 'WontFix'">
+                  {{ bug.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                @if (bug.crbugUrl) {
+                  <a [href]="bug.crbugUrl" target="_blank" (click)="$event.stopPropagation()" class="text-blue-600 hover:text-blue-800 hover:underline">
+                    Issue Link
+                  </a>
+                } @else {
+                  <span class="text-gray-400">N/A</span>
+                }
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="text-blue-600 group-hover:text-blue-800 cursor-pointer">
+                  View Repro <i class="bi bi-arrow-right-short"></i>
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
