@@ -171,7 +171,7 @@
                             <i class="bi text-gray-400" [class.bi-chevron-up]="!isCollapsed" [class.bi-chevron-down]="isCollapsed"></i>
                           </div>
                           <div class="flex items-center gap-1.5 mt-1 text-[10px]">
-                            <span class="text-gray-500 font-normal mr-1">{{ progress.completed }}/{{ progress.total }} Tests</span>
+                            <span class="text-gray-500 font-normal mr-1">{{ progress.selected }}/{{ progress.total }} Selected</span>
                             @if (progress.passed > 0) {
                               <span class="inline-flex items-center gap-1 font-bold text-green-700 bg-green-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200" title="Passed">
                                 <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
@@ -252,7 +252,7 @@
                                   <th scope="col" class="px-3 py-2 !text-center">Status</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg TTFT</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg Total</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Input Chars</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Input Size</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg Speed</th>
                                   <th scope="col" class="px-3 py-2 w-10"></th>
                                 </tr>
@@ -296,7 +296,11 @@
                                       {{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
-                                      {{ test.results.input.length | number:'1.0-0' }}
+                                      @if (test.results.inputAudioDuration) {
+                                        {{ test.results.inputAudioDuration | number:'1.0-1' }} <span class="text-[10px] text-gray-400 font-normal">s</span>
+                                      } @else {
+                                        {{ test.results.input.length | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">chars</span>
+                                      }
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 font-medium">
                                       {{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : "---" }} <span class="text-[10px] text-emerald-600/60 font-normal">c/s</span>
@@ -313,7 +317,13 @@
                                           <div class="mb-4">
                                             <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
                                               <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
-                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">{{ test.results.input.length | number:'1.0-0' }} chars</span>
+                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">
+                                                @if (test.results.inputAudioDuration) {
+                                                  {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
+                                                } @else {
+                                                  {{ test.results.input.length | number:'1.0-0' }} chars
+                                                }
+                                              </span>
                                             </h4>
                                             <div class="flex flex-col sm:flex-row gap-4">
                                               <div class="flex-1 bg-white border border-gray-200 rounded p-3 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
@@ -322,6 +332,11 @@
                                               @if (test.results.inputImageDataUrl) {
                                                 <div class="shrink-0 bg-white border border-gray-200 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
                                                   <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                                                </div>
+                                              }
+                                              @if (test.results.inputAudioUrl) {
+                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-center">
+                                                  <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
                                                 </div>
                                               }
                                             </div>

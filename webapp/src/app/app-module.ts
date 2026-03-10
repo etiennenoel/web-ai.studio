@@ -58,6 +58,10 @@ import { PromptImageOcrComputerFontColdStartAxonTest } from './pages/cortex/axon
 import { PromptImageDescribeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-describe-cold-start.axon-test';
 import { PromptImageExplainMemeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
 import { PromptImageExplainEmotionColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
+import { PromptAudioTranscription119ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-119-cold-start.axon-test';
+import { PromptAudioTranscription4167ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-4167-cold-start.axon-test';
+import { PromptAudioTranscription46ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-46-cold-start.axon-test';
+import { PromptAudioTranscription5670ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-5670-cold-start.axon-test';
 import { CodeModal } from './modals/code/code.modal';
 import {AppComponent} from './app.component';
 import {MarkdownPipe} from './shared/pipes/markdown.pipe';
@@ -155,6 +159,12 @@ import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-creat
     PromptImageDescribeColdStartAxonTest,
     PromptImageExplainMemeColdStartAxonTest,
     PromptImageExplainEmotionColdStartAxonTest,
+
+    // Prompt API Audio
+    PromptAudioTranscription119ColdStartAxonTest,
+    PromptAudioTranscription4167ColdStartAxonTest,
+    PromptAudioTranscription46ColdStartAxonTest,
+    PromptAudioTranscription5670ColdStartAxonTest,
   ],
   bootstrap: [AppComponent]
 })

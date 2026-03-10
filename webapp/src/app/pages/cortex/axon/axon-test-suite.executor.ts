@@ -42,6 +42,10 @@ import { PromptImageOcrComputerFontColdStartAxonTest } from './tests/prompt-imag
 import { PromptImageDescribeColdStartAxonTest } from './tests/prompt-image/prompt-image-describe-cold-start.axon-test';
 import { PromptImageExplainMemeColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
 import { PromptImageExplainEmotionColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
+import { PromptAudioTranscription119ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-119-cold-start.axon-test';
+import { PromptAudioTranscription4167ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-4167-cold-start.axon-test';
+import { PromptAudioTranscription46ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-46-cold-start.axon-test';
+import { PromptAudioTranscription5670ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-5670-cold-start.axon-test';
 import {AxonPreTestResultInterface} from './interfaces/axon-pre-test-result.interface';
 
 @Injectable()
@@ -69,6 +73,10 @@ export class AxonTestSuiteExecutor {
     AxonTestId.PromptImageDescribeColdStart,
     AxonTestId.PromptImageExplainMemeColdStart,
     AxonTestId.PromptImageExplainEmotionColdStart,
+    AxonTestId.PromptAudioTranscription119ColdStart,
+    AxonTestId.PromptAudioTranscription4167ColdStart,
+    AxonTestId.PromptAudioTranscription46ColdStart,
+    AxonTestId.PromptAudioTranscription5670ColdStart,
   ];
 
   results: AxonResultInterface;
@@ -95,6 +103,10 @@ export class AxonTestSuiteExecutor {
     private readonly promptImageDescribeColdStartAxonTest: PromptImageDescribeColdStartAxonTest,
     private readonly promptImageExplainMemeColdStartAxonTest: PromptImageExplainMemeColdStartAxonTest,
     private readonly promptImageExplainEmotionColdStartAxonTest: PromptImageExplainEmotionColdStartAxonTest,
+    private readonly promptAudioTranscription119ColdStartAxonTest: PromptAudioTranscription119ColdStartAxonTest,
+    private readonly promptAudioTranscription4167ColdStartAxonTest: PromptAudioTranscription4167ColdStartAxonTest,
+    private readonly promptAudioTranscription46ColdStartAxonTest: PromptAudioTranscription46ColdStartAxonTest,
+    private readonly promptAudioTranscription5670ColdStartAxonTest: PromptAudioTranscription5670ColdStartAxonTest,
   ) {
 
     this.testIdMap = {
@@ -117,6 +129,10 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.PromptImageDescribeColdStart]: this.promptImageDescribeColdStartAxonTest,
       [AxonTestId.PromptImageExplainMemeColdStart]: this.promptImageExplainMemeColdStartAxonTest,
       [AxonTestId.PromptImageExplainEmotionColdStart]: this.promptImageExplainEmotionColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription119ColdStart]: this.promptAudioTranscription119ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription4167ColdStart]: this.promptAudioTranscription4167ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription46ColdStart]: this.promptAudioTranscription46ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription5670ColdStart]: this.promptAudioTranscription5670ColdStartAxonTest,
     }
 
     this.testsSuite.sort((a, b) => {

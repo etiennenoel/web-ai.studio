@@ -44,6 +44,10 @@ export class CortexPage implements OnInit {
     [AxonTestId.PromptImageDescribeColdStart]: {},
     [AxonTestId.PromptImageExplainMemeColdStart]: {},
     [AxonTestId.PromptImageExplainEmotionColdStart]: {},
+    [AxonTestId.PromptAudioTranscription119ColdStart]: {},
+    [AxonTestId.PromptAudioTranscription4167ColdStart]: {},
+    [AxonTestId.PromptAudioTranscription46ColdStart]: {},
+    [AxonTestId.PromptAudioTranscription5670ColdStart]: {},
     "pretests": {}
   }
 
@@ -195,7 +199,7 @@ export class CortexPage implements OnInit {
   getApiProgress(api: BuiltInAiApi) {
     const allTests = this.getTests(api);
     const tests = allTests.filter(t => this.selectedTestIds.has(t.id));
-    if (tests.length === 0) return { total: 0, completed: 0, percentage: 0, passed: 0, failed: 0, executing: 0, idle: 0 };
+    if (tests.length === 0) return { total: allTests.length, selected: 0, completed: 0, percentage: 0, passed: 0, failed: 0, executing: 0, idle: 0 };
     let completed = 0;
     let passed = 0;
     let failed = 0;
@@ -215,7 +219,8 @@ export class CortexPage implements OnInit {
       }
     }
     return {
-      total: tests.length,
+      total: allTests.length,
+      selected: tests.length,
       completed,
       passed,
       failed,
@@ -247,6 +252,18 @@ export class CortexPage implements OnInit {
       return this.apiCollapsedState[api]!;
     }
     
+    // If any test in this API is explicitly expanded by user or has expanded outputs, keep the API expanded
+    const tests = this.getTests(api);
+    const hasExpandedTest = tests.some(test => {
+      if (this.viewData[test.id].iterationsCollapsed === false) return true;
+      if (this.viewData[test.id].expandedOutputs && Object.values(this.viewData[test.id].expandedOutputs!).some(v => v)) return true;
+      return false;
+    });
+
+    if (hasExpandedTest) {
+      return false;
+    }
+
     // Dynamic logic based on execution state
     if (this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
        // Expand if it's the currently executing API
@@ -298,6 +315,12 @@ export class CortexPage implements OnInit {
     if (this.viewData[test.id].iterationsCollapsed !== undefined) {
       return this.viewData[test.id].iterationsCollapsed!;
     }
+    
+    // If any output is expanded, keep it expanded
+    if (this.viewData[test.id].expandedOutputs && Object.values(this.viewData[test.id].expandedOutputs!).some(v => v)) {
+      return false;
+    }
+    
     return test.results.status !== TestStatus.Executing;
   }
 

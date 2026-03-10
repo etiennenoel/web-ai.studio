@@ -118,11 +118,12 @@ export class PromptImageOcrHandwrittenName3ColdStartAxonTest implements AxonTest
         const maxLen = Math.max(normalizedOutput.length, normalizedExpected.length);
         const accuracy = maxLen === 0 ? 1 : (maxLen - dist) / maxLen;
 
+        iterationResult.output = `Accuracy: ${Math.round(accuracy*100)}%\n\nExpected:\n${expectedText}\n\nActual:\n${output}`;
+
         if (accuracy > 0.97) {
            iterationResult.status = TestStatus.Success;
         } else {
            iterationResult.status = TestStatus.Error;
-           iterationResult.output = `Validation Failed. Accuracy: ${Math.round(accuracy*100)}%. Expected: '${expectedText}'. Got: ${output}`;
         }
       } catch (e: any) {
         iterationResult.status = TestStatus.Error;

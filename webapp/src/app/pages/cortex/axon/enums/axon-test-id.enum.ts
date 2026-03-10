@@ -18,4 +18,8 @@ export enum AxonTestId {
   PromptImageDescribeColdStart = "Prompt Image Describe (Cold)",
   PromptImageExplainMemeColdStart = "Prompt Image Explain Meme (Cold)",
   PromptImageExplainEmotionColdStart = "Prompt Image Explain Emotion (Cold)",
+  PromptAudioTranscription119ColdStart = "Prompt Audio Transcription 119 (Cold)",
+  PromptAudioTranscription4167ColdStart = "Prompt Audio Transcription 4167 (Cold)",
+  PromptAudioTranscription46ColdStart = "Prompt Audio Transcription 46 (Cold)",
+  PromptAudioTranscription5670ColdStart = "Prompt Audio Transcription 5670 (Cold)",
 }

@@ -5,30 +5,31 @@ import {Injectable} from '@angular/core';
 import {AxonTestId} from '../../enums/axon-test-id.enum';
 import {TestStatus} from '../../../../../enums/test-status.enum';
 import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
-import {ImageTestUtils} from './util/image-test-utils';
+import {AudioTestUtils} from './util/audio-test-utils';
 
 declare const LanguageModel: any;
 
 @Injectable()
-export class PromptImageOcrHandwrittenLetter2ColdStartAxonTest implements AxonTestInterface {
-  id: AxonTestId = AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart;
+export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInterface {
+  id: AxonTestId = AxonTestId.PromptAudioTranscription46ColdStart;
   
-  systemInput = "You are a highly accurate OCR system. Return only the exact text present in the image.";
+  systemInput = "You are a highly accurate audio transcription system. Return the exact spoken text.";
 
   results: AxonTestResultInterface = {
     id: this.id,
     status: TestStatus.Idle,
-    api: BuiltInAiApi.PromptWithImage,
+    api: BuiltInAiApi.PromptWithAudio,
     startType: "cold",
     numberOfIterations: 3,
     testIterationResults: [],
-    input: "Extract the handwritten text from the provided image.",
+    input: "Transcribe the spoken audio provided.",
     apiAvailability: "unknown",
-    inputImageDataUrl: "images/cortex/handwritten_letters/a01-072x.png"
+    inputAudioUrl: "images/cortex/speeches/spontaneous-speech-en-46.mp3",
+    inputAudioDuration: 9.756
   };
 
   creationOptions: any = {
-    expectedInputs: [{ type: "text" }, { type: "image" }],
+    expectedInputs: [{ type: "text" }, { type: "audio" }],
     initialPrompts: [{role: "system", content: this.systemInput}]
   };
 
@@ -57,8 +58,8 @@ export class PromptImageOcrHandwrittenLetter2ColdStartAxonTest implements AxonTe
       });
     }
 
-    const expectedText = `These support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.`;
-    const image = await ImageTestUtils.fetchImage(this.results.inputImageDataUrl!);
+    const expectedText = `I have grown pumpkins, sunflowers, lettuces and a few other kinds of vegetables and flowers that grow in the UK.`;
+    const audio = await AudioTestUtils.fetchAudio(this.results.inputAudioUrl!);
 
     for (let iterationResult of this.results.testIterationResults) {
       iterationResult.status = TestStatus.Executing;
@@ -70,8 +71,8 @@ export class PromptImageOcrHandwrittenLetter2ColdStartAxonTest implements AxonTe
       const promptInput = [{
         role: "user",
         content: [
-          { type: "text", value: "Transcribe the text in this image perfectly." },
-          { type: "image", value: image.bitmap }
+          { type: "text", value: "Transcribe the text in this audio perfectly." },
+          { type: "audio", value: audio.blob }
         ]
       }];
 
@@ -120,7 +121,7 @@ export class PromptImageOcrHandwrittenLetter2ColdStartAxonTest implements AxonTe
 
         iterationResult.output = `Accuracy: ${Math.round(accuracy*100)}%\n\nExpected:\n${expectedText}\n\nActual:\n${output}`;
 
-        if (accuracy > 0.97) {
+        if (accuracy > 0.95) {
            iterationResult.status = TestStatus.Success;
         } else {
            iterationResult.status = TestStatus.Error;
