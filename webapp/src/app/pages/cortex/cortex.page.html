@@ -1,4 +1,24 @@
 <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
+
+  @if (!isExtensionInstalled) {
+    <div class="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-sm relative overflow-hidden">
+      <div class="absolute -right-6 -top-10 opacity-[0.07] dark:opacity-10 pointer-events-none">
+        <i class="bi bi-browser-chrome text-[140px] text-blue-800 dark:text-blue-400"></i>
+      </div>
+      <div class="shrink-0 z-10">
+        <img src="images/extension-icon.png" class="w-14 h-14 rounded-xl shadow-md bg-white dark:bg-gray-800 p-1 border border-blue-100 dark:border-blue-700" alt="WebAI Extension">
+      </div>
+      <div class="flex-1 z-10">
+        <h3 class="text-base sm:text-lg font-extrabold text-blue-900 dark:text-blue-100 m-0 mb-1">Supercharge Cortex with the WebAI Chrome Extension!</h3>
+        <p class="text-sm text-blue-800 dark:text-blue-200 m-0">Unlock the complete benchmarking experience. Install the official Chrome Extension to enable deep hardware diagnostics, pinpoint your device's capabilities, and generate comprehensive performance exports.</p>
+      </div>
+      <div class="shrink-0 z-10 mt-2 sm:mt-0 w-full sm:w-auto">
+        <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex sm:inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap">
+          <i class="bi bi-browser-chrome text-lg"></i> Add to Chrome
+        </a>
+      </div>
+    </div>
+  }
   
   <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
     <div class="flex-1">
@@ -420,17 +440,20 @@
         <i class="bi bi-ui-checks text-blue-500"></i>
         <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
       </div>
-      <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
-              (click)="start()"
-              [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-        @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
-          <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-          <span>Running...</span>
-        } @else {
-          <i class="bi bi-play-fill text-xl"></i>
-          <span>Run Cortex Test</span>
-        }
-      </button>
+      
+      <div class="flex items-center gap-4">
+        <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
+                (click)="start()"
+                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+            <span>Running...</span>
+          } @else {
+            <i class="bi bi-play-fill text-xl"></i>
+            <span>Run Cortex Test</span>
+          }
+        </button>
+      </div>
       
       @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
         @let overallProgress = getOverallProgress();
@@ -440,6 +463,16 @@
             <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
           </div>
         </div>
+
+        @if (overallProgress.percentage === 100) {
+          <div class="mt-6">
+            <button class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/50 rounded-full shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    (click)="downloadResults()">
+              <i class="bi bi-filetype-json text-lg"></i>
+              Download JSON Results
+            </button>
+          </div>
+        }
       }
     </div>
 </div>
