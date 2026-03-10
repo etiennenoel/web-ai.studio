@@ -2,57 +2,57 @@
   
   <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
     <div class="flex-1">
-      <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Cortex Test Suite</h1>
-      <p class="text-lg text-gray-500 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
+      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-2">Cortex Test Suite</h1>
+      <p class="text-lg text-gray-500 dark:text-gray-400 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
     </div>
       </div>
 
     @if (this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
-         [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
+         [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.ring-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.border-gray-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-      <button class="w-full px-4 py-2.5 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none"
+         [class.ring-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:ring-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+         [class.border-gray-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing" [class.dark:border-gray-700]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
+      <button class="w-full px-4 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none"
               (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
         <div class="flex items-center gap-4">
-          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-0">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-0">
             <i class="bi bi-card-checklist text-blue-600"></i> Setup Details & Availability
           </h3>
           @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
-              <svg class="animate-spin h-3 w-3 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400">
+              <svg class="animate-spin h-3 w-3 text-yellow-700 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
               Checking Environment...
             </span>
           } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
               <i class="bi bi-check-circle-fill"></i> Setup Complete
             </span>
           }
         </div>
-        <i class="bi text-gray-500 font-bold" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
+        <i class="bi text-gray-500 dark:text-gray-400 font-bold" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
       </button>
       
-      <div class="px-4 py-2.5 border-t border-gray-200" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
+      <div class="px-4 py-2.5 border-t border-gray-200 dark:border-gray-700" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
-            <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 shadow-sm">
-              <div class="font-bold text-sm text-gray-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
+            <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 shadow-sm">
+              <div class="font-bold text-sm text-gray-700 dark:text-gray-300 truncate pr-4" [title]="result.id">{{ result.id }}</div>
               <div class="shrink-0">
                 @switch (result.apiAvailability) {
                   @case ("unknown") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
-                      <svg class="animate-spin h-3.5 w-3.5 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 shadow-sm">
+                      <svg class="animate-spin h-3.5 w-3.5 text-blue-700 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                       Checking...
                     </span>
                   }
                   @case ("available") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50 shadow-sm">
                       <i class="bi bi-check-circle-fill"></i> Ready
                     </span>
                   }
                   @case ("downloading") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-yellow-50 text-yellow-700 border border-yellow-200 shadow-sm animate-pulse">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50 shadow-sm animate-pulse">
                       <i class="bi bi-cloud-arrow-down-fill"></i> Downloading...
                     </span>
                   }
@@ -62,7 +62,7 @@
                     </button>
                   }
                   @case ("unavailable") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-red-50 text-red-700 border border-red-200 shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800/50 shadow-sm">
                       <i class="bi bi-x-circle-fill"></i> Unavailable
                     </span>
                   }
@@ -78,20 +78,20 @@
   <!-- Master Performance Table -->
     <div class="mb-12">
       <div class="flex items-center gap-3 mb-6 px-2">
-        <div class="bg-blue-100 text-blue-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
-        <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight m-0">Performance Overview</h3>
+        <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
+        <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight m-0">Performance Overview</h3>
       </div>
       
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50/80 border-b-2 border-gray-200">
+            <thead class="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-200 dark:border-gray-700">
               <tr>
-                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 uppercase tracking-wider bg-gray-100 border-r border-gray-200 align-bottom w-1/4 min-w-[300px]">
+                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 align-bottom w-1/4 min-w-[300px]">
                   <div class="flex items-center gap-3">
                     <div class="shrink-0" (click)="$event.stopPropagation()">
                       <input type="checkbox" 
-                             class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 shadow-sm"
+                             class="w-4 h-4 text-blue-600 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 shadow-sm"
                              [class.cursor-pointer]="!isTestingRunning"
                              [class.cursor-not-allowed]="isTestingRunning"
                              [class.opacity-50]="isTestingRunning"
@@ -104,34 +104,34 @@
                     <span>API Category / Test Name</span>
                   </div>
                 </th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
               </tr>
-              <tr class="divide-x divide-gray-200 border-t border-gray-100 text-xs shadow-sm">
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+              <tr class="divide-x divide-gray-200 border-t border-gray-100 dark:border-gray-800 text-xs shadow-sm">
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4 border-r-2 border-gray-300"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
                 
-                <th scope="col" class="px-2 py-1 text-blue-700 font-bold !text-right bg-blue-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 font-bold !text-right bg-orange-50/50 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
+                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
+                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200">
               @for (element of builtInAiApis; track $index) {
                 @let api = getBuiltInAiAPIFromItemInterface(element);
                 @let tests = getTests(api);
@@ -143,16 +143,16 @@
                   
                   <!-- API Category Header Row -->
                   <tr class="transition-colors divide-x divide-gray-200 group cursor-pointer" 
-                      [class.bg-yellow-50]="progress.executing > 0"
-                      [class.hover:bg-yellow-100]="progress.executing > 0"
-                      [class.bg-gray-50]="progress.executing === 0"
-                      [class.hover:bg-blue-50]="progress.executing === 0"
+                      [class.bg-yellow-50]="progress.executing > 0" [class.dark:bg-yellow-900/30]="progress.executing > 0"
+                      [class.hover:bg-yellow-100]="progress.executing > 0" [class.dark:hover:bg-yellow-900/50]="progress.executing > 0"
+                      [class.bg-gray-50]="progress.executing === 0" [class.dark:bg-gray-800]="progress.executing === 0"
+                      [class.hover:bg-blue-50]="progress.executing === 0" [class.dark:hover:bg-blue-900/30]="progress.executing === 0"
                       (click)="toggleApi(api, progress)">
-                    <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-gray-900 !text-left border-r border-gray-200 transition-colors">
+                    <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 !text-left border-r border-gray-200 dark:border-gray-700 transition-colors">
                       <div class="flex items-center gap-3">
                         <div class="shrink-0" (click)="$event.stopPropagation()">
                           <input type="checkbox" 
-                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                 class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
                                  [class.cursor-pointer]="!isTestingRunning"
                                  [class.cursor-not-allowed]="isTestingRunning"
                                  [class.opacity-50]="isTestingRunning"
@@ -161,8 +161,8 @@
                                  [disabled]="isTestingRunning"
                                  (change)="toggleCategorySelection(api, $event)">
                         </div>
-                        <div class="p-1.5 rounded-md bg-white border border-gray-200 text-gray-500 shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 transition-colors"
-                             [class.text-yellow-600]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0">
+                        <div class="p-1.5 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 shadow-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors"
+                             [class.text-yellow-600]="progress.executing > 0" [class.dark:text-yellow-500]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0" [class.dark:border-yellow-600]="progress.executing > 0">
                              <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
                         </div>
                         <div class="flex-1">
@@ -171,20 +171,20 @@
                             <i class="bi text-gray-400" [class.bi-chevron-up]="!isCollapsed" [class.bi-chevron-down]="isCollapsed"></i>
                           </div>
                           <div class="flex items-center gap-1.5 mt-1 text-[10px]">
-                            <span class="text-gray-500 font-normal mr-1">{{ progress.selected }}/{{ progress.total }} Selected</span>
+                            <span class="text-gray-500 dark:text-gray-400 font-normal mr-1">{{ progress.selected }}/{{ progress.total }} Selected</span>
                             @if (progress.passed > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-green-700 bg-green-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200" title="Passed">
+                              <span class="inline-flex items-center gap-1 font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200 dark:border-green-800/50" title="Passed">
                                 <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
                               </span>
                             }
                             @if (progress.failed > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-red-700 bg-red-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-red-200" title="Failed">
+                              <span class="inline-flex items-center gap-1 font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-red-200 dark:border-red-800/50" title="Failed">
                                 <i class="bi bi-x-circle-fill"></i> {{ progress.failed }}
                               </span>
                             }
                             @if (progress.executing > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-yellow-700 bg-yellow-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-yellow-200" title="Executing">
-                                <svg class="animate-spin h-3 w-3 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                              <span class="inline-flex items-center gap-1 font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-yellow-200 dark:border-yellow-800/50" title="Executing">
+                                <svg class="animate-spin h-3 w-3 text-yellow-700 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 {{ progress.executing }}
                               </span>
                             }
@@ -193,58 +193,58 @@
                       </div>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
                       {{ coldSummaryResults ? (coldSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults">
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
                       {{ warmSummaryResults ? (warmSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults" [class.dark:text-emerald-400]="coldSummaryResults">
+                      {{ coldSummaryResults ? (coldSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 border-r-2 border-gray-300" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults" [class.dark:text-emerald-400]="warmSummaryResults">
+                      {{ warmSummaryResults ? (warmSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
                     </td>
                     
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10" [class.text-gray-400]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults" [class.dark:text-emerald-400]="coldSummaryResults">
+                      {{ coldSummaryResults ? (coldSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
                     </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10" [class.text-gray-400]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 font-normal ml-0.5">c/s</span>
+                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults" [class.dark:text-emerald-400]="warmSummaryResults">
+                      {{ warmSummaryResults ? (warmSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
                     </td>
                   </tr>
 
                   <!-- Expanded Tests List within the Master Table -->
                   @if (!isCollapsed) {
-                    <tr class="bg-gray-50/80 shadow-inner">
-                      <td colspan="13" class="p-0 border-b-4 border-gray-200">
+                    <tr class="bg-gray-50/80 dark:bg-gray-800/80 shadow-inner">
+                      <td colspan="13" class="p-0 border-b-4 border-gray-200 dark:border-gray-700">
                         <div class="px-4 py-4 pl-12">
-                          <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Tests in {{ element.id }}</h4>
-                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 bg-white">
+                          <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Tests in {{ element.id }}</h4>
+                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                             <table class="min-w-full divide-y divide-gray-200">
-                              <thead class="bg-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-wider !text-left">
+                              <thead class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider !text-left">
                                 <tr>
                                   <th scope="col" class="px-3 py-2 w-10 !text-center">Run</th>
                                   <th scope="col" class="px-3 py-2">Test ID</th>
@@ -260,14 +260,14 @@
                               <tbody class="divide-y divide-gray-100">
                                 @for (test of tests; track $index) {
                                   @let isTestExpanded = !isTestCollapsed(test);
-                                  <tr class="hover:bg-gray-50 transition-colors cursor-pointer group"
-                                      [class.bg-yellow-50]="test.results.status === TestStatus.Executing"
+                                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer group"
+                                      [class.bg-yellow-50]="test.results.status === TestStatus.Executing" [class.dark:bg-yellow-900/30]="test.results.status === TestStatus.Executing"
                                       [class.opacity-40]="!selectedTestIds.has(test.id)"
-                                      [class.bg-gray-50]="!selectedTestIds.has(test.id)"
+                                      [class.bg-gray-50]="!selectedTestIds.has(test.id)" [class.dark:bg-gray-800]="!selectedTestIds.has(test.id)"
                                       (click)="toggleTest(test.id)">
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-center" (click)="$event.stopPropagation()">
                                       <input type="checkbox" 
-                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                             class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
                                              [class.cursor-pointer]="!isTestingRunning"
                                              [class.cursor-not-allowed]="isTestingRunning"
                                              [class.opacity-50]="isTestingRunning"
@@ -276,48 +276,48 @@
                                              (change)="toggleTestSelection(test.id, $event)">
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-left">
-                                      <div class="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ test.id }}</div>
+                                      <div class="text-xs font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ test.id }}</div>
                                       <div class="text-[10px] text-gray-400 truncate max-w-sm font-mono mt-0.5">{{ test.results.input }}</div>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-center">
                                       @if (test.results.startType === 'cold') {
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wider border border-blue-200"><i class="bi bi-thermometer-snow mr-1"></i>Cold</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 uppercase tracking-wider border border-blue-200 dark:border-blue-800/50"><i class="bi bi-thermometer-snow mr-1"></i>Cold</span>
                                       } @else {
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 uppercase tracking-wider border border-orange-200"><i class="bi bi-thermometer-sun mr-1"></i>Warm</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 uppercase tracking-wider border border-orange-200 dark:border-orange-800/50"><i class="bi bi-thermometer-sun mr-1"></i>Warm</span>
                                       }
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-center">
                                       <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
                                     </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
                                       {{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
                                     </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
                                       {{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
                                     </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
                                       @if (test.results.inputAudioDuration) {
                                         {{ test.results.inputAudioDuration | number:'1.0-1' }} <span class="text-[10px] text-gray-400 font-normal">s</span>
                                       } @else {
                                         {{ test.results.input.length | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">chars</span>
                                       }
                                     </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 font-medium">
-                                      {{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : "---" }} <span class="text-[10px] text-emerald-600/60 font-normal">c/s</span>
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">
+                                      {{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : "---" }} <span class="text-[10px] text-emerald-600/60 dark:text-emerald-400/60 font-normal">c/s</span>
                                     </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">
                                       <i class="bi text-sm transition-transform" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
                                     </td>
                                   </tr>
                                   
                                   @if (isTestExpanded) {
-                                    <tr class="bg-gray-50 border-b border-gray-200 shadow-inner">
+                                    <tr class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-inner">
                                       <td colspan="8" class="p-0">
                                         <div class="px-6 py-4 border-l-4 border-blue-500" (click)="$event.stopPropagation()">
                                           <div class="mb-4">
-                                            <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                            <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                                               <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
-                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">
+                                              <span class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono">
                                                 @if (test.results.inputAudioDuration) {
                                                   {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
                                                 } @else {
@@ -326,51 +326,51 @@
                                               </span>
                                             </h4>
                                             <div class="flex flex-col sm:flex-row gap-4">
-                                              <div class="flex-1 bg-white border border-gray-200 rounded p-3 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
+                                              <div class="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 text-xs text-gray-700 dark:text-gray-300 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
                                                 {{ test.results.input }}
                                               </div>
                                               @if (test.results.inputImageDataUrl) {
-                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
+                                                <div class="shrink-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
                                                   <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
                                                 </div>
                                               }
                                               @if (test.results.inputAudioUrl) {
-                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-center">
+                                                <div class="shrink-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 shadow-sm flex items-center justify-center">
                                                   <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
                                                 </div>
                                               }
                                             </div>
                                           </div>
                                           
-                                          <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                          <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                             <i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})
                                           </h4>
-                                          <div class="overflow-hidden rounded border border-gray-200 shadow-sm bg-white">
+                                          <div class="overflow-hidden rounded border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
                                             <table class="min-w-full divide-y divide-gray-200 text-xs !text-center">
-                                              <thead class="bg-gray-100">
+                                              <thead class="bg-gray-100 dark:bg-gray-800">
                                                 <tr>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 w-8 border-r border-gray-200">#</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600">Status</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">TTFT</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Total Time</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Speed</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 !text-right">Output Chars</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 w-16">Output</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 w-8 border-r border-gray-200 dark:border-gray-700">#</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400">Status</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">TTFT</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Total Time</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Speed</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Output Chars</th>
+                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 w-16">Output</th>
                                                 </tr>
                                               </thead>
                                               <tbody class="divide-y divide-gray-100">
                                                 @for (iter of test.results.testIterationResults; track $index) {
-                                                  <tr class="hover:bg-gray-50 transition-colors cursor-pointer" [class.bg-yellow-50]="iter.status === TestStatus.Executing" (click)="iter.output ? toggleOutput(test.id, $index) : null">
-                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center text-gray-500 font-bold bg-gray-50 border-r border-gray-200">{{ $index + 1 }}</td>
+                                                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer" [class.bg-yellow-50]="iter.status === TestStatus.Executing" [class.dark:bg-yellow-900/30]="iter.status === TestStatus.Executing" (click)="iter.output ? toggleOutput(test.id, $index) : null">
+                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center text-gray-500 dark:text-gray-400 font-bold bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">{{ $index + 1 }}</td>
                                                     <td class="px-2 py-1.5 whitespace-nowrap !text-center">
                                                       <axon-test-status-badge [status]="iter.status"></axon-test-status-badge>
                                                     </td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "---" }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "---" }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "---" }} c/s</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "---" }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "---" }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "---" }} c/s</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
                                                     <td class="px-2 py-1.5 whitespace-nowrap !text-center">
-                                                      <button class="inline-flex items-center justify-center px-2 py-1 rounded text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200" 
+                                                      <button class="inline-flex items-center justify-center px-2 py-1 rounded text-blue-600 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-700" 
                                                               title="Toggle Output"
                                                               [disabled]="!iter.output"
                                                               (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
@@ -383,9 +383,9 @@
                                                     </td>
                                                   </tr>
                                                   @if (viewData[test.id].expandedOutputs?.[$index]) {
-                                                    <tr class="bg-gray-900 border-b border-gray-200">
+                                                    <tr class="bg-gray-900 dark:bg-black border-b border-gray-200 dark:border-gray-700">
                                                       <td colspan="7" class="p-4 !text-left">
-                                                        <div class="text-[10px] font-mono text-gray-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
+                                                        <div class="text-[10px] font-mono text-gray-300 dark:text-gray-400 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
                                                           {{ unescapeOutput(iter.output ?? '') }}
                                                         </div>
                                                       </td>
@@ -416,7 +416,7 @@
     </div>
 
     <div class="mt-8 flex flex-col items-center justify-center">
-      <div class="mb-4 text-sm font-bold text-gray-600 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-2">
+      <div class="mb-4 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2">
         <i class="bi bi-ui-checks text-blue-500"></i>
         <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
       </div>
@@ -435,8 +435,8 @@
       @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
         @let overallProgress = getOverallProgress();
         <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
-          <div class="text-sm font-bold text-gray-600">{{ overallProgress.percentage }}% Complete</div>
-          <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+          <div class="text-sm font-bold text-gray-600 dark:text-gray-400">{{ overallProgress.percentage }}% Complete</div>
+          <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
             <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
           </div>
         </div>
