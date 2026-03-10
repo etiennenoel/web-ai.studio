@@ -32,6 +32,20 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName1ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName2ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName3ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-3-cold-start.axon-test';
+import { PromptImageOcrComputerFontColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
+import { PromptImageDescribeColdStartAxonTest } from './tests/prompt-image/prompt-image-describe-cold-start.axon-test';
+import { PromptImageExplainMemeColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
+import { PromptImageExplainEmotionColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
+import { PromptAudioTranscription119ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-119-cold-start.axon-test';
+import { PromptAudioTranscription4167ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-4167-cold-start.axon-test';
+import { PromptAudioTranscription46ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-46-cold-start.axon-test';
+import { PromptAudioTranscription5670ColdStartAxonTest } from './tests/prompt-audio/prompt-audio-transcription-5670-cold-start.axon-test';
 import {AxonPreTestResultInterface} from './interfaces/axon-pre-test-result.interface';
 
 @Injectable()
@@ -49,6 +63,20 @@ export class AxonTestSuiteExecutor {
     AxonTestId.PromptTextFactAnalysisColdStart,
     AxonTestId.PromptTextEthicalAndCreativeColdStart,
     AxonTestId.PromptTextTechnicalChallengeColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName1ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName2ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName3ColdStart,
+    AxonTestId.PromptImageOcrComputerFontColdStart,
+    AxonTestId.PromptImageDescribeColdStart,
+    AxonTestId.PromptImageExplainMemeColdStart,
+    AxonTestId.PromptImageExplainEmotionColdStart,
+    AxonTestId.PromptAudioTranscription119ColdStart,
+    AxonTestId.PromptAudioTranscription4167ColdStart,
+    AxonTestId.PromptAudioTranscription46ColdStart,
+    AxonTestId.PromptAudioTranscription5670ColdStart,
   ];
 
   results: AxonResultInterface;
@@ -65,6 +93,20 @@ export class AxonTestSuiteExecutor {
     private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
     private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
     private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter1ColdStartAxonTest: PromptImageOcrHandwrittenLetter1ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter2ColdStartAxonTest: PromptImageOcrHandwrittenLetter2ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter3ColdStartAxonTest: PromptImageOcrHandwrittenLetter3ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName1ColdStartAxonTest: PromptImageOcrHandwrittenName1ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName2ColdStartAxonTest: PromptImageOcrHandwrittenName2ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName3ColdStartAxonTest: PromptImageOcrHandwrittenName3ColdStartAxonTest,
+    private readonly promptImageOcrComputerFontColdStartAxonTest: PromptImageOcrComputerFontColdStartAxonTest,
+    private readonly promptImageDescribeColdStartAxonTest: PromptImageDescribeColdStartAxonTest,
+    private readonly promptImageExplainMemeColdStartAxonTest: PromptImageExplainMemeColdStartAxonTest,
+    private readonly promptImageExplainEmotionColdStartAxonTest: PromptImageExplainEmotionColdStartAxonTest,
+    private readonly promptAudioTranscription119ColdStartAxonTest: PromptAudioTranscription119ColdStartAxonTest,
+    private readonly promptAudioTranscription4167ColdStartAxonTest: PromptAudioTranscription4167ColdStartAxonTest,
+    private readonly promptAudioTranscription46ColdStartAxonTest: PromptAudioTranscription46ColdStartAxonTest,
+    private readonly promptAudioTranscription5670ColdStartAxonTest: PromptAudioTranscription5670ColdStartAxonTest,
   ) {
 
     this.testIdMap = {
@@ -77,7 +119,31 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
       [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
       [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart]: this.promptImageOcrHandwrittenLetter1ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart]: this.promptImageOcrHandwrittenLetter2ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart]: this.promptImageOcrHandwrittenLetter3ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName1ColdStart]: this.promptImageOcrHandwrittenName1ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName2ColdStart]: this.promptImageOcrHandwrittenName2ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName3ColdStart]: this.promptImageOcrHandwrittenName3ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrComputerFontColdStart]: this.promptImageOcrComputerFontColdStartAxonTest,
+      [AxonTestId.PromptImageDescribeColdStart]: this.promptImageDescribeColdStartAxonTest,
+      [AxonTestId.PromptImageExplainMemeColdStart]: this.promptImageExplainMemeColdStartAxonTest,
+      [AxonTestId.PromptImageExplainEmotionColdStart]: this.promptImageExplainEmotionColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription119ColdStart]: this.promptAudioTranscription119ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription4167ColdStart]: this.promptAudioTranscription4167ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription46ColdStart]: this.promptAudioTranscription46ColdStartAxonTest,
+      [AxonTestId.PromptAudioTranscription5670ColdStart]: this.promptAudioTranscription5670ColdStartAxonTest,
     }
+
+    this.testsSuite.sort((a, b) => {
+      const apiA = this.testIdMap[a].results.api;
+      const apiB = this.testIdMap[b].results.api;
+      if (apiA !== apiB) {
+        const apisArray = Object.values(BuiltInAiApi);
+        return apisArray.indexOf(apiA as BuiltInAiApi) - apisArray.indexOf(apiB as BuiltInAiApi);
+      }
+      return a.localeCompare(b, "en");
+    });
 
     this.results = {
       status: TestStatus.Idle,
@@ -89,38 +155,37 @@ export class AxonTestSuiteExecutor {
     await this.testIdMap[testId].setup();
   }
 
-  async setup(): Promise<void> {
+  async setup(selectedTestIds?: Set<string>): Promise<void> {
     this.results.testsResults = [];
     this.preTestsStatus = TestStatus.Executing;
 
+    const testsToRun = selectedTestIds && selectedTestIds.size > 0 
+      ? this.testsSuite.filter(id => selectedTestIds.has(id))
+      : this.testsSuite;
+
     for (const testSuite of this.testsSuite) {
       const test = this.testIdMap[testSuite];
-
-      // Push the results
       this.results.testsResults.push(test.results);
     }
 
-
     return new Promise(async (resolve, reject) => {
       // Check the status for each API.
-      for (const testSuite of this.testsSuite) {
+      for (const testSuite of testsToRun) {
         const test = this.testIdMap[testSuite];
-
         await test.setup();
       }
 
-      // Check if all setup are in a final state: "available" or "unavailable"
-      if (!this.results.testsResults.find(test => {
+      // Check if all setup for tests to run are in a final state
+      if (!this.results.testsResults.filter(test => testsToRun.includes(test.id as AxonTestId)).find(test => {
         return test.apiAvailability === "downloadable" || test.apiAvailability === "downloading";
       })) {
         this.preTestsStatus = TestStatus.Success;
-
         return resolve();
       }
 
       await new Promise<void>( (resolve1) => {
         setTimeout(async () => {
-          await this.setup();
+          await this.setup(selectedTestIds);
           return resolve1();
         }, 3000);
       })
@@ -130,10 +195,14 @@ export class AxonTestSuiteExecutor {
     })
   }
 
-  async start(): Promise<void> {
+  async start(selectedTestIds?: Set<string>): Promise<void> {
     this.results.status = TestStatus.Executing
 
-    for (const testSuite of this.testsSuite) {
+    const testsToRun = selectedTestIds && selectedTestIds.size > 0 
+      ? this.testsSuite.filter(id => selectedTestIds.has(id))
+      : this.testsSuite;
+
+    for (const testSuite of testsToRun) {
       const test = this.testIdMap[testSuite];
 
       await test.preRun();

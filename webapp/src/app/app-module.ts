@@ -48,6 +48,20 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName1ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName2ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName3ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-3-cold-start.axon-test';
+import { PromptImageOcrComputerFontColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
+import { PromptImageDescribeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-describe-cold-start.axon-test';
+import { PromptImageExplainMemeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
+import { PromptImageExplainEmotionColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
+import { PromptAudioTranscription119ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-119-cold-start.axon-test';
+import { PromptAudioTranscription4167ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-4167-cold-start.axon-test';
+import { PromptAudioTranscription46ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-46-cold-start.axon-test';
+import { PromptAudioTranscription5670ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-audio/prompt-audio-transcription-5670-cold-start.axon-test';
 import { CodeModal } from './modals/code/code.modal';
 import {AppComponent} from './app.component';
 import {MarkdownPipe} from './shared/pipes/markdown.pipe';
@@ -133,6 +147,24 @@ import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-creat
     PromptTextFactAnalysisColdStartAxonTest,
     PromptTextEthicalAndCreativeColdStartAxonTest,
     PromptTextTechnicalChallengeStartAxonTest,
+
+    // Prompt API Image
+    PromptImageOcrHandwrittenLetter1ColdStartAxonTest,
+    PromptImageOcrHandwrittenLetter2ColdStartAxonTest,
+    PromptImageOcrHandwrittenLetter3ColdStartAxonTest,
+    PromptImageOcrHandwrittenName1ColdStartAxonTest,
+    PromptImageOcrHandwrittenName2ColdStartAxonTest,
+    PromptImageOcrHandwrittenName3ColdStartAxonTest,
+    PromptImageOcrComputerFontColdStartAxonTest,
+    PromptImageDescribeColdStartAxonTest,
+    PromptImageExplainMemeColdStartAxonTest,
+    PromptImageExplainEmotionColdStartAxonTest,
+
+    // Prompt API Audio
+    PromptAudioTranscription119ColdStartAxonTest,
+    PromptAudioTranscription4167ColdStartAxonTest,
+    PromptAudioTranscription46ColdStartAxonTest,
+    PromptAudioTranscription5670ColdStartAxonTest,
   ],
   bootstrap: [AppComponent]
 })

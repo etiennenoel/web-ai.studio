@@ -5,69 +5,9 @@
       <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Cortex Test Suite</h1>
       <p class="text-lg text-gray-500 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
     </div>
-    <div class="shrink-0 flex flex-col items-end">
-      <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
-              (click)="start()"
-              [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-        @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
-          <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-          <span>Running...</span>
-        } @else {
-          <i class="bi bi-play-fill text-xl"></i>
-          <span>Run Cortex Test</span>
-        }
-      </button>
-      
-      @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-        @let overallProgress = getOverallProgress();
-        <div class="mt-4 w-full flex items-center justify-end gap-3">
-          <div class="text-sm font-bold text-gray-600">{{ overallProgress.percentage }}% Complete</div>
-          <div class="w-32 bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
-            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
-          </div>
-        </div>
-      }
-    </div>
-  </div>
-
-  <!-- Initial Dashboard State -->
-  @if (axonTestSuiteExecutor.results.status === TestStatus.Idle && axonTestSuiteExecutor.preTestsStatus === TestStatus.Idle) {
-    <div class="mt-8 mb-16 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-      <div class="px-8 py-16 md:px-12 lg:px-16 !text-center">
-        <div class="mx-auto w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-8 shadow-sm ring-8 ring-blue-50/50">
-          <i class="bi bi-speedometer2 text-5xl"></i>
-        </div>
-        <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-5">Ready to Benchmark</h2>
-        <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">Click 'Run Cortex Test' to evaluate and collect precise, uncontended performance metrics across all supported built-in AI models on this device.</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto !text-left">
-          <div class="bg-gray-50 hover:bg-gray-100 transition-colors rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-5 shadow-sm">
-              <i class="bi bi-thermometer-half text-xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Cold & Warm Starts</h3>
-            <p class="text-sm text-gray-500 leading-relaxed">Measures the initialization penalty versus cached execution speed for each API payload.</p>
-          </div>
-          <div class="bg-gray-50 hover:bg-gray-100 transition-colors rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-5 shadow-sm">
-              <i class="bi bi-stopwatch text-xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Time to First Token</h3>
-            <p class="text-sm text-gray-500 leading-relaxed">Tracks exactly how long it takes for the model to process the prompt and start streaming its response.</p>
-          </div>
-          <div class="bg-gray-50 hover:bg-gray-100 transition-colors rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-5 shadow-sm">
-              <i class="bi bi-activity text-xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Throughput Speed</h3>
-            <p class="text-sm text-gray-500 leading-relaxed">Calculates the precise generation speed in characters per second natively on this device.</p>
-          </div>
-        </div>
       </div>
-    </div>
-  }
 
-  @if (this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
+    @if (this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
     <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
          [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
@@ -135,8 +75,7 @@
     </div>
   }
 
-  @if (this.axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-    <!-- Master Performance Table -->
+  <!-- Master Performance Table -->
     <div class="mb-12">
       <div class="flex items-center gap-3 mb-6 px-2">
         <div class="bg-blue-100 text-blue-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
@@ -148,7 +87,23 @@
           <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50/80 border-b-2 border-gray-200">
               <tr>
-                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 uppercase tracking-wider bg-gray-100 border-r border-gray-200 align-bottom w-1/4 min-w-[300px]">API Category / Test Name</th>
+                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 uppercase tracking-wider bg-gray-100 border-r border-gray-200 align-bottom w-1/4 min-w-[300px]">
+                  <div class="flex items-center gap-3">
+                    <div class="shrink-0" (click)="$event.stopPropagation()">
+                      <input type="checkbox" 
+                             class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 shadow-sm"
+                             [class.cursor-pointer]="!isTestingRunning"
+                             [class.cursor-not-allowed]="isTestingRunning"
+                             [class.opacity-50]="isTestingRunning"
+                             [checked]="isAllSelected()"
+                             [indeterminate]="isPartiallySelected()"
+                             [disabled]="isTestingRunning"
+                             (change)="toggleAllSelection($event)"
+                             title="Select/Deselect All">
+                    </div>
+                    <span>API Category / Test Name</span>
+                  </div>
+                </th>
                 <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
                 <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
                 <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 uppercase tracking-wider border-r-2 border-gray-300 bg-white"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
@@ -195,6 +150,17 @@
                       (click)="toggleApi(api, progress)">
                     <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-gray-900 !text-left border-r border-gray-200 transition-colors">
                       <div class="flex items-center gap-3">
+                        <div class="shrink-0" (click)="$event.stopPropagation()">
+                          <input type="checkbox" 
+                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                 [class.cursor-pointer]="!isTestingRunning"
+                                 [class.cursor-not-allowed]="isTestingRunning"
+                                 [class.opacity-50]="isTestingRunning"
+                                 [checked]="isCategorySelected(api)"
+                                 [indeterminate]="isCategoryPartiallySelected(api)"
+                                 [disabled]="isTestingRunning"
+                                 (change)="toggleCategorySelection(api, $event)">
+                        </div>
                         <div class="p-1.5 rounded-md bg-white border border-gray-200 text-gray-500 shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 transition-colors"
                              [class.text-yellow-600]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0">
                              <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
@@ -205,7 +171,7 @@
                             <i class="bi text-gray-400" [class.bi-chevron-up]="!isCollapsed" [class.bi-chevron-down]="isCollapsed"></i>
                           </div>
                           <div class="flex items-center gap-1.5 mt-1 text-[10px]">
-                            <span class="text-gray-500 font-normal mr-1">{{ progress.completed }}/{{ progress.total }} Tests</span>
+                            <span class="text-gray-500 font-normal mr-1">{{ progress.selected }}/{{ progress.total }} Selected</span>
                             @if (progress.passed > 0) {
                               <span class="inline-flex items-center gap-1 font-bold text-green-700 bg-green-100 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200" title="Passed">
                                 <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
@@ -280,12 +246,13 @@
                             <table class="min-w-full divide-y divide-gray-200">
                               <thead class="bg-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-wider !text-left">
                                 <tr>
+                                  <th scope="col" class="px-3 py-2 w-10 !text-center">Run</th>
                                   <th scope="col" class="px-3 py-2">Test ID</th>
                                   <th scope="col" class="px-3 py-2 !text-center w-24">Type</th>
                                   <th scope="col" class="px-3 py-2 !text-center">Status</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg TTFT</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg Total</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Input Chars</th>
+                                  <th scope="col" class="px-3 py-2 !text-right">Input Size</th>
                                   <th scope="col" class="px-3 py-2 !text-right">Avg Speed</th>
                                   <th scope="col" class="px-3 py-2 w-10"></th>
                                 </tr>
@@ -295,7 +262,19 @@
                                   @let isTestExpanded = !isTestCollapsed(test);
                                   <tr class="hover:bg-gray-50 transition-colors cursor-pointer group"
                                       [class.bg-yellow-50]="test.results.status === TestStatus.Executing"
+                                      [class.opacity-40]="!selectedTestIds.has(test.id)"
+                                      [class.bg-gray-50]="!selectedTestIds.has(test.id)"
                                       (click)="toggleTest(test.id)">
+                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center" (click)="$event.stopPropagation()">
+                                      <input type="checkbox" 
+                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                             [class.cursor-pointer]="!isTestingRunning"
+                                             [class.cursor-not-allowed]="isTestingRunning"
+                                             [class.opacity-50]="isTestingRunning"
+                                             [checked]="selectedTestIds.has(test.id)"
+                                             [disabled]="isTestingRunning"
+                                             (change)="toggleTestSelection(test.id, $event)">
+                                    </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-left">
                                       <div class="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ test.id }}</div>
                                       <div class="text-[10px] text-gray-400 truncate max-w-sm font-mono mt-0.5">{{ test.results.input }}</div>
@@ -311,16 +290,20 @@
                                       <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
-                                      {{ (test.results.averageTimeToFirstToken ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
+                                      {{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
-                                      {{ (test.results.averageTotalResponseTime ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
+                                      {{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700">
-                                      {{ test.results.input.length | number:'1.0-0' }}
+                                      @if (test.results.inputAudioDuration) {
+                                        {{ test.results.inputAudioDuration | number:'1.0-1' }} <span class="text-[10px] text-gray-400 font-normal">s</span>
+                                      } @else {
+                                        {{ test.results.input.length | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">chars</span>
+                                      }
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 font-medium">
-                                      {{ (test.results.averageTokensPerSecond ?? "---") | number:'1.0-0' }} <span class="text-[10px] text-emerald-600/60 font-normal">c/s</span>
+                                      {{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : "---" }} <span class="text-[10px] text-emerald-600/60 font-normal">c/s</span>
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500">
                                       <i class="bi text-sm transition-transform" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
@@ -334,10 +317,28 @@
                                           <div class="mb-4">
                                             <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
                                               <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
-                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">{{ test.results.input.length | number:'1.0-0' }} chars</span>
+                                              <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">
+                                                @if (test.results.inputAudioDuration) {
+                                                  {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
+                                                } @else {
+                                                  {{ test.results.input.length | number:'1.0-0' }} chars
+                                                }
+                                              </span>
                                             </h4>
-                                            <div class="bg-white border border-gray-200 rounded p-3 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
-                                              {{ test.results.input }}
+                                            <div class="flex flex-col sm:flex-row gap-4">
+                                              <div class="flex-1 bg-white border border-gray-200 rounded p-3 text-xs text-gray-700 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
+                                                {{ test.results.input }}
+                                              </div>
+                                              @if (test.results.inputImageDataUrl) {
+                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
+                                                  <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                                                </div>
+                                              }
+                                              @if (test.results.inputAudioUrl) {
+                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-3 shadow-sm flex items-center justify-center">
+                                                  <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
+                                                </div>
+                                              }
                                             </div>
                                           </div>
                                           
@@ -359,20 +360,20 @@
                                               </thead>
                                               <tbody class="divide-y divide-gray-100">
                                                 @for (iter of test.results.testIterationResults; track $index) {
-                                                  <tr class="hover:bg-gray-50 transition-colors" [class.bg-yellow-50]="iter.status === TestStatus.Executing">
+                                                  <tr class="hover:bg-gray-50 transition-colors cursor-pointer" [class.bg-yellow-50]="iter.status === TestStatus.Executing" (click)="iter.output ? toggleOutput(test.id, $index) : null">
                                                     <td class="px-2 py-1.5 whitespace-nowrap !text-center text-gray-500 font-bold bg-gray-50 border-r border-gray-200">{{ $index + 1 }}</td>
                                                     <td class="px-2 py-1.5 whitespace-nowrap !text-center">
                                                       <axon-test-status-badge [status]="iter.status"></axon-test-status-badge>
                                                     </td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.timeToFirstToken | number:'1.0-0' }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.totalResponseTime | number:'1.0-0' }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.tokensPerSecond | number:'1.0-0' }} c/s</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "---" }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "---" }} ms</td>
+                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "---" }} c/s</td>
                                                     <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
                                                     <td class="px-2 py-1.5 whitespace-nowrap !text-center">
                                                       <button class="inline-flex items-center justify-center px-2 py-1 rounded text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200" 
                                                               title="Toggle Output"
                                                               [disabled]="!iter.output"
-                                                              (click)="toggleOutput(test.id, $index)">
+                                                              (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
                                                         @if (!viewData[test.id].expandedOutputs?.[$index]) {
                                                           <i class="bi bi-file-text mr-1"></i> View
                                                         } @else {
@@ -413,5 +414,41 @@
         </div>
       </div>
     </div>
-  }
+
+    <div class="mt-8 flex flex-col items-center justify-center">
+      <div class="mb-4 text-sm font-bold text-gray-600 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-2">
+        <i class="bi bi-ui-checks text-blue-500"></i>
+        <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
+      </div>
+      <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
+              (click)="start()"
+              [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+        @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+          <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+          <span>Running...</span>
+        } @else {
+          <i class="bi bi-play-fill text-xl"></i>
+          <span>Run Cortex Test</span>
+        }
+      </button>
+      
+      @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
+        @let overallProgress = getOverallProgress();
+        <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
+          <div class="text-sm font-bold text-gray-600">{{ overallProgress.percentage }}% Complete</div>
+          <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
+          </div>
+        </div>
+      }
+    </div>
 </div>
+
+@if (selectedImageUrl) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4" (click)="closeImage()">
+    <button class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors focus:outline-none" (click)="closeImage()">
+      <i class="bi bi-x-lg text-4xl"></i>
+    </button>
+    <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
+  </div>
+}
