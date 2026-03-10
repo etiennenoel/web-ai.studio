@@ -1,0 +1,57 @@
+# Policy Engine Configuration
+# Saved to: .gemini/policies/safe-defaults.toml
+
+# 1. Safely allow all read-only and exploratory tools
+# These tools don't modify files or system state.
+[[rule]]
+toolName = [
+    "list_directory",
+    "read_file",
+    "grep_search",
+    "glob",
+    "cli_help",
+    "codebase_investigator"
+]
+decision = "allow"
+priority = 100
+
+# 2. Allow harmless agent workflow tools
+# These manage the internal state of the agent or prompt the user.
+[[rule]]
+toolName = [
+    "write_todos",
+    "enter_plan_mode",
+    "ask_user",
+    "activate_skill"
+]
+decision = "allow"
+priority = 100
+
+# 3. Allow common, safe read-only shell commands
+# This speeds up typical git exploration and directory listing without bothering you.
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "git status",
+    "git diff",
+    "git log",
+    "git branch",
+    "git show",
+    "ls ",
+    "pwd",
+    "echo ",
+    "cat "
+]
+decision = "allow"
+priority = 90
+
+# 4. Enforce user confirmation for all destructive actions
+# (This is already the default, but included here for explicitness)
+[[rule]]
+toolName = [
+    "write_file",
+    "replace",
+    "save_memory"
+]
+decision = "ask_user"
+priority = 10

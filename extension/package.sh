@@ -24,15 +24,16 @@ cp -r ./extension-src/* ./release
 ng build base
 ng build devtools-panel
 ng build on-install
-npm run build:content-script
+npm run build:scripts
 
 mkdir -p ./release/devtools-panel
 mkdir -p ./release/on-install
-mkdir -p ./release/content-script
 
 cp -r dist/devtools-panel/browser/* ./release/devtools-panel
 cp -r dist/on-install/browser/* ./release/on-install
-cp -r dist/content-script/* ./release/content-script
+cp dist/content-script/main.js ./release/content-script.js
+cp dist/content-script/injected.js ./release/injected.js
+cp dist/service-worker/main.js ./release/service-worker.js
 
 # Copy Assets
 cp -r ./release/assets ./release/devtools-panel

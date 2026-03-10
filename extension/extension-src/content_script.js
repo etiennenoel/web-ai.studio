@@ -1,4 +1,0 @@
-const load = async () => {
-};
-
-load();

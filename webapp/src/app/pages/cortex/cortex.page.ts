@@ -23,6 +23,7 @@ export class CortexPage implements OnInit {
 
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
   selectedImageUrl: string | null = null;
+  isExtensionInstalled: boolean = false;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
@@ -58,6 +59,8 @@ export class CortexPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+    
     this.route.queryParamMap.subscribe(params => {
       const testsParam = params.get('tests');
       if (testsParam !== null) {
@@ -66,6 +69,34 @@ export class CortexPage implements OnInit {
         this.selectedTestIds = new Set(this.axonTestSuiteExecutor.testsSuite);
       }
     });
+  }
+
+  async downloadResults() {
+    let hardwareInfo = null;
+    if (this.isExtensionInstalled) {
+      try {
+        hardwareInfo = await (window as any).webai.getHardwareInformation();
+      } catch (e) {
+        console.error("Failed to get hardware info", e);
+      }
+    }
+
+    const data = {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      hardware: hardwareInfo,
+      results: this.axonTestSuiteExecutor.results
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cortex-benchmark-results-${new Date().getTime()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   toggleTestSelection(testId: string, event?: Event) {

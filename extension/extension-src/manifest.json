@@ -10,10 +10,13 @@
   "icons": {
     "128": "assets/images/icon.png"
   },
-  "permissions": [],
+  "permissions": [
+    "system.cpu",
+    "system.memory"
+  ],
   "devtools_page": "devtools-loader.html",
   "background": {
-    "service_worker": "service_worker.js",
+    "service_worker": "service-worker.js",
     "type": "module"
   },
   "content_scripts": [
@@ -22,7 +25,7 @@
         "<all_urls>"
       ],
       "js": [
-        "content-script/main.js"
+        "content-script.js"
       ],
       "run_at": "document_start"
     }
@@ -30,7 +33,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/images/spark.png"
+        "assets/images/spark.png",
+        "injected.js"
       ],
       "matches": [
         "<all_urls>"
