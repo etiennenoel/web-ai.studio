@@ -8,4 +8,9 @@ export enum AxonTestId {
   PromptTextFactAnalysisColdStart = "Prompt (Text). Analyze the scenario and provide a response. Cold Start.",
   PromptTextEthicalAndCreativeColdStart = "Prompt (Text). Answer Ethical Dilemma, then creative task. Cold Start.",
   PromptTextTechnicalChallengeColdStart = "Prompt (Text). Technical challenge, write code. Cold Start.",
+  PromptImageOcrHandwrittenColdStart = "Prompt Image OCR Handwritten (Cold)",
+  PromptImageOcrComputerFontColdStart = "Prompt Image OCR Computer Font (Cold)",
+  PromptImageDescribeColdStart = "Prompt Image Describe (Cold)",
+  PromptImageExplainMemeColdStart = "Prompt Image Explain Meme (Cold)",
+  PromptImageExplainEmotionColdStart = "Prompt Image Explain Emotion (Cold)",
 }

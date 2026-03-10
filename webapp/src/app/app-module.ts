@@ -48,6 +48,11 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import { PromptImageOcrHandwrittenColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-cold-start.axon-test';
+import { PromptImageOcrComputerFontColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
+import { PromptImageDescribeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-describe-cold-start.axon-test';
+import { PromptImageExplainMemeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
+import { PromptImageExplainEmotionColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
 import { CodeModal } from './modals/code/code.modal';
 import {AppComponent} from './app.component';
 import {MarkdownPipe} from './shared/pipes/markdown.pipe';
@@ -133,6 +138,13 @@ import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-creat
     PromptTextFactAnalysisColdStartAxonTest,
     PromptTextEthicalAndCreativeColdStartAxonTest,
     PromptTextTechnicalChallengeStartAxonTest,
+
+    // Prompt API Image
+    PromptImageOcrHandwrittenColdStartAxonTest,
+    PromptImageOcrComputerFontColdStartAxonTest,
+    PromptImageDescribeColdStartAxonTest,
+    PromptImageExplainMemeColdStartAxonTest,
+    PromptImageExplainEmotionColdStartAxonTest,
   ],
   bootstrap: [AppComponent]
 })

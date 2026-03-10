@@ -14,6 +14,8 @@ export interface AxonTestResultInterface {
 
   input: string;
 
+  inputImageDataUrl?: string;
+
   numberOfIterations: number;
 
   averageTimeToFirstToken?: number;

@@ -99,3 +99,28 @@ Use these instead:
 *   **Workflows**:
     *   Workflows are scoped to their respective directories to avoid unnecessary builds.
     *   When modifying workflows, ensure path filters (`paths: [...]`) are maintained.
+
+---
+
+## **4. Cortex Test Suite (`webapp/`)**
+
+### **Adding a New Test**
+To add a new benchmark test to the Cortex Test Suite, you must modify the following files:
+
+1.  **Create the Test Class:** Create your test class in the appropriate folder under `webapp/src/app/pages/cortex/axon/tests/<api-folder>/`. The class should implement `AxonTestInterface` (or extend an existing base test class).
+2.  **Add `AxonTestId`:** Open `webapp/src/app/pages/cortex/axon/enums/axon-test-id.enum.ts` and add a new enum value for your test.
+3.  **Provide the Test:** Open `webapp/src/app/app-module.ts` and add your new test class to the `providers` array (not `declarations`).
+4.  **Register the Test in Executor:** Open `webapp/src/app/pages/cortex/axon/axon-test-suite.executor.ts` and:
+    *   Import your new test class.
+    *   Inject it into the `constructor(...)`.
+    *   Add the test's `AxonTestId` to the `testsSuite` array.
+    *   Map the `AxonTestId` to your injected instance inside the `this.testIdMap` object in the constructor.
+5.  **Initialize UI State:** Open `webapp/src/app/pages/cortex/cortex.page.ts` and add the test's `AxonTestId` to the `viewData` object initialized with an empty object `{}`.
+
+### **Adding a New Category of Tests**
+The Cortex UI dynamically renders categories based on the defined AI APIs. To add an entirely new category:
+
+1.  **Update the API Enum:** Open `webapp/src/app/enums/built-in-ai-api.enum.ts` and add a new value representing the new Built-In API category.
+2.  **Assign a UI Icon:** Open `webapp/src/app/pages/cortex/cortex.page.ts` and update the `getIconForApi` method to return an appropriate Bootstrap Icon class (e.g., `'bi-magic'`) for the new enum value.
+    *   **Agent Instruction:** *If the user asks to add a new category, always ask them which Bootstrap icon best represents it if it isn't obvious.*
+3.  **Add Tests:** Add the individual tests for this new category using the "Adding a New Test" steps above. The UI will automatically generate the category row and tables in the Performance Overview once at least one test exists for that API category.

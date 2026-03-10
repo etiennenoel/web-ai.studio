@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
 import {BuiltInAiApi} from '../../enums/built-in-ai-api.enum';
@@ -18,6 +19,7 @@ import {ItemInterface} from '../../core/interfaces/item.interface';
 export class CortexPage implements OnInit {
 
   builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
+  selectedTestIds: Set<string> = new Set<string>();
 
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
 
@@ -31,15 +33,90 @@ export class CortexPage implements OnInit {
     [AxonTestId.PromptTextFactAnalysisColdStart]: {},
     [AxonTestId.PromptTextEthicalAndCreativeColdStart]: {},
     [AxonTestId.PromptTextTechnicalChallengeColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenColdStart]: {},
+    [AxonTestId.PromptImageOcrComputerFontColdStart]: {},
+    [AxonTestId.PromptImageDescribeColdStart]: {},
+    [AxonTestId.PromptImageExplainMemeColdStart]: {},
+    [AxonTestId.PromptImageExplainEmotionColdStart]: {},
     "pretests": {}
   }
 
   constructor(
-    public readonly axonTestSuiteExecutor: AxonTestSuiteExecutor
-    ) {
-  }
+    public readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    this.route.queryParamMap.subscribe(params => {
+      const testsParam = params.get('tests');
+      if (testsParam !== null) {
+        this.selectedTestIds = new Set(testsParam ? testsParam.split('|') : []);
+      } else {
+        this.selectedTestIds = new Set(this.axonTestSuiteExecutor.testsSuite);
+      }
+    });
+  }
+
+  toggleTestSelection(testId: string, event?: Event) {
+    if (event) event.stopPropagation();
+    if (this.selectedTestIds.has(testId)) {
+        this.selectedTestIds.delete(testId);
+    } else {
+        this.selectedTestIds.add(testId);
+    }
+    this.updateUrl();
+  }
+
+  toggleCategorySelection(api: BuiltInAiApi, event?: Event) {
+    if (event) event.stopPropagation();
+    const tests = this.getTests(api);
+    const allSelected = tests.every(t => this.selectedTestIds.has(t.id));
+    if (allSelected) {
+        tests.forEach(t => this.selectedTestIds.delete(t.id));
+    } else {
+        tests.forEach(t => this.selectedTestIds.add(t.id));
+    }
+    this.updateUrl();
+  }
+
+  updateUrl() {
+    const testsArr = Array.from(this.selectedTestIds);
+    this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { tests: testsArr.length === this.axonTestSuiteExecutor.testsSuite.length ? null : testsArr.join('|') },
+        queryParamsHandling: 'merge'
+    });
+  }
+
+  isCategorySelected(api: BuiltInAiApi): boolean {
+    const tests = this.getTests(api);
+    return tests.length > 0 && tests.every(t => this.selectedTestIds.has(t.id));
+  }
+
+  isCategoryPartiallySelected(api: BuiltInAiApi): boolean {
+    const tests = this.getTests(api);
+    if (tests.length === 0) return false;
+    const selectedCount = tests.filter(t => this.selectedTestIds.has(t.id)).length;
+    return selectedCount > 0 && selectedCount < tests.length;
+  }
+
+  isAllSelected(): boolean {
+    return this.selectedTestIds.size === this.axonTestSuiteExecutor.testsSuite.length;
+  }
+
+  isPartiallySelected(): boolean {
+    return this.selectedTestIds.size > 0 && this.selectedTestIds.size < this.axonTestSuiteExecutor.testsSuite.length;
+  }
+
+  toggleAllSelection(event?: Event) {
+    if (event) event.stopPropagation();
+    if (this.isAllSelected()) {
+      this.selectedTestIds.clear();
+    } else {
+      this.selectedTestIds = new Set(this.axonTestSuiteExecutor.testsSuite);
+    }
+    this.updateUrl();
   }
 
   async start() {
@@ -49,12 +126,12 @@ export class CortexPage implements OnInit {
     // Explicitly open the setup details pane so users can watch the status
     this.viewData.pretests.iterationsCollapsed = false;
 
-    await this.axonTestSuiteExecutor.setup();
+    await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
 
     this.viewData.pretests.iterationsCollapsed = true;
 
     // Once everything passes, we can start the tests.
-    await this.axonTestSuiteExecutor.start();
+    await this.axonTestSuiteExecutor.start(this.selectedTestIds);
   }
 
   forceSetup(testId: AxonTestId): Promise<void> {
@@ -92,6 +169,11 @@ export class CortexPage implements OnInit {
     return item.id as BuiltInAiApi;
   }
 
+  get isTestingRunning(): boolean {
+    return this.axonTestSuiteExecutor.results.status === TestStatus.Executing || 
+           this.axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing;
+  }
+
   get currentExecutingTest(): AxonTestInterface | null {
     if (this.axonTestSuiteExecutor.results.status !== TestStatus.Executing) return null;
     
@@ -105,7 +187,8 @@ export class CortexPage implements OnInit {
   }
 
   getApiProgress(api: BuiltInAiApi) {
-    const tests = this.getTests(api);
+    const allTests = this.getTests(api);
+    const tests = allTests.filter(t => this.selectedTestIds.has(t.id));
     if (tests.length === 0) return { total: 0, completed: 0, percentage: 0, passed: 0, failed: 0, executing: 0, idle: 0 };
     let completed = 0;
     let passed = 0;
@@ -137,7 +220,7 @@ export class CortexPage implements OnInit {
   }
 
   getOverallProgress() {
-    const tests = this.axonTestSuiteExecutor.testsSuite;
+    const tests = this.axonTestSuiteExecutor.testsSuite.filter(id => this.selectedTestIds.has(id));
     if (tests.length === 0) return { total: 0, completed: 0, percentage: 0 };
     let completed = 0;
     for (const testId of tests) {
@@ -194,8 +277,8 @@ export class CortexPage implements OnInit {
       case BuiltInAiApi.LanguageDetector: return 'bi-search';
       case BuiltInAiApi.Translator: return 'bi-translate';
       case BuiltInAiApi.Summarizer: return 'bi-card-text';
+      case BuiltInAiApi.PromptWithImage: return 'bi-image';
       case BuiltInAiApi.Prompt:
-      case BuiltInAiApi.PromptWithImage:
       case BuiltInAiApi.PromptWithAudio:
         return 'bi-chat-text';
       case BuiltInAiApi.Proofreader: return 'bi-spellcheck';

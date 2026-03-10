@@ -1,22 +1,22 @@
 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
-      [class.bg-red-50]="status === TestStatus.Fail"
-      [class.text-red-700]="status === TestStatus.Fail"
-      [class.border-red-200]="status === TestStatus.Fail"
+      [class.bg-red-50]="status === TestStatus.Fail || status === TestStatus.Error"
+      [class.text-red-700]="status === TestStatus.Fail || status === TestStatus.Error"
+      [class.border-red-200]="status === TestStatus.Fail || status === TestStatus.Error"
       
       [class.bg-blue-50]="status === TestStatus.Executing"
       [class.text-blue-700]="status === TestStatus.Executing"
       [class.border-blue-200]="status === TestStatus.Executing"
       
-      [class.bg-gray-100]="status === TestStatus.Idle"
-      [class.text-gray-600]="status === TestStatus.Idle"
-      [class.border-gray-200]="status === TestStatus.Idle"
+      [class.bg-gray-100]="status === TestStatus.Idle || status === TestStatus.Skipped"
+      [class.text-gray-600]="status === TestStatus.Idle || status === TestStatus.Skipped"
+      [class.border-gray-200]="status === TestStatus.Idle || status === TestStatus.Skipped"
       
       [class.bg-green-50]="status === TestStatus.Success"
       [class.text-green-700]="status === TestStatus.Success"
       [class.border-green-200]="status === TestStatus.Success">
       
-  @if(status === TestStatus.Fail) {
-    <i class="bi bi-x-circle"></i>
+  @if(status === TestStatus.Fail || status === TestStatus.Error) {
+    <i class="bi bi-x-circle-fill"></i>
   }
   @if(status === TestStatus.Executing) {
     <svg class="animate-spin h-3.5 w-3.5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -27,8 +27,11 @@
   @if(status === TestStatus.Idle) {
     <i class="bi bi-clock"></i>
   }
+  @if(status === TestStatus.Skipped) {
+    <i class="bi bi-dash-circle"></i>
+  }
   @if(status === TestStatus.Success) {
-    <i class="bi bi-check-circle"></i>
+    <i class="bi bi-check-circle-fill"></i>
   }
 
   <span>{{ status }}</span>

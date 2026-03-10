@@ -32,6 +32,11 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import { PromptImageOcrHandwrittenColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-cold-start.axon-test';
+import { PromptImageOcrComputerFontColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
+import { PromptImageDescribeColdStartAxonTest } from './tests/prompt-image/prompt-image-describe-cold-start.axon-test';
+import { PromptImageExplainMemeColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
+import { PromptImageExplainEmotionColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-emotion-cold-start.axon-test';
 import {AxonPreTestResultInterface} from './interfaces/axon-pre-test-result.interface';
 
 @Injectable()
@@ -49,6 +54,11 @@ export class AxonTestSuiteExecutor {
     AxonTestId.PromptTextFactAnalysisColdStart,
     AxonTestId.PromptTextEthicalAndCreativeColdStart,
     AxonTestId.PromptTextTechnicalChallengeColdStart,
+    AxonTestId.PromptImageOcrHandwrittenColdStart,
+    AxonTestId.PromptImageOcrComputerFontColdStart,
+    AxonTestId.PromptImageDescribeColdStart,
+    AxonTestId.PromptImageExplainMemeColdStart,
+    AxonTestId.PromptImageExplainEmotionColdStart,
   ];
 
   results: AxonResultInterface;
@@ -65,6 +75,11 @@ export class AxonTestSuiteExecutor {
     private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
     private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
     private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
+    private readonly promptImageOcrHandwrittenColdStartAxonTest: PromptImageOcrHandwrittenColdStartAxonTest,
+    private readonly promptImageOcrComputerFontColdStartAxonTest: PromptImageOcrComputerFontColdStartAxonTest,
+    private readonly promptImageDescribeColdStartAxonTest: PromptImageDescribeColdStartAxonTest,
+    private readonly promptImageExplainMemeColdStartAxonTest: PromptImageExplainMemeColdStartAxonTest,
+    private readonly promptImageExplainEmotionColdStartAxonTest: PromptImageExplainEmotionColdStartAxonTest,
   ) {
 
     this.testIdMap = {
@@ -77,7 +92,22 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
       [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
       [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenColdStart]: this.promptImageOcrHandwrittenColdStartAxonTest,
+      [AxonTestId.PromptImageOcrComputerFontColdStart]: this.promptImageOcrComputerFontColdStartAxonTest,
+      [AxonTestId.PromptImageDescribeColdStart]: this.promptImageDescribeColdStartAxonTest,
+      [AxonTestId.PromptImageExplainMemeColdStart]: this.promptImageExplainMemeColdStartAxonTest,
+      [AxonTestId.PromptImageExplainEmotionColdStart]: this.promptImageExplainEmotionColdStartAxonTest,
     }
+
+    this.testsSuite.sort((a, b) => {
+      const apiA = this.testIdMap[a].results.api;
+      const apiB = this.testIdMap[b].results.api;
+      if (apiA !== apiB) {
+        const apisArray = Object.values(BuiltInAiApi);
+        return apisArray.indexOf(apiA as BuiltInAiApi) - apisArray.indexOf(apiB as BuiltInAiApi);
+      }
+      return a.localeCompare(b, "en");
+    });
 
     this.results = {
       status: TestStatus.Idle,
@@ -89,38 +119,37 @@ export class AxonTestSuiteExecutor {
     await this.testIdMap[testId].setup();
   }
 
-  async setup(): Promise<void> {
+  async setup(selectedTestIds?: Set<string>): Promise<void> {
     this.results.testsResults = [];
     this.preTestsStatus = TestStatus.Executing;
 
+    const testsToRun = selectedTestIds && selectedTestIds.size > 0 
+      ? this.testsSuite.filter(id => selectedTestIds.has(id))
+      : this.testsSuite;
+
     for (const testSuite of this.testsSuite) {
       const test = this.testIdMap[testSuite];
-
-      // Push the results
       this.results.testsResults.push(test.results);
     }
 
-
     return new Promise(async (resolve, reject) => {
       // Check the status for each API.
-      for (const testSuite of this.testsSuite) {
+      for (const testSuite of testsToRun) {
         const test = this.testIdMap[testSuite];
-
         await test.setup();
       }
 
-      // Check if all setup are in a final state: "available" or "unavailable"
-      if (!this.results.testsResults.find(test => {
+      // Check if all setup for tests to run are in a final state
+      if (!this.results.testsResults.filter(test => testsToRun.includes(test.id as AxonTestId)).find(test => {
         return test.apiAvailability === "downloadable" || test.apiAvailability === "downloading";
       })) {
         this.preTestsStatus = TestStatus.Success;
-
         return resolve();
       }
 
       await new Promise<void>( (resolve1) => {
         setTimeout(async () => {
-          await this.setup();
+          await this.setup(selectedTestIds);
           return resolve1();
         }, 3000);
       })
@@ -130,10 +159,14 @@ export class AxonTestSuiteExecutor {
     })
   }
 
-  async start(): Promise<void> {
+  async start(selectedTestIds?: Set<string>): Promise<void> {
     this.results.status = TestStatus.Executing
 
-    for (const testSuite of this.testsSuite) {
+    const testsToRun = selectedTestIds && selectedTestIds.size > 0 
+      ? this.testsSuite.filter(id => selectedTestIds.has(id))
+      : this.testsSuite;
+
+    for (const testSuite of testsToRun) {
       const test = this.testIdMap[testSuite];
 
       await test.preRun();
