@@ -22,6 +22,7 @@ export class CortexPage implements OnInit {
   selectedTestIds: Set<string> = new Set<string>();
 
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
+  selectedImageUrl: string | null = null;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
@@ -33,7 +34,12 @@ export class CortexPage implements OnInit {
     [AxonTestId.PromptTextFactAnalysisColdStart]: {},
     [AxonTestId.PromptTextEthicalAndCreativeColdStart]: {},
     [AxonTestId.PromptTextTechnicalChallengeColdStart]: {},
-    [AxonTestId.PromptImageOcrHandwrittenColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenName1ColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenName2ColdStart]: {},
+    [AxonTestId.PromptImageOcrHandwrittenName3ColdStart]: {},
     [AxonTestId.PromptImageOcrComputerFontColdStart]: {},
     [AxonTestId.PromptImageDescribeColdStart]: {},
     [AxonTestId.PromptImageExplainMemeColdStart]: {},
@@ -312,4 +318,13 @@ export class CortexPage implements OnInit {
   }
 
   protected readonly TestStatus = TestStatus;
+
+  openImage(url: string, event: Event) {
+    event.stopPropagation();
+    this.selectedImageUrl = url;
+  }
+
+  closeImage() {
+    this.selectedImageUrl = null;
+  }
 }

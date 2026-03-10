@@ -320,7 +320,7 @@
                                                 {{ test.results.input }}
                                               </div>
                                               @if (test.results.inputImageDataUrl) {
-                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-1 shadow-sm flex items-center justify-center">
+                                                <div class="shrink-0 bg-white border border-gray-200 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
                                                   <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
                                                 </div>
                                               }
@@ -428,3 +428,12 @@
       }
     </div>
 </div>
+
+@if (selectedImageUrl) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4" (click)="closeImage()">
+    <button class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors focus:outline-none" (click)="closeImage()">
+      <i class="bi bi-x-lg text-4xl"></i>
+    </button>
+    <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
+  </div>
+}

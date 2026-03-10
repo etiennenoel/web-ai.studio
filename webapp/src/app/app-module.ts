@@ -48,7 +48,12 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
-import { PromptImageOcrHandwrittenColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName1ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName2ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName3ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-name-3-cold-start.axon-test';
 import { PromptImageOcrComputerFontColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
 import { PromptImageDescribeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-describe-cold-start.axon-test';
 import { PromptImageExplainMemeColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
@@ -140,7 +145,12 @@ import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-creat
     PromptTextTechnicalChallengeStartAxonTest,
 
     // Prompt API Image
-    PromptImageOcrHandwrittenColdStartAxonTest,
+    PromptImageOcrHandwrittenLetter1ColdStartAxonTest,
+    PromptImageOcrHandwrittenLetter2ColdStartAxonTest,
+    PromptImageOcrHandwrittenLetter3ColdStartAxonTest,
+    PromptImageOcrHandwrittenName1ColdStartAxonTest,
+    PromptImageOcrHandwrittenName2ColdStartAxonTest,
+    PromptImageOcrHandwrittenName3ColdStartAxonTest,
     PromptImageOcrComputerFontColdStartAxonTest,
     PromptImageDescribeColdStartAxonTest,
     PromptImageExplainMemeColdStartAxonTest,

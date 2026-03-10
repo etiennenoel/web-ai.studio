@@ -32,7 +32,12 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
-import { PromptImageOcrHandwrittenColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName1ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-1-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName2ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-2-cold-start.axon-test';
+import { PromptImageOcrHandwrittenName3ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-name-3-cold-start.axon-test';
 import { PromptImageOcrComputerFontColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-computer-font-cold-start.axon-test';
 import { PromptImageDescribeColdStartAxonTest } from './tests/prompt-image/prompt-image-describe-cold-start.axon-test';
 import { PromptImageExplainMemeColdStartAxonTest } from './tests/prompt-image/prompt-image-explain-meme-cold-start.axon-test';
@@ -54,7 +59,12 @@ export class AxonTestSuiteExecutor {
     AxonTestId.PromptTextFactAnalysisColdStart,
     AxonTestId.PromptTextEthicalAndCreativeColdStart,
     AxonTestId.PromptTextTechnicalChallengeColdStart,
-    AxonTestId.PromptImageOcrHandwrittenColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName1ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName2ColdStart,
+    AxonTestId.PromptImageOcrHandwrittenName3ColdStart,
     AxonTestId.PromptImageOcrComputerFontColdStart,
     AxonTestId.PromptImageDescribeColdStart,
     AxonTestId.PromptImageExplainMemeColdStart,
@@ -75,7 +85,12 @@ export class AxonTestSuiteExecutor {
     private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
     private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
     private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
-    private readonly promptImageOcrHandwrittenColdStartAxonTest: PromptImageOcrHandwrittenColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter1ColdStartAxonTest: PromptImageOcrHandwrittenLetter1ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter2ColdStartAxonTest: PromptImageOcrHandwrittenLetter2ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenLetter3ColdStartAxonTest: PromptImageOcrHandwrittenLetter3ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName1ColdStartAxonTest: PromptImageOcrHandwrittenName1ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName2ColdStartAxonTest: PromptImageOcrHandwrittenName2ColdStartAxonTest,
+    private readonly promptImageOcrHandwrittenName3ColdStartAxonTest: PromptImageOcrHandwrittenName3ColdStartAxonTest,
     private readonly promptImageOcrComputerFontColdStartAxonTest: PromptImageOcrComputerFontColdStartAxonTest,
     private readonly promptImageDescribeColdStartAxonTest: PromptImageDescribeColdStartAxonTest,
     private readonly promptImageExplainMemeColdStartAxonTest: PromptImageExplainMemeColdStartAxonTest,
@@ -92,7 +107,12 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
       [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
       [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
-      [AxonTestId.PromptImageOcrHandwrittenColdStart]: this.promptImageOcrHandwrittenColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart]: this.promptImageOcrHandwrittenLetter1ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart]: this.promptImageOcrHandwrittenLetter2ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart]: this.promptImageOcrHandwrittenLetter3ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName1ColdStart]: this.promptImageOcrHandwrittenName1ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName2ColdStart]: this.promptImageOcrHandwrittenName2ColdStartAxonTest,
+      [AxonTestId.PromptImageOcrHandwrittenName3ColdStart]: this.promptImageOcrHandwrittenName3ColdStartAxonTest,
       [AxonTestId.PromptImageOcrComputerFontColdStart]: this.promptImageOcrComputerFontColdStartAxonTest,
       [AxonTestId.PromptImageDescribeColdStart]: this.promptImageDescribeColdStartAxonTest,
       [AxonTestId.PromptImageExplainMemeColdStart]: this.promptImageExplainMemeColdStartAxonTest,
