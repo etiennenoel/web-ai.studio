@@ -25,14 +25,17 @@ ng build base
 ng build devtools-panel
 ng build on-install
 npm run build:content-script
+npm run build:service-worker
 
 mkdir -p ./release/devtools-panel
 mkdir -p ./release/on-install
 mkdir -p ./release/content-script
+mkdir -p ./release/service-worker
 
 cp -r dist/devtools-panel/browser/* ./release/devtools-panel
 cp -r dist/on-install/browser/* ./release/on-install
 cp -r dist/content-script/* ./release/content-script
+cp -r dist/service-worker/* ./release/service-worker
 
 # Copy Assets
 cp -r ./release/assets ./release/devtools-panel

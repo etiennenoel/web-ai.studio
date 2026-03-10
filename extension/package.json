@@ -12,6 +12,7 @@
     "build:devtools-panel": "ng build devtools-panel",
     "build:on-install": "ng build on-install",
     "build:content-script": "tsc -p projects/content-script/tsconfig.json",
+    "build:service-worker": "tsc -p projects/service-worker/tsconfig.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "package": "./package.sh"

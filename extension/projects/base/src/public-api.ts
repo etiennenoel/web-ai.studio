@@ -15,3 +15,4 @@ export * from './lib/interfaces/api-status-result.interface';
 export * from './lib/services/toast.service';
 export * from './lib/version';
 export * from './lib/config/feature-flags';
+export * from './lib/interfaces/hardware-info.interface';

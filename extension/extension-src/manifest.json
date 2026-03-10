@@ -10,10 +10,13 @@
   "icons": {
     "128": "assets/images/icon.png"
   },
-  "permissions": [],
+  "permissions": [
+    "system.cpu",
+    "system.memory"
+  ],
   "devtools_page": "devtools-loader.html",
   "background": {
-    "service_worker": "service_worker.js",
+    "service_worker": "service-worker/main.js",
     "type": "module"
   },
   "content_scripts": [
