@@ -14,6 +14,7 @@
     "system.cpu",
     "system.memory"
   ],
+  "host_permissions": ["https://web-ai.studio/*", "http://localhost:8200/"],
   "devtools_page": "devtools-loader.html",
   "background": {
     "service_worker": "service-worker.js",
