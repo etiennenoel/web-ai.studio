@@ -5,35 +5,19 @@ declare const chrome: any;
 
 console.log('WebAI Extension Content Script injected.');
 
+// The content script executes in an "isolated world". 
+// This means that even though it shares the same DOM as the host page,
+// it does NOT share the same Javascript context (e.g. the same `window` object).
+// If we attach properties to `window` here, the host page's scripts will never see them.
+// Therefore, we MUST inject a `<script>` tag into the DOM to run code in the host page's context.
+
 // 1. Inject script into the page DOM
 const script = document.createElement('script');
-script.textContent = `
-  window.webai = window.webai || {};
-  window.webai.version = '${APP_VERSION}'; // Matches manifest version
-  
-  window.webai.getHardwareInformation = function(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const messageId = 'webai-hw-info-' + Date.now() + '-' + Math.random();
-      
-      const listener = (event: any) => {
-        if (event.source !== window) return;
-        if (event.data && event.data.type === 'WEBAI_HW_INFO_RESPONSE' && event.data.messageId === messageId) {
-          window.removeEventListener('message', listener);
-          if (event.data.error) {
-            reject(new Error(event.data.error));
-          } else {
-            resolve(event.data.data);
-          }
-        }
-      };
-      
-      window.addEventListener('message', listener);
-      window.postMessage({ type: 'WEBAI_HW_INFO_REQUEST', messageId: messageId }, '*');
-    });
-  };
-`;
+script.src = chrome.runtime.getURL('injected.js');
 (document.head || document.documentElement).appendChild(script);
-script.remove();
+script.onload = () => {
+  script.remove();
+};
 
 // 2. Listen for messages from the injected script
 window.addEventListener('message', async (event) => {

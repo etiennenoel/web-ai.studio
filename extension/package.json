@@ -11,8 +11,7 @@
     "build:base": "ng build base",
     "build:devtools-panel": "ng build devtools-panel",
     "build:on-install": "ng build on-install",
-    "build:content-script": "tsc -p projects/content-script/tsconfig.json",
-    "build:service-worker": "tsc -p projects/service-worker/tsconfig.json",
+    "build:scripts": "esbuild projects/content-script/src/main.ts --bundle --outfile=dist/content-script/main.js && esbuild projects/content-script/src/injected.ts --bundle --outfile=dist/content-script/injected.js && esbuild projects/service-worker/src/main.ts --bundle --outfile=dist/service-worker/main.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "package": "./package.sh"
