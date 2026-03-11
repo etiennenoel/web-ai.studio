@@ -35,13 +35,23 @@ export class HistoryComponent implements OnInit {
   filteredGroups: SessionGroup[] = [];
   
   timeFilter: '5m' | '1h' | '24h' | 'all' = 'all';
-  apiFilter: string = 'all';
+  apiFilter: string[] = [];
+  isApiDropdownOpen: boolean = false;
   
   isLoading = true;
   error: string | null = null;
   wrapApiEnabled: boolean = true;
   
-  availableApis: string[] = ['all', 'LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
+  availableApis: string[] = ['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
+  apiColors: Record<string, string> = {
+    'LanguageModel': 'bg-[#8ab4f8] text-[#202124]',
+    'Summarizer': 'bg-[#f28b82] text-[#202124]',
+    'Translator': 'bg-[#81c995] text-[#202124]',
+    'LanguageDetector': 'bg-[#fbbc04] text-[#202124]',
+    'Writer': 'bg-[#c58af9] text-[#202124]',
+    'Rewriter': 'bg-[#f48fb1] text-[#202124]',
+    'Proofreader': 'bg-[#80cbc4] text-[#202124]'
+  };
 
   showClearConfirm: boolean = false;
   expandedSessions: Set<string> = new Set<string>();
@@ -152,7 +162,7 @@ export class HistoryComponent implements OnInit {
     
     this.filteredGroups = this.sessionGroups.filter(group => {
       const matchTime = this.timeFilter === 'all' || group.timestamp >= timeLimit;
-      const matchApi = this.apiFilter === 'all' || group.api === this.apiFilter;
+      const matchApi = this.apiFilter.length === 0 || this.apiFilter.includes(group.api);
       return matchTime && matchApi;
     });
   }
@@ -162,9 +172,61 @@ export class HistoryComponent implements OnInit {
     this.applyFilters();
   }
 
-  setApiFilter(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.apiFilter = value;
+  getTimeFilterCount(filter: '5m' | '1h' | '24h' | 'all'): number {
+    const now = Date.now();
+    let timeLimit = 0;
+    
+    switch (filter) {
+      case '5m': timeLimit = now - 5 * 60 * 1000; break;
+      case '1h': timeLimit = now - 60 * 60 * 1000; break;
+      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
+    }
+    
+    return this.sessionGroups.filter(group => {
+      const matchTime = filter === 'all' || group.timestamp >= timeLimit;
+      const matchApi = this.apiFilter.length === 0 || this.apiFilter.includes(group.api);
+      return matchTime && matchApi;
+    }).length;
+  }
+
+  getApiFilterCount(api: string): number {
+    const now = Date.now();
+    let timeLimit = 0;
+    
+    switch (this.timeFilter) {
+      case '5m': timeLimit = now - 5 * 60 * 1000; break;
+      case '1h': timeLimit = now - 60 * 60 * 1000; break;
+      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
+    }
+
+    return this.sessionGroups.filter(group => {
+      const matchTime = this.timeFilter === 'all' || group.timestamp >= timeLimit;
+      const matchApi = group.api === api;
+      return matchTime && matchApi;
+    }).length;
+  }
+
+  toggleApiDropdown() {
+    this.isApiDropdownOpen = !this.isApiDropdownOpen;
+  }
+
+  closeApiDropdown() {
+    this.isApiDropdownOpen = false;
+  }
+
+  toggleApiFilter(api: string, event: Event) {
+    event.stopPropagation();
+    if (this.apiFilter.includes(api)) {
+      this.apiFilter = this.apiFilter.filter(a => a !== api);
+    } else {
+      this.apiFilter.push(api);
+    }
+    this.applyFilters();
+  }
+
+  clearApiFilter(event?: Event) {
+    if (event) event.stopPropagation();
+    this.apiFilter = [];
     this.applyFilters();
   }
 

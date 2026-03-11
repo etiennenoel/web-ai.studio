@@ -22,18 +22,50 @@
   <div class="flex flex-wrap gap-4 mb-6">
     <!-- Time Filters -->
     <div class="flex bg-[#292a2d] rounded-md border border-[#3c4043] overflow-hidden">
-      <button (click)="setTimeFilter('all')" [class.bg-[#3c4043]]="timeFilter === 'all'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">All Time</button>
-      <button (click)="setTimeFilter('24h')" [class.bg-[#3c4043]]="timeFilter === '24h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last 24h</button>
-      <button (click)="setTimeFilter('1h')" [class.bg-[#3c4043]]="timeFilter === '1h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last Hour</button>
-      <button (click)="setTimeFilter('5m')" [class.bg-[#3c4043]]="timeFilter === '5m'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors">Last 5m</button>
+      <button (click)="setTimeFilter('all')" [class.bg-[#3c4043]]="timeFilter === 'all'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">All Time ({{ getTimeFilterCount('all') }})</button>
+      <button (click)="setTimeFilter('24h')" [class.bg-[#3c4043]]="timeFilter === '24h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last 24h ({{ getTimeFilterCount('24h') }})</button>
+      <button (click)="setTimeFilter('1h')" [class.bg-[#3c4043]]="timeFilter === '1h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last Hour ({{ getTimeFilterCount('1h') }})</button>
+      <button (click)="setTimeFilter('5m')" [class.bg-[#3c4043]]="timeFilter === '5m'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors">Last 5m ({{ getTimeFilterCount('5m') }})</button>
     </div>
 
     <!-- API Filter -->
-    <div class="flex items-center">
+    <div class="flex items-center relative">
       <label class="text-sm text-gray-400 mr-2">API:</label>
-      <select (change)="setApiFilter($event)" class="bg-[#292a2d] border border-[#3c4043] text-gray-300 text-sm rounded-md px-3 py-2 outline-none focus:border-[#8ab4f8]">
-        <option *ngFor="let api of availableApis" [value]="api">{{ api === 'all' ? 'All APIs' : api }}</option>
-      </select>
+      
+      <div class="relative">
+        <!-- Backdrop to close dropdown -->
+        <div *ngIf="isApiDropdownOpen" class="fixed inset-0 z-20" (click)="closeApiDropdown()"></div>
+        
+        <button (click)="toggleApiDropdown()" class="bg-[#292a2d] border border-[#3c4043] text-sm rounded-md px-3 py-2 outline-none focus:border-[#8ab4f8] flex items-center justify-between min-w-[150px] relative z-30 transition-colors" [class.border-[#8ab4f8]]="isApiDropdownOpen">
+          <div class="flex flex-wrap gap-1 items-center">
+            <span *ngIf="apiFilter.length === 0" class="text-gray-300">All APIs</span>
+            <span *ngFor="let api of apiFilter" class="px-1.5 py-0.5 text-[10px] font-bold rounded" [ngClass]="apiColors[api] || 'bg-gray-500 text-white'">
+              {{ api }}
+            </span>
+          </div>
+          <i class="fa-solid fa-chevron-down text-gray-500 text-xs ml-3 transition-transform" [class.rotate-180]="isApiDropdownOpen"></i>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div *ngIf="isApiDropdownOpen" class="absolute top-full right-0 mt-1 w-64 bg-[#292a2d] border border-[#3c4043] rounded-md shadow-xl z-40 py-2">
+          <div class="px-3 pb-2 mb-2 border-b border-[#3c4043] flex justify-between items-center">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter APIs</span>
+            <button *ngIf="apiFilter.length > 0" (click)="clearApiFilter($event)" class="text-xs text-[#8ab4f8] hover:text-[#aecbfa]">Clear</button>
+          </div>
+          
+          <div class="max-h-60 overflow-y-auto custom-scrollbar">
+            <div *ngFor="let api of availableApis" (click)="toggleApiFilter(api, $event)" class="px-3 py-2 hover:bg-[#303134] cursor-pointer flex items-center justify-between group transition-colors">
+              <span class="px-2 py-1 text-[10px] font-bold rounded" [ngClass]="apiColors[api] || 'bg-gray-500 text-white'">
+                {{ api }} ({{ getApiFilterCount(api) }})
+              </span>
+              <div class="w-4 h-4 rounded border flex items-center justify-center transition-colors" 
+                   [ngClass]="apiFilter.includes(api) ? 'bg-[#8ab4f8] border-[#8ab4f8] text-[#202124]' : 'border-[#5f6368] group-hover:border-[#8ab4f8]'">
+                <i *ngIf="apiFilter.includes(api)" class="fa-solid fa-check text-[10px]"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -68,7 +100,7 @@
           <!-- Main Row -->
           <tr class="hover:bg-[#303134] cursor-pointer transition-colors" (click)="toggleExpand(group.sessionId, $event)">
             <td class="p-3 align-middle border-t border-[#3c4043]">
-              <span class="px-2 py-1 bg-[#8ab4f8] text-[#202124] text-xs font-bold rounded inline-flex items-center gap-2">
+              <span class="px-2 py-1 text-xs font-bold rounded inline-flex items-center gap-2" [ngClass]="apiColors[group.api] || 'bg-gray-500 text-white'">
                 {{ group.api }}
               </span>
             </td>
@@ -176,6 +208,10 @@
         </ng-container>
       </tbody>
     </table>
+  </div>
+  
+  <div *ngIf="!isLoading && filteredGroups.length > 0" class="text-xs text-gray-500 text-center mt-4">
+    {{ filteredGroups.length }} session{{ filteredGroups.length === 1 ? '' : 's' }} shown.
   </div>
 
   <!-- Clear History Confirmation Modal -->
