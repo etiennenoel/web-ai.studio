@@ -205,6 +205,11 @@ export class AxonTestSuiteExecutor {
     for (const testSuite of testsToRun) {
       const test = this.testIdMap[testSuite];
 
+      if (test.results.apiAvailability === "unavailable") {
+        test.results.status = TestStatus.Skipped;
+        continue;
+      }
+
       await test.preRun();
       await test.run();
       await test.postRun();

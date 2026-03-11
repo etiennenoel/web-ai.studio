@@ -247,6 +247,8 @@ export class CortexPage implements OnInit {
         executing++;
       } else if (test.results.status === TestStatus.Idle) {
         idle++;
+      } else if (test.results.status === TestStatus.Skipped) {
+        completed++;
       }
     }
     return {
@@ -267,7 +269,7 @@ export class CortexPage implements OnInit {
     let completed = 0;
     for (const testId of tests) {
       const test = this.axonTestSuiteExecutor.testIdMap[testId];
-      if (test.results.status === TestStatus.Success || test.results.status === TestStatus.Error) {
+      if (test.results.status === TestStatus.Success || test.results.status === TestStatus.Error || test.results.status === TestStatus.Skipped) {
         completed++;
       }
     }
