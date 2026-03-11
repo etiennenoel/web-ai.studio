@@ -41,7 +41,10 @@ export class HistoryComponent implements OnInit {
   error: string | null = null;
   wrapApiEnabled: boolean = true;
   
-  availableApis: string[] = ['all', 'LanguageModel', 'Summarizer', 'Translator', 'Detector', 'Writer', 'Rewriter', 'Proofreader'];
+  availableApis: string[] = ['all', 'LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
+
+  showClearConfirm: boolean = false;
+  expandedSessions: Set<string> = new Set<string>();
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -164,6 +167,86 @@ export class HistoryComponent implements OnInit {
     this.apiFilter = value;
     this.applyFilters();
   }
+
+  promptClearHistory() {
+    this.showClearConfirm = true;
+  }
+
+  cancelClearHistory() {
+    this.showClearConfirm = false;
+  }
+
+  executeClearHistory() {
+    this.showClearConfirm = false;
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (isException || !origin) {
+          this.error = 'Could not get inspected window origin.';
+          this.cdr.detectChanges();
+          return;
+        }
+        
+        chrome.runtime.sendMessage({
+          action: 'clear_api_history',
+          payload: { origin }
+        }, (response: any) => {
+          if (chrome.runtime.lastError) {
+            this.error = chrome.runtime.lastError.message;
+          } else if (response.error) {
+            this.error = response.error;
+          } else {
+            this.loadHistory();
+          }
+          this.cdr.detectChanges();
+        });
+      });
+    } else {
+      this.rawItems = [];
+      this.groupSessions();
+    }
+  }
+
+  toggleExpand(sessionId: string, event: Event) {
+    if ((event.target as HTMLElement).closest('button')) return;
+    if (this.expandedSessions.has(sessionId)) {
+      this.expandedSessions.delete(sessionId);
+    } else {
+      this.expandedSessions.add(sessionId);
+    }
+  }
+
+  isExpanded(sessionId: string): boolean {
+    return this.expandedSessions.has(sessionId);
+  }
+
+  deleteSession(sessionId: string) {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (isException || !origin) {
+          this.error = 'Could not get inspected window origin.';
+          this.cdr.detectChanges();
+          return;
+        }
+        
+        chrome.runtime.sendMessage({
+          action: 'delete_api_session',
+          payload: { origin, sessionId }
+        }, (response: any) => {
+          if (chrome.runtime.lastError) {
+            this.error = chrome.runtime.lastError.message;
+          } else if (response.error) {
+            this.error = response.error;
+          } else {
+            this.loadHistory();
+          }
+          this.cdr.detectChanges();
+        });
+      });
+    } else {
+      this.rawItems = this.rawItems.filter(item => item.sessionId !== sessionId);
+      this.groupSessions();
+    }
+  }
   
   getCreateDuration(item: any): number | null {
     if (item?.timestamps?.create && item?.timestamps?.completed) {
@@ -190,6 +273,18 @@ export class HistoryComponent implements OnInit {
       return item.timestamps.first_token - item.timestamps.execute;
     }
     return null;
+  }
+
+  getGroupStatus(group: SessionGroup): 'completed' | 'error' | 'running' {
+    if (group.createItem?.errorMessage) return 'error';
+    
+    let hasRunning = false;
+    for (const method of group.methodItems) {
+      if (method.errorMessage) return 'error';
+      if (method.response === undefined) hasRunning = true;
+    }
+    
+    return hasRunning ? 'running' : 'completed';
   }
 
   provideFeedback(group: SessionGroup) {

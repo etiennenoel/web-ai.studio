@@ -1,9 +1,14 @@
-<div class="h-full flex flex-col p-6 overflow-hidden">
+<div class="h-full flex flex-col p-6 overflow-hidden relative">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold">API Call History</h1>
-    <button (click)="loadHistory()" class="px-4 py-2 bg-[#8ab4f8] text-[#202124] rounded-md hover:bg-[#aecbfa] transition-colors text-sm font-medium">
-      <i class="fa-solid fa-arrow-rotate-right mr-2"></i>Refresh
-    </button>
+    <div class="flex gap-2">
+      <button (click)="promptClearHistory()" class="px-4 py-2 bg-[#3c4043] text-gray-300 rounded-md hover:bg-[#4a4d51] transition-colors text-sm font-medium">
+        <i class="fa-solid fa-trash-can mr-2"></i>Clear History
+      </button>
+      <button (click)="loadHistory()" class="px-4 py-2 bg-[#8ab4f8] text-[#202124] rounded-md hover:bg-[#aecbfa] transition-colors text-sm font-medium">
+        <i class="fa-solid fa-arrow-rotate-right mr-2"></i>Refresh
+      </button>
+    </div>
   </div>
 
   <div *ngIf="!wrapApiEnabled" class="bg-yellow-900/20 border border-yellow-500/50 text-yellow-200 p-4 rounded-md mb-6 flex items-start gap-3">
@@ -48,94 +53,144 @@
   </div>
 
   <!-- History List -->
-  <div *ngIf="!isLoading && filteredGroups.length > 0" class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-    <div class="space-y-6 pb-4">
-      <div *ngFor="let group of filteredGroups" class="bg-[#292a2d] border border-[#3c4043] rounded-lg p-4 flex flex-col">
-        <div class="flex justify-between items-start mb-4 border-b border-[#3c4043] pb-3">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 bg-[#8ab4f8] text-[#202124] text-xs font-bold rounded">{{ group.api }}</span>
-            <span class="text-xs text-gray-400 font-mono">Session: {{ group.sessionId.substring(0, 8) }}...</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <button (click)="provideFeedback(group)" class="text-xs text-gray-300 bg-[#3c4043] hover:bg-[#4a4d51] px-2 py-1 rounded transition-colors flex items-center gap-1">
-              <i class="fa-regular fa-comment-dots"></i> Submit Feedback
-            </button>
-            <span class="text-xs text-gray-500">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
-          </div>
-        </div>
-
-        <div class="relative pl-4 border-l-2 border-[#3c4043] space-y-6 ml-2">
+  <div *ngIf="!isLoading && filteredGroups.length > 0" class="flex-1 overflow-y-auto custom-scrollbar">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-[#292a2d] sticky top-0 z-10 shadow-sm border-b border-[#3c4043]">
+        <tr>
+          <th class="p-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">API</th>
+          <th class="p-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Session ID</th>
+          <th class="p-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Time</th>
+          <th class="p-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#3c4043]">
+        <ng-container *ngFor="let group of filteredGroups">
+          <!-- Main Row -->
+          <tr class="hover:bg-[#303134] cursor-pointer transition-colors" (click)="toggleExpand(group.sessionId, $event)">
+            <td class="p-3 align-middle border-t border-[#3c4043]">
+              <span class="px-2 py-1 bg-[#8ab4f8] text-[#202124] text-xs font-bold rounded inline-flex items-center gap-2">
+                {{ group.api }}
+              </span>
+            </td>
+            <td class="p-3 align-middle border-t border-[#3c4043]">
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-300 font-mono">{{ group.sessionId.substring(0, 8) }}...</span>
+                <span *ngIf="getGroupStatus(group) === 'error'" class="px-1.5 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+                <span *ngIf="getGroupStatus(group) === 'running'" class="px-1.5 py-0.5 bg-yellow-900/40 text-yellow-300 text-[10px] rounded border border-yellow-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> Running</span>
+                <span *ngIf="getGroupStatus(group) === 'completed'" class="px-1.5 py-0.5 bg-green-900/40 text-green-300 text-[10px] rounded border border-green-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Done</span>
+              </div>
+            </td>
+            <td class="p-3 align-middle border-t border-[#3c4043]">
+              <span class="text-xs text-gray-400">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
+            </td>
+            <td class="p-3 align-middle text-right border-t border-[#3c4043]">
+              <div class="flex items-center justify-end gap-2">
+                <button (click)="provideFeedback(group); $event.stopPropagation()" class="text-xs text-gray-300 bg-[#3c4043] hover:bg-[#4a4d51] px-2 py-1 rounded transition-colors flex items-center gap-1" title="Submit Feedback">
+                  <i class="fa-regular fa-comment-dots"></i> Submit Feedback
+                </button>
+                <button (click)="deleteSession(group.sessionId); $event.stopPropagation()" class="text-xs text-red-300 bg-red-900/30 hover:bg-red-900/50 border border-red-800/30 px-2 py-1 rounded transition-colors flex items-center gap-1" title="Delete Session">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <i class="fa-solid fa-chevron-down text-gray-500 transition-transform ml-2" [class.rotate-180]="isExpanded(group.sessionId)"></i>
+              </div>
+            </td>
+          </tr>
           
-          <!-- Create Step -->
-          <div *ngIf="group.createItem as createItem" class="relative">
-            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#8ab4f8] ring-4 ring-[#292a2d]"></div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-sm font-semibold text-white">create</span>
-              <span *ngIf="createItem.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
-              <span *ngIf="getCreateDuration(createItem) as duration" class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
-            </div>
-            
-            <div *ngIf="createItem.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
-              {{ createItem.errorMessage }}
-            </div>
-
-            <div *ngIf="createItem.options && (createItem.options | json) !== '{}'" class="mt-2 bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
-              <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-              <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ createItem.options | json }}</pre>
-            </div>
-          </div>
-          
-          <div *ngIf="!group.createItem" class="relative">
-            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-gray-600 ring-4 ring-[#292a2d]"></div>
-            <div class="text-sm font-semibold text-gray-500 italic">create (missing)</div>
-          </div>
-
-          <!-- Method Steps -->
-          <ng-container *ngFor="let item of group.methodItems; let last = last">
-            <div class="relative" [class.mb-6]="true">
-              <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-[#292a2d]"></div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-sm font-semibold text-[#e8eaed]">{{ item.method }}</span>
-                <span *ngIf="item.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+          <!-- Expanded Details -->
+          <tr *ngIf="isExpanded(group.sessionId)" class="bg-[#202124]">
+            <td colspan="4" class="p-4 border-b border-[#3c4043]">
+              <div class="relative pl-4 border-l-2 border-[#3c4043] space-y-6 ml-2">
                 
-                <span *ngIf="getDuration(item) as duration" class="text-xs text-gray-500 ml-2"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
-                <span *ngIf="getTtft(item) as ttft" class="text-xs text-gray-500 ml-2"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ ttft }}ms</span>
-              </div>
+                <!-- Create Step -->
+                <div *ngIf="group.createItem as createItem" class="relative">
+                  <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#8ab4f8] ring-4 ring-[#202124]"></div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-sm font-semibold text-white">create</span>
+                    <span *ngIf="createItem.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+                    <span *ngIf="getCreateDuration(createItem) as duration" class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
+                  </div>
+                  
+                  <div *ngIf="createItem.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
+                    {{ createItem.errorMessage }}
+                  </div>
 
-              <div class="grid grid-cols-1 gap-3 mt-2">
-                <div *ngIf="item.options && (item.options | json) !== '{}'" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
-                  <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                  <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ item.options | json }}</pre>
+                  <div *ngIf="createItem.options && (createItem.options | json) !== '{}'" class="mt-2 bg-[#292a2d] rounded p-3 border border-[#3c4043] overflow-hidden">
+                    <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
+                    <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ createItem.options | json }}</pre>
+                  </div>
                 </div>
-                <div *ngIf="item.args && item.args.length > 0" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
-                  <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                  <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+                
+                <div *ngIf="!group.createItem" class="relative">
+                  <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-gray-600 ring-4 ring-[#202124]"></div>
+                  <div class="text-sm font-semibold text-gray-500 italic">create (missing)</div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Result or Error Step -->
-            <div class="relative" [class.mb-6]="!last">
-              <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full ring-4 ring-[#292a2d]"
-                   [ngClass]="item.errorMessage ? 'bg-red-500' : (item.response !== undefined ? 'bg-green-500' : 'bg-yellow-500 animate-pulse')"></div>
-              
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-sm font-semibold" [ngClass]="item.errorMessage ? 'text-red-400' : (item.response !== undefined ? 'text-green-400' : 'text-yellow-400')">
-                  {{ item.errorMessage ? 'error' : (item.response !== undefined ? 'response' : 'running...') }}
-                </span>
-              </div>
+                <!-- Method Steps -->
+                <ng-container *ngFor="let item of group.methodItems; let last = last">
+                  <div class="relative" [class.mb-6]="true">
+                    <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-[#202124]"></div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-sm font-semibold text-[#e8eaed]">{{ item.method }}</span>
+                      <span *ngIf="item.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+                      
+                      <span *ngIf="getDuration(item) as duration" class="text-xs text-gray-500 ml-2"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
+                      <span *ngIf="getTtft(item) as ttft" class="text-xs text-gray-500 ml-2"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ ttft }}ms</span>
+                    </div>
 
-              <div *ngIf="item.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
-                {{ item.errorMessage }}
-              </div>
+                    <div class="grid grid-cols-1 gap-3 mt-2">
+                      <div *ngIf="item.options && (item.options | json) !== '{}'" class="bg-[#292a2d] rounded p-3 border border-[#3c4043] overflow-hidden">
+                        <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
+                        <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ item.options | json }}</pre>
+                      </div>
+                      <div *ngIf="item.args && item.args.length > 0" class="bg-[#292a2d] rounded p-3 border border-[#3c4043] overflow-hidden">
+                        <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
+                        <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+                      </div>
+                    </div>
+                  </div>
 
-              <div *ngIf="item.response !== undefined" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden mt-2">
-                <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.response | json }}</pre>
-              </div>
-            </div>
-          </ng-container>
+                  <!-- Result or Error Step -->
+                  <div class="relative" [class.mb-6]="!last">
+                    <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full ring-4 ring-[#202124]"
+                         [ngClass]="item.errorMessage ? 'bg-red-500' : (item.response !== undefined ? 'bg-green-500' : 'bg-yellow-500 animate-pulse')"></div>
+                    
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-sm font-semibold" [ngClass]="item.errorMessage ? 'text-red-400' : (item.response !== undefined ? 'text-green-400' : 'text-yellow-400')">
+                        {{ item.errorMessage ? 'error' : (item.response !== undefined ? 'response' : 'running...') }}
+                      </span>
+                    </div>
 
-        </div>
+                    <div *ngIf="item.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
+                      {{ item.errorMessage }}
+                    </div>
+
+                    <div *ngIf="item.response !== undefined" class="bg-[#292a2d] rounded p-3 border border-[#3c4043] overflow-hidden mt-2">
+                      <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.response | json }}</pre>
+                    </div>
+                  </div>
+                </ng-container>
+
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Clear History Confirmation Modal -->
+  <div *ngIf="showClearConfirm" class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-[#292a2d] border border-[#3c4043] rounded-lg p-6 shadow-xl max-w-sm w-full mx-4 animate-fade-in-up">
+      <h3 class="text-xl font-bold text-white mb-2">Clear History</h3>
+      <p class="text-gray-400 text-sm mb-6">Are you sure you want to delete all history records for this origin? This action cannot be undone.</p>
+      
+      <div class="flex justify-end gap-3">
+        <button (click)="cancelClearHistory()" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-transparent hover:bg-[#3c4043] rounded transition-colors">
+          Cancel
+        </button>
+        <button (click)="executeClearHistory()" class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors shadow-sm">
+          Yes, clear history
+        </button>
       </div>
     </div>
   </div>

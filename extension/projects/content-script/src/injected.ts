@@ -66,9 +66,25 @@ window.webai.languageModel.getHistory = createHistoryFetcher('LanguageModel');
 window.webai.summarizer = window.webai.summarizer || {};
 window.webai.summarizer.getHistory = createHistoryFetcher('Summarizer');
 
+window.webai.translator = window.webai.translator || {};
+window.webai.translator.getHistory = createHistoryFetcher('Translator');
+
+window.webai.languageDetector = window.webai.languageDetector || {};
+window.webai.languageDetector.getHistory = createHistoryFetcher('LanguageDetector');
+
+window.webai.writer = window.webai.writer || {};
+window.webai.writer.getHistory = createHistoryFetcher('Writer');
+
+window.webai.rewriter = window.webai.rewriter || {};
+window.webai.rewriter.getHistory = createHistoryFetcher('Rewriter');
+
+window.webai.proofreader = window.webai.proofreader || {};
+window.webai.proofreader.getHistory = createHistoryFetcher('Proofreader');
+
 function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
   if (maxDepth < 0) return undefined;
   if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'string') return obj;
   if (typeof obj !== 'object') {
     if (typeof obj === 'function' || typeof obj === 'symbol') return undefined;
     return obj;
@@ -83,10 +99,50 @@ function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
     return obj.map(item => sanitizeForPostMessage(item, maxDepth - 1));
   }
 
-  const result: any = {};
-  for (const key of Object.keys(obj)) {
-    result[key] = sanitizeForPostMessage(obj[key], maxDepth - 1);
+  if (typeof obj.toJSON === 'function') {
+    try {
+      return sanitizeForPostMessage(obj.toJSON(), maxDepth - 1);
+    } catch(e) {}
   }
+
+  const isPrimitiveWrapper = obj instanceof String || obj instanceof Number || obj instanceof Boolean;
+
+  const result: any = {};
+  let hasProps = false;
+  
+  let currentObj = obj;
+  const seenProps = new Set<string>();
+  
+  while (currentObj && currentObj !== Object.prototype && currentObj !== String.prototype && currentObj !== Number.prototype && currentObj !== Boolean.prototype) {
+    for (const key of Object.getOwnPropertyNames(currentObj)) {
+      if (key === 'constructor' || seenProps.has(key)) continue;
+      
+      // Skip array-like index properties and length on String wrappers
+      if (isPrimitiveWrapper && (!isNaN(parseInt(key)) || key === 'length')) continue;
+
+      seenProps.add(key);
+      try {
+        const val = obj[key];
+        if (typeof val !== 'function') {
+          hasProps = true;
+          result[key] = sanitizeForPostMessage(val, maxDepth - 1);
+        }
+      } catch(e) {}
+    }
+    currentObj = Object.getPrototypeOf(currentObj);
+  }
+
+  if (!hasProps) {
+    if (isPrimitiveWrapper) return obj.valueOf();
+    if (typeof obj.toString === 'function' && obj.toString !== Object.prototype.toString) {
+      try { return obj.toString(); } catch(e) {}
+    }
+  }
+
+  if (isPrimitiveWrapper && hasProps) {
+    result.__value = obj.valueOf();
+  }
+
   return result;
 }
 
@@ -169,14 +225,14 @@ function wrapAPI(apiName: string) {
                   try {
                     const result = value.apply(target, args);
                     
-                    if (result instanceof Promise) {
-                      return result.then(res => {
+                    if (result && typeof result.then === 'function') {
+                      return result.then((res: any) => {
                         if (res instanceof ReadableStream) {
                           return handleStream(res, methodCallId, callId, methodName);
                         }
                         emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(res) });
                         return res;
-                      }).catch(err => {
+                      }).catch((err: any) => {
                         emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
                         throw err;
                       });
@@ -206,3 +262,8 @@ function wrapAPI(apiName: string) {
 
 wrapAPI('LanguageModel');
 wrapAPI('Summarizer');
+wrapAPI('Translator');
+wrapAPI('LanguageDetector');
+wrapAPI('Writer');
+wrapAPI('Rewriter');
+wrapAPI('Proofreader');

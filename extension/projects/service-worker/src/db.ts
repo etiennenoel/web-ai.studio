@@ -101,6 +101,47 @@ export class WebAIDatabase {
     });
   }
 
+  async clearHistory(origin: string): Promise<void> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const index = store.index('origin');
+      const request = index.getAllKeys(IDBKeyRange.only(origin));
+
+      request.onsuccess = () => {
+        const keys = request.result || [];
+        keys.forEach(key => store.delete(key));
+        resolve();
+      };
+      
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
+  async deleteSession(origin: string, sessionId: string): Promise<void> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const index = store.index('origin');
+      const request = index.getAll(IDBKeyRange.only(origin));
+
+      request.onsuccess = () => {
+        const results = request.result || [];
+        const toDelete = results.filter((item: any) => item.sessionId === sessionId);
+        toDelete.forEach((item: any) => store.delete(item.id));
+        resolve();
+      };
+      
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
   async getSetting(key: string, defaultValue: any): Promise<any> {
     if (!this.db) {
       await this.init();
