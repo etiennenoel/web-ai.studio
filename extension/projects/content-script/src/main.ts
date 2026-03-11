@@ -11,13 +11,23 @@ console.log('WebAI Extension Content Script injected.');
 // If we attach properties to `window` here, the host page's scripts will never see them.
 // Therefore, we MUST inject a `<script>` tag into the DOM to run code in the host page's context.
 
-// 1. Inject script into the page DOM
-const script = document.createElement('script');
-script.src = chrome.runtime.getURL('injected.js');
-(document.head || document.documentElement).appendChild(script);
-script.onload = () => {
-  script.remove();
-};
+// Check settings before injecting the wrapping script
+chrome.runtime.sendMessage({ action: 'get_setting', key: 'wrap_api', defaultValue: true }, (response: any) => {
+  // If chrome.runtime.lastError occurs, we assume default (true)
+  const wrapApi = response && response.value !== undefined ? response.value : true;
+  
+  if (wrapApi) {
+    // 1. Inject script into the page DOM
+    const script = document.createElement('script');
+    script.src = chrome.runtime.getURL('injected.js');
+    (document.head || document.documentElement).appendChild(script);
+    script.onload = () => {
+      script.remove();
+    };
+  } else {
+    console.log('WebAI Extension: API wrapping is disabled in settings.');
+  }
+});
 
 // 2. Listen for messages from the injected script
 window.addEventListener('message', async (event) => {
@@ -89,6 +99,39 @@ window.addEventListener('message', async (event) => {
         type: 'WEBAI_HW_INFO_RESPONSE', 
         messageId: messageId, 
         data: data 
+      }, '*');
+    });
+  } else if (event.data && event.data.type === 'WEBAI_API_CALL') {
+    // Forward the API call log to the background script
+    chrome.runtime.sendMessage({
+      action: 'log_api_call',
+      payload: event.data.payload
+    }, () => {
+      // Ignore response or error to avoid console warnings
+      if (chrome.runtime.lastError) {
+        // do nothing
+      }
+    });
+  } else if (event.data && event.data.type === 'WEBAI_GET_HISTORY') {
+    const messageId = event.data.messageId;
+    chrome.runtime.sendMessage({
+      action: 'get_api_history',
+      payload: event.data.payload
+    }, (response: any) => {
+      if (chrome.runtime.lastError) {
+        window.postMessage({ 
+          type: 'WEBAI_GET_HISTORY_RESPONSE', 
+          messageId: messageId, 
+          error: chrome.runtime.lastError.message 
+        }, '*');
+        return;
+      }
+      
+      window.postMessage({ 
+        type: 'WEBAI_GET_HISTORY_RESPONSE', 
+        messageId: messageId, 
+        data: response.data,
+        error: response.error
       }, '*');
     });
   }

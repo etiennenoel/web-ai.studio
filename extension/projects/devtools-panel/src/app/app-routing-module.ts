@@ -9,11 +9,14 @@ import { DetectorComponent } from './panels/detector/detector.component';
 import { ProofreaderComponent } from './panels/proofreader/proofreader.component';
 import { WriterComponent } from './panels/writer/writer.component';
 import { RewriterComponent } from './panels/rewriter/rewriter.component';
+import { HistoryComponent } from './panels/history/history.component';
 import { PanelTab } from './enums/panel-tab.enum';
+import { SettingsComponent } from 'base';
 
 const routes: Routes = [
   { path: '', redirectTo: PanelTab.OVERVIEW, pathMatch: 'full' },
   { path: PanelTab.OVERVIEW, component: OverviewComponent },
+  { path: PanelTab.HISTORY, component: HistoryComponent },
   { path: PanelTab.MODELS, component: ModelsComponent },
   { path: PanelTab.PROMPT, component: PromptComponent },
   { path: PanelTab.SUMMARIZER, component: SummarizerComponent },
@@ -22,6 +25,7 @@ const routes: Routes = [
   { path: PanelTab.PROOFREADER, component: ProofreaderComponent },
   { path: PanelTab.WRITER, component: WriterComponent },
   { path: PanelTab.REWRITER, component: RewriterComponent },
+  { path: PanelTab.SETTINGS, component: SettingsComponent },
 ];
 
 @NgModule({

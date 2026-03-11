@@ -9,6 +9,12 @@
                         class="text-gray-400 font-normal">Extension</span></h1>
             </div>
             <div class="flex items-center gap-4">
+                <a routerLink="/settings" class="text-gray-400 hover:text-white transition-colors cursor-pointer" *ngIf="!isSettingsRoute" title="Settings">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </a>
+                <a routerLink="/" class="text-gray-400 hover:text-white transition-colors cursor-pointer" *ngIf="isSettingsRoute" title="Home">
+                    <i class="fa-solid fa-home text-lg"></i>
+                </a>
                 <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded border border-blue-700">v{{ appVersion }}</span>
             </div>
         </div>
@@ -16,7 +22,8 @@
 
     <!-- Hero Section -->
     <main class="flex-1">
-        <section class="py-16 text-center px-4">
+        <div *ngIf="!isSettingsRoute">
+            <section class="py-16 text-center px-4">
             <div class="max-w-3xl mx-auto">
                 <div class="inline-block mb-4">
                     <span
@@ -246,6 +253,11 @@
                 </div>
             </div>
         </section>
+        </div>
+        
+        <div *ngIf="isSettingsRoute" class="flex justify-center items-start pt-16 h-full">
+            <router-outlet></router-outlet>
+        </div>
 
     </main>
 

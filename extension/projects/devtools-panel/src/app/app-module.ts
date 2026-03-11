@@ -17,6 +17,7 @@ import { DetectorComponent } from './panels/detector/detector.component';
 import { ProofreaderComponent } from './panels/proofreader/proofreader.component';
 import { WriterComponent } from './panels/writer/writer.component';
 import { RewriterComponent } from './panels/rewriter/rewriter.component';
+import { HistoryComponent } from './panels/history/history.component';
 import { ModelDownloadCard } from './components/model-download-card/model-download-card';
 import { ApiStatusComponent } from './components/api-status/api-status.component';
 import {BaseModule} from "base";
@@ -28,6 +29,7 @@ import {BaseModule} from "base";
     ToastComponent,
     HistoryListComponent,
     OverviewComponent,
+    HistoryComponent,
     ModelsComponent,
     PromptComponent,
     SummarizerComponent,
