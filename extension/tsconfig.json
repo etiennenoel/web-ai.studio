@@ -46,6 +46,12 @@
     },
     {
       "path": "./projects/base/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/popup/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/popup/tsconfig.spec.json"
     }
   ]
 }

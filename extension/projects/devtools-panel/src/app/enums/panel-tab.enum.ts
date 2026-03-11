@@ -4,6 +4,7 @@
  */
 export enum PanelTab {
     OVERVIEW = 'overview',
+    HISTORY = 'history',
     PROMPT = 'prompt',
     SUMMARIZER = 'summarizer',
     TRANSLATOR = 'translator',
@@ -12,4 +13,5 @@ export enum PanelTab {
     WRITER = 'writer',
     REWRITER = 'rewriter',
     MODELS = 'models',
+    SETTINGS = 'settings',
 }
