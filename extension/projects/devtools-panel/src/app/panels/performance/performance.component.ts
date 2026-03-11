@@ -66,6 +66,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedApis: Set<string> = new Set<string>(['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader']);
   
   hoveredApi: string | null = null;
+
+  expandedApi: string | null = null;
+  hoveredSession: string | null = null;
+  expandedSessions: Set<string> = new Set<string>();
+
   
   isLoading = true;
   error: string | null = null;
@@ -272,6 +277,114 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setHoveredApi(null);
   }
 
+
+  toggleExpandApi(api: string) {
+    if (this.expandedApi === api) {
+      this.expandedApi = null;
+    } else {
+      this.expandedApi = api;
+    }
+  }
+
+  getGroupsForApi(api: string): SessionGroup[] {
+    return this.timeFilteredGroups.filter(g => g.api === api).reverse();
+  }
+
+  setHoveredSession(sessionId: string | null) {
+    if (this.hoveredSession === sessionId) return;
+    this.hoveredSession = sessionId;
+    if (this.chart) {
+      this.chart.update('none');
+    }
+  }
+
+  getPointColor(ctx: any, defaultColor: string): string {
+    if (!ctx.raw || !this.hoveredSession) return defaultColor;
+    return ctx.raw.session === this.hoveredSession.substring(0, 8) ? '#ffffff' : defaultColor;
+  }
+
+  getPointRadius(ctx: any): number {
+    if (!ctx.raw || !this.hoveredSession) return 4;
+    return ctx.raw.session === this.hoveredSession.substring(0, 8) ? 8 : 4;
+  }
+
+  toggleExpandSession(sessionId: string, event: Event) {
+    if ((event.target as HTMLElement).closest('button')) return;
+    if (this.expandedSessions.has(sessionId)) {
+      this.expandedSessions.delete(sessionId);
+    } else {
+      this.expandedSessions.add(sessionId);
+    }
+  }
+
+  isSessionExpanded(sessionId: string): boolean {
+    return this.expandedSessions.has(sessionId);
+  }
+
+  getCreateDuration(item: any): number | null {
+    if (item?.timestamps?.create && item?.timestamps?.completed) {
+      return item.timestamps.completed - item.timestamps.create;
+    }
+    if (item?.timestamps?.create && item?.timestamps?.error) {
+      return item.timestamps.error - item.timestamps.create;
+    }
+    return null;
+  }
+  
+  getDuration(item: any): number | null {
+    if (item?.timestamps?.execute && item?.timestamps?.completed) {
+      return item.timestamps.completed - item.timestamps.execute;
+    }
+    if (item?.timestamps?.execute && item?.timestamps?.error) {
+      return item.timestamps.error - item.timestamps.execute;
+    }
+    return null;
+  }
+  
+  getTtft(item: any): number | null {
+    if (item?.timestamps?.execute && item?.timestamps?.first_token) {
+      return item.timestamps.first_token - item.timestamps.execute;
+    }
+    return null;
+  }
+
+  getGroupStatus(group: SessionGroup): 'completed' | 'error' | 'running' {
+    if (group.createItem?.errorMessage) return 'error';
+    let hasRunning = false;
+    for (const method of group.methodItems) {
+      if (method.errorMessage) return 'error';
+      if (method.response === undefined) hasRunning = true;
+    }
+    return hasRunning ? 'running' : 'completed';
+  }
+  
+  provideFeedback(group: SessionGroup) {
+    const dataStr = JSON.stringify(group, null, 2);
+    const issueBody = `I'm reporting an issue with the following session:\n\n\`\`\`json\n${dataStr}\n\`\`\`\n\n**Additional Feedback:**\n`;
+    const encodedBody = encodeURIComponent(issueBody);
+    const url = `https://github.com/etiennenoel/web-ai.studio/issues/new?title=Feedback%20on%20${group.api}%20Session&body=${encodedBody}`;
+    window.open(url, '_blank');
+  }
+
+  deleteSession(sessionId: string) {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (!isException && origin) {
+          chrome.runtime.sendMessage({
+            action: 'delete_api_session',
+            payload: { origin, sessionId }
+          }, () => {
+            this.loadHistory();
+          });
+        }
+      });
+    } else {
+      this.rawItems = this.rawItems.filter(item => item.sessionId !== sessionId && item.id !== sessionId);
+      this.groupSessions();
+    }
+  }
+
+
   calculateStats() {
     const apiData: Record<string, {
       success: number;
@@ -393,11 +506,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
           apiName: api,
           data: createDataPoints,
           borderColor: color,
-          backgroundColor: color,
+          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
           borderWidth: 2,
           borderDash: [2, 2],
           tension: 0.2,
-          pointRadius: 4,
+          pointRadius: (ctx: any) => this.getPointRadius(ctx),
           pointHoverRadius: 6
         });
       }
@@ -407,11 +520,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
           apiName: api,
           data: ttftDataPoints,
           borderColor: color,
-          backgroundColor: color,
+          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
           borderWidth: 2,
           borderDash: [5, 5],
           tension: 0.2,
-          pointRadius: 4,
+          pointRadius: (ctx: any) => this.getPointRadius(ctx),
           pointHoverRadius: 6
         });
       }
@@ -421,10 +534,10 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
           apiName: api,
           data: inferenceDataPoints,
           borderColor: color,
-          backgroundColor: color,
+          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
           borderWidth: 2,
           tension: 0.2,
-          pointRadius: 4,
+          pointRadius: (ctx: any) => this.getPointRadius(ctx),
           pointHoverRadius: 6
         });
       }
