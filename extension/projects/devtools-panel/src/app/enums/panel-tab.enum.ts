@@ -4,6 +4,7 @@
  */
 export enum PanelTab {
     OVERVIEW = 'overview',
+    PERFORMANCE = 'performance',
     HISTORY = 'history',
     PROMPT = 'prompt',
     SUMMARIZER = 'summarizer',

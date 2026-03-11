@@ -1,0 +1,131 @@
+<div class="h-full flex flex-col p-6 overflow-hidden relative">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">API Performance</h1>
+    <div class="flex gap-2">
+      <button (click)="loadHistory()" class="px-4 py-2 bg-[#8ab4f8] text-[#202124] rounded-md hover:bg-[#aecbfa] transition-colors text-sm font-medium">
+        <i class="fa-solid fa-arrow-rotate-right mr-2"></i>Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-4 mb-6">
+    <!-- Time Filters -->
+    <div class="flex bg-[#292a2d] rounded-md border border-[#3c4043] overflow-hidden">
+      <button (click)="setTimeFilter('all')" [class.bg-[#3c4043]]="timeFilter === 'all'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">All Time ({{ getTimeFilterCount('all') }})</button>
+      <button (click)="setTimeFilter('24h')" [class.bg-[#3c4043]]="timeFilter === '24h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last 24h ({{ getTimeFilterCount('24h') }})</button>
+      <button (click)="setTimeFilter('1h')" [class.bg-[#3c4043]]="timeFilter === '1h'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors border-r border-[#3c4043]">Last Hour ({{ getTimeFilterCount('1h') }})</button>
+      <button (click)="setTimeFilter('5m')" [class.bg-[#3c4043]]="timeFilter === '5m'" class="px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] transition-colors">Last 5m ({{ getTimeFilterCount('5m') }})</button>
+    </div>
+  </div>
+
+  <!-- Loading & Error States -->
+  <div *ngIf="isLoading" class="flex-1 flex justify-center items-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#8ab4f8]"></div>
+  </div>
+  
+  <div *ngIf="error" class="bg-red-900/20 border border-red-500/50 text-red-200 p-4 rounded-md mb-6">
+    <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ error }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && timeFilteredGroups.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
+    <i class="fa-solid fa-chart-line text-4xl mb-4 text-gray-600"></i>
+    <p>No API performance data found for the selected filters.</p>
+  </div>
+
+  <div *ngIf="!isLoading && !error && timeFilteredGroups.length > 0" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6 pr-2">
+    
+    <!-- Chart Section -->
+    <div class="bg-[#292a2d] border border-[#3c4043] rounded-lg p-4 flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-[#e8eaed]">Execution Time Plot</h2>
+        <div class="flex items-center gap-4 text-xs text-gray-400">
+          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-dotted"></span> Creation Time</div>
+          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-dashed"></span> TTFT</div>
+          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-solid"></span> Inference Time</div>
+        </div>
+      </div>
+      
+      <div class="relative w-full h-[300px]">
+        <canvas #performanceChart></canvas>
+      </div>
+    </div>
+
+    <!-- Stats Table Section -->
+    <div class="bg-[#292a2d] border border-[#3c4043] rounded-lg p-4 flex flex-col">
+      <h2 class="text-lg font-bold text-[#e8eaed] mb-4">Performance Statistics</h2>
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead class="bg-[#202124] sticky top-0 shadow-sm border-b border-[#3c4043]">
+            <tr>
+              <th colspan="3" class="p-2 border-b border-r border-[#3c4043]"></th>
+              <th colspan="5" class="p-2 font-bold text-gray-300 text-center uppercase tracking-wider border-b border-r border-[#3c4043]">TTFT</th>
+              <th colspan="5" class="p-2 font-bold text-gray-300 text-center uppercase tracking-wider border-b border-r border-[#3c4043]">Creation Time</th>
+              <th colspan="5" class="p-2 font-bold text-gray-300 text-center uppercase tracking-wider border-b border-[#3c4043]">Inference Time</th>
+            </tr>
+            <tr>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-center w-8 border-r border-[#3c4043]">
+                <input type="checkbox" class="rounded border-[#3c4043] bg-[#292a2d] text-[#8ab4f8] focus:ring-[#8ab4f8]"
+                       [checked]="selectedApis.size === availableApis.length"
+                       (change)="toggleAllApis($event)">
+              </th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider">API</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider">Success</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider border-r border-[#3c4043]">Errors</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Avg</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Med</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p90</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p95</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider border-r border-[#3c4043] text-right">p99</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Avg</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Med</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p90</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p95</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider border-r border-[#3c4043] text-right">p99</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Avg</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">Med</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p90</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p95</th>
+              <th class="p-3 font-semibold text-gray-400 uppercase tracking-wider text-right">p99</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#3c4043]">
+            <tr *ngFor="let stat of stats" class="transition-colors cursor-pointer" 
+                [class.bg-[#303134]]="hoveredApi === stat.api" 
+                [class.hover:bg-[#303134]]="true"
+                (mouseenter)="onRowHover(stat.api)"
+                (mouseleave)="onRowLeave()">
+              <td class="p-3 border-t border-[#3c4043] text-center border-r" (click)="$event.stopPropagation()">
+                <input type="checkbox" class="rounded border-[#3c4043] bg-[#292a2d] text-[#8ab4f8] focus:ring-[#8ab4f8]"
+                       [checked]="selectedApis.has(stat.api)"
+                       (change)="toggleApiFilter(stat.api, $event)">
+              </td>
+              <td class="p-3 border-t border-[#3c4043]" (click)="toggleApiFilter(stat.api, $event)">
+                <span class="px-2 py-1 text-[10px] font-bold rounded" [style.color]="'#202124'" [style.backgroundColor]="apiColors[stat.api] ? apiColors[stat.api].match(/#\w+/)![0] : '#6b7280'">
+                  {{ stat.api }}
+                </span>
+              </td>
+              <td class="p-3 text-green-400 font-mono border-t border-[#3c4043]">{{ stat.success }}</td>
+              <td class="p-3 text-red-400 font-mono border-t border-r border-[#3c4043]">{{ stat.errors }}</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.avgTtft | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.medianTtft | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p90Ttft | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p95Ttft | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-r border-[#3c4043] text-right">{{ stat.p99Ttft | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.avgCreate | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.medianCreate | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p90Create | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p95Create | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-r border-[#3c4043] text-right">{{ stat.p99Create | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.avgInference | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.medianInference | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p90Inference | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p95Inference | number:'1.0-0' }} ms</td>
+              <td class="p-3 text-gray-300 font-mono border-t border-[#3c4043] text-right">{{ stat.p99Inference | number:'1.0-0' }} ms</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
