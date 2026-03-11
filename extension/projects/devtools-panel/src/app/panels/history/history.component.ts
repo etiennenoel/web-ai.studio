@@ -13,6 +13,7 @@ export interface HistoryItem {
   options?: any;
   args?: any[];
   errorMessage?: string;
+  response?: any;
 }
 
 export interface SessionGroup {
@@ -189,5 +190,13 @@ export class HistoryComponent implements OnInit {
       return item.timestamps.first_token - item.timestamps.execute;
     }
     return null;
+  }
+
+  provideFeedback(group: SessionGroup) {
+    const dataStr = JSON.stringify(group, null, 2);
+    const issueBody = `I'm reporting an issue with the following session:\n\n\`\`\`json\n${dataStr}\n\`\`\`\n\n**Additional Feedback:**\n`;
+    const encodedBody = encodeURIComponent(issueBody);
+    const url = `https://github.com/etiennenoel/web-ai.studio/issues/new?title=Feedback%20on%20${group.api}%20Session&body=${encodedBody}`;
+    window.open(url, '_blank');
   }
 }

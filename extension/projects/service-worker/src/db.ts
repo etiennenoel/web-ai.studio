@@ -65,6 +65,7 @@ export class WebAIDatabase {
         if (data.errorMessage !== undefined) record.errorMessage = data.errorMessage;
         if (data.options !== undefined) record.options = data.options;
         if (data.args !== undefined) record.args = data.args;
+        if (data.response !== undefined) record.response = data.response;
 
         const putReq = store.put(record);
         putReq.onsuccess = () => resolve();

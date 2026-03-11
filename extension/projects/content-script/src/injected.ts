@@ -119,17 +119,21 @@ function wrapAPI(apiName: string) {
       const handleStream = (stream: ReadableStream, callId: string, sessionId: string, method: string) => {
         const reader = stream.getReader();
         let firstTokenSeen = false;
+        let accumulatedResponse = '';
         return new ReadableStream({
           async pull(controller) {
             try {
               const { done, value } = await reader.read();
               if (done) {
-                emitStage(callId, sessionId, method, 'completed');
+                emitStage(callId, sessionId, method, 'completed', { response: accumulatedResponse });
                 controller.close();
               } else {
                 if (!firstTokenSeen) {
                   firstTokenSeen = true;
                   emitStage(callId, sessionId, method, 'first_token');
+                }
+                if (typeof value === 'string') {
+                  accumulatedResponse += value;
                 }
                 controller.enqueue(value);
               }
@@ -170,7 +174,7 @@ function wrapAPI(apiName: string) {
                         if (res instanceof ReadableStream) {
                           return handleStream(res, methodCallId, callId, methodName);
                         }
-                        emitStage(methodCallId, callId, methodName, 'completed');
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(res) });
                         return res;
                       }).catch(err => {
                         emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
@@ -179,7 +183,7 @@ function wrapAPI(apiName: string) {
                     } else if (result instanceof ReadableStream) {
                       return handleStream(result, methodCallId, callId, methodName);
                     } else {
-                      emitStage(methodCallId, callId, methodName, 'completed');
+                      emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(result) });
                       return result;
                     }
                   } catch (err: any) {

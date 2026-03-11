@@ -56,7 +56,12 @@
             <span class="px-2 py-1 bg-[#8ab4f8] text-[#202124] text-xs font-bold rounded">{{ group.api }}</span>
             <span class="text-xs text-gray-400 font-mono">Session: {{ group.sessionId.substring(0, 8) }}...</span>
           </div>
-          <span class="text-xs text-gray-500">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
+          <div class="flex items-center gap-3">
+            <button (click)="provideFeedback(group)" class="text-xs text-gray-300 bg-[#3c4043] hover:bg-[#4a4d51] px-2 py-1 rounded transition-colors flex items-center gap-1">
+              <i class="fa-regular fa-comment-dots"></i> Submit Feedback
+            </button>
+            <span class="text-xs text-gray-500">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
+          </div>
         </div>
 
         <div class="relative pl-4 border-l-2 border-[#3c4043] space-y-6 ml-2">
@@ -86,31 +91,49 @@
           </div>
 
           <!-- Method Steps -->
-          <div *ngFor="let item of group.methodItems" class="relative">
-            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-[#292a2d]"></div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-sm font-semibold text-[#e8eaed]">{{ item.method }}</span>
-              <span *ngIf="item.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+          <ng-container *ngFor="let item of group.methodItems; let last = last">
+            <div class="relative" [class.mb-6]="true">
+              <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-[#292a2d]"></div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm font-semibold text-[#e8eaed]">{{ item.method }}</span>
+                <span *ngIf="item.timestamps?.error" class="px-2 py-0.5 bg-red-900/40 text-red-300 text-[10px] rounded border border-red-800/50">Error</span>
+                
+                <span *ngIf="getDuration(item) as duration" class="text-xs text-gray-500 ml-2"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
+                <span *ngIf="getTtft(item) as ttft" class="text-xs text-gray-500 ml-2"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ ttft }}ms</span>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3 mt-2">
+                <div *ngIf="item.options && (item.options | json) !== '{}'" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
+                  <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
+                  <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ item.options | json }}</pre>
+                </div>
+                <div *ngIf="item.args && item.args.length > 0" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
+                  <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
+                  <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result or Error Step -->
+            <div class="relative" [class.mb-6]="!last">
+              <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full ring-4 ring-[#292a2d]"
+                   [ngClass]="item.errorMessage ? 'bg-red-500' : (item.response !== undefined ? 'bg-green-500' : 'bg-yellow-500 animate-pulse')"></div>
               
-              <span *ngIf="getDuration(item) as duration" class="text-xs text-gray-500 ml-2"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
-              <span *ngIf="getTtft(item) as ttft" class="text-xs text-gray-500 ml-2"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ ttft }}ms</span>
-            </div>
-
-            <div *ngIf="item.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
-              {{ item.errorMessage }}
-            </div>
-
-            <div class="grid grid-cols-1 gap-3 mt-2">
-              <div *ngIf="item.options && (item.options | json) !== '{}'" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
-                <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                <pre class="text-xs text-gray-300 overflow-x-auto m-0">{{ item.options | json }}</pre>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm font-semibold" [ngClass]="item.errorMessage ? 'text-red-400' : (item.response !== undefined ? 'text-green-400' : 'text-yellow-400')">
+                  {{ item.errorMessage ? 'error' : (item.response !== undefined ? 'response' : 'running...') }}
+                </span>
               </div>
-              <div *ngIf="item.args && item.args.length > 0" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden">
-                <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+
+              <div *ngIf="item.errorMessage" class="text-xs text-red-300 bg-red-900/20 p-2 rounded border border-red-800/30 mt-2 inline-block">
+                {{ item.errorMessage }}
+              </div>
+
+              <div *ngIf="item.response !== undefined" class="bg-[#202124] rounded p-3 border border-[#3c4043] overflow-hidden mt-2">
+                <pre class="text-xs text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.response | json }}</pre>
               </div>
             </div>
-          </div>
+          </ng-container>
 
         </div>
       </div>
