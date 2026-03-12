@@ -44,13 +44,13 @@ export class HistoryComponent implements OnInit {
   
   availableApis: string[] = ['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
   apiColors: Record<string, string> = {
-    'LanguageModel': 'bg-[#8ab4f8] text-[#202124]',
-    'Summarizer': 'bg-[#f28b82] text-[#202124]',
-    'Translator': 'bg-[#81c995] text-[#202124]',
-    'LanguageDetector': 'bg-[#fbbc04] text-[#202124]',
-    'Writer': 'bg-[#c58af9] text-[#202124]',
-    'Rewriter': 'bg-[#f48fb1] text-[#202124]',
-    'Proofreader': 'bg-[#80cbc4] text-[#202124]'
+    'LanguageModel': '#8ab4f8',
+    'Summarizer': '#f28b82',
+    'Translator': '#81c995',
+    'LanguageDetector': '#fbbc04',
+    'Writer': '#c58af9',
+    'Rewriter': '#f48fb1',
+    'Proofreader': '#80cbc4'
   };
 
   showClearConfirm: boolean = false;

@@ -4,31 +4,48 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #202124;
-  color: #e8eaed;
+  background-color: #ffffff;
+  color: #111827;
   min-width: 450px;
   min-height: 400px;
 }
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #202124;
+    color: #e8eaed;
+  }
+}
 
 .gradient-text {
-  background: linear-gradient(90deg, #60a5fa, #a78bfa);
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-.feature-card {
-  background-color: #292a2d;
-  border: 1px solid #3c4043;
-  transition: all 0.3s ease;
+@media (prefers-color-scheme: dark) {
+  .gradient-text {
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
+
+.feature-card {
+  transition: all 0.3s ease;
+}
 .feature-card:hover {
-  border-color: #60a5fa;
   transform: translateY(-2px);
 }
 
 .step-circle {
-  background: #202124;
-  border: 2px solid #60a5fa;
-  color: #60a5fa;
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+  .step-circle {
+    background: #202124;
+    border: 2px solid #60a5fa;
+    color: #60a5fa;
+  }
 }

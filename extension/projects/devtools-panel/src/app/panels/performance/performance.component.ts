@@ -543,7 +543,13 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDark ? '#9aa0a6' : '#4b5563'; // gray-600 in light mode
+    const gridColor = isDark ? '#3c4043' : '#e5e7eb'; // gray-200 in light mode
+
     this.chart = new Chart(ctx, {
+
       type: 'line',
       data: {
         datasets
@@ -583,26 +589,26 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
             title: {
               display: true,
               text: 'Time',
-              color: '#9aa0a6'
+              color: textColor
             },
             ticks: {
-              color: '#9aa0a6'
+              color: textColor
             },
             grid: {
-              color: '#3c4043'
+              color: gridColor
             }
           },
           y: {
             title: {
               display: true,
               text: 'Execution Time (ms)',
-              color: '#9aa0a6'
+              color: textColor
             },
             ticks: {
-              color: '#9aa0a6'
+              color: textColor
             },
             grid: {
-              color: '#3c4043'
+              color: gridColor
             },
             beginAtZero: true
           }
