@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,13 +11,13 @@ declare const chrome: any;
   template: `
     <div class="h-full flex flex-col bg-white dark:bg-[#202124] text-gray-900 dark:text-[#e8eaed]">
       <!-- Header -->
-      <div class="border-b border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] px-6 py-4 flex items-center gap-3">
+      <div *ngIf="showHeader" class="border-b border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] px-6 py-4 flex items-center gap-3">
         <h2 class="text-lg font-bold tracking-wide">Settings</h2>
       </div>
 
       <!-- Content -->
       <div class="p-6 flex-1 overflow-y-auto">
-        <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-4">Settings</h3>
+        <h3 *ngIf="showHeader" class="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-4">Settings</h3>
         
         <div class="space-y-4">
           <label class="flex items-start gap-4 cursor-pointer group p-4 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] hover:border-gray-400 dark:hover:border-[#5f6368] rounded-xl transition-all">
@@ -48,6 +48,8 @@ declare const chrome: any;
   styles: []
 })
 export class SettingsComponent implements OnInit {
+  @Input() showHeader: boolean = true;
+  
   wrapApiEnabled: boolean = true;
   loading: boolean = true;
   savedMessage: boolean = false;
