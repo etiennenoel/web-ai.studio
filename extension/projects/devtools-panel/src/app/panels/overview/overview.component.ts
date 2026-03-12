@@ -26,7 +26,7 @@ export class OverviewComponent implements OnInit {
   // System Status
   modelStatusText = 'Checking...';
   modelVariant = '-';
-  modelStatusClass = 'bg-gray-500';
+  modelStatusClass = 'bg-gray-300 dark:bg-gray-500';
 
   vramUsage = '-';
   storageTotal = '-';
@@ -94,7 +94,7 @@ export class OverviewComponent implements OnInit {
     } else {
         this.modelStatusText = 'Not Available';
         this.modelVariant = '-';
-        this.modelStatusClass = 'bg-gray-500';
+        this.modelStatusClass = 'bg-gray-300 dark:bg-gray-500';
     }
   }
 
@@ -165,16 +165,16 @@ export class OverviewComponent implements OnInit {
     switch (status) {
         case 'available':
         case 'readily':
-            return 'bg-[#1e3a2a] text-[#4ade80] border-[#14532d]';
+            return 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-800/50 border-0';
         case 'downloading':
         case 'downloadable':
         case 'after-download':
-            return 'bg-blue-900/30 text-blue-400 border-blue-800';
+            return 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-800/50 border-0';
         case 'unavailable':
         case 'error':
-            return 'bg-red-900/30 text-red-400 border-red-800';
+            return 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-800/50 border-0';
         default:
-            return 'bg-gray-700 text-gray-400 border-gray-600';
+            return 'bg-gray-50 dark:bg-gray-800/50 text-gray-800 dark:text-gray-400 ring-1 ring-inset ring-gray-600/20 dark:ring-gray-700/50 border-0';
     }
   }
 

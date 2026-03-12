@@ -69,6 +69,7 @@ Because of the folder structure created by package.sh, references in extension-s
 * **Routing:** Use HashLocationStrategy (e.g., provideRouter(routes, withHashLocation())). PushState routing does not work in extensions.
 * **Zone.js:** Wrap all Chrome API callbacks (e.g., chrome.runtime.onMessage) inside ngZone.run(() \=\> { ... }) to ensure UI updates.
 * **Asset References:** In HTML/SCSS, use relative paths (e.g., src="./assets/logo.png"), never absolute paths.
+* **No CDNs:** NEVER use external CDNs (e.g., `<link rel="stylesheet" href="https://cdnjs...">`) in `index.html` or other extension files. Chrome extensions have strict Content Security Policies (CSP) and offline requirements. Always install libraries via `npm` (e.g., `@fortawesome/fontawesome-free`) and bundle them directly via the `styles` or `scripts` array in `angular.json`.
 
 ### **6\. Development Workflow**
 

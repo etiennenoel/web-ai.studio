@@ -9,7 +9,14 @@
 .status-amber { background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
 
 .nav-btn.active-nav {
-    background-color: #35363a;
-    color: #60a5fa; /* blue-400 */
-    border-left-color: #60a5fa;
+    background-color: #e5e7eb; /* gray-200 in light mode */
+    color: #2563eb; /* blue-600 */
+    border-left-color: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+    .nav-btn.active-nav {
+        background-color: #35363a;
+        color: #60a5fa; /* blue-400 */
+        border-left-color: #60a5fa;
+    }
 }

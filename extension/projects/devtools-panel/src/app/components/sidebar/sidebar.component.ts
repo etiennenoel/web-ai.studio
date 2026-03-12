@@ -13,6 +13,7 @@ export class SidebarComponent {
   appVersion = APP_VERSION;
   readonly menuItems: MenuItemConfig[] = [
     { id: PanelTab.OVERVIEW, label: 'Overview', iconClass: 'fa-solid fa-gauge-high', isApi: false, isManagement: false },
+    { id: PanelTab.PERFORMANCE, label: 'Performance', iconClass: 'fa-solid fa-chart-line', isApi: false, isManagement: false },
     { id: PanelTab.HISTORY, label: 'History', iconClass: 'fa-solid fa-clock-rotate-left', isApi: false, isManagement: false },
     { id: PanelTab.SETTINGS, label: 'Settings', iconClass: 'fa-solid fa-gear', isApi: false, isManagement: false },
     { id: PanelTab.MODELS, label: 'Models', iconClass: 'fa-solid fa-layer-group', isApi: false, isManagement: true },

@@ -13,9 +13,9 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-[400px]">
         <div class="flex flex-col gap-4">
-            <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
-                <label class="text-xs text-gray-400 font-bold mb-2 uppercase">Input Text</label>
-                <textarea [(ngModel)]="inputText" class="flex-1 w-full bg-[#202124] border border-[#5f6368] rounded p-3 text-sm text-gray-200 resize-none focus:border-blue-500 focus:outline-none font-mono" placeholder="Paste text to detect language..."></textarea>
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] flex-1 flex flex-col">
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase">Input Text</label>
+                <textarea [(ngModel)]="inputText" class="flex-1 w-full bg-white dark:bg-[#202124] border border-gray-400 dark:border-[#5f6368] rounded p-3 text-sm text-gray-800 dark:text-gray-200 resize-none focus:border-blue-500 focus:outline-none font-mono" placeholder="Paste text to detect language..."></textarea>
                 <button (click)="detect()" [disabled]="isDetecting" class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 self-end">
                     {{ isDetecting ? 'Detecting...' : 'Detect' }}
                 </button>
@@ -23,29 +23,29 @@
         </div>
 
         <div class="flex flex-col gap-4">
-            <div class="bg-[#292a2d] p-4 rounded border border-[#3c4043] flex-1 flex flex-col">
-                <label class="text-xs text-gray-400 font-bold mb-2 uppercase">Detected Languages</label>
-                <div class="flex-1 w-full bg-[#202124] border border-[#3c4043] rounded p-3 overflow-y-auto overflow-x-auto" style="height: 300px; max-height: 300px;">
-                    <div *ngIf="errorMsg" class="text-red-400 text-sm">{{errorMsg}}</div>
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] flex-1 flex flex-col">
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase">Detected Languages</label>
+                <div class="flex-1 w-full bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#3c4043] rounded p-3 overflow-y-auto overflow-x-auto" style="height: 300px; max-height: 300px;">
+                    <div *ngIf="errorMsg" class="text-red-600 dark:text-red-400 text-sm">{{errorMsg}}</div>
                     <div *ngIf="!errorMsg && detectionResult.length === 0" class="text-gray-500 text-sm italic text-center mt-10">Results will appear here...</div>
                     
-                    <div *ngIf="detectionResult.length > 0" class="bg-[#292a2d] rounded border border-[#3c4043] overflow-hidden">
+                    <div *ngIf="detectionResult.length > 0" class="bg-gray-50 dark:bg-[#292a2d] rounded border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-[#35363a] text-gray-400 uppercase text-xs">
+                            <thead class="bg-gray-200 dark:bg-[#35363a] text-gray-600 dark:text-gray-400 uppercase text-xs">
                                 <tr>
                                     <th class="p-3 font-normal">Language</th>
                                     <th class="p-3 font-normal">Confidence</th>
                                 </tr>
                             </thead>
-                            <tbody class="font-mono text-xs text-gray-300">
-                                <tr *ngFor="let res of detectionResult" class="border-b border-[#3c4043] last:border-0 hover:bg-[#2f3034]">
-                                    <td class="p-3"><span class="text-sm font-bold text-gray-200">{{res.detectedLanguage | uppercase}}</span></td>
+                            <tbody class="font-mono text-xs text-gray-700 dark:text-gray-300">
+                                <tr *ngFor="let res of detectionResult" class="border-b border-gray-300 dark:border-[#3c4043] last:border-0 hover:bg-gray-100 dark:hover:bg-[#2f3034]">
+                                    <td class="p-3"><span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{res.detectedLanguage | uppercase}}</span></td>
                                     <td class="p-3">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-24 bg-[#3c4043] h-1.5 rounded-full overflow-hidden">
+                                            <div class="w-24 bg-gray-300 dark:bg-[#3c4043] h-1.5 rounded-full overflow-hidden">
                                                 <div class="bg-blue-500 h-full rounded-full transition-all duration-300" [style.width.%]="res.confidence * 100"></div>
                                             </div>
-                                            <span class="text-xs text-gray-400 font-mono w-10 text-right">{{(res.confidence * 100) | number:'1.0-0'}}%</span>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400 font-mono w-10 text-right">{{(res.confidence * 100) | number:'1.0-0'}}%</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -59,19 +59,19 @@
 
     <!-- Code Viewer -->
     <div class="mb-6">
-        <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-400 hover:text-white focus:outline-none mb-2">
+        <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white focus:outline-none mb-2">
             <span>Show Code</span>
             <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
         </button>
-        <div *ngIf="isCodeViewerVisible" class="bg-[#0d1117] p-3 rounded border border-[#3c4043] overflow-x-auto relative group-code">
-            <pre><code class="text-xs font-mono text-gray-300">{{codeSnippet}}</code></pre>
-            <button (click)="copyCode()" class="absolute top-2 right-2 bg-[#292a2d] hover:bg-[#3c4043] text-gray-400 p-1.5 rounded">
+        <div *ngIf="isCodeViewerVisible" class="bg-gray-200 dark:bg-[#0d1117] p-3 rounded border border-gray-300 dark:border-[#3c4043] overflow-x-auto relative group-code">
+            <pre><code class="text-xs font-mono text-gray-700 dark:text-gray-300">{{codeSnippet}}</code></pre>
+            <button (click)="copyCode()" class="absolute top-2 right-2 bg-gray-200 dark:bg-[#292a2d] hover:bg-gray-300 dark:hover:bg-[#3c4043] text-gray-700 dark:text-gray-400 p-1.5 rounded">
                 <i class="fa-regular fa-copy"></i>
             </button>
         </div>
     </div>
 
-    <div *ngIf="showHistory" class="mt-6 border-t border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
+    <div *ngIf="showHistory" class="mt-6 border-t border-gray-300 dark:border-[#3c4043] pt-6 flex-1 min-h-0 flex flex-col">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold">Call History</h3>
             <span class="text-xs text-gray-500">{{history.length}} items</span>

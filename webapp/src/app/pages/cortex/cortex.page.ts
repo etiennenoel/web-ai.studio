@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
@@ -9,6 +9,7 @@ import {AxonSummaryResultsInterface} from './axon/interfaces/axon-summary-result
 import {MathematicalCalculations} from './axon/util/mathematical-calculations';
 import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
+import { isPlatformServer } from '@angular/common';
 
 @Component({
   selector: 'page-cortex',
@@ -23,7 +24,7 @@ export class CortexPage implements OnInit {
 
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
   selectedImageUrl: string | null = null;
-  isExtensionInstalled: boolean = false;
+  isExtensionInstalled: boolean = true; // By default we don't show it.
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
@@ -55,10 +56,16 @@ export class CortexPage implements OnInit {
   constructor(
     public readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private readonly platformId: Object,
+
   ) {}
 
   ngOnInit() {
+    if(isPlatformServer(this.platformId)) {
+      return;
+    }
+    
     this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
     
     this.route.queryParamMap.subscribe(params => {

@@ -13,6 +13,7 @@ export interface HistoryItem {
   options?: any;
   args?: any[];
   errorMessage?: string;
+  response?: any;
 }
 
 export interface SessionGroup {
@@ -34,13 +35,26 @@ export class HistoryComponent implements OnInit {
   filteredGroups: SessionGroup[] = [];
   
   timeFilter: '5m' | '1h' | '24h' | 'all' = 'all';
-  apiFilter: string = 'all';
+  apiFilter: string[] = [];
+  isApiDropdownOpen: boolean = false;
   
   isLoading = true;
   error: string | null = null;
   wrapApiEnabled: boolean = true;
   
-  availableApis: string[] = ['all', 'LanguageModel', 'Summarizer', 'Translator', 'Detector', 'Writer', 'Rewriter', 'Proofreader'];
+  availableApis: string[] = ['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
+  apiColors: Record<string, string> = {
+    'LanguageModel': '#8ab4f8',
+    'Summarizer': '#f28b82',
+    'Translator': '#81c995',
+    'LanguageDetector': '#fbbc04',
+    'Writer': '#c58af9',
+    'Rewriter': '#f48fb1',
+    'Proofreader': '#80cbc4'
+  };
+
+  showClearConfirm: boolean = false;
+  expandedSessions: Set<string> = new Set<string>();
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -148,7 +162,7 @@ export class HistoryComponent implements OnInit {
     
     this.filteredGroups = this.sessionGroups.filter(group => {
       const matchTime = this.timeFilter === 'all' || group.timestamp >= timeLimit;
-      const matchApi = this.apiFilter === 'all' || group.api === this.apiFilter;
+      const matchApi = this.apiFilter.length === 0 || this.apiFilter.includes(group.api);
       return matchTime && matchApi;
     });
   }
@@ -158,10 +172,142 @@ export class HistoryComponent implements OnInit {
     this.applyFilters();
   }
 
-  setApiFilter(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.apiFilter = value;
+  getTimeFilterCount(filter: '5m' | '1h' | '24h' | 'all'): number {
+    const now = Date.now();
+    let timeLimit = 0;
+    
+    switch (filter) {
+      case '5m': timeLimit = now - 5 * 60 * 1000; break;
+      case '1h': timeLimit = now - 60 * 60 * 1000; break;
+      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
+    }
+    
+    return this.sessionGroups.filter(group => {
+      const matchTime = filter === 'all' || group.timestamp >= timeLimit;
+      const matchApi = this.apiFilter.length === 0 || this.apiFilter.includes(group.api);
+      return matchTime && matchApi;
+    }).length;
+  }
+
+  getApiFilterCount(api: string): number {
+    const now = Date.now();
+    let timeLimit = 0;
+    
+    switch (this.timeFilter) {
+      case '5m': timeLimit = now - 5 * 60 * 1000; break;
+      case '1h': timeLimit = now - 60 * 60 * 1000; break;
+      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
+    }
+
+    return this.sessionGroups.filter(group => {
+      const matchTime = this.timeFilter === 'all' || group.timestamp >= timeLimit;
+      const matchApi = group.api === api;
+      return matchTime && matchApi;
+    }).length;
+  }
+
+  toggleApiDropdown() {
+    this.isApiDropdownOpen = !this.isApiDropdownOpen;
+  }
+
+  closeApiDropdown() {
+    this.isApiDropdownOpen = false;
+  }
+
+  toggleApiFilter(api: string, event: Event) {
+    event.stopPropagation();
+    if (this.apiFilter.includes(api)) {
+      this.apiFilter = this.apiFilter.filter(a => a !== api);
+    } else {
+      this.apiFilter.push(api);
+    }
     this.applyFilters();
+  }
+
+  clearApiFilter(event?: Event) {
+    if (event) event.stopPropagation();
+    this.apiFilter = [];
+    this.applyFilters();
+  }
+
+  promptClearHistory() {
+    this.showClearConfirm = true;
+  }
+
+  cancelClearHistory() {
+    this.showClearConfirm = false;
+  }
+
+  executeClearHistory() {
+    this.showClearConfirm = false;
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (isException || !origin) {
+          this.error = 'Could not get inspected window origin.';
+          this.cdr.detectChanges();
+          return;
+        }
+        
+        chrome.runtime.sendMessage({
+          action: 'clear_api_history',
+          payload: { origin }
+        }, (response: any) => {
+          if (chrome.runtime.lastError) {
+            this.error = chrome.runtime.lastError.message;
+          } else if (response.error) {
+            this.error = response.error;
+          } else {
+            this.loadHistory();
+          }
+          this.cdr.detectChanges();
+        });
+      });
+    } else {
+      this.rawItems = [];
+      this.groupSessions();
+    }
+  }
+
+  toggleExpand(sessionId: string, event: Event) {
+    if ((event.target as HTMLElement).closest('button')) return;
+    if (this.expandedSessions.has(sessionId)) {
+      this.expandedSessions.delete(sessionId);
+    } else {
+      this.expandedSessions.add(sessionId);
+    }
+  }
+
+  isExpanded(sessionId: string): boolean {
+    return this.expandedSessions.has(sessionId);
+  }
+
+  deleteSession(sessionId: string) {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (isException || !origin) {
+          this.error = 'Could not get inspected window origin.';
+          this.cdr.detectChanges();
+          return;
+        }
+        
+        chrome.runtime.sendMessage({
+          action: 'delete_api_session',
+          payload: { origin, sessionId }
+        }, (response: any) => {
+          if (chrome.runtime.lastError) {
+            this.error = chrome.runtime.lastError.message;
+          } else if (response.error) {
+            this.error = response.error;
+          } else {
+            this.loadHistory();
+          }
+          this.cdr.detectChanges();
+        });
+      });
+    } else {
+      this.rawItems = this.rawItems.filter(item => item.sessionId !== sessionId);
+      this.groupSessions();
+    }
   }
   
   getCreateDuration(item: any): number | null {
@@ -189,5 +335,25 @@ export class HistoryComponent implements OnInit {
       return item.timestamps.first_token - item.timestamps.execute;
     }
     return null;
+  }
+
+  getGroupStatus(group: SessionGroup): 'completed' | 'error' | 'running' {
+    if (group.createItem?.errorMessage) return 'error';
+    
+    let hasRunning = false;
+    for (const method of group.methodItems) {
+      if (method.errorMessage) return 'error';
+      if (method.response === undefined) hasRunning = true;
+    }
+    
+    return hasRunning ? 'running' : 'completed';
+  }
+
+  provideFeedback(group: SessionGroup) {
+    const dataStr = JSON.stringify(group, null, 2);
+    const issueBody = `I'm reporting an issue with the following session:\n\n\`\`\`json\n${dataStr}\n\`\`\`\n\n**Additional Feedback:**\n`;
+    const encodedBody = encodeURIComponent(issueBody);
+    const url = `https://github.com/etiennenoel/web-ai.studio/issues/new?title=Feedback%20on%20${group.api}%20Session&body=${encodedBody}`;
+    window.open(url, '_blank');
   }
 }

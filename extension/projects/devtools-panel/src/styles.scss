@@ -7,28 +7,59 @@
     height: 10px;
 }
 ::-webkit-scrollbar-track {
-    background: #202124; 
+    background: #f9fafb;
 }
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+      background: #202124; 
+  }
+}
+
 ::-webkit-scrollbar-thumb {
-    background: #4a4c50; 
+    background: #d1d5db; 
     border-radius: 5px;
-    border: 2px solid #202124;
+    border: 2px solid #f9fafb;
 }
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+      background: #4a4c50; 
+      border-radius: 5px;
+      border: 2px solid #202124;
+  }
+}
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #5f6368; 
+    background: #9ca3af; 
+}
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb:hover {
+      background: #5f6368; 
+  }
 }
 
 /* Syntax Highlighting Mock */
-.token-keyword { color: #ff7b72; }
-.token-string { color: #a5d6ff; }
-.token-function { color: #d2a8ff; }
-.token-comment { color: #8b949e; }
+.token-keyword { color: #d73a49; }
+.token-string { color: #032f62; }
+.token-function { color: #6f42c1; }
+.token-comment { color: #6a737d; }
+@media (prefers-color-scheme: dark) {
+  .token-keyword { color: #ff7b72; }
+  .token-string { color: #a5d6ff; }
+  .token-function { color: #d2a8ff; }
+  .token-comment { color: #8b949e; }
+}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #202124; /* Chrome Dark Theme BG */
-    color: #e8eaed;
+    background-color: #ffffff;
+    color: #111827;
     margin: 0;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: #202124;
+      color: #e8eaed;
+  }
 }
 
 .status-dot {

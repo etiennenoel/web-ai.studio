@@ -51,6 +51,41 @@ chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: a
     return true;
   }
   
+  if (request.action === 'clear_api_history') {
+    const origin = request.payload?.origin || (sender.tab?.url ? new URL(sender.tab.url).origin : null);
+    
+    if (!origin) {
+      sendResponse({ error: "Missing origin" });
+      return false;
+    }
+    
+    db.clearHistory(origin).then(() => {
+      sendResponse({ success: true });
+    }).catch(err => {
+      console.error("Failed to clear API history from IDB", err);
+      sendResponse({ error: err.message });
+    });
+    return true;
+  }
+  
+  if (request.action === 'delete_api_session') {
+    const origin = request.payload?.origin || (sender.tab?.url ? new URL(sender.tab.url).origin : null);
+    const sessionId = request.payload?.sessionId;
+    
+    if (!origin || !sessionId) {
+      sendResponse({ error: "Missing origin or sessionId" });
+      return false;
+    }
+    
+    db.deleteSession(origin, sessionId).then(() => {
+      sendResponse({ success: true });
+    }).catch(err => {
+      console.error("Failed to delete API session from IDB", err);
+      sendResponse({ error: err.message });
+    });
+    return true;
+  }
+  
   if (request.action === 'getHardwareInformation') {
     Promise.all([
       new Promise(resolve => chrome.system.cpu.getInfo(resolve)),

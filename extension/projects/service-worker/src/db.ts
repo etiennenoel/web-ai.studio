@@ -65,6 +65,7 @@ export class WebAIDatabase {
         if (data.errorMessage !== undefined) record.errorMessage = data.errorMessage;
         if (data.options !== undefined) record.options = data.options;
         if (data.args !== undefined) record.args = data.args;
+        if (data.response !== undefined) record.response = data.response;
 
         const putReq = store.put(record);
         putReq.onsuccess = () => resolve();
@@ -94,6 +95,47 @@ export class WebAIDatabase {
         }
         filtered.sort((a, b) => b.timestamp - a.timestamp);
         resolve(filtered);
+      };
+      
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
+  async clearHistory(origin: string): Promise<void> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const index = store.index('origin');
+      const request = index.getAllKeys(IDBKeyRange.only(origin));
+
+      request.onsuccess = () => {
+        const keys = request.result || [];
+        keys.forEach(key => store.delete(key));
+        resolve();
+      };
+      
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
+  async deleteSession(origin: string, sessionId: string): Promise<void> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const index = store.index('origin');
+      const request = index.getAll(IDBKeyRange.only(origin));
+
+      request.onsuccess = () => {
+        const results = request.result || [];
+        const toDelete = results.filter((item: any) => item.sessionId === sessionId);
+        toDelete.forEach((item: any) => store.delete(item.id));
+        resolve();
       };
       
       request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
