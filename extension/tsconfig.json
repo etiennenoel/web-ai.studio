@@ -52,6 +52,12 @@
     },
     {
       "path": "./projects/popup/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/side-panel/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/side-panel/tsconfig.spec.json"
     }
   ]
 }

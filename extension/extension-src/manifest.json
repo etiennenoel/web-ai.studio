@@ -4,15 +4,18 @@
   "description": "Unlock Chrome’s Built-In AI. Monitor local model readiness, inspect APIs, and debug your on-device AI natively in DevTools.",
   "version": "0.4.0",
   "action": {
-    "default_popup": "popup/index.html",
     "default_icon": "assets/images/icon.png"
+  },
+  "side_panel": {
+    "default_path": "side-panel/index.html"
   },
   "icons": {
     "128": "assets/images/icon.png"
   },
   "permissions": [
     "system.cpu",
-    "system.memory"
+    "system.memory",
+    "sidePanel"
   ],
   "devtools_page": "devtools-loader.html",
   "background": {

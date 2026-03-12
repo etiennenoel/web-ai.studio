@@ -2,6 +2,10 @@ import { db } from './db';
 
 declare const chrome: any;
 
+chrome.action.onClicked.addListener((tab: any) => {
+  chrome.sidePanel.open({ windowId: tab.windowId });
+});
+
 chrome.runtime.onInstalled.addListener((details: any) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     chrome.tabs.create({
@@ -28,6 +32,16 @@ chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: a
       sendResponse({ success: true });
     }).catch(err => {
       console.error("Failed to save API call to IDB", err);
+      sendResponse({ error: err.message });
+    });
+    return true;
+  }
+  
+  if (request.action === 'get_all_history') {
+    db.getAllHistory().then(history => {
+      sendResponse({ data: history });
+    }).catch(err => {
+      console.error("Failed to get all API history from IDB", err);
       sendResponse({ error: err.message });
     });
     return true;

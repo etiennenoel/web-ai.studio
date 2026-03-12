@@ -1,0 +1,47 @@
+<div class="p-4">
+  <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+    <h1 class="text-xl font-semibold">Active Sessions</h1>
+    <a routerLink="/settings" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Settings">
+      <i class="fas fa-cog text-xl"></i>
+    </a>
+  </div>
+
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+    <i class="fas fa-circle-notch fa-spin text-4xl mb-4"></i>
+    <p>Loading sessions...</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <div *ngIf="origins.length === 0" class="text-center text-gray-500 dark:text-gray-400 mt-8">
+      <i class="fas fa-ghost text-4xl mb-2"></i>
+      <p>No active sessions found.</p>
+      <p class="text-sm">Use Built-in AI APIs on any site to see them here.</p>
+    </div>
+
+    <div *ngFor="let origin of origins" class="mb-6">
+      <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-800 p-2 rounded-t-md">
+        <h2 class="font-medium truncate text-sm" [title]="origin">{{ origin }}</h2>
+        <button (click)="clearHistory(origin)" class="text-xs text-red-500 hover:text-red-700 p-1" title="Clear all sessions for this site">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+      
+      <div class="border border-gray-100 dark:border-gray-800 rounded-b-md p-2">
+        <div *ngFor="let session of sessionsByOrigin[origin]" class="mb-3 last:mb-0 p-3 bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-700 rounded">
+          <div class="flex justify-between items-start mb-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              {{ session.apiName }}
+            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400" [title]="session.latestTimestamp | date:'medium'">
+              {{ session.latestTimestamp | date:'shortTime' }}
+            </span>
+          </div>
+          <div class="text-xs text-gray-600 dark:text-gray-300">
+            <div class="font-mono truncate mb-1">ID: {{ session.sessionId }}</div>
+            <div>{{ session.calls.length }} call(s) recorded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
