@@ -25,15 +25,18 @@ ng build base
 ng build devtools-panel
 ng build on-install
 ng build popup
+ng build side-panel
 npm run build:scripts
 
 mkdir -p ./release/devtools-panel
 mkdir -p ./release/on-install
 mkdir -p ./release/popup
+mkdir -p ./release/side-panel
 
 cp -r dist/devtools-panel/browser/* ./release/devtools-panel
 cp -r dist/on-install/browser/* ./release/on-install
 cp -r dist/popup/browser/* ./release/popup
+cp -r dist/side-panel/browser/* ./release/side-panel
 cp dist/content-script/main.js ./release/content-script.js
 cp dist/content-script/injected.js ./release/injected.js
 cp dist/service-worker/main.js ./release/service-worker.js
@@ -42,3 +45,4 @@ cp dist/service-worker/main.js ./release/service-worker.js
 cp -r ./release/assets ./release/devtools-panel
 cp -r ./release/assets ./release/on-install
 cp -r ./release/assets ./release/popup
+cp -r ./release/assets ./release/side-panel

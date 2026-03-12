@@ -76,6 +76,25 @@ export class WebAIDatabase {
     });
   }
 
+  async getAllHistory(): Promise<any[]> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readonly');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const results = request.result || [];
+        results.sort((a, b) => b.timestamp - a.timestamp);
+        resolve(results);
+      };
+      
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
   async getHistory(origin: string, apiName?: string): Promise<any[]> {
     if (!this.db) {
       await this.init();
