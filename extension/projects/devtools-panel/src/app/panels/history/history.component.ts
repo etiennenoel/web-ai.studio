@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 declare const chrome: any;
 
@@ -56,7 +57,7 @@ export class HistoryComponent implements OnInit {
   showClearConfirm: boolean = false;
   expandedSessions: Set<string> = new Set<string>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.loadHistory();
@@ -347,6 +348,45 @@ export class HistoryComponent implements OnInit {
     }
     
     return hasRunning ? 'running' : 'completed';
+  }
+
+  getMediaUrls(item: any): { type: string, url: SafeResourceUrl }[] {
+    const urls: { type: string, url: SafeResourceUrl }[] = [];
+    
+    const search = (obj: any) => {
+      if (!obj) return;
+      if (typeof obj !== 'object') return;
+      
+      if (obj.__type === 'Blob' && obj.dataUrl) {
+        const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(obj.dataUrl);
+        if (obj.type && obj.type.startsWith('audio/')) {
+          urls.push({ type: 'audio', url: safeUrl });
+        } else if (obj.type && obj.type.startsWith('image/')) {
+          urls.push({ type: 'image', url: safeUrl });
+        } else if (obj.dataUrl.startsWith('data:audio/')) {
+           urls.push({ type: 'audio', url: safeUrl });
+        } else if (obj.dataUrl.startsWith('data:image/')) {
+           urls.push({ type: 'image', url: safeUrl });
+        } else {
+           // fallback guessing
+           if (obj.dataUrl.includes('audio')) {
+               urls.push({ type: 'audio', url: safeUrl });
+           } else {
+               urls.push({ type: 'image', url: safeUrl });
+           }
+        }
+        return;
+      }
+      
+      for (const key of Object.keys(obj)) {
+        search(obj[key]);
+      }
+    };
+    
+    if (item.args) search(item.args);
+    if (item.options) search(item.options);
+    
+    return urls;
   }
 
   provideFeedback(group: SessionGroup) {

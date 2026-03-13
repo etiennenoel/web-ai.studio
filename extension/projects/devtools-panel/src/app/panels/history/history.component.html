@@ -177,6 +177,15 @@
                       <div *ngIf="item.args && item.args.length > 0" class="bg-gray-50 dark:bg-[#292a2d] rounded p-3 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                         <div class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
                         <pre class="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+                        <div *ngIf="getMediaUrls(item).length > 0" class="mt-4 flex flex-wrap gap-4 pt-3 border-t border-gray-200 dark:border-[#3c4043]">
+                          <ng-container *ngFor="let media of getMediaUrls(item)">
+                            <div class="flex flex-col gap-1">
+                              <span class="text-[10px] text-gray-500 uppercase font-semibold">{{ media.type }}</span>
+                              <img *ngIf="media.type === 'image'" [src]="media.url" class="max-h-48 max-w-full rounded border border-gray-300 dark:border-[#3c4043] bg-white dark:bg-[#202124]" alt="Prompt input image" />
+                              <audio *ngIf="media.type === 'audio'" [src]="media.url" controls class="w-full max-w-md h-10"></audio>
+                            </div>
+                          </ng-container>
+                        </div>
                       </div>
                     </div>
                   </div>

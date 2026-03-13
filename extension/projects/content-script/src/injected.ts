@@ -81,7 +81,7 @@ window.webai.rewriter.getHistory = createHistoryFetcher('Rewriter');
 window.webai.proofreader = window.webai.proofreader || {};
 window.webai.proofreader.getHistory = createHistoryFetcher('Proofreader');
 
-function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
+async function sanitizeForPostMessage(obj: any, maxDepth = 3): Promise<any> {
   if (maxDepth < 0) return undefined;
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'string') return obj;
@@ -92,16 +92,32 @@ function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
   
   if (obj instanceof EventTarget) return { __type: 'EventTarget' };
   if (obj instanceof ReadableStream) return { __type: 'ReadableStream' };
-  if (typeof Blob !== 'undefined' && obj instanceof Blob) return { __type: 'Blob', size: obj.size, type: obj.type };
+  if (typeof Blob !== 'undefined' && obj instanceof Blob) {
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(obj);
+      });
+      return { __type: 'Blob', size: obj.size, type: obj.type, dataUrl: dataUrl };
+    } catch (e) {
+      return { __type: 'Blob', size: obj.size, type: obj.type };
+    }
+  }
   if (typeof ArrayBuffer !== 'undefined' && (ArrayBuffer.isView(obj) || obj instanceof ArrayBuffer)) return { __type: 'BufferData', byteLength: obj.byteLength };
 
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeForPostMessage(item, maxDepth - 1));
+    const arr = [];
+    for (const item of obj) {
+      arr.push(await sanitizeForPostMessage(item, maxDepth - 1));
+    }
+    return arr;
   }
 
   if (typeof obj.toJSON === 'function') {
     try {
-      return sanitizeForPostMessage(obj.toJSON(), maxDepth - 1);
+      return await sanitizeForPostMessage(obj.toJSON(), maxDepth - 1);
     } catch(e) {}
   }
 
@@ -125,7 +141,7 @@ function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
         const val = obj[key];
         if (typeof val !== 'function') {
           hasProps = true;
-          result[key] = sanitizeForPostMessage(val, maxDepth - 1);
+          result[key] = await sanitizeForPostMessage(val, maxDepth - 1);
         }
       } catch(e) {}
     }
@@ -206,7 +222,8 @@ function wrapAPI(apiName: string) {
 
       apiObj.create = async function(options?: any) {
         const callId = crypto.randomUUID();
-        emitStage(callId, callId, 'create', 'create', { options: sanitizeForPostMessage(options || {}) });
+        const sanitizedOptions = await sanitizeForPostMessage(options || {});
+        emitStage(callId, callId, 'create', 'create', { options: sanitizedOptions });
 
         try {
           const originalInstance = await originalCreate.call(this, options);
@@ -220,17 +237,20 @@ function wrapAPI(apiName: string) {
                   const methodCallId = crypto.randomUUID();
                   const methodName = prop.toString();
                   
-                  emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizeForPostMessage(args) });
+                  sanitizeForPostMessage(args).then(sanitizedArgs => {
+                    emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
+                  });
 
                   try {
                     const result = value.apply(target, args);
                     
                     if (result && typeof result.then === 'function') {
-                      return result.then((res: any) => {
+                      return result.then(async (res: any) => {
                         if (res instanceof ReadableStream) {
                           return handleStream(res, methodCallId, callId, methodName);
                         }
-                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(res) });
+                        const sanitizedRes = await sanitizeForPostMessage(res);
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizedRes });
                         return res;
                       }).catch((err: any) => {
                         emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
@@ -239,7 +259,9 @@ function wrapAPI(apiName: string) {
                     } else if (result instanceof ReadableStream) {
                       return handleStream(result, methodCallId, callId, methodName);
                     } else {
-                      emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(result) });
+                      sanitizeForPostMessage(result).then(sanitizedRes => {
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizedRes });
+                      });
                       return result;
                     }
                   } catch (err: any) {
