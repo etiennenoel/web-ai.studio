@@ -111,10 +111,10 @@ async function sanitizeForPostMessage(obj: any, maxDepth = 10): Promise<any> {
     } else if (typeof HTMLImageElement !== 'undefined' && obj instanceof HTMLImageElement) {
       width = obj.naturalWidth || obj.width;
       height = obj.naturalHeight || obj.height;
-    } else if (typeof ImageBitmap !== 'undefined' && obj instanceof ImageBitmap) {
+    } else if (typeof window !== 'undefined' && 'ImageBitmap' in window && obj instanceof (window as any).ImageBitmap) {
       width = obj.width;
       height = obj.height;
-    } else if (typeof ImageData !== 'undefined' && obj instanceof ImageData) {
+    } else if (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) {
       width = obj.width;
       height = obj.height;
     }
@@ -124,7 +124,7 @@ async function sanitizeForPostMessage(obj: any, maxDepth = 10): Promise<any> {
         const canvas = new OffscreenCanvas(width, height);
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          if (typeof ImageData !== 'undefined' && obj instanceof ImageData) {
+          if (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) {
             ctx.putImageData(obj, 0, 0);
           } else {
             ctx.drawImage(obj as any, 0, 0, width, height);
@@ -140,9 +140,18 @@ async function sanitizeForPostMessage(obj: any, maxDepth = 10): Promise<any> {
         }
       }
     } catch (e) {
-      // Ignore errors (like cross-origin tainting) and fall back
+      // Ignore errors (like cross-origin tainting) and fall back below
     }
-    return { __type: 'Blob', size: 0, type: 'image/png', width, height }; // fallback if conversion fails
+    
+    // Fallback if canvas manipulation failed (e.g., CORS tainting) or dimensions were 0
+    if (typeof HTMLImageElement !== 'undefined' && obj instanceof HTMLImageElement && obj.src) {
+      return { __type: 'Blob', size: 0, type: 'image/png', dataUrl: obj.src, width, height };
+    }
+    if (typeof HTMLVideoElement !== 'undefined' && obj instanceof HTMLVideoElement && (obj.src || obj.currentSrc)) {
+      return { __type: 'Blob', size: 0, type: 'video/mp4', dataUrl: obj.currentSrc || obj.src, width, height };
+    }
+    
+    return { __type: 'Blob', size: 0, type: 'image/png', width, height }; // ultimate fallback
   }
 
   if (typeof Blob !== 'undefined' && obj instanceof Blob) {

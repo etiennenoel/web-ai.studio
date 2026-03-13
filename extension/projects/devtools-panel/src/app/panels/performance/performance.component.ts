@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
 import { Chart } from 'chart.js/auto';
 import { HistoryItem, SessionGroup } from '../history/history.component';
 
@@ -86,7 +86,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     'Proofreader': '#80cbc4'
   };
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
 
   ngOnInit() {
     this.loadHistory();
@@ -473,26 +473,27 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       const apiGroups = this.timeFilteredGroups.filter(g => g.api === api);
       if (apiGroups.length === 0) continue;
 
-      const createDataPoints: { x: string, y: number, session: string }[] = [];
-      const ttftDataPoints: { x: string, y: number, session: string }[] = [];
-      const inferenceDataPoints: { x: string, y: number, session: string }[] = [];
+      const createDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
+      const ttftDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
+      const inferenceDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
 
       for (const group of apiGroups) {
         const x = new Date(group.timestamp).toLocaleTimeString();
         const session = group.sessionId.substring(0, 8);
+        const fullSessionId = group.sessionId;
 
         if (group.createItem?.timestamps?.create && group.createItem?.timestamps?.completed) {
-          createDataPoints.push({ x, y: group.createItem.timestamps.completed - group.createItem.timestamps.create, session });
+          createDataPoints.push({ x, y: group.createItem.timestamps.completed - group.createItem.timestamps.create, session, fullSessionId });
         }
         for (const item of group.methodItems) {
           if (item.timestamps?.execute && item.timestamps?.first_token) {
-            ttftDataPoints.push({ x, y: item.timestamps.first_token - item.timestamps.execute, session });
+            ttftDataPoints.push({ x, y: item.timestamps.first_token - item.timestamps.execute, session, fullSessionId });
             break;
           }
         }
         for (const item of group.methodItems) {
           if (item.timestamps?.execute && item.timestamps?.completed) {
-            inferenceDataPoints.push({ x, y: item.timestamps.completed - item.timestamps.execute, session });
+            inferenceDataPoints.push({ x, y: item.timestamps.completed - item.timestamps.execute, session, fullSessionId });
             break;
           }
         }
@@ -559,15 +560,53 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
         maintainAspectRatio: false,
         interaction: {
           mode: 'nearest',
-          intersect: true,
+          intersect: false,
         },
         onHover: (event, elements, chart) => {
+          if (event.native?.target) {
+            (event.native.target as HTMLElement).style.cursor = elements && elements.length > 0 ? 'pointer' : 'default';
+          }
           if (elements && elements.length > 0) {
             const datasetIndex = elements[0].datasetIndex;
             const hoveredApiName = chart.data.datasets[datasetIndex] ? (chart.data.datasets[datasetIndex] as any).apiName : null;
             this.setHoveredApi(hoveredApiName);
           } else if (this.hoveredApi !== null) {
             this.setHoveredApi(null);
+          }
+        },
+        onClick: (event, elements, chart) => {
+          if (elements && elements.length > 0) {
+            const datasetIndex = elements[0].datasetIndex;
+            const dataIndex = elements[0].index;
+            const dataset = chart.data.datasets[datasetIndex] as any;
+            const apiName = dataset.apiName;
+            const fullSessionId = dataset.data[dataIndex]?.fullSessionId;
+
+            if (!fullSessionId) {
+              console.warn('WebAI: No fullSessionId found on data point', dataset.data[dataIndex]);
+              return;
+            }
+
+            this.ngZone.run(() => {
+              this.expandedApi = apiName;
+              this.expandedSessions.add(fullSessionId);
+              this.cdr.detectChanges();
+              
+              setTimeout(() => {
+                const rowId = `session-row-${fullSessionId}`;
+                const el = document.getElementById(rowId);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Flash the row slightly to draw attention
+                  el.classList.add('bg-blue-100', 'dark:bg-[#8ab4f8]/20');
+                  setTimeout(() => {
+                    el.classList.remove('bg-blue-100', 'dark:bg-[#8ab4f8]/20');
+                  }, 1500);
+                } else {
+                  console.warn(`WebAI: Could not find row element with id ${rowId}`);
+                }
+              }, 150);
+            });
           }
         },
         plugins: {

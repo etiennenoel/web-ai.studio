@@ -89,6 +89,7 @@
     <table class="w-full text-left border-collapse">
       <thead class="bg-gray-50 dark:bg-[#292a2d] sticky top-0 z-10 shadow-sm border-b border-gray-300 dark:border-[#3c4043]">
         <tr>
+          <th class="p-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-10"></th>
           <th class="p-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">API</th>
           <th class="p-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Session ID</th>
           <th class="p-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
@@ -99,6 +100,13 @@
         <ng-container *ngFor="let group of displayedGroups">
           <!-- Main Row -->
           <tr class="hover:bg-gray-100 dark:hover:bg-[#303134] cursor-pointer transition-colors" (click)="toggleExpand(group.sessionId, $event)">
+            <td class="p-3 align-middle border-t border-gray-300 dark:border-[#3c4043] w-10 text-center">
+              <div class="flex items-center justify-center gap-1.5 text-gray-500">
+                <i *ngIf="hasText(group)" class="fa-regular fa-file-lines text-xs" title="Text"></i>
+                <i *ngIf="hasImage(group)" class="fa-regular fa-image text-xs" title="Image"></i>
+                <i *ngIf="hasAudio(group)" class="fa-solid fa-volume-high text-xs" title="Audio"></i>
+              </div>
+            </td>
             <td class="p-3 align-middle border-t border-gray-300 dark:border-[#3c4043]">
               <span class="px-2 py-1 text-xs font-bold rounded inline-flex items-center gap-2" [style.color]="'#202124'" [style.backgroundColor]="apiColors[group.api] || '#6b7280'">
                 {{ group.api }}
@@ -130,7 +138,7 @@
           
           <!-- Expanded Details -->
           <tr *ngIf="isExpanded(group.sessionId)" class="bg-white dark:bg-[#202124]">
-            <td colspan="4" class="p-4 border-b border-gray-300 dark:border-[#3c4043]">
+            <td colspan="5" class="p-4 border-b border-gray-300 dark:border-[#3c4043]">
               <div class="relative pl-4 border-l-2 border-gray-300 dark:border-[#3c4043] space-y-6 ml-2">
                 
                 <!-- Create Step -->

@@ -90,16 +90,21 @@ export class WebAIDatabase {
     });
   }
 
-  private stripDataUrls(obj: any, depth = 0): boolean {
+  private stripDataUrls(obj: any, parentInfo: { hasAudio: boolean, hasImage: boolean }, depth = 0): boolean {
     if (!obj || typeof obj !== 'object' || depth > 10) return false;
     let foundMedia = false;
     if (obj.__type === 'Blob' && obj.dataUrl) {
       obj.hasMedia = true;
+      if (obj.type?.startsWith('audio/') || obj.dataUrl.startsWith('data:audio/') || obj.dataUrl.includes('audio')) {
+        parentInfo.hasAudio = true;
+      } else {
+        parentInfo.hasImage = true;
+      }
       delete obj.dataUrl;
       return true;
     }
     for (const key of Object.keys(obj)) {
-      if (this.stripDataUrls(obj[key], depth + 1)) {
+      if (this.stripDataUrls(obj[key], parentInfo, depth + 1)) {
         foundMedia = true;
       }
     }
@@ -120,9 +125,12 @@ export class WebAIDatabase {
         results.sort((a, b) => b.timestamp - a.timestamp);
         results.forEach(item => {
           let hasMedia = false;
-          if (item.args && this.stripDataUrls(item.args)) hasMedia = true;
-          if (item.options && this.stripDataUrls(item.options)) hasMedia = true;
+          let info = { hasAudio: false, hasImage: false };
+          if (item.args && this.stripDataUrls(item.args, info)) hasMedia = true;
+          if (item.options && this.stripDataUrls(item.options, info)) hasMedia = true;
           item.hasMedia = hasMedia;
+          item.hasAudio = info.hasAudio;
+          item.hasImage = info.hasImage;
         });
         resolve(results);
       };
@@ -151,9 +159,12 @@ export class WebAIDatabase {
         filtered.sort((a, b) => b.timestamp - a.timestamp);
         filtered.forEach(item => {
           let hasMedia = false;
-          if (item.args && this.stripDataUrls(item.args)) hasMedia = true;
-          if (item.options && this.stripDataUrls(item.options)) hasMedia = true;
+          let info = { hasAudio: false, hasImage: false };
+          if (item.args && this.stripDataUrls(item.args, info)) hasMedia = true;
+          if (item.options && this.stripDataUrls(item.options, info)) hasMedia = true;
           item.hasMedia = hasMedia;
+          item.hasAudio = info.hasAudio;
+          item.hasImage = info.hasImage;
         });
         resolve(filtered);
       };
