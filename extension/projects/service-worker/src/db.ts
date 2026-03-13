@@ -90,16 +90,20 @@ export class WebAIDatabase {
     });
   }
 
-  private stripDataUrls(obj: any, depth = 0): void {
-    if (!obj || typeof obj !== 'object' || depth > 10) return;
+  private stripDataUrls(obj: any, depth = 0): boolean {
+    if (!obj || typeof obj !== 'object' || depth > 10) return false;
+    let foundMedia = false;
     if (obj.__type === 'Blob' && obj.dataUrl) {
       obj.hasMedia = true;
       delete obj.dataUrl;
-      return;
+      return true;
     }
     for (const key of Object.keys(obj)) {
-      this.stripDataUrls(obj[key], depth + 1);
+      if (this.stripDataUrls(obj[key], depth + 1)) {
+        foundMedia = true;
+      }
     }
+    return foundMedia;
   }
 
   async getAllHistory(): Promise<any[]> {
@@ -115,8 +119,10 @@ export class WebAIDatabase {
         const results = request.result || [];
         results.sort((a, b) => b.timestamp - a.timestamp);
         results.forEach(item => {
-          if (item.args) this.stripDataUrls(item.args);
-          if (item.options) this.stripDataUrls(item.options);
+          let hasMedia = false;
+          if (item.args && this.stripDataUrls(item.args)) hasMedia = true;
+          if (item.options && this.stripDataUrls(item.options)) hasMedia = true;
+          item.hasMedia = hasMedia;
         });
         resolve(results);
       };
@@ -144,8 +150,10 @@ export class WebAIDatabase {
         }
         filtered.sort((a, b) => b.timestamp - a.timestamp);
         filtered.forEach(item => {
-          if (item.args) this.stripDataUrls(item.args);
-          if (item.options) this.stripDataUrls(item.options);
+          let hasMedia = false;
+          if (item.args && this.stripDataUrls(item.args)) hasMedia = true;
+          if (item.options && this.stripDataUrls(item.options)) hasMedia = true;
+          item.hasMedia = hasMedia;
         });
         resolve(filtered);
       };

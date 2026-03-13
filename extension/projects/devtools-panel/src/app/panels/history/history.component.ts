@@ -17,6 +17,7 @@ export interface HistoryItem {
   response?: any;
   mediaUrls?: { type: string, url: SafeResourceUrl }[];
   mediaUrlsLoaded?: boolean;
+  hasMedia?: boolean;
   displayOptions?: string;
   displayArgs?: string;
   displayResponse?: string;
@@ -411,7 +412,7 @@ export class HistoryComponent implements OnInit {
       const group = this.sessionGroups.find(g => g.sessionId === sessionId);
       if (group && typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
         const fetchMedia = (item: HistoryItem) => {
-          if (!item.mediaUrlsLoaded && ((item.args as any)?.hasMedia || item.options?.hasMedia)) {
+          if (!item.mediaUrlsLoaded && item.hasMedia) {
             chrome.runtime.sendMessage({
               action: 'get_history_item',
               payload: { id: item.id }

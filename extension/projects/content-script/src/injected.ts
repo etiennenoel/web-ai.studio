@@ -81,7 +81,7 @@ window.webai.rewriter.getHistory = createHistoryFetcher('Rewriter');
 window.webai.proofreader = window.webai.proofreader || {};
 window.webai.proofreader.getHistory = createHistoryFetcher('Proofreader');
 
-async function sanitizeForPostMessage(obj: any, maxDepth = 3): Promise<any> {
+async function sanitizeForPostMessage(obj: any, maxDepth = 10): Promise<any> {
   if (maxDepth < 0) return undefined;
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'string') return obj;
@@ -90,8 +90,61 @@ async function sanitizeForPostMessage(obj: any, maxDepth = 3): Promise<any> {
     return obj;
   }
   
-  if (obj instanceof EventTarget) return { __type: 'EventTarget' };
+  if (obj instanceof EventTarget && !(obj instanceof HTMLImageElement || obj instanceof HTMLVideoElement || obj instanceof HTMLCanvasElement)) return { __type: 'EventTarget' };
   if (obj instanceof ReadableStream) return { __type: 'ReadableStream' };
+  
+  const isImageSource = (
+    (typeof window !== 'undefined' && 'ImageBitmap' in window && obj instanceof (window as any).ImageBitmap) ||
+    (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) ||
+    (typeof window !== 'undefined' && 'HTMLImageElement' in window && obj instanceof (window as any).HTMLImageElement) ||
+    (typeof window !== 'undefined' && 'HTMLVideoElement' in window && obj instanceof (window as any).HTMLVideoElement) ||
+    (typeof window !== 'undefined' && 'HTMLCanvasElement' in window && obj instanceof (window as any).HTMLCanvasElement) ||
+    (typeof window !== 'undefined' && 'OffscreenCanvas' in window && obj instanceof (window as any).OffscreenCanvas)
+  );
+
+  if (isImageSource) {
+    let width = obj.width;
+    let height = obj.height;
+    if (typeof HTMLVideoElement !== 'undefined' && obj instanceof HTMLVideoElement) {
+      width = obj.videoWidth;
+      height = obj.videoHeight;
+    } else if (typeof HTMLImageElement !== 'undefined' && obj instanceof HTMLImageElement) {
+      width = obj.naturalWidth || obj.width;
+      height = obj.naturalHeight || obj.height;
+    } else if (typeof ImageBitmap !== 'undefined' && obj instanceof ImageBitmap) {
+      width = obj.width;
+      height = obj.height;
+    } else if (typeof ImageData !== 'undefined' && obj instanceof ImageData) {
+      width = obj.width;
+      height = obj.height;
+    }
+
+    try {
+      if (width > 0 && height > 0) {
+        const canvas = new OffscreenCanvas(width, height);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          if (typeof ImageData !== 'undefined' && obj instanceof ImageData) {
+            ctx.putImageData(obj, 0, 0);
+          } else {
+            ctx.drawImage(obj as any, 0, 0, width, height);
+          }
+          const blob = await canvas.convertToBlob({ type: 'image/png' });
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+          });
+          return { __type: 'Blob', size: blob.size, type: 'image/png', dataUrl: dataUrl, width, height };
+        }
+      }
+    } catch (e) {
+      // Ignore errors (like cross-origin tainting) and fall back
+    }
+    return { __type: 'Blob', size: 0, type: 'image/png', width, height }; // fallback if conversion fails
+  }
+
   if (typeof Blob !== 'undefined' && obj instanceof Blob) {
     try {
       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -110,7 +163,11 @@ async function sanitizeForPostMessage(obj: any, maxDepth = 3): Promise<any> {
   if (Array.isArray(obj)) {
     const arr = [];
     for (const item of obj) {
-      arr.push(await sanitizeForPostMessage(item, maxDepth - 1));
+      if (item === undefined || item === null) {
+        arr.push(item);
+      } else {
+        arr.push(await sanitizeForPostMessage(item, maxDepth - 1));
+      }
     }
     return arr;
   }

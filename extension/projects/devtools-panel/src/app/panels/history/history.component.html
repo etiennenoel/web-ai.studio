@@ -182,7 +182,7 @@
                             <div class="flex flex-col gap-1">
                               <span class="text-[10px] text-gray-500 uppercase font-semibold">{{ media.type }}</span>
                               <img *ngIf="media.type === 'image'" [src]="media.url" class="max-h-48 max-w-full rounded border border-gray-300 dark:border-[#3c4043] bg-white dark:bg-[#202124]" alt="Prompt input image" />
-                              <audio *ngIf="media.type === 'audio'" [src]="media.url" controls class="w-full max-w-md h-10"></audio>
+                              <audio *ngIf="media.type === 'audio'" [src]="media.url" controls class="w-[300px] h-10"></audio>
                             </div>
                           </ng-container>
                         </div>
