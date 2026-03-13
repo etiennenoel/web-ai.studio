@@ -76,6 +76,32 @@ export class WebAIDatabase {
     });
   }
 
+  async getHistoryItem(id: string): Promise<any> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readonly');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.get(id);
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
+  private stripDataUrls(obj: any, depth = 0): void {
+    if (!obj || typeof obj !== 'object' || depth > 10) return;
+    if (obj.__type === 'Blob' && obj.dataUrl) {
+      obj.hasMedia = true;
+      delete obj.dataUrl;
+      return;
+    }
+    for (const key of Object.keys(obj)) {
+      this.stripDataUrls(obj[key], depth + 1);
+    }
+  }
+
   async getAllHistory(): Promise<any[]> {
     if (!this.db) {
       await this.init();
@@ -88,6 +114,10 @@ export class WebAIDatabase {
       request.onsuccess = () => {
         const results = request.result || [];
         results.sort((a, b) => b.timestamp - a.timestamp);
+        results.forEach(item => {
+          if (item.args) this.stripDataUrls(item.args);
+          if (item.options) this.stripDataUrls(item.options);
+        });
         resolve(results);
       };
       
@@ -113,6 +143,10 @@ export class WebAIDatabase {
           filtered = results.filter(item => item.api === apiName);
         }
         filtered.sort((a, b) => b.timestamp - a.timestamp);
+        filtered.forEach(item => {
+          if (item.args) this.stripDataUrls(item.args);
+          if (item.options) this.stripDataUrls(item.options);
+        });
         resolve(filtered);
       };
       
@@ -136,6 +170,20 @@ export class WebAIDatabase {
         resolve();
       };
       
+      request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
+    });
+  }
+
+  async clearAllHistory(): Promise<void> {
+    if (!this.db) {
+      await this.init();
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.clear();
+
+      request.onsuccess = () => resolve();
       request.onerror = (event: Event) => reject((event.target as IDBRequest).error);
     });
   }
