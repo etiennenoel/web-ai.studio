@@ -16,13 +16,13 @@
           <div class="d-flex gap-2 mb-2 flex-wrap">
             @for (att of message.attachments; track $index) {
               @if (att.type === 'image') {
-                <img [src]="att.safeUrl" style="max-height: 150px; border-radius: 8px; object-fit: contain; background-color: rgba(0,0,0,0.1);"/>
+                <img [src]="att.safeUrl" [alt]="att.file?.name || 'Attached image'" [title]="att.file?.name || 'Attached image'" style="max-height: 150px; border-radius: 8px; object-fit: contain; background-color: rgba(0,0,0,0.1);"/>
               }
               @if (att.type === 'audio') {
-                <audio [src]="att.safeUrl" controls style="height: 30px;"></audio>
+                <audio [src]="att.safeUrl" controls style="height: 30px;" [title]="att.file?.name || 'Attached audio'"></audio>
               }
               @if (att.type === 'pdf') {
-                <div class="d-flex align-items-center justify-content-center bg-body-tertiary rounded" style="width: 100px; height: 100px;">
+                <div class="d-flex flex-column align-items-center justify-content-center bg-body-tertiary rounded p-2" style="width: 100px; height: 100px;" [title]="att.file?.name || 'Attached PDF'">
                   <i class="bi bi-file-earmark-pdf fs-1"></i>
                 </div>
               }
