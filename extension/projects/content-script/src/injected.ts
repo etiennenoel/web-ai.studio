@@ -297,11 +297,25 @@ function wrapAPI(apiName: string) {
 
           return new Proxy(originalInstance, {
             get(target, prop, receiver) {
-              const value = Reflect.get(target, prop, receiver);
+              const value = Reflect.get(target, prop, target);
               if (typeof value === 'function') {
+                const methodName = prop.toString();
+                const explicitlyWrapped = [
+                  'prompt', 'promptStreaming', 'append',
+                  'summarize', 'summarizeStreaming',
+                  'translate', 'translateStreaming',
+                  'detect', 'write', 'writeStreaming',
+                  'rewrite', 'rewriteStreaming',
+                  'proofread', 'proofreadStreaming',
+                  'clone', 'destroy'
+                ].includes(methodName);
+
+                if (!explicitlyWrapped) {
+                  return value.bind(target);
+                }
+
                 return function(...args: any[]) {
                   const methodCallId = crypto.randomUUID();
-                  const methodName = prop.toString();
                   
                   sanitizeForPostMessage(args).then(sanitizedArgs => {
                     emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
