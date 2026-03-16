@@ -64,11 +64,30 @@ export class ConversationManager {
     this.abortController = currentAbortController;
 
     try {
+      let promptInput: any = options.prompt;
+
+      if (options.attachments && options.attachments.length > 0) {
+        let content: any[] = [];
+        if (options.prompt && options.prompt.trim() !== "") {
+           content.push({ type: "text", value: options.prompt });
+        }
+        
+        for (const pt of options.attachments) {
+           if (pt.type === 'image') {
+              const bmp = await createImageBitmap(pt.file);
+              content.push({ type: "image", value: bmp });
+           } else if (pt.type === 'audio') {
+              content.push({ type: "audio", value: pt.file });
+           }
+        }
+        promptInput = [{ role: "user", content: content }];
+      }
+
       if (options.stream) {
         let fullResponse = '';
         this.addMessage({ role: 'model', content: '' }); // Add empty message for streaming
 
-        const stream = this.session.promptStreaming(options.prompt, {
+        const stream = this.session.promptStreaming(promptInput, {
           signal: currentAbortController.signal
         });
         
@@ -84,7 +103,7 @@ export class ConversationManager {
           }
         }
       } else {
-        const response = await this.session.prompt(options.prompt, {
+        const response = await this.session.prompt(promptInput, {
           signal: currentAbortController.signal
         });
         if (this.abortController !== currentAbortController) return;
