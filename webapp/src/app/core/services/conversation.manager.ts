@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PromptRunOptions } from '../models/prompt-run.options';
 import { InferenceStateEnum } from '../enums/inference-state.enum';
+import { Attachment } from '../interfaces/attachment.interface';
 
 declare const LanguageModel: any;
 
 export interface Message {
   role: 'user' | 'model' | 'system';
   content: string;
+  attachments?: Attachment[];
 }
 
 @Injectable({
@@ -57,7 +59,7 @@ export class ConversationManager {
       this.cancel();
     }
 
-    this.addMessage({ role: 'user', content: options.prompt });
+    this.addMessage({ role: 'user', content: options.prompt, attachments: options.attachments });
     this._status.next(InferenceStateEnum.InProgress);
 
     const currentAbortController = new AbortController();

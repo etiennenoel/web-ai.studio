@@ -12,6 +12,23 @@
     <div class="card" [class.bg-primary]="message.role === 'user'" [class.text-white]="message.role === 'user'"
       [class.w-100]="message.role !== 'user'" style="max-width: 80%;">
       <div class="card-body p-2">
+        @if (message.attachments && message.attachments.length > 0) {
+          <div class="d-flex gap-2 mb-2 flex-wrap">
+            @for (att of message.attachments; track $index) {
+              @if (att.type === 'image') {
+                <img [src]="att.safeUrl" style="max-height: 150px; border-radius: 8px; object-fit: contain; background-color: rgba(0,0,0,0.1);"/>
+              }
+              @if (att.type === 'audio') {
+                <audio [src]="att.safeUrl" controls style="height: 30px;"></audio>
+              }
+              @if (att.type === 'pdf') {
+                <div class="d-flex align-items-center justify-content-center bg-body-tertiary rounded" style="width: 100px; height: 100px;">
+                  <i class="bi bi-file-earmark-pdf fs-1"></i>
+                </div>
+              }
+            }
+          </div>
+        }
         @if (message.role !== 'user' && !message.content && status === 'InProgress' && $index === messages.length - 1) {
         <app-latency-loader></app-latency-loader>
         }
