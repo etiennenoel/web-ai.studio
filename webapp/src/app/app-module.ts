@@ -76,6 +76,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
 import { BugsPage } from './pages/bugs/bugs.page';
 import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
+import {EvalsPage} from './pages/evals/evals.page';
 
 @NgModule({
   declarations: [
@@ -90,6 +91,7 @@ import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-creat
     FirstCreateShouldFullyLoadTheModelPage,
     BugsPage,
     PromptCodeModal,
+    EvalsPage,
 
     AutoScrollDirective,
      CortexPage,

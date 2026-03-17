@@ -10,6 +10,7 @@ import {CortexPage} from './pages/cortex/cortex.page';
 import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
 import {BugsPage} from './pages/bugs/bugs.page';
 import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
+import {EvalsPage} from './pages/evals/evals.page';
 
 const routes: Routes = [
   {
@@ -42,6 +43,13 @@ const routes: Routes = [
         component: ChatPage,
         data: {
           route: RouteEnum.Translation
+        }
+      },
+      {
+        path: "evals",
+        component: EvalsPage,
+        data: {
+          route: RouteEnum.Evals
         }
       },
       {
