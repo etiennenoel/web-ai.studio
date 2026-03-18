@@ -60,7 +60,9 @@
     </ul>
   </div>
   
-  <div class="mt-auto px-3 pb-3">
-    <a [routerLink]="getRouterLink(RouteEnum.TermsOfService)" class="text-muted text-decoration-none" style="font-size: 0.8rem;">Terms of Service</a>
+  <div class="mt-auto px-3 pb-3 d-flex flex-wrap align-items-center" style="gap: 0.5rem; font-size: 0.8rem;">
+    <a [routerLink]="getRouterLink(RouteEnum.PrivacyPolicy)" class="text-muted text-decoration-none">Privacy Policy</a>
+    <span class="text-muted">&bull;</span>
+    <a [routerLink]="getRouterLink(RouteEnum.TermsOfService)" class="text-muted text-decoration-none">Terms of Service</a>
   </div>
 </div>
