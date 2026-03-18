@@ -46,6 +46,16 @@ chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: a
     });
     return true;
   }
+
+  if (request.action === 'get_history_item') {
+    db.getHistoryItem(request.payload?.id).then(item => {
+      sendResponse({ data: item });
+    }).catch(err => {
+      console.error("Failed to get API history item from IDB", err);
+      sendResponse({ error: err.message });
+    });
+    return true;
+  }
   
   if (request.action === 'get_api_history') {
     const origin = request.payload?.origin || (sender.tab?.url ? new URL(sender.tab.url).origin : null);
@@ -77,6 +87,16 @@ chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: a
       sendResponse({ success: true });
     }).catch(err => {
       console.error("Failed to clear API history from IDB", err);
+      sendResponse({ error: err.message });
+    });
+    return true;
+  }
+  
+  if (request.action === 'clear_all_history') {
+    db.clearAllHistory().then(() => {
+      sendResponse({ success: true });
+    }).catch(err => {
+      console.error("Failed to clear all API history from IDB", err);
       sendResponse({ error: err.message });
     });
     return true;

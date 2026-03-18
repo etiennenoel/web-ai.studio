@@ -146,6 +146,7 @@
                       <tbody class="divide-y divide-[#3c4043]">
                         <ng-container *ngFor="let group of getGroupsForApi(stat.api)">
                           <tr class="hover:bg-gray-100 dark:hover:bg-[#303134] cursor-pointer transition-colors" 
+                              [id]="'session-row-' + group.sessionId"
                               (mouseenter)="setHoveredSession(group.sessionId)"
                               (mouseleave)="setHoveredSession(null)"
                               (click)="toggleExpandSession(group.sessionId, $event)">

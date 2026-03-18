@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
@@ -17,7 +17,7 @@ import { isPlatformServer } from '@angular/common';
   templateUrl: './cortex.page.html',
   styleUrl: './cortex.page.scss'
 })
-export class CortexPage implements OnInit {
+export class CortexPage implements OnInit, AfterViewInit {
 
   builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
   selectedTestIds: Set<string> = new Set<string>();
@@ -66,8 +66,6 @@ export class CortexPage implements OnInit {
       return;
     }
     
-    this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
-    
     this.route.queryParamMap.subscribe(params => {
       const testsParam = params.get('tests');
       if (testsParam !== null) {
@@ -77,6 +75,14 @@ export class CortexPage implements OnInit {
       }
     });
   }
+
+ngAfterViewInit(): void {
+  if(isPlatformServer(this.platformId)) {
+    return;
+  }
+
+  this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+}
 
   async downloadResults() {
     let hardwareInfo = null;

@@ -81,7 +81,7 @@ window.webai.rewriter.getHistory = createHistoryFetcher('Rewriter');
 window.webai.proofreader = window.webai.proofreader || {};
 window.webai.proofreader.getHistory = createHistoryFetcher('Proofreader');
 
-function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
+async function sanitizeForPostMessage(obj: any, maxDepth = 10): Promise<any> {
   if (maxDepth < 0) return undefined;
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'string') return obj;
@@ -90,18 +90,100 @@ function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
     return obj;
   }
   
-  if (obj instanceof EventTarget) return { __type: 'EventTarget' };
+  if (obj instanceof EventTarget && !(obj instanceof HTMLImageElement || obj instanceof HTMLVideoElement || obj instanceof HTMLCanvasElement)) return { __type: 'EventTarget' };
   if (obj instanceof ReadableStream) return { __type: 'ReadableStream' };
-  if (typeof Blob !== 'undefined' && obj instanceof Blob) return { __type: 'Blob', size: obj.size, type: obj.type };
+  
+  const isImageSource = (
+    (typeof window !== 'undefined' && 'ImageBitmap' in window && obj instanceof (window as any).ImageBitmap) ||
+    (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) ||
+    (typeof window !== 'undefined' && 'HTMLImageElement' in window && obj instanceof (window as any).HTMLImageElement) ||
+    (typeof window !== 'undefined' && 'HTMLVideoElement' in window && obj instanceof (window as any).HTMLVideoElement) ||
+    (typeof window !== 'undefined' && 'HTMLCanvasElement' in window && obj instanceof (window as any).HTMLCanvasElement) ||
+    (typeof window !== 'undefined' && 'OffscreenCanvas' in window && obj instanceof (window as any).OffscreenCanvas)
+  );
+
+  if (isImageSource) {
+    let width = obj.width;
+    let height = obj.height;
+    if (typeof HTMLVideoElement !== 'undefined' && obj instanceof HTMLVideoElement) {
+      width = obj.videoWidth;
+      height = obj.videoHeight;
+    } else if (typeof HTMLImageElement !== 'undefined' && obj instanceof HTMLImageElement) {
+      width = obj.naturalWidth || obj.width;
+      height = obj.naturalHeight || obj.height;
+    } else if (typeof window !== 'undefined' && 'ImageBitmap' in window && obj instanceof (window as any).ImageBitmap) {
+      width = obj.width;
+      height = obj.height;
+    } else if (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) {
+      width = obj.width;
+      height = obj.height;
+    }
+
+    try {
+      if (width > 0 && height > 0) {
+        const canvas = new OffscreenCanvas(width, height);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          if (typeof window !== 'undefined' && 'ImageData' in window && obj instanceof (window as any).ImageData) {
+            ctx.putImageData(obj, 0, 0);
+          } else {
+            ctx.drawImage(obj as any, 0, 0, width, height);
+          }
+          const blob = await canvas.convertToBlob({ type: 'image/png' });
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+          });
+          return { __type: 'Blob', size: blob.size, type: 'image/png', dataUrl: dataUrl, width, height };
+        }
+      }
+    } catch (e) {
+      // Ignore errors (like cross-origin tainting) and fall back below
+    }
+    
+    // Fallback if canvas manipulation failed (e.g., CORS tainting) or dimensions were 0
+    if (typeof HTMLImageElement !== 'undefined' && obj instanceof HTMLImageElement && obj.src) {
+      return { __type: 'Blob', size: 0, type: 'image/png', dataUrl: obj.src, width, height };
+    }
+    if (typeof HTMLVideoElement !== 'undefined' && obj instanceof HTMLVideoElement && (obj.src || obj.currentSrc)) {
+      return { __type: 'Blob', size: 0, type: 'video/mp4', dataUrl: obj.currentSrc || obj.src, width, height };
+    }
+    
+    return { __type: 'Blob', size: 0, type: 'image/png', width, height }; // ultimate fallback
+  }
+
+  if (typeof Blob !== 'undefined' && obj instanceof Blob) {
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(obj);
+      });
+      return { __type: 'Blob', size: obj.size, type: obj.type, dataUrl: dataUrl };
+    } catch (e) {
+      return { __type: 'Blob', size: obj.size, type: obj.type };
+    }
+  }
   if (typeof ArrayBuffer !== 'undefined' && (ArrayBuffer.isView(obj) || obj instanceof ArrayBuffer)) return { __type: 'BufferData', byteLength: obj.byteLength };
 
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeForPostMessage(item, maxDepth - 1));
+    const arr = [];
+    for (const item of obj) {
+      if (item === undefined || item === null) {
+        arr.push(item);
+      } else {
+        arr.push(await sanitizeForPostMessage(item, maxDepth - 1));
+      }
+    }
+    return arr;
   }
 
   if (typeof obj.toJSON === 'function') {
     try {
-      return sanitizeForPostMessage(obj.toJSON(), maxDepth - 1);
+      return await sanitizeForPostMessage(obj.toJSON(), maxDepth - 1);
     } catch(e) {}
   }
 
@@ -125,7 +207,7 @@ function sanitizeForPostMessage(obj: any, maxDepth = 3): any {
         const val = obj[key];
         if (typeof val !== 'function') {
           hasProps = true;
-          result[key] = sanitizeForPostMessage(val, maxDepth - 1);
+          result[key] = await sanitizeForPostMessage(val, maxDepth - 1);
         }
       } catch(e) {}
     }
@@ -206,7 +288,8 @@ function wrapAPI(apiName: string) {
 
       apiObj.create = async function(options?: any) {
         const callId = crypto.randomUUID();
-        emitStage(callId, callId, 'create', 'create', { options: sanitizeForPostMessage(options || {}) });
+        const sanitizedOptions = await sanitizeForPostMessage(options || {});
+        emitStage(callId, callId, 'create', 'create', { options: sanitizedOptions });
 
         try {
           const originalInstance = await originalCreate.call(this, options);
@@ -214,23 +297,40 @@ function wrapAPI(apiName: string) {
 
           return new Proxy(originalInstance, {
             get(target, prop, receiver) {
-              const value = Reflect.get(target, prop, receiver);
+              const value = Reflect.get(target, prop, target);
               if (typeof value === 'function') {
+                const methodName = prop.toString();
+                const explicitlyWrapped = [
+                  'prompt', 'promptStreaming', 'append',
+                  'summarize', 'summarizeStreaming',
+                  'translate', 'translateStreaming',
+                  'detect', 'write', 'writeStreaming',
+                  'rewrite', 'rewriteStreaming',
+                  'proofread', 'proofreadStreaming',
+                  'clone', 'destroy'
+                ].includes(methodName);
+
+                if (!explicitlyWrapped) {
+                  return value.bind(target);
+                }
+
                 return function(...args: any[]) {
                   const methodCallId = crypto.randomUUID();
-                  const methodName = prop.toString();
                   
-                  emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizeForPostMessage(args) });
+                  sanitizeForPostMessage(args).then(sanitizedArgs => {
+                    emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
+                  });
 
                   try {
                     const result = value.apply(target, args);
                     
                     if (result && typeof result.then === 'function') {
-                      return result.then((res: any) => {
+                      return result.then(async (res: any) => {
                         if (res instanceof ReadableStream) {
                           return handleStream(res, methodCallId, callId, methodName);
                         }
-                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(res) });
+                        const sanitizedRes = await sanitizeForPostMessage(res);
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizedRes });
                         return res;
                       }).catch((err: any) => {
                         emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
@@ -239,7 +339,9 @@ function wrapAPI(apiName: string) {
                     } else if (result instanceof ReadableStream) {
                       return handleStream(result, methodCallId, callId, methodName);
                     } else {
-                      emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizeForPostMessage(result) });
+                      sanitizeForPostMessage(result).then(sanitizedRes => {
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizedRes });
+                      });
                       return result;
                     }
                   } catch (err: any) {
