@@ -48,11 +48,15 @@ jobs:
         run: mv .npmrc-github .npmrc
         working-directory: ./webapp
 
-      - name: Build the app
+      - name: Install dependencies
         run: npm ci
         working-directory: ./webapp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_LOGIN_READ_TOKEN }}
+
+      - name: Test the app
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+        working-directory: ./webapp
 
       # Runs a single command using the runners shell
       - name: Build the app

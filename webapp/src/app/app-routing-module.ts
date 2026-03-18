@@ -8,6 +8,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
 import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
+import {TermsOfServicePage} from './pages/terms-of-service/terms-of-service.page';
 import {BugsPage} from './pages/bugs/bugs.page';
 import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 import {EvalsPage} from './pages/evals/evals.page';
@@ -71,6 +72,13 @@ const routes: Routes = [
         component: PrivacyPolicyPage,
         data: {
           route: RouteEnum.PrivacyPolicy
+        }
+      },
+      {
+        path: "terms-of-service",
+        component: TermsOfServicePage,
+        data: {
+          route: RouteEnum.TermsOfService
         }
       }
     ]

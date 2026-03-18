@@ -33,6 +33,7 @@ describe('PromptInputComponent', () => {
 
   it('should clear promptText and attachments on run', async () => {
     // Setup initial state
+    component.capabilities.available = true;
     component.promptText = 'Test prompt';
     component.attachments = [{
         id: '1',

@@ -1,6 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 
 import { CodeModal } from './code.modal';
+
+@Pipe({ name: 'render_markdown', standalone: false })
+class MockRenderMarkdownPipe implements PipeTransform {
+  transform(value: string): string { return value; }
+}
 
 describe('CodeModal', () => {
   let component: CodeModal;
@@ -8,7 +15,9 @@ describe('CodeModal', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CodeModal]
+      declarations: [CodeModal, MockRenderMarkdownPipe],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 
