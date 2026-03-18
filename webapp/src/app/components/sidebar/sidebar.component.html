@@ -1,60 +1,66 @@
-<div class="p-2 pt-3">
-<h1 class="text-center">WebAI Studio</h1>
+<div class="d-flex flex-column justify-content-between h-100 p-2 pt-3">
+  <div>
+    <h1 class="text-center">WebAI Studio</h1>
 
-  <ul class="nav flex-column mt-3 gap-1">
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Chat">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
-        <i class="bi bi-chat-left me-2"></i>
-        <span>Chat</span>
-      </a>
-    </li>
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Translation">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Translation)">
-        <i class="bi bi-translate me-2"></i>
-        <span>Translation</span>
-      </a>
-    </li>
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.WritingAssistance">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.WritingAssistance)">
-        <i class="bi bi-pencil-square me-2"></i>
-        <span>Writing Assistance</span>
-      </a>
-    </li>
+    <ul class="nav flex-column mt-3 gap-1">
+      <li class="nav-item" [class.active]="routeEnum === RouteEnum.Chat">
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
+          <i class="bi bi-chat-left me-2"></i>
+          <span>Chat</span>
+        </a>
+      </li>
+      <li class="nav-item" [class.active]="routeEnum === RouteEnum.Translation">
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Translation)">
+          <i class="bi bi-translate me-2"></i>
+          <span>Translation</span>
+        </a>
+      </li>
+      <li class="nav-item" [class.active]="routeEnum === RouteEnum.WritingAssistance">
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.WritingAssistance)">
+          <i class="bi bi-pencil-square me-2"></i>
+          <span>Writing Assistance</span>
+        </a>
+      </li>
 
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Evals">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Evals)">
-        <i class="bi bi-search-heart me-2"></i>
-        <span>Evals</span>
-      </a>
-    </li>
+      <li class="nav-item" [class.active]="routeEnum === RouteEnum.Evals">
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Evals)">
+          <i class="bi bi-search-heart me-2"></i>
+          <span>Evals</span>
+        </a>
+      </li>
 
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.MediaGeneration">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
-        <i class="bi bi-chat-left-heart me-2"></i>
-        <span>Media Generation</span>
-        <span class="badge rounded-pill bg-warning ms-2">WIP</span>
-      </a>
-    </li>
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Build">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
-        <i class="bi bi-puzzle me-2"></i>
-        <span>Build</span>
-        <span class="badge rounded-pill bg-warning ms-2">WIP</span>
-      </a>
-    </li>
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Demos">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
-        <i class="bi bi-display me-2"></i>
-        <span>Demos</span>
-        <span class="badge rounded-pill bg-warning ms-2">WIP</span>
-      </a>
-    </li>
-    <li class="nav-item" [class.active]="routeEnum === RouteEnum.Cortex">
-      <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Cortex)">
-        <img style="width:15px;" class="bi me-2" src="images/cortex-icon.png">
-        <span>Cortex</span>
-        <span class="badge rounded-pill bg-warning ms-2">WIP</span>
-      </a>
-    </li>
-  </ul>
+      <li class="nav-item position-relative mt-2" [class.active]="routeEnum === RouteEnum.MediaGeneration">
+        <span class="badge rounded-pill bg-warning position-absolute" style="top: -6px; left: 35px; font-size: 0.55rem; z-index: 1; padding: 0.25em 0.4em;">WIP</span>
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
+          <i class="bi bi-chat-left-heart me-2"></i>
+          <span>Media Generation</span>
+        </a>
+      </li>
+      <li class="nav-item position-relative mt-2" [class.active]="routeEnum === RouteEnum.Build">
+        <span class="badge rounded-pill bg-warning position-absolute" style="top: -6px; left: 35px; font-size: 0.55rem; z-index: 1; padding: 0.25em 0.4em;">WIP</span>
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
+          <i class="bi bi-puzzle me-2"></i>
+          <span>Build</span>
+        </a>
+      </li>
+      <li class="nav-item position-relative mt-2" [class.active]="routeEnum === RouteEnum.Demos">
+        <span class="badge rounded-pill bg-warning position-absolute" style="top: -6px; left: 35px; font-size: 0.55rem; z-index: 1; padding: 0.25em 0.4em;">WIP</span>
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">
+          <i class="bi bi-display me-2"></i>
+          <span>Demos</span>
+        </a>
+      </li>
+      <li class="nav-item position-relative mt-2" [class.active]="routeEnum === RouteEnum.Cortex">
+        <span class="badge rounded-pill bg-warning position-absolute" style="top: -6px; left: 35px; font-size: 0.55rem; z-index: 1; padding: 0.25em 0.4em;">WIP</span>
+        <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Cortex)">
+          <img style="width:15px;" class="bi me-2" src="images/cortex-icon.png">
+          <span>Cortex</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="mt-auto px-3 pb-3">
+    <a [routerLink]="getRouterLink(RouteEnum.TermsOfService)" class="text-muted text-decoration-none" style="font-size: 0.8rem;">Terms of Service</a>
+  </div>
 </div>

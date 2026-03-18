@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { WritingAssistancePage } from './writing-assistance.page';
 
@@ -8,7 +9,8 @@ describe('WritingAssistancePage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [WritingAssistancePage]
+      declarations: [WritingAssistancePage],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 

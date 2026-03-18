@@ -74,6 +74,7 @@ import {AttachmentModalComponent} from './components/prompt-input/attachment-mod
 import {LatencyLoaderComponent} from './components/latency-loader/latency-loader.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
+import { TermsOfServicePage } from './pages/terms-of-service/terms-of-service.page';
 import { BugsPage } from './pages/bugs/bugs.page';
 import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 import {EvalsPage} from './pages/evals/evals.page';
@@ -88,6 +89,7 @@ import {EvalsPage} from './pages/evals/evals.page';
     TranslationPage,
     WritingAssistancePage,
     PrivacyPolicyPage,
+    TermsOfServicePage,
     FirstCreateShouldFullyLoadTheModelPage,
     BugsPage,
     PromptCodeModal,

@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { PromptCodeModal } from './prompt-code-modal';
 
@@ -8,7 +10,9 @@ describe('PromptCodeModal', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PromptCodeModal]
+      declarations: [PromptCodeModal],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 

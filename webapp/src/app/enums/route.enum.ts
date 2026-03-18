@@ -9,5 +9,6 @@ export enum RouteEnum {
   Axon = "/cortex/axon",
   Demos = "/demos",
   PrivacyPolicy = "/privacy-policy",
+  TermsOfService = "/terms-of-service",
   Bugs = "/bugs",
 }
