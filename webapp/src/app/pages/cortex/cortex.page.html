@@ -20,14 +20,47 @@
     </div>
   }
   
+  <!-- Top Header with Actions -->
   <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
     <div class="flex-1">
-      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-2">Cortex Test Suite</h1>
+      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-2 flex items-center gap-3">
+        Cortex Test Suite
+        @if (isImportedReport) {
+          <span class="text-sm font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 px-3 py-1 rounded-full uppercase tracking-wider align-middle border border-purple-200 dark:border-purple-800">Imported Report</span>
+        }
+      </h1>
       <p class="text-lg text-gray-500 dark:text-gray-400 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
+      
+      @if (isImportedReport && importedTimestamp) {
+        <div class="mt-4 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm inline-block">
+          <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Report Details</div>
+          <div class="text-sm text-gray-800 dark:text-gray-200"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
+          <div class="text-xs text-gray-500 font-mono mt-1 max-w-2xl truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
+        </div>
+      }
     </div>
-      </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+      @if (isImportedReport) {
+        <button class="btn btn-outline-secondary flex items-center gap-2 px-4 py-2" (click)="resetState()">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset & Run New Test
+        </button>
+      } @else {
+        <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
+        <button class="btn btn-outline-secondary flex items-center gap-2 px-4 py-2 shadow-sm" (click)="triggerImport()" [disabled]="isTestingRunning">
+          <i class="bi bi-upload"></i> Import JSON Report
+        </button>
+      }
+      
+      @if (axonTestSuiteExecutor.results.status === TestStatus.Success || axonTestSuiteExecutor.results.status === TestStatus.Error) {
+        <button class="btn btn-primary flex items-center gap-2 px-4 py-2 shadow-sm" (click)="downloadResults()">
+          <i class="bi bi-download"></i> Export Full JSON
+        </button>
+      }
+    </div>
+  </div>
 
-    @if (this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
+    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
          [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
@@ -91,6 +124,45 @@
             </div>
           }
         </div>
+      </div>
+    </div>
+  }
+
+  @if (isReportReady) {
+    <!-- Hardware Info -->
+    @if (hardwareInfo) {
+      <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+          <i class="bi bi-cpu"></i> Hardware Information
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
+            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
+            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Cores</div>
+            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
+            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Comparison Chart -->
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+        <i class="bi bi-bar-chart"></i> Tests Comparison (TTFT & Total Response Time)
+      </h3>
+      <div class="relative w-full h-[400px]">
+        <canvas id="cortex-comparison-chart"></canvas>
       </div>
     </div>
   }
@@ -435,139 +507,85 @@
       </div>
     </div>
 
-    <div class="mt-8 flex flex-col items-center justify-center">
-      <div class="mb-4 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2">
-        <i class="bi bi-ui-checks text-blue-500"></i>
-        <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
-      </div>
-      
-      <div class="flex items-center gap-4">
-        <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
-                (click)="start()"
-                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
-            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-            <span>Running...</span>
-          } @else {
-            <i class="bi bi-play-fill text-xl"></i>
-            <span>Run Cortex Test</span>
-          }
-        </button>
-      </div>
-      
-      @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-        @let overallProgress = getOverallProgress();
-        <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
-          <div class="text-sm font-bold text-gray-600 dark:text-gray-400">{{ overallProgress.percentage }}% Complete</div>
-          <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
-          </div>
+    @if (!isImportedReport) {
+      <div class="mt-8 flex flex-col items-center justify-center">
+        <div class="mb-4 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2">
+          <i class="bi bi-ui-checks text-blue-500"></i>
+          <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
         </div>
-
-        @if (overallProgress.percentage === 100) {
-          <div class="mt-6">
-            <button class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/50 rounded-full shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    (click)="downloadResults()">
-              <i class="bi bi-filetype-json text-lg"></i>
-              Download JSON Results
-            </button>
+        
+        <div class="flex items-center gap-4">
+          <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
+                  (click)="start()"
+                  [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+            @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+              <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+              <span>Running...</span>
+            } @else {
+              <i class="bi bi-play-fill text-xl"></i>
+              <span>Run Cortex Test</span>
+            }
+          </button>
+        </div>
+        
+        @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
+          @let overallProgress = getOverallProgress();
+          <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
+            <div class="text-sm font-bold text-gray-600 dark:text-gray-400">{{ overallProgress.percentage }}% Complete</div>
+            <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+              <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
+            </div>
           </div>
         }
-      }
-    </div>
+      </div>
+    }
     
-    <!-- Cortex Official Report -->
-    @if (axonTestSuiteExecutor.results.status === TestStatus.Success || axonTestSuiteExecutor.results.status === TestStatus.Error) {
-      @let overallProgress = getOverallProgress();
-      @if (overallProgress.percentage === 100) {
-        <div class="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-3">
-              <i class="bi bi-file-earmark-bar-graph text-blue-600"></i>
-              Official Cortex Report
-            </h2>
-            <button class="btn btn-primary flex items-center gap-2" (click)="downloadResults()">
-              <i class="bi bi-download"></i> Export Full JSON
-            </button>
-          </div>
+    <!-- Cortex Test Visualizations -->
+    @if (isReportReady) {
+      <div class="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
+        <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-8 flex items-center gap-3">
+          <i class="bi bi-graph-up text-blue-600"></i> Individual Test Visualizations
+        </h3>
 
-          <!-- Hardware Info -->
-          @if (hardwareInfo) {
-            <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
-              <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-                <i class="bi bi-cpu"></i> Hardware Information
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
-                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
+        <!-- Individual Test Charts -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          @for (testId of selectedTestIds; track testId) {
+            @let test = getTestById(testId);
+            @if (test && test.results.testIterationResults.length > 0) {
+              <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col">
+                <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1 truncate" [title]="test.id">{{ test.id }}</h3>
+                <div class="text-xs text-gray-500 mb-4 flex items-center gap-3">
+                  <span><i class="bi bi-tag mr-1"></i> {{ test.results.api }}</span>
+                  <span [class.text-blue-600]="test.results.startType === 'cold'" [class.text-orange-600]="test.results.startType === 'warm'">
+                    <i class="bi" [class.bi-thermometer-snow]="test.results.startType === 'cold'" [class.bi-thermometer-sun]="test.results.startType === 'warm'"></i> 
+                    {{ test.results.startType | titlecase }} Start
+                  </span>
+                  <span><i class="bi bi-arrow-clockwise mr-1"></i> {{ test.results.numberOfIterations }} runs</span>
                 </div>
-                <div class="md:col-span-2">
-                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
-                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
+                
+                <div class="flex-1 relative w-full min-h-[250px]">
+                  <canvas [id]="'cortex-test-chart-' + test.id"></canvas>
                 </div>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Cores</div>
-                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
-                </div>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
-                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
+                
+                <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
+                  <div>
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg TTFT</div>
+                    <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTimeToFirstToken | number:'1.0-0' }} ms</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Total</div>
+                    <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTotalResponseTime | number:'1.0-0' }} ms</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Speed</div>
+                    <div class="font-mono text-sm text-emerald-600 dark:text-emerald-400">{{ test.results.averageTokensPerSecond | number:'1.0-0' }} c/s</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-
-          <!-- Comparison Chart -->
-          <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-              <i class="bi bi-bar-chart"></i> Tests Comparison (TTFT & Total Response Time)
-            </h3>
-            <div class="relative w-full h-[400px]">
-              <canvas id="cortex-comparison-chart"></canvas>
-            </div>
-          </div>
-
-          <!-- Individual Test Charts -->
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            @for (testId of selectedTestIds; track testId) {
-              @let test = getTestById(testId);
-              @if (test && test.results.testIterationResults.length > 0) {
-                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col">
-                  <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1 truncate" [title]="test.id">{{ test.id }}</h3>
-                  <div class="text-xs text-gray-500 mb-4 flex items-center gap-3">
-                    <span><i class="bi bi-tag mr-1"></i> {{ test.results.api }}</span>
-                    <span [class.text-blue-600]="test.results.startType === 'cold'" [class.text-orange-600]="test.results.startType === 'warm'">
-                      <i class="bi" [class.bi-thermometer-snow]="test.results.startType === 'cold'" [class.bi-thermometer-sun]="test.results.startType === 'warm'"></i> 
-                      {{ test.results.startType | titlecase }} Start
-                    </span>
-                    <span><i class="bi bi-arrow-clockwise mr-1"></i> {{ test.results.numberOfIterations }} runs</span>
-                  </div>
-                  
-                  <div class="flex-1 relative w-full min-h-[250px]">
-                    <canvas [id]="'cortex-test-chart-' + test.id"></canvas>
-                  </div>
-                  
-                  <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
-                    <div>
-                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg TTFT</div>
-                      <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTimeToFirstToken | number:'1.0-0' }} ms</div>
-                    </div>
-                    <div>
-                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Total</div>
-                      <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTotalResponseTime | number:'1.0-0' }} ms</div>
-                    </div>
-                    <div>
-                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Speed</div>
-                      <div class="font-mono text-sm text-emerald-600 dark:text-emerald-400">{{ test.results.averageTokensPerSecond | number:'1.0-0' }} c/s</div>
-                    </div>
-                  </div>
-                </div>
-              }
             }
-          </div>
+          }
         </div>
-      }
+      </div>
     }
 </div>
 

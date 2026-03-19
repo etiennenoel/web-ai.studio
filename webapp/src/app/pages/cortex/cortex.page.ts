@@ -31,6 +31,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   comparisonChart: Chart | null = null;
   testCharts: { [id: string]: Chart } = {};
 
+  isImportedReport = false;
+  importedTimestamp: string | null = null;
+  importedUserAgent: string | null = null;
+
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
     [AxonTestId.LanguageDetectorShortStringWarmStart]: {},
@@ -65,6 +69,64 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     @Inject(PLATFORM_ID) private readonly platformId: Object,
 
   ) {}
+
+  triggerImport() {
+    const fileInput = document.getElementById('cortex-report-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target?.result as string);
+          this.loadReport(data);
+        } catch (error) {
+          console.error("Failed to parse JSON", error);
+          alert("Invalid JSON file");
+        }
+      };
+      reader.readAsText(file);
+    }
+    // Clear input so same file can be selected again
+    event.target.value = '';
+  }
+
+  loadReport(data: any) {
+    if (data && data.results) {
+      this.axonTestSuiteExecutor.results = data.results;
+      this.hardwareInfo = data.hardware;
+      this.importedTimestamp = data.timestamp;
+      this.importedUserAgent = data.userAgent;
+      
+      this.selectedTestIds.clear();
+      
+      for (const result of data.results.testsResults) {
+        if (this.axonTestSuiteExecutor.testIdMap[result.id as AxonTestId]) {
+          this.axonTestSuiteExecutor.testIdMap[result.id as AxonTestId].results = result;
+          this.selectedTestIds.add(result.id);
+        }
+      }
+      
+      this.isImportedReport = true;
+      this.axonTestSuiteExecutor.preTestsStatus = TestStatus.Success;
+      this.axonTestSuiteExecutor.results.status = TestStatus.Success;
+      
+      setTimeout(() => {
+        this.renderCharts();
+      }, 100);
+    } else {
+      alert("Invalid report format");
+    }
+  }
+
+  resetState() {
+    window.location.reload();
+  }
 
   ngOnInit() {
     if(isPlatformServer(this.platformId)) {
@@ -388,8 +450,17 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get isTestingRunning(): boolean {
-    return this.axonTestSuiteExecutor.results.status === TestStatus.Executing || 
+    return this.isImportedReport || 
+           this.axonTestSuiteExecutor.results.status === TestStatus.Executing || 
            this.axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing;
+  }
+
+  get isReportReady(): boolean {
+    if (this.isImportedReport) return true;
+    if (this.axonTestSuiteExecutor.results.status === TestStatus.Success || this.axonTestSuiteExecutor.results.status === TestStatus.Error) {
+      return this.getOverallProgress().percentage === 100;
+    }
+    return false;
   }
 
   get currentExecutingTest(): AxonTestInterface | null {
