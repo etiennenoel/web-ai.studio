@@ -12,6 +12,7 @@ import {TermsOfServicePage} from './pages/terms-of-service/terms-of-service.page
 import {BugsPage} from './pages/bugs/bugs.page';
 import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 import {EvalsPage} from './pages/evals/evals.page';
+import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
 
 const routes: Routes = [
   {
@@ -33,6 +34,13 @@ const routes: Routes = [
     component: FirstCreateShouldFullyLoadTheModelPage,
     data: {
       route: RouteEnum.Bugs
+    }
+  },
+  {
+    path: "extension",
+    component: ExtensionLandingPage,
+    data: {
+      route: RouteEnum.Extension
     }
   },
   {

@@ -10,6 +10,7 @@ import { ToastComponent } from './components/toast/toast.component';
 import { HistoryListComponent } from './components/history-list/history-list.component';
 import { OverviewComponent } from './panels/overview/overview.component';
 import { ModelsComponent } from './panels/models/models.component';
+import { DiagnosisComponent } from './panels/diagnosis/diagnosis.component';
 import { PromptComponent } from './panels/prompt/prompt.component';
 import { SummarizerComponent } from './panels/summarizer/summarizer.component';
 import { TranslatorComponent } from './panels/translator/translator.component';
@@ -33,6 +34,7 @@ import {BaseModule} from "base";
     HistoryComponent,
     PerformanceComponent,
     ModelsComponent,
+    DiagnosisComponent,
     PromptComponent,
     SummarizerComponent,
     TranslatorComponent,
