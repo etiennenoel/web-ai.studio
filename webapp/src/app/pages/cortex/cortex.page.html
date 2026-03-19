@@ -475,6 +475,100 @@
         }
       }
     </div>
+    
+    <!-- Cortex Official Report -->
+    @if (axonTestSuiteExecutor.results.status === TestStatus.Success || axonTestSuiteExecutor.results.status === TestStatus.Error) {
+      @let overallProgress = getOverallProgress();
+      @if (overallProgress.percentage === 100) {
+        <div class="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-3">
+              <i class="bi bi-file-earmark-bar-graph text-blue-600"></i>
+              Official Cortex Report
+            </h2>
+            <button class="btn btn-primary flex items-center gap-2" (click)="downloadResults()">
+              <i class="bi bi-download"></i> Export Full JSON
+            </button>
+          </div>
+
+          <!-- Hardware Info -->
+          @if (hardwareInfo) {
+            <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
+              <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <i class="bi bi-cpu"></i> Hardware Information
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
+                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
+                </div>
+                <div class="md:col-span-2">
+                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
+                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Cores</div>
+                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
+                  <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Comparison Chart -->
+          <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <i class="bi bi-bar-chart"></i> Tests Comparison (TTFT & Total Response Time)
+            </h3>
+            <div class="relative w-full h-[400px]">
+              <canvas id="cortex-comparison-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Individual Test Charts -->
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            @for (testId of selectedTestIds; track testId) {
+              @let test = getTestById(testId);
+              @if (test && test.results.testIterationResults.length > 0) {
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col">
+                  <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1 truncate" [title]="test.id">{{ test.id }}</h3>
+                  <div class="text-xs text-gray-500 mb-4 flex items-center gap-3">
+                    <span><i class="bi bi-tag mr-1"></i> {{ test.results.api }}</span>
+                    <span [class.text-blue-600]="test.results.startType === 'cold'" [class.text-orange-600]="test.results.startType === 'warm'">
+                      <i class="bi" [class.bi-thermometer-snow]="test.results.startType === 'cold'" [class.bi-thermometer-sun]="test.results.startType === 'warm'"></i> 
+                      {{ test.results.startType | titlecase }} Start
+                    </span>
+                    <span><i class="bi bi-arrow-clockwise mr-1"></i> {{ test.results.numberOfIterations }} runs</span>
+                  </div>
+                  
+                  <div class="flex-1 relative w-full min-h-[250px]">
+                    <canvas [id]="'cortex-test-chart-' + test.id"></canvas>
+                  </div>
+                  
+                  <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
+                    <div>
+                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg TTFT</div>
+                      <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTimeToFirstToken | number:'1.0-0' }} ms</div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Total</div>
+                      <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ test.results.averageTotalResponseTime | number:'1.0-0' }} ms</div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Speed</div>
+                      <div class="font-mono text-sm text-emerald-600 dark:text-emerald-400">{{ test.results.averageTokensPerSecond | number:'1.0-0' }} c/s</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    }
 </div>
 
 @if (selectedImageUrl) {
