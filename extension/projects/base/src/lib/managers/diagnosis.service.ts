@@ -240,6 +240,8 @@ export class DiagnosisService {
       this.errorCount$.next(errorCount);
       this.isChecking$.next(false);
     }
+  }
+
   fetchErrorHistory() {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       if (chrome.devtools) {

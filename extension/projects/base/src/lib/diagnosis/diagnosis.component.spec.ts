@@ -13,17 +13,20 @@ describe('DiagnosisComponent', () => {
   let apisSubject: BehaviorSubject<ApiDiagnostic[]>;
   let isCheckingSubject: BehaviorSubject<boolean>;
   let errorCountSubject: BehaviorSubject<number>;
+  let errorHistorySubject: BehaviorSubject<any[]>;
 
   beforeEach(async () => {
     apisSubject = new BehaviorSubject<ApiDiagnostic[]>([]);
     isCheckingSubject = new BehaviorSubject<boolean>(false);
     errorCountSubject = new BehaviorSubject<number>(0);
+    errorHistorySubject = new BehaviorSubject<any[]>([]);
 
     mockDiagnosisService = {
       runChecks: vi.fn(),
       apis$: apisSubject.asObservable(),
       isChecking$: isCheckingSubject.asObservable(),
-      errorCount$: errorCountSubject.asObservable()
+      errorCount$: errorCountSubject.asObservable(),
+      errorHistory$: errorHistorySubject.asObservable()
     };
 
     await TestBed.configureTestingModule({
