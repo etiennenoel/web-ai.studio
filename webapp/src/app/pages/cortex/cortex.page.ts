@@ -352,66 +352,69 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     }
+  }
+
+  renderTestChart(testId: string) {
+    const test = this.getTestById(testId);
+    if (!test || test.results.testIterationResults.length === 0) return;
     
-    // Individual Test Charts
-    for (const testId of this.selectedTestIds) {
-      const test = this.getTestById(testId);
-      if (!test || test.results.testIterationResults.length === 0) continue;
-      
-      const canvas = document.getElementById('cortex-test-chart-' + test.id) as HTMLCanvasElement;
-      if (!canvas) continue;
-      
-      if (this.testCharts[test.id]) this.testCharts[test.id].destroy();
-      
-      const labels = test.results.testIterationResults.map((_, i) => `Run ${i + 1}`);
-      const ttft = test.results.testIterationResults.map(r => r.timeToFirstToken || 0);
-      const total = test.results.testIterationResults.map(r => r.totalResponseTime || 0);
-      
-      this.testCharts[test.id] = new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'TTFT (ms)',
-              data: ttft,
-              borderColor: '#8ab4f8',
-              backgroundColor: '#8ab4f8',
-              borderDash: [5, 5],
-              tension: 0.2
-            },
-            {
-              label: 'Total Response (ms)',
-              data: total,
-              borderColor: '#c58af9',
-              backgroundColor: '#c58af9',
-              tension: 0.2
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          color: textColor,
-          scales: {
-            x: {
-              grid: { color: gridColor },
-              ticks: { color: textColor }
-            },
-            y: {
-              grid: { color: gridColor },
-              ticks: { color: textColor },
-              beginAtZero: true
-            }
+    const canvas = document.getElementById('cortex-test-chart-' + test.id) as HTMLCanvasElement;
+    if (!canvas) return;
+    
+    if (this.testCharts[test.id]) this.testCharts[test.id].destroy();
+    
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDark ? '#9aa0a6' : '#4b5563';
+    const gridColor = isDark ? '#3c4043' : '#e5e7eb';
+    
+    const labels = test.results.testIterationResults.map((_, i) => `Run ${i + 1}`);
+    const ttft = test.results.testIterationResults.map(r => r.timeToFirstToken || 0);
+    const total = test.results.testIterationResults.map(r => r.totalResponseTime || 0);
+    
+    this.testCharts[test.id] = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'TTFT (ms)',
+            data: ttft,
+            borderColor: '#8ab4f8',
+            backgroundColor: '#8ab4f8',
+            borderDash: [5, 5],
+            tension: 0.2
           },
-          plugins: {
-            legend: {
-              labels: { color: textColor }
-            }
+          {
+            label: 'Total Response (ms)',
+            data: total,
+            borderColor: '#c58af9',
+            backgroundColor: '#c58af9',
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        color: textColor,
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: { color: textColor }
+          },
+          y: {
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: textColor }
           }
         }
-      });
-    }
+      }
+    });
   }
 
   forceSetup(testId: AxonTestId): Promise<void> {
@@ -608,6 +611,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   toggleTest(testId: AxonTestId) {
     const test = this.axonTestSuiteExecutor.testIdMap[testId];
     this.viewData[testId].iterationsCollapsed = !this.isTestCollapsed(test);
+    
+    if (!this.viewData[testId].iterationsCollapsed) {
+      setTimeout(() => {
+        this.renderTestChart(testId);
+      }, 50);
+    }
   }
 
   unescapeOutput(output: string): string {
