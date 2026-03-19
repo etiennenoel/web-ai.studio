@@ -79,6 +79,7 @@ import { BugsPage } from './pages/bugs/bugs.page';
 import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 import {EvalsPage} from './pages/evals/evals.page';
 import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
+import {HistoryListComponent} from './components/history-list/history-list.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.
     PrivacyPolicyPage,
     TermsOfServicePage,
     ExtensionLandingPage,
+    HistoryListComponent,
     FirstCreateShouldFullyLoadTheModelPage,
     BugsPage,
     PromptCodeModal,

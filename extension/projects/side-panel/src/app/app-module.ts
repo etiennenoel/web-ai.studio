@@ -6,7 +6,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { OverviewComponent } from './overview/overview';
 import { SettingsComponent } from './settings/settings';
-import { SettingsComponent as LibSettingsComponent } from 'base';
+import { SettingsComponent as LibSettingsComponent, DiagnosisComponent } from 'base';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,8 @@ import { SettingsComponent as LibSettingsComponent } from 'base';
     BrowserModule,
     CommonModule,
     AppRoutingModule,
-    LibSettingsComponent
+    LibSettingsComponent,
+    DiagnosisComponent
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

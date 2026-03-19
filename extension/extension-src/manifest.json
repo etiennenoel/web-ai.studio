@@ -15,7 +15,9 @@
   "permissions": [
     "system.cpu",
     "system.memory",
-    "sidePanel"
+    "sidePanel",
+    "tabs",
+    "activeTab"
   ],
   "devtools_page": "devtools-loader.html",
   "background": {

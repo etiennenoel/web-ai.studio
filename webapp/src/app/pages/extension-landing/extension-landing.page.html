@@ -67,7 +67,9 @@
               <i class="bi bi-graph-up text-gray-500"></i> Performance
             </div>
             <div (click)="setTab('diagnosis')" [ngClass]="activeTab === 'diagnosis' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
-              <i class="bi bi-heart-pulse text-gray-500"></i> Diagnosis
+              <i class="bi bi-heart-pulse text-gray-500"></i>
+              <span class="flex-1">Diagnosis</span>
+              <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">2</span>
             </div>
             <div (click)="setTab('history')" [ngClass]="activeTab === 'history' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
               <i class="bi bi-clock-history text-gray-500"></i> History

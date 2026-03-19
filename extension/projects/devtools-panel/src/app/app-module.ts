@@ -10,7 +10,6 @@ import { ToastComponent } from './components/toast/toast.component';
 import { HistoryListComponent } from './components/history-list/history-list.component';
 import { OverviewComponent } from './panels/overview/overview.component';
 import { ModelsComponent } from './panels/models/models.component';
-import { DiagnosisComponent } from './panels/diagnosis/diagnosis.component';
 import { PromptComponent } from './panels/prompt/prompt.component';
 import { SummarizerComponent } from './panels/summarizer/summarizer.component';
 import { TranslatorComponent } from './panels/translator/translator.component';
@@ -22,7 +21,7 @@ import { HistoryComponent } from './panels/history/history.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { ModelDownloadCard } from './components/model-download-card/model-download-card';
 import { ApiStatusComponent } from './components/api-status/api-status.component';
-import {BaseModule} from "base";
+import {BaseModule, DiagnosisComponent} from "base";
 
 @NgModule({
   declarations: [
@@ -34,7 +33,6 @@ import {BaseModule} from "base";
     HistoryComponent,
     PerformanceComponent,
     ModelsComponent,
-    DiagnosisComponent,
     PromptComponent,
     SummarizerComponent,
     TranslatorComponent,
@@ -51,6 +49,7 @@ import {BaseModule} from "base";
     FormsModule,
     CommonModule,
     BaseModule,
+    DiagnosisComponent,
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

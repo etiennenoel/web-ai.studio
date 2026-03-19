@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Observable } from 'rxjs';
 import {
     ModelManager,
     WriterManager,
@@ -7,7 +8,8 @@ import {
     ProofreaderManager,
     SummarizerManager,
     TranslatorManager,
-    LanguageDetectorManager
+    LanguageDetectorManager,
+    DiagnosisService
 } from 'base';
 
 declare const chrome: any;
@@ -44,6 +46,7 @@ export class OverviewComponent implements OnInit {
   apiCapabilities: ApiAvailability[] = [];
   activeDownloads = new Map<string, { controller: AbortController, progress: number }>();
   showDevtoolsInfo = true;
+  errorCount$: Observable<number>;
 
   constructor(
     private cdr: ChangeDetectorRef, 
@@ -55,8 +58,11 @@ export class OverviewComponent implements OnInit {
     private proofreaderManager: ProofreaderManager,
     private summarizerManager: SummarizerManager,
     private translatorManager: TranslatorManager,
-    private detectorManager: LanguageDetectorManager
-  ) {}
+    private detectorManager: LanguageDetectorManager,
+    private diagnosisService: DiagnosisService
+  ) {
+    this.errorCount$ = this.diagnosisService.errorCount$;
+  }
 
   ngOnInit(): void {
     this.refreshAll();

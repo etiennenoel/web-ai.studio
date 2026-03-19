@@ -11,9 +11,8 @@ import { WriterComponent } from './panels/writer/writer.component';
 import { RewriterComponent } from './panels/rewriter/rewriter.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { HistoryComponent } from './panels/history/history.component';
-import { DiagnosisComponent } from './panels/diagnosis/diagnosis.component';
 import { PanelTab } from './enums/panel-tab.enum';
-import { SettingsComponent } from 'base';
+import { SettingsComponent, DiagnosisComponent } from 'base';
 
 const routes: Routes = [
   { path: '', redirectTo: PanelTab.OVERVIEW, pathMatch: 'full' },
