@@ -11,6 +11,9 @@
             <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer">
               <i [class]="item.iconClass + ' w-5 text-center'"></i>
               <span class="ml-3 text-xs font-medium hidden md:block">{{item.label}}</span>
+              <span *ngIf="item.id === 'diagnosis' && (errorCount$ | async) as errorCount" class="hidden md:flex ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full items-center justify-center min-w-[1.25rem]">
+                  {{ errorCount }}
+              </span>
             </a>
           </ng-container>
 

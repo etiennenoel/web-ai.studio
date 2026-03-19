@@ -30,6 +30,26 @@ window.webai.getHardwareInformation = function(): Promise<any> {
   });
 };
 
+window.addEventListener('message', (event: any) => {
+  if (event.source !== window) return;
+  if (event.data && event.data.type === 'WEBAI_DIAGNOSIS_EVAL_REQUEST') {
+    const result = {
+      Summarizer: typeof window.Summarizer !== 'undefined',
+      LanguageModel: typeof window.LanguageModel !== 'undefined',
+      Translator: typeof window.Translator !== 'undefined',
+      LanguageDetector: typeof window.LanguageDetector !== 'undefined',
+      Writer: typeof window.Writer !== 'undefined',
+      Rewriter: typeof window.Rewriter !== 'undefined',
+      Proofreader: typeof window.Proofreader !== 'undefined'
+    };
+    window.postMessage({
+      type: 'WEBAI_DIAGNOSIS_EVAL_RESPONSE',
+      messageId: event.data.messageId,
+      data: result
+    }, '*');
+  }
+});
+
 function createHistoryFetcher(apiName: string) {
   return function(): Promise<any[]> {
     return new Promise((resolve, reject) => {

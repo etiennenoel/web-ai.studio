@@ -15,4 +15,5 @@ export enum PanelTab {
     REWRITER = 'rewriter',
     MODELS = 'models',
     SETTINGS = 'settings',
+    DIAGNOSIS = 'diagnosis',
 }

@@ -12,7 +12,7 @@ import { RewriterComponent } from './panels/rewriter/rewriter.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { HistoryComponent } from './panels/history/history.component';
 import { PanelTab } from './enums/panel-tab.enum';
-import { SettingsComponent } from 'base';
+import { SettingsComponent, DiagnosisComponent } from 'base';
 
 const routes: Routes = [
   { path: '', redirectTo: PanelTab.OVERVIEW, pathMatch: 'full' },
@@ -20,6 +20,7 @@ const routes: Routes = [
   { path: PanelTab.PERFORMANCE, component: PerformanceComponent },
   { path: PanelTab.HISTORY, component: HistoryComponent },
   { path: PanelTab.MODELS, component: ModelsComponent },
+  { path: PanelTab.DIAGNOSIS, component: DiagnosisComponent },
   { path: PanelTab.PROMPT, component: PromptComponent },
   { path: PanelTab.SUMMARIZER, component: SummarizerComponent },
   { path: PanelTab.TRANSLATOR, component: TranslatorComponent },

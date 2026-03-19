@@ -21,7 +21,7 @@ import { HistoryComponent } from './panels/history/history.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { ModelDownloadCard } from './components/model-download-card/model-download-card';
 import { ApiStatusComponent } from './components/api-status/api-status.component';
-import {BaseModule} from "base";
+import {BaseModule, DiagnosisComponent} from "base";
 
 @NgModule({
   declarations: [
@@ -49,6 +49,7 @@ import {BaseModule} from "base";
     FormsModule,
     CommonModule,
     BaseModule,
+    DiagnosisComponent,
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { PanelTab } from '../../enums/panel-tab.enum';
 import { MenuItemConfig } from '../../interfaces/menu-item-config.interface';
-import { APP_VERSION } from 'base';
+import { APP_VERSION, DiagnosisService } from 'base';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,9 +12,12 @@ import { APP_VERSION } from 'base';
 })
 export class SidebarComponent {
   appVersion = APP_VERSION;
+  errorCount$: Observable<number>;
+
   readonly menuItems: MenuItemConfig[] = [
     { id: PanelTab.OVERVIEW, label: 'Overview', iconClass: 'fa-solid fa-gauge-high', isApi: false, isManagement: false },
     { id: PanelTab.PERFORMANCE, label: 'Performance', iconClass: 'fa-solid fa-chart-line', isApi: false, isManagement: false },
+    { id: PanelTab.DIAGNOSIS, label: 'Diagnosis', iconClass: 'fa-solid fa-stethoscope', isApi: false, isManagement: false },
     { id: PanelTab.HISTORY, label: 'History', iconClass: 'fa-solid fa-clock-rotate-left', isApi: false, isManagement: false },
     { id: PanelTab.SETTINGS, label: 'Settings', iconClass: 'fa-solid fa-gear', isApi: false, isManagement: false },
     { id: PanelTab.MODELS, label: 'Models', iconClass: 'fa-solid fa-layer-group', isApi: false, isManagement: true },
@@ -25,6 +29,10 @@ export class SidebarComponent {
     { id: PanelTab.WRITER, label: 'Writer API', iconClass: 'fa-solid fa-pen-nib', isApi: true, isManagement: false },
     { id: PanelTab.REWRITER, label: 'Rewriter API', iconClass: 'fa-solid fa-wand-magic-sparkles', isApi: true, isManagement: false },
   ];
+
+  constructor(private diagnosisService: DiagnosisService) {
+    this.errorCount$ = this.diagnosisService.errorCount$;
+  }
 
   get apiItems() { return this.menuItems.filter(item => item.isApi); }
   get managementItems() { return this.menuItems.filter(item => item.isManagement); }

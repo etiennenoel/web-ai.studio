@@ -2,9 +2,17 @@
   <!-- Header -->
   <div class="flex justify-between items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-2">
     <h1 class="text-xl font-semibold">WebAI Status</h1>
-    <a routerLink="/settings" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Settings">
-      <i class="fas fa-cog text-xl"></i>
-    </a>
+    <div class="flex gap-4 items-center">
+      <a routerLink="/diagnosis" class="relative text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Diagnosis">
+        <i class="fas fa-stethoscope text-xl"></i>
+        <span *ngIf="(errorCount$ | async) as errorCount" class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center justify-center min-w-[1.1rem]">
+            {{ errorCount }}
+        </span>
+      </a>
+      <a routerLink="/settings" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Settings">
+        <i class="fas fa-cog text-xl"></i>
+      </a>
+    </div>
   </div>
 
   <!-- Model Status -->

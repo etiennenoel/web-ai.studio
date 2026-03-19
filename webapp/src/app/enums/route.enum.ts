@@ -11,4 +11,5 @@ export enum RouteEnum {
   PrivacyPolicy = "/privacy-policy",
   TermsOfService = "/terms-of-service",
   Bugs = "/bugs",
+  Extension = "/extension",
 }

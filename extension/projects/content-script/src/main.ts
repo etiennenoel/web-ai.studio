@@ -29,6 +29,26 @@ chrome.runtime.sendMessage({ action: 'get_setting', key: 'wrap_api', defaultValu
   }
 });
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'diagnose_apis') {
+    const messageId = 'webai-diag-' + Date.now() + '-' + Math.random();
+    
+    const listener = (event: any) => {
+      if (event.source !== window) return;
+      if (event.data && event.data.type === 'WEBAI_DIAGNOSIS_EVAL_RESPONSE' && event.data.messageId === messageId) {
+        window.removeEventListener('message', listener);
+        sendResponse({ data: event.data.data });
+      }
+    };
+    
+    window.addEventListener('message', listener);
+    window.postMessage({ type: 'WEBAI_DIAGNOSIS_EVAL_REQUEST', messageId: messageId }, '*');
+    
+    // Return true to indicate we wish to send a response asynchronously
+    return true;
+  }
+});
+
 // 2. Listen for messages from the injected script
 window.addEventListener('message', async (event) => {
   if (event.source !== window) return;

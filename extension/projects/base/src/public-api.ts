@@ -17,3 +17,5 @@ export * from './lib/version';
 export * from './lib/config/feature-flags';
 export * from './lib/interfaces/hardware-info.interface';
 export * from './lib/settings/settings.component';
+export * from './lib/diagnosis/diagnosis.component';
+export * from './lib/managers/diagnosis.service';

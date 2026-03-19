@@ -29,6 +29,13 @@
         </a>
       </li>
 
+      <li class="nav-item" [class.active]="routeEnum === RouteEnum.Extension">
+        <a class="nav-link d-flex align-items-center text-blue-400" [routerLink]="getRouterLink(RouteEnum.Extension)">
+          <i class="bi bi-puzzle me-2"></i>
+          <span class="font-bold">Extension</span>
+        </a>
+      </li>
+
       <li class="nav-item position-relative mt-2" [class.active]="routeEnum === RouteEnum.MediaGeneration">
         <span class="badge rounded-pill bg-warning position-absolute" style="top: -6px; left: 35px; font-size: 0.55rem; z-index: 1; padding: 0.25em 0.4em;">WIP</span>
         <a class="nav-link d-flex align-items-center" [routerLink]="getRouterLink(RouteEnum.Chat)">

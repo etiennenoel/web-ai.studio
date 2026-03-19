@@ -10,6 +10,9 @@ describe('content-script main', () => {
         sendMessage: vi.fn(),
         getURL: vi.fn().mockReturnValue('chrome-extension://mock-id/injected.js'),
         lastError: null,
+        onMessage: {
+          addListener: vi.fn()
+        }
       }
     };
     (global as any).chrome = mockChrome;

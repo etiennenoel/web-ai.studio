@@ -1,0 +1,470 @@
+<div class="h-100 overflow-y-auto custom-scrollbar p-6 bg-gray-50 dark:bg-[#1e1e20]">
+  <div class="max-w-7xl mx-auto space-y-12 pb-12">
+    
+    <!-- Hero Section -->
+    <div class="text-center pt-8 pb-4">
+      <div class="inline-flex items-center justify-center p-3 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-6">
+        <i class="bi bi-puzzle text-4xl text-blue-600 dark:text-blue-400"></i>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white tracking-tight">
+        Debug the Chrome Built-in AI APIs <br/> <span class="text-blue-600 dark:text-blue-400">Like a Pro</span>
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
+        The ultimate DevTools extension for inspecting, debugging, and prototyping with Chrome's local Gemini Nano APIs. Monitor tokens, latency, and model status in real-time.
+      </p>
+      <div class="flex items-center justify-center gap-4">
+        <!-- We'll replace this with an actual web store link later if needed -->
+        <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" class="btn btn-primary btn-lg rounded-pill px-8 font-semibold shadow-sm hover:shadow-md transition-all">
+          <i class="bi bi-chrome me-2"></i> Install Extension
+        </a>
+        <a href="https://github.com/etiennenoel/web-ai.studio/tree/master/extension" target="_blank" class="btn btn-outline-secondary btn-lg rounded-pill px-8 font-semibold transition-all">
+          <i class="bi bi-github me-2"></i> View Source
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Screenshot / Demo Area -->
+    <div class="rounded-2xl shadow-2xl mb-16 overflow-hidden border border-gray-300 dark:border-gray-700 max-w-6xl mx-auto">
+      
+      <!-- Fake Chrome Window Header -->
+      <div class="h-8 bg-gray-200 dark:bg-[#35363a] flex items-center px-4 gap-2 border-b border-gray-300 dark:border-gray-700">
+        <div class="flex gap-1.5">
+          <div class="w-3 h-3 rounded-full bg-red-400"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+        </div>
+        <div class="flex-1 text-center text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+          DevTools
+        </div>
+      </div>
+      
+      <!-- Fake DevTools Top Bar -->
+      <div class="h-10 bg-gray-100 dark:bg-[#202124] border-b border-gray-300 dark:border-[#3c4043] flex items-center px-4 text-sm text-gray-600 dark:text-gray-400 gap-6 select-none overflow-hidden">
+        <div class="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white cursor-pointer"><i class="bi bi-cursor"></i></div>
+        <div class="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white cursor-pointer"><i class="bi bi-phone"></i></div>
+        <div class="flex h-full gap-4 items-center">
+          <div class="h-full flex items-center hover:text-gray-900 dark:hover:text-white cursor-pointer border-b-2 border-transparent">Elements</div>
+          <div class="h-full flex items-center hover:text-gray-900 dark:hover:text-white cursor-pointer border-b-2 border-transparent">Console</div>
+          <div class="h-full flex items-center hover:text-gray-900 dark:hover:text-white cursor-pointer border-b-2 border-transparent">Network</div>
+          <div class="h-full flex items-center text-blue-600 dark:text-blue-400 font-medium border-b-2 border-blue-600 dark:border-blue-400">WebAI</div>
+          <div class="h-full flex items-center hover:text-gray-900 dark:hover:text-white cursor-pointer border-b-2 border-transparent">Application</div>
+          <div class="h-full flex items-center hover:text-gray-900 dark:hover:text-white cursor-pointer border-b-2 border-transparent"><i class="bi bi-chevron-double-right"></i></div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-[#202124] flex flex-col md:flex-row h-[500px]">
+        <!-- Mock Sidebar -->
+        <div class="w-full md:w-64 bg-gray-50 dark:bg-[#292a2d] border-r border-gray-200 dark:border-[#3c4043] flex-shrink-0 flex flex-col select-none">
+          <div class="p-3 border-b border-gray-200 dark:border-[#3c4043] flex items-center gap-2">
+            <div class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs"><i class="bi bi-puzzle"></i></div>
+            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">WebAI Panel</span>
+          </div>
+          <div class="p-2 space-y-1">
+            <div (click)="setTab('overview')" [ngClass]="activeTab === 'overview' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-speedometer2 text-gray-500"></i> Overview
+            </div>
+            <div (click)="setTab('performance')" [ngClass]="activeTab === 'performance' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-graph-up text-gray-500"></i> Performance
+            </div>
+            <div (click)="setTab('diagnosis')" [ngClass]="activeTab === 'diagnosis' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-heart-pulse text-gray-500"></i>
+              <span class="flex-1">Diagnosis</span>
+              <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">2</span>
+            </div>
+            <div (click)="setTab('history')" [ngClass]="activeTab === 'history' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-clock-history text-gray-500"></i> History
+            </div>
+          </div>
+          
+          <div class="mt-4 px-3 py-1">
+            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">APIs</span>
+          </div>
+          <div class="p-2 space-y-1">
+            <div (click)="setTab('prompt')" [ngClass]="activeTab === 'prompt' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-terminal text-gray-500"></i> Prompt API
+            </div>
+            <div (click)="setTab('summarizer')" [ngClass]="activeTab === 'summarizer' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
+              <i class="bi bi-file-text text-gray-500"></i> Summarizer API
+            </div>
+          </div>
+        </div>
+
+        <!-- Mock Main Content Areas -->
+        <div class="flex-1 bg-white dark:bg-[#202124] relative overflow-y-auto custom-scrollbar h-full">
+        
+        <!-- Overview Tab -->
+        <div *ngIf="activeTab === 'overview'" class="p-6 animate-fade-in bg-gray-50 dark:bg-[#1e1e20] min-h-full">
+          <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <h2 class="text-xl font-semibold">Dashboard</h2>
+            <div class="flex gap-2">
+                <button class="text-xs bg-white dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] px-3 py-1.5 rounded text-gray-700 dark:text-gray-300">
+                    <i class="bi bi-arrow-clockwise mr-1"></i> Refresh
+                </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <!-- Mock Model Download Card -->
+            <div class="bg-white dark:bg-[#292a2d] p-4 rounded-xl border border-gray-200 dark:border-[#3c4043] flex flex-col justify-between h-full col-span-1 md:col-span-3 lg:col-span-1">
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-600 dark:text-gray-400 text-xs font-mono uppercase font-bold tracking-wider">Base Model</span>
+                        <div class="w-8 h-8 rounded bg-gray-50 dark:bg-[#202124] flex items-center justify-center border border-gray-200 dark:border-[#3c4043]">
+                            <img src="assets/images/spark.png" class="w-4 h-4">
+                        </div>
+                    </div>
+                    <div class="text-lg font-bold mb-1">Gemini Nano</div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="status-dot status-green w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-sm font-medium text-green-700 dark:text-green-400">Available</span>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <!-- API Capabilities Grid -->
+          <div>
+            <h3 class="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-3">API Capabilities</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              
+              <!-- Prompt API -->
+              <div class="bg-white dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4 flex flex-col justify-between">
+                  <div>
+                      <div class="flex justify-between items-start mb-3">
+                          <div class="w-8 h-8 rounded bg-gray-50 dark:bg-[#202124] flex items-center justify-center border border-gray-200 dark:border-[#3c4043]">
+                              <i class="bi bi-terminal text-gray-700 dark:text-gray-300"></i>
+                          </div>
+                          <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                            Available
+                          </span>
+                      </div>
+                      <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-1">Prompt API</h3>
+                      <p class="text-xs text-gray-500 line-clamp-2">Direct access to Gemini Nano</p>
+                  </div>
+              </div>
+
+              <!-- Summarizer API -->
+              <div class="bg-white dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4 flex flex-col justify-between">
+                  <div>
+                      <div class="flex justify-between items-start mb-3">
+                          <div class="w-8 h-8 rounded bg-gray-50 dark:bg-[#202124] flex items-center justify-center border border-gray-200 dark:border-[#3c4043]">
+                              <i class="bi bi-file-text text-gray-700 dark:text-gray-300"></i>
+                          </div>
+                          <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                            Downloadable
+                          </span>
+                      </div>
+                      <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-1">Summarizer API</h3>
+                      <p class="text-xs text-gray-500 line-clamp-2">Generate summaries of content</p>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-[#3c4043] flex justify-end">
+                      <button class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded flex items-center gap-2">
+                          <i class="bi bi-download"></i> Setup
+                      </button>
+                  </div>
+              </div>
+
+              <!-- Translator API -->
+              <div class="bg-white dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4 flex flex-col justify-between">
+                  <div>
+                      <div class="flex justify-between items-start mb-3">
+                          <div class="w-8 h-8 rounded bg-gray-50 dark:bg-[#202124] flex items-center justify-center border border-gray-200 dark:border-[#3c4043]">
+                              <i class="bi bi-translate text-gray-700 dark:text-gray-300"></i>
+                          </div>
+                          <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                            Unavailable
+                          </span>
+                      </div>
+                      <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-1">Translator API</h3>
+                      <p class="text-xs text-gray-500 line-clamp-2">Translate text natively</p>
+                  </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Tab -->
+        <div *ngIf="activeTab === 'performance'" class="p-6 animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-1">Performance</h2>
+              <p class="text-sm text-gray-500">Real-time metrics for local AI inference.</p>
+            </div>
+            <span class="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full"><i class="bi bi-circle-fill mr-1 text-[8px] animate-pulse"></i> Tracking Active</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded-xl border border-gray-200 dark:border-[#3c4043]">
+              <div class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Avg Time to First Token</div>
+              <div class="text-2xl font-mono text-gray-800 dark:text-gray-200">184<span class="text-sm text-gray-500 ml-1">ms</span></div>
+            </div>
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded-xl border border-gray-200 dark:border-[#3c4043]">
+              <div class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Avg Tokens / Sec</div>
+              <div class="text-2xl font-mono text-gray-800 dark:text-gray-200">45.2</div>
+            </div>
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded-xl border border-gray-200 dark:border-[#3c4043]">
+              <div class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">Total Tokens Processed</div>
+              <div class="text-2xl font-mono text-gray-800 dark:text-gray-200">8,402</div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4 h-48 flex items-center justify-center flex-col">
+             <!-- Mock chart graphic -->
+             <div class="w-full h-32 flex items-end justify-between px-4 gap-2">
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 40%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 65%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 45%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 80%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 30%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 55%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 90%"></div>
+                <div class="w-full bg-blue-400 dark:bg-blue-600 rounded-t opacity-80" style="height: 70%"></div>
+             </div>
+             <div class="w-full border-t border-gray-300 dark:border-[#5f6368] mt-2 flex justify-between text-xs text-gray-500 pt-1">
+                <span>10 mins ago</span>
+                <span>Tokens/sec over time</span>
+                <span>Now</span>
+             </div>
+          </div>
+        </div>
+
+        <!-- Diagnosis Tab -->
+        <div *ngIf="activeTab === 'diagnosis'" class="p-6 animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-1">Diagnosis</h2>
+              <p class="text-sm text-gray-500">Verify API availability across contexts.</p>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Re-run Checks</button>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-lg p-4">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="font-bold">Prompt API (<code>window.LanguageModel</code>)</h3>
+                <span class="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-2 py-1 rounded font-semibold">Origin Trial</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-3 bg-white dark:bg-[#202124] border border-gray-200 dark:border-[#3c4043] rounded">
+                  <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">DevTools Context</div>
+                  <div class="text-sm font-medium"><i class="bi bi-check-circle-fill text-green-500 mr-1"></i> Available</div>
+                </div>
+                <div class="p-3 bg-white dark:bg-[#202124] border border-gray-200 dark:border-[#3c4043] rounded">
+                  <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Inspected Page Context</div>
+                  <div class="text-sm font-medium"><i class="bi bi-check-circle-fill text-green-500 mr-1"></i> Available</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-lg p-4">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="font-bold">Writer API (<code>window.Writer</code>)</h3>
+                <span class="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs px-2 py-1 rounded font-semibold">Dev Trial</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-3 bg-white dark:bg-[#202124] border border-gray-200 dark:border-[#3c4043] rounded">
+                  <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">DevTools Context</div>
+                  <div class="text-sm font-medium"><i class="bi bi-x-circle-fill text-red-500 mr-1"></i> Not Found</div>
+                </div>
+                <div class="p-3 bg-white dark:bg-[#202124] border border-gray-200 dark:border-[#3c4043] rounded">
+                  <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Inspected Page Context</div>
+                  <div class="text-sm font-medium"><i class="bi bi-x-circle-fill text-red-500 mr-1"></i> Not Found</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Tab -->
+        <div *ngIf="activeTab === 'history'" class="p-6 animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-1">History</h2>
+              <p class="text-sm text-gray-500">Inspect past requests and responses.</p>
+            </div>
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Clear</button>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="border border-gray-200 dark:border-[#3c4043] rounded-lg overflow-hidden">
+              <div class="bg-gray-100 dark:bg-[#35363a] p-3 flex justify-between items-center border-b border-gray-200 dark:border-[#3c4043] cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 text-xs font-mono px-2 py-0.5 rounded">Prompt</span>
+                  <span class="text-sm font-medium">"Can you explain how React context works?"</span>
+                </div>
+                <div class="text-xs text-gray-500 flex items-center gap-3">
+                  <span>850ms</span>
+                  <span><i class="bi bi-chevron-down"></i></span>
+                </div>
+              </div>
+              <div class="p-4 bg-white dark:bg-[#292a2d] text-sm">
+                <div class="mb-2">
+                  <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Response</span>
+                  <p class="text-gray-800 dark:text-gray-200 leading-relaxed">React context provides a way to pass data through the component tree without having to pass props down manually at every level. It is designed to share data that can be considered "global" for a tree of React components...</p>
+                </div>
+                <div class="mt-4 flex gap-2">
+                  <button class="btn btn-xs btn-outline-secondary"><i class="bi bi-code-slash"></i> View Code</button>
+                  <button class="btn btn-xs btn-outline-secondary"><i class="bi bi-play-fill"></i> Replay</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-gray-200 dark:border-[#3c4043] rounded-lg overflow-hidden">
+              <div class="bg-gray-100 dark:bg-[#35363a] p-3 flex justify-between items-center cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs font-mono px-2 py-0.5 rounded">Summarizer</span>
+                  <span class="text-sm font-medium text-gray-600 dark:text-gray-400">"In 2024, the web platform saw numerous advancements..."</span>
+                </div>
+                <div class="text-xs text-gray-500 flex items-center gap-3">
+                  <span>420ms</span>
+                  <span><i class="bi bi-chevron-right"></i></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt API Tab -->
+        <div *ngIf="activeTab === 'prompt'" class="p-6 animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-2xl font-bold mb-1">Prompt API Testbed</h2>
+              <p class="text-sm text-gray-500">Prototype configurations and test prompts directly.</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-2 space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">System Prompt</label>
+                <textarea class="w-full bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" rows="3" placeholder="You are a helpful assistant..."></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">User Prompt</label>
+                <textarea class="w-full bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" rows="4" placeholder="Ask something..."></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button class="btn btn-primary px-6"><i class="bi bi-play-fill mr-1"></i> Run Prompt</button>
+              </div>
+            </div>
+            
+            <div class="col-span-1 bg-gray-50 dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4">
+              <h3 class="text-sm font-bold border-b border-gray-200 dark:border-[#3c4043] pb-2 mb-4">Configuration</h3>
+              
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="font-medium text-gray-600 dark:text-gray-400">Temperature</span>
+                    <span class="font-mono text-gray-500">0.8</span>
+                  </div>
+                  <input type="range" class="w-full" min="0" max="1" step="0.1" value="0.8">
+                </div>
+                
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="font-medium text-gray-600 dark:text-gray-400">Top K</span>
+                    <span class="font-mono text-gray-500">3</span>
+                  </div>
+                  <input type="range" class="w-full" min="1" max="10" step="1" value="3">
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200 dark:border-[#3c4043]">
+                  <button class="btn btn-sm btn-outline-secondary w-full"><i class="bi bi-code-slash mr-1"></i> Generate Code</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summarizer API Tab -->
+        <div *ngIf="activeTab === 'summarizer'" class="p-6 animate-fade-in flex items-center justify-center h-full">
+           <div class="text-center text-gray-400 dark:text-gray-500">
+              <i class="bi bi-file-text text-6xl mb-3 block"></i>
+              <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Summarizer API</h3>
+              <p>Specialized tabs for all task-based APIs exist to test options like formats, types, and lengths without writing boilerplate code.</p>
+           </div>
+        </div>
+        
+      </div>
+    </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div>
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Supercharge your Local AI Workflow</h2>
+        <p class="text-gray-600 dark:text-gray-400">Everything you need to build powerful, resilient applications with built-in AI.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Feature 1: Performance -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-graph-up text-xl text-blue-600 dark:text-blue-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Automatic Performance Tracking</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Automatically track time-to-first-token and tokens-per-second for every API call. Visualize latency across different APIs and system states.
+          </p>
+        </div>
+
+        <!-- Feature 2: Diagnosis -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+          <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-heart-pulse text-xl text-indigo-600 dark:text-indigo-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">API Diagnosis</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Instantly diagnose API availability and Origin Trial status. Check DevTools vs Window contexts and find exactly which flags need enabling.
+          </p>
+        </div>
+
+        <!-- Feature 3: History -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-clock-history text-xl text-purple-600 dark:text-purple-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Prompt History</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Keep a detailed log of all API interactions. Review past prompts, responses, errors, and easily replay them or copy the generated code.
+          </p>
+        </div>
+
+        <!-- Feature 4: Models -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
+          <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-box-seam text-xl text-amber-600 dark:text-amber-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Model Management</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Check the download status of local models, see model sizes, and trigger downloads on demand straight from the DevTools panel.
+          </p>
+        </div>
+
+        <!-- Feature 5: Mocking -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-teal-300 dark:hover:border-teal-700 transition-colors">
+          <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-sign-stop text-xl text-teal-600 dark:text-teal-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Mock Responses</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Intercept built-in API calls from your application and provide custom mock responses. Perfect for testing UI edge cases and error handling.
+          </p>
+        </div>
+
+        <!-- Feature 6: Sidebar -->
+        <div class="bg-white dark:bg-[#292a2d] p-6 rounded-2xl border border-gray-200 dark:border-[#3c4043] hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-4">
+            <i class="bi bi-layout-sidebar text-xl text-green-600 dark:text-green-400"></i>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Chrome Side Panel</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            Access the extension quickly from the Chrome Sidebar. See which tabs are using the AI APIs and keep an eye on hardware usage.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
