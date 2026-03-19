@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID, OnDestroy} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
@@ -10,6 +10,7 @@ import {MathematicalCalculations} from './axon/util/mathematical-calculations';
 import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
+import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'page-cortex',
@@ -17,7 +18,7 @@ import { isPlatformServer } from '@angular/common';
   templateUrl: './cortex.page.html',
   styleUrl: './cortex.page.scss'
 })
-export class CortexPage implements OnInit, AfterViewInit {
+export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   builtInAiApis: ItemInterface[] = EnumUtils.getItems(BuiltInAiApi);
   selectedTestIds: Set<string> = new Set<string>();
@@ -25,6 +26,14 @@ export class CortexPage implements OnInit, AfterViewInit {
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
   selectedImageUrl: string | null = null;
   isExtensionInstalled: boolean = true; // By default we don't show it.
+  
+  hardwareInfo: any = null;
+  comparisonChart: Chart | null = null;
+  testCharts: { [id: string]: Chart } = {};
+
+  isImportedReport = false;
+  importedTimestamp: string | null = null;
+  importedUserAgent: string | null = null;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
@@ -61,6 +70,64 @@ export class CortexPage implements OnInit, AfterViewInit {
 
   ) {}
 
+  triggerImport() {
+    const fileInput = document.getElementById('cortex-report-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target?.result as string);
+          this.loadReport(data);
+        } catch (error) {
+          console.error("Failed to parse JSON", error);
+          alert("Invalid JSON file");
+        }
+      };
+      reader.readAsText(file);
+    }
+    // Clear input so same file can be selected again
+    event.target.value = '';
+  }
+
+  loadReport(data: any) {
+    if (data && data.results) {
+      this.axonTestSuiteExecutor.results = data.results;
+      this.hardwareInfo = data.hardware;
+      this.importedTimestamp = data.timestamp;
+      this.importedUserAgent = data.userAgent;
+      
+      this.selectedTestIds.clear();
+      
+      for (const result of data.results.testsResults) {
+        if (this.axonTestSuiteExecutor.testIdMap[result.id as AxonTestId]) {
+          this.axonTestSuiteExecutor.testIdMap[result.id as AxonTestId].results = result;
+          this.selectedTestIds.add(result.id);
+        }
+      }
+      
+      this.isImportedReport = true;
+      this.axonTestSuiteExecutor.preTestsStatus = TestStatus.Success;
+      this.axonTestSuiteExecutor.results.status = TestStatus.Success;
+      
+      setTimeout(() => {
+        this.renderCharts();
+      }, 100);
+    } else {
+      alert("Invalid report format");
+    }
+  }
+
+  resetState() {
+    window.location.reload();
+  }
+
   ngOnInit() {
     if(isPlatformServer(this.platformId)) {
       return;
@@ -76,13 +143,24 @@ export class CortexPage implements OnInit, AfterViewInit {
     });
   }
 
-ngAfterViewInit(): void {
-  if(isPlatformServer(this.platformId)) {
-    return;
+  ngOnDestroy() {
+    if (this.comparisonChart) {
+      this.comparisonChart.destroy();
+    }
+    for (const key in this.testCharts) {
+      if (this.testCharts[key]) {
+        this.testCharts[key].destroy();
+      }
+    }
   }
 
-  this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
-}
+  ngAfterViewInit(): void {
+    if(isPlatformServer(this.platformId)) {
+      return;
+    }
+
+    this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+  }
 
   async downloadResults() {
     let hardwareInfo = null;
@@ -186,6 +264,157 @@ ngAfterViewInit(): void {
 
     // Once everything passes, we can start the tests.
     await this.axonTestSuiteExecutor.start(this.selectedTestIds);
+    
+    await this.generateReport();
+  }
+  
+  async generateReport() {
+    if (this.isExtensionInstalled) {
+      try {
+        this.hardwareInfo = await (window as any).webai.getHardwareInformation();
+      } catch (e) {
+        console.error("Failed to get hardware info", e);
+      }
+    }
+    
+    setTimeout(() => {
+      this.renderCharts();
+    }, 100);
+  }
+  
+  getTestById(id: string): AxonTestInterface | undefined {
+    return this.axonTestSuiteExecutor.testIdMap[id as AxonTestId];
+  }
+  
+  renderCharts() {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDark ? '#9aa0a6' : '#4b5563';
+    const gridColor = isDark ? '#3c4043' : '#e5e7eb';
+    
+    // Comparison Chart
+    const comparisonCanvas = document.getElementById('cortex-comparison-chart') as HTMLCanvasElement;
+    if (comparisonCanvas) {
+      if (this.comparisonChart) this.comparisonChart.destroy();
+      
+      const labels: string[] = [];
+      const ttftData: number[] = [];
+      const totalData: number[] = [];
+      
+      for (const testId of this.selectedTestIds) {
+        const test = this.getTestById(testId);
+        if (test && test.results.testIterationResults.length > 0) {
+          labels.push(test.id.substring(0, 15) + '...');
+          ttftData.push(test.results.averageTimeToFirstToken || 0);
+          totalData.push(test.results.averageTotalResponseTime || 0);
+        }
+      }
+      
+      this.comparisonChart = new Chart(comparisonCanvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Avg TTFT (ms)',
+              data: ttftData,
+              backgroundColor: '#8ab4f8',
+              borderColor: '#8ab4f8',
+              borderWidth: 1
+            },
+            {
+              label: 'Avg Total Response (ms)',
+              data: totalData,
+              backgroundColor: '#c58af9',
+              borderColor: '#c58af9',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          color: textColor,
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: { color: textColor, maxRotation: 45, minRotation: 45 }
+            },
+            y: {
+              grid: { color: gridColor },
+              ticks: { color: textColor }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: textColor }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  renderTestChart(testId: string) {
+    const test = this.getTestById(testId);
+    if (!test || test.results.testIterationResults.length === 0) return;
+    
+    const canvas = document.getElementById('cortex-test-chart-' + test.id) as HTMLCanvasElement;
+    if (!canvas) return;
+    
+    if (this.testCharts[test.id]) this.testCharts[test.id].destroy();
+    
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDark ? '#9aa0a6' : '#4b5563';
+    const gridColor = isDark ? '#3c4043' : '#e5e7eb';
+    
+    const labels = test.results.testIterationResults.map((_, i) => `Run ${i + 1}`);
+    const ttft = test.results.testIterationResults.map(r => r.timeToFirstToken || 0);
+    const total = test.results.testIterationResults.map(r => r.totalResponseTime || 0);
+    
+    this.testCharts[test.id] = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'TTFT (ms)',
+            data: ttft,
+            borderColor: '#8ab4f8',
+            backgroundColor: '#8ab4f8',
+            borderDash: [5, 5],
+            tension: 0.2
+          },
+          {
+            label: 'Total Response (ms)',
+            data: total,
+            borderColor: '#c58af9',
+            backgroundColor: '#c58af9',
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        color: textColor,
+        scales: {
+          x: {
+            grid: { color: gridColor },
+            ticks: { color: textColor }
+          },
+          y: {
+            grid: { color: gridColor },
+            ticks: { color: textColor },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: textColor }
+          }
+        }
+      }
+    });
   }
 
   forceSetup(testId: AxonTestId): Promise<void> {
@@ -224,8 +453,17 @@ ngAfterViewInit(): void {
   }
 
   get isTestingRunning(): boolean {
-    return this.axonTestSuiteExecutor.results.status === TestStatus.Executing || 
+    return this.isImportedReport || 
+           this.axonTestSuiteExecutor.results.status === TestStatus.Executing || 
            this.axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing;
+  }
+
+  get isReportReady(): boolean {
+    if (this.isImportedReport) return true;
+    if (this.axonTestSuiteExecutor.results.status === TestStatus.Success || this.axonTestSuiteExecutor.results.status === TestStatus.Error) {
+      return this.getOverallProgress().percentage === 100;
+    }
+    return false;
   }
 
   get currentExecutingTest(): AxonTestInterface | null {
@@ -373,6 +611,12 @@ ngAfterViewInit(): void {
   toggleTest(testId: AxonTestId) {
     const test = this.axonTestSuiteExecutor.testIdMap[testId];
     this.viewData[testId].iterationsCollapsed = !this.isTestCollapsed(test);
+    
+    if (!this.viewData[testId].iterationsCollapsed) {
+      setTimeout(() => {
+        this.renderTestChart(testId);
+      }, 50);
+    }
   }
 
   unescapeOutput(output: string): string {
