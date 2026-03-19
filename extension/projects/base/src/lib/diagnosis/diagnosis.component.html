@@ -138,5 +138,43 @@
       </div>
     </div>
 
+    <!-- History of Errors -->
+    <div *ngIf="errorHistory.length > 0" class="mt-8 border-t border-gray-200 dark:border-[#3c4043] pt-6">
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-clock-rotate-left"></i> Recent Errors from History
+      </h3>
+      
+      <ng-container *ngIf="!isSidePanel()">
+        <div class="space-y-4">
+          <div *ngFor="let item of errorHistory" class="bg-white dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-mono text-sm font-bold">{{ item.api }}.{{ item.method }}</span>
+              <span class="text-xs text-gray-500">{{ item.timestamp | date:'shortTime' }}</span>
+            </div>
+            <div class="text-sm text-red-600 dark:text-red-400 mt-2 bg-red-50 dark:bg-red-900/10 p-2 rounded font-mono whitespace-pre-wrap break-words">
+              {{ item.errorMessage || item.response?.error || 'Unknown error' }}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isSidePanel()">
+        <div *ngFor="let group of groupedErrorHistory" class="mb-6">
+          <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3 truncate" [title]="group.origin">{{ group.origin }}</h4>
+          <div class="space-y-4">
+            <div *ngFor="let item of group.items" class="bg-white dark:bg-[#292a2d] border border-gray-200 dark:border-[#3c4043] rounded-xl p-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-mono text-sm font-bold">{{ item.api }}.{{ item.method }}</span>
+                <span class="text-xs text-gray-500">{{ item.timestamp | date:'shortTime' }}</span>
+              </div>
+              <div class="text-sm text-red-600 dark:text-red-400 mt-2 bg-red-50 dark:bg-red-900/10 p-2 rounded font-mono whitespace-pre-wrap break-words">
+                {{ item.errorMessage || item.response?.error || 'Unknown error' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
   </div>
 </section>

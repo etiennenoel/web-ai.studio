@@ -16,6 +16,8 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
   apis: ApiDiagnostic[] = [];
   isChecking = true;
   hasErrors = false;
+  errorHistory: any[] = [];
+  groupedErrorHistory: { origin: string; items: any[] }[] = [];
   private subscriptions: Subscription[] = [];
 
   get failingApis() {
@@ -44,6 +46,21 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
       }),
       this.diagnosisService.errorCount$.subscribe(count => {
         this.hasErrors = count > 0;
+        this.cdr.detectChanges();
+      }),
+      this.diagnosisService.errorHistory$.subscribe(history => {
+        this.errorHistory = history;
+        if (this.isSidePanel()) {
+          const grouped = history.reduce((acc, item) => {
+            if (!acc[item.origin]) acc[item.origin] = [];
+            acc[item.origin].push(item);
+            return acc;
+          }, {});
+          this.groupedErrorHistory = Object.keys(grouped).map(origin => ({
+            origin,
+            items: grouped[origin]
+          }));
+        }
         this.cdr.detectChanges();
       })
     );

@@ -84,6 +84,7 @@ export class DiagnosisService {
   public apis$ = new BehaviorSubject<ApiDiagnostic[]>(this.apisData);
   public isChecking$ = new BehaviorSubject<boolean>(true);
   public errorCount$ = new BehaviorSubject<number>(0);
+  public errorHistory$ = new BehaviorSubject<any[]>([]);
 
   constructor(private ngZone: NgZone) {
     this.runChecks();
@@ -91,6 +92,8 @@ export class DiagnosisService {
 
   runChecks() {
     this.isChecking$.next(true);
+    this.fetchErrorHistory();
+
     
     const currentApis = this.apis$.getValue();
 
@@ -236,6 +239,39 @@ export class DiagnosisService {
       this.apis$.next([...currentApis]);
       this.errorCount$.next(errorCount);
       this.isChecking$.next(false);
+    }
+  fetchErrorHistory() {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      if (chrome.devtools) {
+        chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+          if (!isException && origin) {
+            chrome.runtime.sendMessage({ action: 'get_api_history', payload: { origin, apiName: 'all' } }, (response: any) => {
+              this.ngZone.run(() => {
+                if (response && response.data) {
+                  const errors = response.data.filter((item: any) => item.errorMessage || (item.response && item.response.error));
+                  this.errorHistory$.next(errors);
+                } else {
+                  this.errorHistory$.next([]);
+                }
+              });
+            });
+          } else {
+            this.errorHistory$.next([]);
+          }
+        });
+      } else {
+        // Side panel
+        chrome.runtime.sendMessage({ action: 'get_all_history' }, (response: any) => {
+          this.ngZone.run(() => {
+            if (response && response.data) {
+              const errors = response.data.filter((item: any) => item.errorMessage || (item.response && item.response.error));
+              this.errorHistory$.next(errors);
+            } else {
+              this.errorHistory$.next([]);
+            }
+          });
+        });
+      }
     }
   }
 }
