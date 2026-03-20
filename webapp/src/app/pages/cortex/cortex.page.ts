@@ -35,6 +35,11 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   importedTimestamp: string | null = null;
   importedUserAgent: string | null = null;
 
+  isGeneratingUrl = false;
+  generatedShareUrl: string | null = null;
+  showShareModal = false;
+  isUrlCopied = false;
+
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
     [AxonTestId.LanguageDetectorShortStringWarmStart]: {},
@@ -124,6 +129,112 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  async saveReportToUrl() {
+    this.isGeneratingUrl = true;
+    this.showShareModal = true;
+    this.generatedShareUrl = null;
+
+    let hwInfo = this.hardwareInfo;
+    if (!hwInfo && this.isExtensionInstalled) {
+      try {
+        hwInfo = await (window as any).webai.getHardwareInformation();
+      } catch (e) {
+        console.error("Failed to get hardware info", e);
+      }
+    }
+
+    const reportData = {
+      timestamp: this.importedTimestamp || new Date().toISOString(),
+      userAgent: this.importedUserAgent || navigator.userAgent,
+      hardware: hwInfo,
+      results: this.axonTestSuiteExecutor.results
+    };
+
+    try {
+      const jsonString = JSON.stringify(reportData);
+      
+      // Use Compression API to shrink the payload significantly before base64 encoding
+      const stream = new Blob([jsonString]).stream();
+      const compressedStream = stream.pipeThrough(new CompressionStream('deflate-raw'));
+      const compressedResponse = new Response(compressedStream);
+      const buffer = await compressedResponse.arrayBuffer();
+      
+      // Convert buffer to base64url string
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64 = btoa(binary);
+      // Make it URL safe
+      const base64url = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('report', base64url);
+      
+      this.generatedShareUrl = currentUrl.toString();
+      
+    } catch (e) {
+      console.error('Failed to compress and save report to URL', e);
+      alert('Report is too large to save in URL.');
+      this.showShareModal = false;
+    } finally {
+      this.isGeneratingUrl = false;
+    }
+  }
+
+  async copyShareUrl() {
+    if (this.generatedShareUrl) {
+      try {
+        await navigator.clipboard.writeText(this.generatedShareUrl);
+        this.isUrlCopied = true;
+        setTimeout(() => {
+          this.isUrlCopied = false;
+        }, 3000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
+  }
+
+  closeShareModal() {
+    this.showShareModal = false;
+    this.isUrlCopied = false;
+  }
+
+  async loadReportFromUrl(base64url: string) {
+    try {
+      // Revert URL safe characters
+      let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+      // Add padding if needed
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      
+      // Decompress
+      const stream = new Blob([bytes]).stream();
+      const decompressedStream = stream.pipeThrough(new DecompressionStream('deflate-raw'));
+      const decompressedResponse = new Response(decompressedStream);
+      const jsonString = await decompressedResponse.text();
+      
+      const data = JSON.parse(jsonString);
+      this.loadReport(data);
+    } catch (e) {
+      console.error('Failed to load report from URL', e);
+      alert('Failed to load report from URL. The link might be broken or expired.');
+      // Remove the broken report parameter
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete('report');
+      window.history.replaceState({}, '', currentUrl.toString());
+    }
+  }
+
   resetState() {
     window.location.reload();
   }
@@ -134,6 +245,13 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
     
     this.route.queryParamMap.subscribe(params => {
+      const reportParam = params.get('report');
+      if (reportParam) {
+        // If we have a report, prioritize loading it and don't overwrite with default test selections
+        this.loadReportFromUrl(reportParam);
+        return;
+      }
+      
       const testsParam = params.get('tests');
       if (testsParam !== null) {
         this.selectedTestIds = new Set(testsParam ? testsParam.split('|') : []);

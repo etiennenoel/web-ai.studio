@@ -127,9 +127,14 @@
       <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-3">
         <i class="bi bi-file-earmark-bar-graph text-blue-600"></i> Cortex Report
       </h2>
-      <button class="btn btn-primary flex items-center gap-2 px-6 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="downloadResults()">
-        <i class="bi bi-download text-lg"></i> Download Report
-      </button>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button class="btn btn-outline-primary flex items-center gap-2 px-6 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="saveReportToUrl()">
+          <i class="bi bi-link-45deg text-lg"></i> Share via URL
+        </button>
+        <button class="btn btn-primary flex items-center gap-2 px-6 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="downloadResults()">
+          <i class="bi bi-download text-lg"></i> Download JSON
+        </button>
+      </div>
     </div>
 
     <!-- Hardware Info -->
@@ -566,5 +571,56 @@
       <i class="bi bi-x-lg text-4xl"></i>
     </button>
     <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
+  </div>
+}
+
+@if (showShareModal) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 m-0 flex items-center gap-2">
+          <i class="bi bi-share text-blue-600"></i> Share Report
+        </h3>
+        <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors focus:outline-none" (click)="closeShareModal()">
+          <i class="bi bi-x-lg text-xl"></i>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        @if (isGeneratingUrl) {
+          <div class="flex flex-col items-center justify-center py-8">
+            <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-600 dark:text-gray-400 font-medium">Compressing and generating URL...</p>
+          </div>
+        } @else if (generatedShareUrl) {
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Your report has been compressed and attached to the URL below. Anyone with this link can view the exact state of this benchmark.
+          </p>
+          
+          <div class="flex gap-2">
+            <input type="text" readonly [value]="generatedShareUrl" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500 font-mono" (click)="$any($event.target).select()">
+            <button class="btn shrink-0 flex items-center justify-center gap-2" [ngClass]="isUrlCopied ? 'btn-success' : 'btn-primary'" (click)="copyShareUrl()">
+              @if (isUrlCopied) {
+                <i class="bi bi-check2"></i> Copied!
+              } @else {
+                <i class="bi bi-copy"></i> Copy
+              }
+            </button>
+          </div>
+          
+          <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 text-xs rounded-lg border border-yellow-200 dark:border-yellow-800/50 flex gap-3">
+            <i class="bi bi-exclamation-triangle-fill text-lg shrink-0"></i>
+            <span>Because this relies on URL length, very large reports (e.g. ones with large base64 image outputs) might exceed browser URL limits and fail to load for some users.</span>
+          </div>
+        }
+      </div>
+      
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
+        <button class="btn btn-outline-secondary" (click)="closeShareModal()">Close</button>
+      </div>
+    </div>
   </div>
 }
