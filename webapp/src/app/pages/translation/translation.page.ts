@@ -11,7 +11,10 @@ import {TranslationCodeModal} from '../../components/translation-code-modal/tran
   selector: 'lib-translation',
   standalone: false,
   templateUrl: './translation.page.html',
-  styleUrl: './translation.page.scss'
+  styleUrl: './translation.page.scss',
+  host: {
+    class: 'block h-full w-full flex flex-col min-h-0'
+  }
 })
 export class TranslationPage {
   protected readonly locales = LOCALES;

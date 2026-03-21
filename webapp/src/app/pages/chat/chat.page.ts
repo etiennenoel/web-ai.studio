@@ -16,7 +16,10 @@ declare const LanguageModel: any;
   selector: 'page-chat',
   templateUrl: './chat.page.html',
   standalone: false,
-  styleUrl: './chat.page.scss'
+  styleUrl: './chat.page.scss',
+  host: {
+    class: 'block h-full w-full flex flex-col min-h-0'
+  }
 })
 export class ChatPage extends BasePage implements OnInit, OnDestroy {
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;

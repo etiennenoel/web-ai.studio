@@ -11,7 +11,10 @@ import {EvalsExecutionEnum} from '../../enums/evals-execution.enum';
   selector: 'page-evals',
   templateUrl: './evals.page.html',
   standalone: false,
-  styleUrl: './evals.page.scss'
+  styleUrl: './evals.page.scss',
+  host: {
+    class: 'block h-full w-full flex flex-col min-h-0'
+  }
 })
 export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 

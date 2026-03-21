@@ -12,7 +12,10 @@ import {WritingAssistanceInputComponent} from '../../components/writing-assistan
   selector: 'webai-studio-writing-assistance',
   standalone: false,
   templateUrl: './writing-assistance.page.html',
-  styleUrl: './writing-assistance.page.scss'
+  styleUrl: './writing-assistance.page.scss',
+  host: {
+    class: 'block h-full w-full flex flex-col min-h-0'
+  }
 })
 export class WritingAssistancePage implements OnInit {
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
