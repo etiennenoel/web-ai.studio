@@ -12,10 +12,11 @@
       <option value="javascript">JavaScript</option>
     </select>
   </div>
-  <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-inner">
+  <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-inner flex-grow h-[70vh]">
     <app-code-editor
+      class="block h-full w-full"
       [code]="code"
-      [height]="'500px'"
+      [height]="'100%'"
     ></app-code-editor>
   </div>
 </div>

@@ -4,7 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-code-editor',
   template: '<div #editor style="width: 100%; height: 100%;"></div>',
-  styles: [':host { display: block; }'],
+  styles: [':host { display: block; width: 100%; height: 100%; }'],
   standalone: false
 })
 export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy {
@@ -21,7 +21,14 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   async ngAfterViewInit(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
       const ace = (await import('ace-builds')).default;
-      ace.config.set('basePath', 'https://unpkg.com/ace-builds@1.43.5/src-noconflict');
+      
+      // Dynamically load the modes and themes so they are bundled with webpack 
+      // but don't execute in the Node SSR environment
+      await import('ace-builds/src-noconflict/mode-javascript');
+      await import('ace-builds/src-noconflict/mode-typescript');
+      await import('ace-builds/src-noconflict/theme-chrome');
+      await import('ace-builds/src-noconflict/theme-one_dark');
+
       this.editor = ace.edit(this.editorRef.nativeElement);
       
       this.updateTheme();
