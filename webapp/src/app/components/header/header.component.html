@@ -1,13 +1,14 @@
-<div class="container-fluid">
-  <div class="d-flex align-items-center mt-3 mb-2 gap-3">
-    <button class="btn btn-soft sidebar-icon" (click)="openSidebar()"><i class="bi bi-list"></i></button>
-    <div class="flex-grow-1 header-title-container">
+<div class="w-full px-4 sm:px-6 lg:px-8">
+  <div class="flex items-center mt-4 mb-3 gap-3">
+    <button class="lg:hidden p-2 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-zinc-800 transition-colors" (click)="openSidebar()">
+      <i class="bi bi-list text-xl"></i>
+    </button>
+    <div class="flex-grow">
       <ng-content select="[header-title-row]"></ng-content>
     </div>
   </div>
 
   <ng-content></ng-content>
 
-  <hr class="ms-3 me-3">
+  <hr class="border-t border-slate-200 dark:border-zinc-800/80 my-3">
 </div>
-

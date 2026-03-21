@@ -1,6 +1,6 @@
-<div class="layout d-flex">
-  <webai-studio-sidebar class="offcanvas offcanvas-start"></webai-studio-sidebar>
-  <div class="flex-grow-1">
+<div class="flex h-screen w-full transition-colors duration-200">
+  <webai-studio-sidebar class="offcanvas offcanvas-start lg:block flex-shrink-0 border-r border-slate-200 dark:border-zinc-800"></webai-studio-sidebar>
+  <div class="flex-grow h-full overflow-hidden flex flex-col">
     <router-outlet></router-outlet>
   </div>
 </div>
