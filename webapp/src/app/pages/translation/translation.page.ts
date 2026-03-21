@@ -38,8 +38,30 @@ export class TranslationPage {
   textareaFormControl = new FormControl('');
 
   translatedText = '';
+  
+  apiAvailabilityStatus: 'loading...' | 'available' | 'downloading' | 'downloadable' | 'unavailable' | 'unknown' = 'unknown';
+
+  sourceSearchTerm = '';
+  destinationSearchTerm = '';
 
   constructor(@Inject(PLATFORM_ID) private readonly platformId: Object){
+  }
+
+  ngOnInit() {
+    this.setupTranslator();
+  }
+
+  getFilteredLocales(term: string): LocaleInterface[] {
+    if (!term) return this.locales;
+    const lowerTerm = term.toLowerCase();
+    return this.locales.filter(locale => 
+      locale.language.toLowerCase().includes(lowerTerm) || 
+      locale.code.toLowerCase().includes(lowerTerm)
+    );
+  }
+
+  getApiAvailability(): 'loading...' | 'available' | 'downloading' | 'downloadable' | 'unavailable' | 'unknown' {
+    return this.apiAvailabilityStatus;
   }
 
   getDownloadStatus(): 'idle' | 'downloading' | 'completed' | 'unavailable' {
@@ -113,14 +135,55 @@ export class TranslationPage {
   }
 
   async setupTranslator() {
+    this.apiAvailabilityStatus = 'loading...';
+    
     if(
       isPlatformServer(this.platformId) ||
-      !("Translator" in self) ||
-      !this.sourceLocale ||
-      !this.destinationLocale ||
-      this.sourceLocale === this.destinationLocale
+      !("Translator" in self)
     ) {
+      this.apiAvailabilityStatus = 'unavailable';
       return;
+    }
+
+    if (!this.sourceLocale || !this.destinationLocale || this.sourceLocale === this.destinationLocale) {
+       // if we are detecting language we need to know if detection is available
+       if (!this.sourceLocale) {
+         try {
+            if ("languageDetector" in self) {
+              const capabilities = await (self as any).languageDetector.capabilities();
+              this.apiAvailabilityStatus = capabilities.available;
+            } else if ("ai" in self && (self as any).ai.languageDetector) {
+              const capabilities = await (self as any).ai.languageDetector.capabilities();
+              this.apiAvailabilityStatus = capabilities.available;
+            } else {
+              this.apiAvailabilityStatus = 'unknown';
+            }
+         } catch (e) {
+            this.apiAvailabilityStatus = 'unknown';
+         }
+       } else {
+         this.apiAvailabilityStatus = 'unknown';
+       }
+       return;
+    }
+
+    try {
+        if ("translation" in self) {
+            this.apiAvailabilityStatus = await (self as any).translation.canTranslate({
+                sourceLanguage: this.sourceLocale.code,
+                targetLanguage: this.destinationLocale.code
+            });
+        } else if ("Translator" in self && "availability" in (self as any).Translator) {
+            this.apiAvailabilityStatus = await (self as any).Translator.availability({
+                sourceLanguage: this.sourceLocale.code,
+                targetLanguage: this.destinationLocale.code
+            });
+        } else {
+            this.apiAvailabilityStatus = 'unavailable';
+        }
+    } catch(e) {
+        this.apiAvailabilityStatus = 'unavailable';
+        return;
     }
 
     await this.createTranslator(this.sourceLocale, this.destinationLocale)
