@@ -1,16 +1,21 @@
-<div class="modal-header">
-  <h4 class="modal-title d-flex gap-2"><i class="bi bi-code-square"></i>Get Code</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+<div class="modal-header border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-zinc-900 !rounded-t-[calc(var(--bs-modal-border-radius)-1px)]">
+  <h4 class="modal-title flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
+    <i class="bi bi-code-square text-indigo-500"></i> Get Code
+  </h4>
+  <button type="button" class="btn-close dark:invert focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
-<div class="modal-body gap-2 d-flex flex-column">
-  <div class="d-grid">
-  <select class="form-select" aria-label="Default select example" [formControl]="languageFormControl">
-    <option value="typescript">Typescript</option>
-    <option value="javascript">Javascript</option>
-  </select>
+<div class="modal-body flex flex-col gap-4 p-5 bg-slate-50 dark:bg-[#121212] !rounded-b-[calc(var(--bs-modal-border-radius)-1px)]">
+  <div class="w-full flex justify-between items-center">
+    <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Language</label>
+    <select class="form-select w-48 bg-[#ffffff] dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm cursor-pointer" aria-label="Language Select" [formControl]="languageFormControl">
+      <option value="typescript">TypeScript</option>
+      <option value="javascript">JavaScript</option>
+    </select>
   </div>
-  <app-code-editor
-    [code]="code"
-    [height]="'600px'"
-  ></app-code-editor>
+  <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-800 shadow-inner">
+    <app-code-editor
+      [code]="code"
+      [height]="'500px'"
+    ></app-code-editor>
+  </div>
 </div>

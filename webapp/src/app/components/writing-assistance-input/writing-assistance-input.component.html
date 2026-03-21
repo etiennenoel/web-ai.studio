@@ -1,169 +1,261 @@
-<div class="w-100 flex-column d-flex justify-content-center">
-  <div class="card bg-body-secondary border-0">
-    <div class="card-body d-flex align-items-end gap-2">
+<div class="w-full flex flex-col justify-center transition-all duration-200 relative">
+  
+  <!-- API Selector Tabs -->
+  <div class="flex items-center gap-1 mb-2 px-1">
+    <button class="px-4 py-1.5 !rounded-full text-sm font-medium transition-colors border-none focus:outline-none"
+            [ngClass]="api === WritingAssistanceApiEnum.SummarizerApi ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-zinc-800/50'"
+            (click)="clickOnApi(WritingAssistanceApiEnum.SummarizerApi)">
+      <i class="bi bi-text-paragraph mr-1.5"></i> Summarize
+    </button>
+    <button class="px-4 py-1.5 !rounded-full text-sm font-medium transition-colors border-none focus:outline-none"
+            [ngClass]="api === WritingAssistanceApiEnum.WriterApi ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-zinc-800/50'"
+            (click)="clickOnApi(WritingAssistanceApiEnum.WriterApi)">
+      <i class="bi bi-pencil-square mr-1.5"></i> Write
+    </button>
+    <button class="px-4 py-1.5 !rounded-full text-sm font-medium transition-colors border-none focus:outline-none"
+            [ngClass]="api === WritingAssistanceApiEnum.RewriterApi ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-transparent text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-zinc-800/50'"
+            (click)="clickOnApi(WritingAssistanceApiEnum.RewriterApi)">
+      <i class="bi bi-arrow-clockwise mr-1.5"></i> Rewrite
+    </button>
+  </div>
 
-      <textarea
-        [(ngModel)]="input"
-        (keydown.meta.enter)="onRunClick()"
-        (keydown.control.enter)="onRunClick()"
-        class="form-control border-0 bg-transparent shadow-none flex-grow-1"
-        placeholder="Enter your text here"
-        style="field-sizing: content; resize: none; max-height: 300px;"
-      ></textarea>
+  <div class="relative bg-[#ffffff] dark:bg-zinc-800/90 !rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700/80 flex flex-col focus-within:ring-2 focus-within:ring-indigo-500/20 dark:focus-within:ring-indigo-500/20 transition-shadow p-2">
+    
+    <!-- Text Area -->
+    <textarea
+      [(ngModel)]="input"
+      (keydown.meta.enter)="onRunClick()"
+      (keydown.control.enter)="onRunClick()"
+      class="w-full bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 resize-none text-base p-3 min-h-[100px] max-h-[300px]"
+      placeholder="Enter your text here..."
+      style="field-sizing: content;"
+      [disabled]="state === PromptInputStateEnum.Inferencing"
+    ></textarea>
 
-      @switch (api) {
-        @case(WritingAssistanceApiEnum.SummarizerApi) {
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerType">
-             <option [ngValue]="undefined" disabled>Select Type</option>
+    <!-- Controls Row -->
+    <div class="flex items-center justify-between mt-2 pl-2">
+      
+      <!-- Left side: Dropdowns & Settings -->
+      <div class="flex items-center gap-2 flex-wrap">
+        
+        <!-- Summarizer Options -->
+        @if (api === WritingAssistanceApiEnum.SummarizerApi) {
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerType">
+             <option [ngValue]="undefined" disabled>Type</option>
              @for (type of SummarizerTypeEnum | keyvalue; track type.key) {
                 <option [value]="type.value">{{ type.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerLength">
-             <option [ngValue]="undefined" disabled>Select Length</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerLength">
+             <option [ngValue]="undefined" disabled>Length</option>
              @for (len of SummarizerLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.summarizerFormat">
-             <option [ngValue]="undefined" disabled>Select Format</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.summarizerFormat">
+             <option [ngValue]="undefined" disabled>Format</option>
              @for (format of SummarizerFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
              }
           </select>
         }
-        @case(WritingAssistanceApiEnum.WriterApi) {
-           <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerTone">
-             <option [ngValue]="undefined" disabled>Select Tone</option>
+
+        <!-- Writer Options -->
+        @if (api === WritingAssistanceApiEnum.WriterApi) {
+           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerTone">
+             <option [ngValue]="undefined" disabled>Tone</option>
              @for (tone of WriterToneEnum | keyvalue; track tone.key) {
                 <option [value]="tone.value">{{ tone.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerLength">
-             <option [ngValue]="undefined" disabled>Select Length</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerLength">
+             <option [ngValue]="undefined" disabled>Length</option>
              @for (len of WriterLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.writerFormat">
-             <option [ngValue]="undefined" disabled>Select Format</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.writerFormat">
+             <option [ngValue]="undefined" disabled>Format</option>
              @for (format of WriterFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
              }
           </select>
         }
-        @case(WritingAssistanceApiEnum.RewriterApi) {
-           <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterTone">
-             <option [ngValue]="undefined" disabled>Select Tone</option>
+
+        <!-- Rewriter Options -->
+        @if (api === WritingAssistanceApiEnum.RewriterApi) {
+           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterTone">
+             <option [ngValue]="undefined" disabled>Tone</option>
              @for (tone of RewriterToneEnum | keyvalue; track tone.key) {
                 <option [value]="tone.value">{{ tone.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterLength">
-             <option [ngValue]="undefined" disabled>Select Length</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterLength">
+             <option [ngValue]="undefined" disabled>Length</option>
              @for (len of RewriterLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-
-          <select class="form-select btn-soft" style="width: auto;" [(ngModel)]="options.rewriterFormat">
-             <option [ngValue]="undefined" disabled>Select Format</option>
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.rewriterFormat">
+             <option [ngValue]="undefined" disabled>Format</option>
              @for (format of RewriterFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
              }
           </select>
         }
-      }
-      <div class="d-inline-block" ngbDropdown [autoClose]="'outside'">
-        <button class="btn btn-settings btn-soft"
-                [class.text-success]="settingsActive"
-                [class.badge-settings]="settingsActive"
-                [class.active]="settingsActive"
-                [disabled]="state === PromptInputStateEnum.Inferencing"
-                type="button" ngbDropdownToggle aria-expanded="false">
-          <i class="bi bi-sliders2"></i>
-          <span
-            class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
-            <span class="visually-hidden">New alerts</span>
-          </span>
-        </button>
-        <ul class="dropdown-menu p-3" ngbDropdownMenu style="width:350px;">
-          <li class="mb-2">
-            <label class="form-label small">Output Language</label>
-            <select class="form-select form-select-sm" [(ngModel)]="options.outputLanguage">
-                <option [ngValue]="undefined">Default</option>
-                @for (lang of LocaleEnum | keyvalue; track lang.key) {
-                    <option [value]="lang.value">{{ lang.key }}</option>
-                }
-            </select>
-          </li>
 
-          <li class="mb-2">
-            <label class="form-label small">Expected Input Languages</label>
-            <select class="form-select form-select-sm" multiple [(ngModel)]="options.expectedInputLanguages">
-                @for (lang of LocaleEnum | keyvalue; track lang.key) {
-                    <option [value]="lang.value">{{ lang.key }}</option>
-                }
-            </select>
-          </li>
-
-          <li class="mb-2">
-            <label class="form-label small">Expected Context Languages</label>
-            <select class="form-select form-select-sm" multiple [(ngModel)]="options.expectedContextLanguages">
-                @for (lang of LocaleEnum | keyvalue; track lang.key) {
-                    <option [value]="lang.value">{{ lang.key }}</option>
-                }
-            </select>
-          </li>
-
-          <li class="mb-2">
-            <label class="form-label small">Context</label>
-            <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="options.context"></textarea>
-          </li>
-        </ul>
-      </div>
-      @switch (state) {
-        @case (PromptInputStateEnum.Ready) {
-          <button class="btn btn-primary d-flex gap-3 position-relative" (click)="onRunClick()" placement="top"
-                  [ngbTooltip]="runBtnTooltip">
-            @switch (this.api) {
-              @case (WritingAssistanceApiEnum.SummarizerApi) {
-                Summarize
-              }
-              @case (WritingAssistanceApiEnum.WriterApi) {
-                Write
-              }
-              @case (WritingAssistanceApiEnum.RewriterApi) {
-                Rewrite
-              }
+        <!-- Context / Lang Settings Dropdown (using Bootstrap's JS for dropdown but tailwind styles) -->
+        <div class="dropup" ngbDropdown [autoClose]="'outside'">
+          <button class="relative flex items-center justify-center w-9 h-9 !rounded-full transition-all focus:outline-none border-none bg-transparent after:!hidden"
+                  [ngClass]="settingsActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-zinc-800'"
+                  [disabled]="state === PromptInputStateEnum.Inferencing"
+                  type="button" ngbDropdownToggle aria-expanded="false">
+            <i class="bi bi-sliders2"></i>
+            @if(settingsActive) {
+            <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-white dark:border-zinc-800"></span>
             }
-            <i
-            class="bi bi-lightning-charge-fill"></i>
           </button>
-        }
-        @case (PromptInputStateEnum.Inferencing) {
-          <button class="btn btn-danger d-flex gap-3" (click)="onStopClick()">
-            <i class="bi bi-stop-circle-fill"></i> Stop
-          </button>
-        }
-      }
-    </div>
+          
+          <ul class="dropdown-menu p-4 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-2xl !min-w-[350px] mb-2" ngbDropdownMenu>
+            <li class="mb-4">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Output Language</label>
+              <select class="form-select form-select-sm !rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="options.outputLanguage">
+                  <option [ngValue]="undefined">Default</option>
+                  @for (lang of LocaleEnum | keyvalue; track lang.key) {
+                      <option [value]="lang.value">{{ lang.key }}</option>
+                  }
+              </select>
+            </li>
 
-    <div class="p-2 api-selector d-flex gap-2">
-      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.SummarizerApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.SummarizerApi)">
-        <i class="bi bi-text-paragraph"></i> Summarizer
-      </button>
-      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.WriterApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.WriterApi)">
-        <i class="bi bi-pencil-square"></i> Writer
-      </button>
-      <button class="btn btn-soft" [class.active]="api === WritingAssistanceApiEnum.RewriterApi" type="button" (click)="clickOnApi(WritingAssistanceApiEnum.RewriterApi)">
-        <i class="bi bi-arrow-clockwise"></i> Rewriter
-      </button>
+            <li class="mb-4">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Expected Input Langs</label>
+              
+              @if (options.expectedInputLanguages && options.expectedInputLanguages.length > 0) {
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                @for (langCode of options.expectedInputLanguages; track langCode) {
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50">
+                    {{ getLocaleName(langCode) }}
+                    <button type="button" class="flex-shrink-0 ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-500 hover:bg-indigo-200 hover:text-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-800 dark:hover:text-indigo-200 focus:outline-none transition-colors" (click)="toggleExpectedInputLanguage(langCode)">
+                      <i class="bi bi-x text-sm leading-none"></i>
+                    </button>
+                  </span>
+                }
+              </div>
+              }
+
+              <div class="dropdown" ngbDropdown>
+                <button class="w-full text-left bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="inputLangsSearchTerm = ''">
+                  <span class="text-slate-500 dark:text-slate-400">Add language...</span>
+                  <i class="bi bi-chevron-down text-slate-400"></i>
+                </button>
+                <div class="dropdown-menu w-full bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-lg p-2" ngbDropdownMenu>
+                  <div class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
+                    <div class="relative">
+                      <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                      <input type="text" class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 outline-none" 
+                             placeholder="Search languages..." 
+                             [(ngModel)]="inputLangsSearchTerm" 
+                             (click)="$event.stopPropagation()">
+                    </div>
+                  </div>
+                  <div class="max-h-48 overflow-y-auto mt-1">
+                    @for (lang of getFilteredLocales(inputLangsSearchTerm); track lang.code) {
+                      <button class="dropdown-item px-3 py-1.5 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors flex items-center justify-between" 
+                              type="button" (click)="toggleExpectedInputLanguage(lang.code); $event.stopPropagation()">
+                        <span>{{ lang.name }} <span class="text-slate-400 dark:text-slate-500 text-xs ml-1">({{ lang.code }})</span></span>
+                        @if (options.expectedInputLanguages?.includes(lang.code)) {
+                          <i class="bi bi-check-lg text-indigo-600 dark:text-indigo-400 text-lg leading-none"></i>
+                        }
+                      </button>
+                    }
+                    @if (getFilteredLocales(inputLangsSearchTerm).length === 0) {
+                      <div class="px-3 py-2 text-center text-sm text-slate-500 dark:text-slate-400">No languages found.</div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li class="mb-4">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Expected Context Langs</label>
+              
+              @if (options.expectedContextLanguages && options.expectedContextLanguages.length > 0) {
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                @for (langCode of options.expectedContextLanguages; track langCode) {
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                    {{ getLocaleName(langCode) }}
+                    <button type="button" class="flex-shrink-0 ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center text-emerald-500 hover:bg-emerald-200 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-800 dark:hover:text-emerald-200 focus:outline-none transition-colors" (click)="toggleExpectedContextLanguage(langCode)">
+                      <i class="bi bi-x text-sm leading-none"></i>
+                    </button>
+                  </span>
+                }
+              </div>
+              }
+
+              <div class="dropdown" ngbDropdown>
+                <button class="w-full text-left bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="contextLangsSearchTerm = ''">
+                  <span class="text-slate-500 dark:text-slate-400">Add language...</span>
+                  <i class="bi bi-chevron-down text-slate-400"></i>
+                </button>
+                <div class="dropdown-menu w-full bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-lg p-2" ngbDropdownMenu>
+                  <div class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
+                    <div class="relative">
+                      <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                      <input type="text" class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500 outline-none" 
+                             placeholder="Search languages..." 
+                             [(ngModel)]="contextLangsSearchTerm" 
+                             (click)="$event.stopPropagation()">
+                    </div>
+                  </div>
+                  <div class="max-h-48 overflow-y-auto mt-1">
+                    @for (lang of getFilteredLocales(contextLangsSearchTerm); track lang.code) {
+                      <button class="dropdown-item px-3 py-1.5 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors flex items-center justify-between" 
+                              type="button" (click)="toggleExpectedContextLanguage(lang.code); $event.stopPropagation()">
+                        <span>{{ lang.name }} <span class="text-slate-400 dark:text-slate-500 text-xs ml-1">({{ lang.code }})</span></span>
+                        @if (options.expectedContextLanguages?.includes(lang.code)) {
+                          <i class="bi bi-check-lg text-emerald-600 dark:text-emerald-400 text-lg leading-none"></i>
+                        }
+                      </button>
+                    }
+                    @if (getFilteredLocales(contextLangsSearchTerm).length === 0) {
+                      <div class="px-3 py-2 text-center text-sm text-slate-500 dark:text-slate-400">No languages found.</div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Additional Context</label>
+              <textarea class="form-control form-control-sm !rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none" rows="3" [(ngModel)]="options.context" placeholder="Add extra context..."></textarea>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right side: Run/Stop Button -->
+      <div>
+        @if (state === PromptInputStateEnum.Ready) {
+          <button type="button" class="relative flex items-center justify-center h-10 px-4 !rounded-full transition-all duration-200 focus:outline-none shadow-sm border-none ml-1 bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:text-white" 
+                  (click)="onRunClick()"
+                  [disabled]="!input.trim()"
+                  [ngbTooltip]="runBtnTooltip" placement="top">
+            <span class="font-medium mr-2 text-sm">
+              @if (api === WritingAssistanceApiEnum.SummarizerApi) { Summarize }
+              @if (api === WritingAssistanceApiEnum.WriterApi) { Write }
+              @if (api === WritingAssistanceApiEnum.RewriterApi) { Rewrite }
+            </span>
+            <i class="bi bi-lightning-charge-fill"></i>
+          </button>
+        } @else {
+          <button type="button" class="relative flex items-center justify-center h-10 px-4 !rounded-full transition-all duration-200 focus:outline-none shadow-sm border-none ml-1 bg-slate-800 hover:bg-slate-900 text-white dark:bg-red-600 dark:hover:bg-red-500 dark:text-white" 
+                  (click)="onStopClick()">
+            <span class="font-medium mr-2 text-sm">Stop</span>
+            <i class="bi bi-stop-circle-fill"></i>
+          </button>
+        }
+      </div>
+      
     </div>
   </div>
 </div>

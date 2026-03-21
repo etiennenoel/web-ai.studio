@@ -1,9 +1,12 @@
-import {Component, Inject, OnInit, PLATFORM_ID, signal, WritableSignal} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID, signal, ViewChild} from '@angular/core';
 import {isPlatformServer} from '@angular/common';
 import {WritingAssistanceService} from '../../core/services/writing-assistance.service';
 import {WritingAssistanceApiEnum} from '../../core/enums/writing-assistance-api.enum';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {WritingAssistanceOptions} from '../../core/models/writing-assistance-options.model';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {WritingAssistanceCodeModal} from '../../components/writing-assistance-code-modal/writing-assistance-code-modal';
+import {WritingAssistanceInputComponent} from '../../components/writing-assistance-input/writing-assistance-input.component';
 
 @Component({
   selector: 'webai-studio-writing-assistance',
@@ -17,14 +20,29 @@ export class WritingAssistancePage implements OnInit {
   languageModelAvailability?: string;
   output = signal<string>('');
 
+  @ViewChild('inputComponent') inputComponent!: WritingAssistanceInputComponent;
+
   constructor(
     private readonly writingAssistanceService: WritingAssistanceService,
     @Inject(PLATFORM_ID) private platformId: Object,
+    private readonly ngbModal: NgbModal,
   ) {
     this.checkAvailability(this.api);
   }
 
   ngOnInit() {
+  }
+
+  openCodeModal() {
+    const codeModalComponent = this.ngbModal.open(WritingAssistanceCodeModal, {
+      size: "xl",
+    });
+    const instance = codeModalComponent.componentInstance as WritingAssistanceCodeModal;
+    instance.api = this.api;
+    if (this.inputComponent) {
+      instance.options = this.inputComponent.options;
+    }
+    instance.updateCode();
   }
 
   async checkAvailability(api: WritingAssistanceApiEnum) {
