@@ -9,16 +9,16 @@ import { LoadingLabel } from '../../core/models/loading-label.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="d-flex align-items-center gap-3 my-1">
-      <div class="typing-indicator d-flex gap-1 align-items-center">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+    <div class="flex items-center gap-3 my-1">
+      <div class="flex gap-1.5 items-center h-5">
+        <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full opacity-40 animate-[dot-bounce_1.4s_infinite_ease-in-out]"></div>
+        <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full opacity-40 animate-[dot-bounce_1.4s_infinite_ease-in-out]" style="animation-delay: 0.2s"></div>
+        <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full opacity-40 animate-[dot-bounce_1.4s_infinite_ease-in-out]" style="animation-delay: 0.4s"></div>
       </div>
       
-      <div class="content-wrapper" aria-live="polite">
+      <div aria-live="polite">
         @if (currentLabel; as label) {
-          <div class="latency-text fade-in-out">
+          <div class="text-sm text-slate-500 dark:text-slate-400 font-medium fade-in-out">
             {{ isInitialState() ? 'Processing.' : label.text }}
           </div>
         }
@@ -33,32 +33,9 @@ import { LoadingLabel } from '../../core/models/loading-label.model';
       animation-delay: 200ms;
     }
 
-    .typing-indicator {
-       height: 20px; /* Aligns visually with the line-height of the text */
-    }
-
-    .typing-indicator .dot {
-      width: 5px;
-      height: 5px;
-      background-color: var(--bs-primary);
-      border-radius: 50%;
-      opacity: 0.4;
-      animation: dot-bounce 1.4s infinite ease-in-out;
-    }
-
-    .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
-
     @keyframes dot-bounce {
       0%, 80%, 100% { transform: scale(1); opacity: 0.4; }
       40% { transform: scale(1.5); opacity: 1; }
-    }
-
-    .latency-text {
-      font-size: 0.9rem;
-      color: var(--bs-secondary-color);
-      line-height: 1.4;
-      font-weight: 400;
     }
 
     .fade-in-out {

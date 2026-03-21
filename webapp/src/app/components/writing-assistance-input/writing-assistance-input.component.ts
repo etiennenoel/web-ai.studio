@@ -91,6 +91,9 @@ export class WritingAssistanceInputComponent implements OnInit {
   maxTopK = 128;
   defaultTopK = 3;
 
+  inputLangsSearchTerm = '';
+  contextLangsSearchTerm = '';
+
   // Expose Enums
   WritingAssistanceApiEnum = WritingAssistanceApiEnum;
   PromptInputStateEnum = PromptInputStateEnum;
@@ -118,6 +121,41 @@ export class WritingAssistanceInputComponent implements OnInit {
 
   constructor(@Inject(PLATFORM_ID) private readonly platformId: Object,
               private modalService: NgbModal) {
+  }
+
+  getFilteredLocales(term: string) {
+    const entries = Object.entries(LocaleEnum).map(([key, value]) => ({ name: key, code: value as LocaleEnum }));
+    if (!term) return entries;
+    const lowerTerm = term.toLowerCase();
+    return entries.filter(lang => 
+      lang.name.toLowerCase().includes(lowerTerm) || 
+      lang.code.toLowerCase().includes(lowerTerm)
+    );
+  }
+
+  getLocaleName(code: string): string {
+    const entry = Object.entries(LocaleEnum).find(([_, value]) => value === code);
+    return entry ? entry[0] : code;
+  }
+
+  toggleExpectedInputLanguage(code: LocaleEnum) {
+    if (!this.options.expectedInputLanguages) this.options.expectedInputLanguages = [];
+    const idx = this.options.expectedInputLanguages.indexOf(code);
+    if (idx >= 0) {
+      this.options.expectedInputLanguages.splice(idx, 1);
+    } else {
+      this.options.expectedInputLanguages.push(code);
+    }
+  }
+
+  toggleExpectedContextLanguage(code: LocaleEnum) {
+    if (!this.options.expectedContextLanguages) this.options.expectedContextLanguages = [];
+    const idx = this.options.expectedContextLanguages.indexOf(code);
+    if (idx >= 0) {
+      this.options.expectedContextLanguages.splice(idx, 1);
+    } else {
+      this.options.expectedContextLanguages.push(code);
+    }
   }
 
   async ngOnInit() {

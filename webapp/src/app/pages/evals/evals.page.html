@@ -1,171 +1,201 @@
-<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
-  <webai-studio-header title="Evals">
-
-    <div class="d-flex align-items-center mt-5 ms-3 me-3">
-      <h2 class="h6 flex-grow-1">Evals</h2>
-
+<webai-studio-header title="Evals">
+    <div header-title-row class="flex items-center w-full">
+      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">Evals</h2>
     </div>
   </webai-studio-header>
 
+  <!-- Main Area -->
+  <div class="flex-grow flex flex-col mx-auto w-full px-4 sm:px-6 lg:px-8 overflow-hidden h-[calc(100vh-120px)]">
+    <div class="flex-grow overflow-y-auto pb-4 pt-6">
+    
+    <!-- How to Use Card -->
+    <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 !rounded-2xl p-5 mb-6 shadow-sm">
+      <h2 class="text-xl font-semibold text-indigo-900 dark:text-indigo-300 mb-3 flex items-center gap-2">
+        <i class="bi bi-info-circle"></i> How to Use
+      </h2>
+      <h5 class="text-sm font-semibold text-indigo-800 dark:text-indigo-400 mb-2 flex items-center gap-2">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets
+      </h5>
+      <ol class="list-decimal list-inside text-sm text-indigo-800/80 dark:text-indigo-300/80 space-y-1.5 ml-1">
+        <li>(Optional) Drop audio files to create new rows.</li>
+        <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline hover:text-indigo-600 dark:hover:text-indigo-200">Copy the template</a></li>
+        <li>Fill the rows in the spreadsheet.</li>
+        <li>Copy your spreadsheet (without the header columns) and paste it in the first input in the first row, named "Context". It will merge with existing rows (e.g. created from audio files).</li>
+      </ol>
+    </div>
 
-  <div class="container-fluid flex-grow-1" style="    height: calc(100vh - 120px);">
+    <!-- Actions & Status -->
+    <div class="mb-6 flex flex-col gap-4">
+      <button class="w-full py-4 !rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2" (click)="run()">
+        <i class="bi bi-lightning-charge-fill"></i> Run Evals
+      </button>
 
-    <div class="alert alert-primary">
-      <h2 class="display-6">How to Use?</h2>
-      <h5><i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets?</h5>
-      <div>
-        <ol>
-          <li>(Optional) Drop audio files to create new rows.</li>
-          <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy">Copy the template</a></li>
-          <li>Fill the rows in the spreadsheet.</li>
-          <li>Copy your spreadsheet (without the header columns) and paste it in the first input in the first row, named "Context". It will merge with existing rows (e.g. created from audio files).</li>
-        </ol>
+      <div class="border-2 border-dashed border-slate-300 dark:border-zinc-700 !rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-100 dark:bg-zinc-900/30 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
+        <i class="bi bi-mic text-4xl text-slate-400 dark:text-slate-500 mb-3 block"></i>
+        <p class="text-lg font-medium text-slate-600 dark:text-slate-400 m-0">Drop audio files here to create rows</p>
       </div>
-    </div>
 
-    <div class="d-grid">
-      <button class="btn btn-primary btn-lg" (click)="run()"><i class="bi bi-lightning"></i> Run Evals</button>
-    </div>
-
-    <div class="border rounded p-4 text-center mt-4 mb-4 bg-light" style="border-style: dashed !important; cursor: pointer;" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
-      <i class="bi bi-mic display-4 text-muted"></i>
-      <p class="mt-2 mb-0 lead text-muted">Drop audio files here to create rows</p>
-    </div>
-
-    @if(status !== EvalsExecutionEnum.Idle) {
-      <div class="alert"
-           [class.alert-danger]="status === EvalsExecutionEnum.Error"
-           [class.alert-primary]="status === EvalsExecutionEnum.InProgress"
-      >
-        @if(status === EvalsExecutionEnum.InProgress) {
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        }
-        <div>{{ this.statusMessage }}</div>
-      </div>
-    }
-
-    <form [formGroup]="form">
-      <table class="table mt-5">
-        <thead>
-        <tr>
-          <th style="min-width: 250px;">Context</th>
-          <th style="min-width: 250px;">Input</th>
-          <th style="min-width: 250px;">Images</th>
-          <th style="min-width: 250px;">Audio</th>
-          <th>API</th>
-          <th>Status</th>
-          <!--        <th>Performance</th>-->
-          <th>Output</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody formArrayName="rows">
-          @for (formRow of rows.controls; track $index) {
-            <tr [formGroupName]="$index">
-              <td>
-                <textarea class="form-control" rows="3" formControlName="context" (paste)="onPaste($event, $index)"></textarea>
-              </td>
-              <td>
-                <textarea class="form-control" rows="3" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
-              </td>
-              <td (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
-                <div class="border rounded p-2 text-center mb-2" style="border-style: dashed !important; cursor: pointer;" (click)="fileInput.click()">
-                  <i class="bi bi-cloud-upload display-6"></i>
-                  <p class="m-0 small text-muted">Click or Drag Images</p>
-                  <input #fileInput type="file" multiple accept="image/*" class="d-none" (change)="selectImage($event, $index)">
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                  @for (image of formRow.value.images; track $index) {
-                    <div class="position-relative d-inline-block">
-                      <img [src]="image" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; cursor: zoom-in;" (click)="previewImage(image)">
-                      <button class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle" style="width: 18px; height: 18px; line-height: 14px; transform: translate(30%, -30%); font-size: 10px;" (click)="removeImage($index, $index); $event.stopPropagation()">
-                        <i class="bi bi-x"></i>
-                      </button>
-                    </div>
-                  }
-                </div>
-              </td>
-              <td (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
-                <div class="border rounded p-2 text-center mb-2" style="border-style: dashed !important; cursor: pointer;" (click)="audioInput.click()">
-                  <i class="bi bi-mic display-6"></i>
-                  <p class="m-0 small text-muted">Click or Drag Audio</p>
-                  <input #audioInput type="file" multiple accept="audio/*" class="d-none" (change)="selectAudio($event, $index)">
-                </div>
-                <div class="d-flex flex-column gap-2">
-                  @for (audio of formRow.value.audio; track $index) {
-                    <div class="position-relative border rounded p-1 d-flex align-items-center bg-light">
-                      <audio [src]="audio" controls class="w-100" style="height: 30px;"></audio>
-                      <button class="btn btn-sm btn-danger ms-2 p-0 rounded-circle" style="width: 20px; height: 20px; line-height: 16px;" (click)="removeAudio($index, $index)">
-                        <i class="bi bi-x"></i>
-                      </button>
-                    </div>
-                  }
-                </div>
-              </td>
-              <td>
-                <select class="form-select" formControlName="api">
-                  <option [value]="'Summarizer'">Summarizer</option>
-                  <option [value]="'Prompt'">Prompt</option>
-                </select>
-              </td>
-              <td><span
-                class="badge"
-                [class.text-bg-secondary]="formRow.value.status === InferenceStatusEnum.Idle"
-                [class.text-bg-primary]="formRow.value.status === InferenceStatusEnum.InProgress"
-                [class.text-bg-success]="formRow.value.status === InferenceStatusEnum.Success"
-                [class.text-bg-danger]="formRow.value.status === InferenceStatusEnum.Error"
-              >{{ formRow.value.status }}</span></td>
-              <!--          <td></td>-->
-              <td>
-                {{ formRow.value.output }}
-              </td>
-              <td>
-                <button class="btn btn-sm btn-danger" (click)="removeRow($index)"><i class="bi bi-trash3"></i></button>
-              </td>
-            </tr>
+      @if(status !== EvalsExecutionEnum.Idle) {
+        <div class="p-4 !rounded-xl border flex items-center gap-3"
+             [ngClass]="{
+               'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400': status === EvalsExecutionEnum.Error,
+               'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-800/50 dark:text-indigo-400': status === EvalsExecutionEnum.InProgress,
+               'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800/50 dark:text-emerald-400': status === EvalsExecutionEnum.Success
+             }">
+          @if(status === EvalsExecutionEnum.InProgress) {
+            <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          } @else if (status === EvalsExecutionEnum.Success) {
+            <i class="bi bi-check-circle-fill text-xl"></i>
+          } @else if (status === EvalsExecutionEnum.Error) {
+            <i class="bi bi-exclamation-triangle-fill text-xl"></i>
           }
-        </tbody>
-      </table>
-      <div class="text-center mt-3 mb-5">
-        <button class="btn btn-outline-primary" (click)="addRow()"><i class="bi bi-plus-lg"></i> Add Row</button>
-      </div>
-    </form>
-  </div>
-</div>
+          
+          <div class="font-medium">
+            @if(status === EvalsExecutionEnum.InProgress) {
+              {{ statusMessage || 'Running evaluations...' }}
+            } @else if (status === EvalsExecutionEnum.Success) {
+              {{ statusMessage || 'Evaluations completed successfully.' }}
+            } @else {
+              {{ statusMessage || 'An error occurred during evaluation.' }}
+            }
+          </div>
+        </div>
+      }
+    </div>
 
+    <!-- Evals Table -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 !rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden mb-8">
+      <div class="overflow-x-auto w-full p-4">
+        <form [formGroup]="form">
+          <table class="w-full text-left border-collapse min-w-[1200px]">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-zinc-700">
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Context</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Input</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Images</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Audio</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[10%]">API</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[8%]">Status</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[10%]">Output</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[2%] text-center">Act</th>
+              </tr>
+            </thead>
+            <tbody formArrayName="rows" class="divide-y divide-slate-100 dark:divide-zinc-700/50">
+              @for (formRow of rows.controls; track $index) {
+                <tr [formGroupName]="$index" class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/50 transition-colors align-top">
+                  <td class="p-3">
+                    <textarea class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="context" (paste)="onPaste($event, $index)" placeholder="Paste spreadsheet here..."></textarea>
+                  </td>
+                  <td class="p-3">
+                    <textarea class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
+                  </td>
+                  <td class="p-3" (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
+                    <div class="border border-dashed border-slate-300 dark:border-zinc-600 !rounded-xl p-3 text-center mb-3 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" (click)="fileInput.click()">
+                      <i class="bi bi-cloud-upload text-2xl text-slate-400 dark:text-slate-500"></i>
+                      <p class="m-0 text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Click or Drag</p>
+                      <input #fileInput type="file" multiple accept="image/*" class="hidden" (change)="selectImage($event, $index)">
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      @for (image of formRow.value.images; track $index) {
+                        <div class="relative inline-block group">
+                          <img [src]="image" class="w-16 h-16 object-cover !rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity" (click)="previewImage(image)">
+                          <button class="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full shadow-sm text-[10px] transition-transform scale-0 group-hover:scale-100" (click)="removeImage($index, $index); $event.stopPropagation()">
+                            <i class="bi bi-x"></i>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                  <td class="p-3" (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
+                    <div class="border border-dashed border-slate-300 dark:border-zinc-600 !rounded-xl p-3 text-center mb-3 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" (click)="audioInput.click()">
+                      <i class="bi bi-mic text-2xl text-slate-400 dark:text-slate-500"></i>
+                      <p class="m-0 text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Click or Drag</p>
+                      <input #audioInput type="file" multiple accept="audio/*" class="hidden" (change)="selectAudio($event, $index)">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      @for (audio of formRow.value.audio; track $index) {
+                        <div class="relative border border-slate-200 dark:border-zinc-700 !rounded-lg p-1.5 flex items-center bg-slate-50 dark:bg-zinc-900 shadow-sm group">
+                          <audio [src]="audio" controls class="w-full h-8 max-w-[200px]"></audio>
+                          <button class="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full shadow-sm text-[10px] transition-transform scale-0 group-hover:scale-100" (click)="removeAudio($index, $index)">
+                            <i class="bi bi-x"></i>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                  <td class="p-3">
+                    <select class="form-select w-full bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500" formControlName="api">
+                      <option [value]="'Summarizer'">Summarizer</option>
+                      <option [value]="'Prompt'">Prompt</option>
+                    </select>
+                  </td>
+                  <td class="p-3">
+                    <span class="inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-md border"
+                          [ngClass]="{
+                            'bg-slate-100 text-slate-600 border-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:border-zinc-700': formRow.value.status === InferenceStatusEnum.Idle,
+                            'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:border-indigo-800/50 animate-pulse': formRow.value.status === InferenceStatusEnum.InProgress,
+                            'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800/50': formRow.value.status === InferenceStatusEnum.Success,
+                            'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800/50': formRow.value.status === InferenceStatusEnum.Error
+                          }">
+                      {{ formRow.value.status }}
+                    </span>
+                  </td>
+                  <td class="p-3">
+                    <div class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap w-full min-w-[200px]">
+                      {{ formRow.value.output }}
+                    </div>
+                  </td>
+                  <td class="p-3 text-center">
+                    <button class="w-8 h-8 flex items-center justify-center !rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors border-none" (click)="removeRow($index)" title="Remove Row">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </form>
+      </div>
+      
+      <!-- Add Row Footer -->
+      <div class="bg-slate-50 dark:bg-zinc-900/50 border-t border-slate-200 dark:border-zinc-700 p-4 flex justify-center">
+        <button class="flex items-center gap-2 px-5 py-2 !rounded-xl border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" (click)="addRow()">
+          <i class="bi bi-plus-lg"></i> Add Row
+        </button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+<!-- Reset Confirmation Modal -->
 @if (showResetConfirmation) {
-  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Reset Rows?</h5>
-          <button type="button" class="btn-close" (click)="cancelReset()"></button>
-        </div>
-        <div class="modal-body">
-          <p>Dropping audio files will reset the existing rows. Are you sure you want to continue?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelReset()">Cancel</button>
-          <button type="button" class="btn btn-danger" (click)="processAudioFiles()">Reset</button>
-        </div>
+  <div class="fixed inset-0 z-[1050] flex items-center justify-center bg-slate-900/50 dark:bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-[#ffffff] dark:bg-zinc-900 !rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-zinc-800 transform transition-all">
+      <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-900/50">
+        <h5 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">Reset Rows?</h5>
+        <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none" (click)="cancelReset()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 dark:text-slate-300 mb-0">Dropping audio files will reset the existing rows. Are you sure you want to continue?</p>
+      </div>
+      <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 flex justify-end gap-3">
+        <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-[#ffffff] dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors focus:outline-none" (click)="cancelReset()">Cancel</button>
+        <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-red-600 hover:bg-red-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="processAudioFiles()">Reset</button>
       </div>
     </div>
   </div>
 }
 
+<!-- Image Preview Modal -->
 @if (previewImageSrc) {
-  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.8);" (click)="closePreview()">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content bg-transparent border-0 text-center">
-        <div class="modal-body p-0">
-          <img [src]="previewImageSrc" class="img-fluid rounded" style="max-height: 90vh;" (click)="$event.stopPropagation()">
-          <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle" (click)="closePreview()">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-      </div>
+  <div class="fixed inset-0 z-[1060] flex items-center justify-center bg-slate-900/90 dark:bg-black/90 backdrop-blur-md p-4" (click)="closePreview()">
+    <div class="relative max-w-5xl w-full h-full flex items-center justify-center">
+      <img [src]="previewImageSrc" class="max-w-full max-h-[90vh] !rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
+      <button class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
   </div>
 }

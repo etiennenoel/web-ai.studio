@@ -4,12 +4,17 @@ import {LOCALES} from '../../constants/locales.constant';
 import {LOCALES_MAP} from '../../constants/locales-map.constant';
 import {isPlatformServer} from '@angular/common';
 import {FormControl} from '@angular/forms';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslationCodeModal} from '../../components/translation-code-modal/translation-code-modal';
 
 @Component({
   selector: 'lib-translation',
   standalone: false,
   templateUrl: './translation.page.html',
-  styleUrl: './translation.page.scss'
+  styleUrl: './translation.page.scss',
+  host: {
+    class: 'block h-full w-full flex flex-col min-h-0'
+  }
 })
 export class TranslationPage {
   protected readonly locales = LOCALES;
@@ -38,8 +43,43 @@ export class TranslationPage {
   textareaFormControl = new FormControl('');
 
   translatedText = '';
+  
+  apiAvailabilityStatus: 'loading...' | 'available' | 'downloading' | 'downloadable' | 'unavailable' | 'unknown' = 'unknown';
 
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object){
+  sourceSearchTerm = '';
+  destinationSearchTerm = '';
+
+  constructor(
+    @Inject(PLATFORM_ID) private readonly platformId: Object,
+    private readonly ngbModal: NgbModal,
+  ){
+  }
+
+  ngOnInit() {
+    this.setupTranslator();
+  }
+
+  openCodeModal() {
+    const codeModalComponent = this.ngbModal.open(TranslationCodeModal, {
+      size: "xl",
+    });
+    const instance = codeModalComponent.componentInstance as TranslationCodeModal;
+    instance.sourceLanguage = this.sourceLocale;
+    instance.targetLanguage = this.destinationLocale;
+    instance.updateCode();
+  }
+
+  getFilteredLocales(term: string): LocaleInterface[] {
+    if (!term) return this.locales;
+    const lowerTerm = term.toLowerCase();
+    return this.locales.filter(locale => 
+      locale.language.toLowerCase().includes(lowerTerm) || 
+      locale.code.toLowerCase().includes(lowerTerm)
+    );
+  }
+
+  getApiAvailability(): 'loading...' | 'available' | 'downloading' | 'downloadable' | 'unavailable' | 'unknown' {
+    return this.apiAvailabilityStatus;
   }
 
   getDownloadStatus(): 'idle' | 'downloading' | 'completed' | 'unavailable' {
@@ -113,14 +153,50 @@ export class TranslationPage {
   }
 
   async setupTranslator() {
+    this.apiAvailabilityStatus = 'loading...';
+    
     if(
       isPlatformServer(this.platformId) ||
-      !("Translator" in self) ||
-      !this.sourceLocale ||
-      !this.destinationLocale ||
-      this.sourceLocale === this.destinationLocale
+      !("Translator" in self)
     ) {
+      this.apiAvailabilityStatus = 'unavailable';
       return;
+    }
+
+    if (!this.sourceLocale || !this.destinationLocale || this.sourceLocale === this.destinationLocale) {
+       // if we are detecting language we need to know if detection is available
+       if (!this.sourceLocale) {
+         try {
+            if ("LanguageDetector" in self && "availability" in (self as any).LanguageDetector) {
+              const availability = await (self as any).LanguageDetector.availability();
+              this.apiAvailabilityStatus = availability;
+            } else if ("languageDetector" in self) {
+              const capabilities = await (self as any).languageDetector.capabilities();
+              this.apiAvailabilityStatus = capabilities.available;
+            } else {
+              this.apiAvailabilityStatus = 'unknown';
+            }
+         } catch (e) {
+            this.apiAvailabilityStatus = 'unknown';
+         }
+       } else {
+         this.apiAvailabilityStatus = 'unknown';
+       }
+       return;
+    }
+
+    try {
+        if ("Translator" in self && "availability" in (self as any).Translator) {
+            this.apiAvailabilityStatus = await (self as any).Translator.availability({
+                sourceLanguage: this.sourceLocale.code,
+                targetLanguage: this.destinationLocale.code
+            });
+        } else {
+            this.apiAvailabilityStatus = 'unavailable';
+        }
+    } catch(e) {
+        this.apiAvailabilityStatus = 'unavailable';
+        return;
     }
 
     await this.createTranslator(this.sourceLocale, this.destinationLocale)

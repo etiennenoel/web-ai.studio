@@ -1,38 +1,64 @@
-<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+<div class="flex flex-col h-full bg-transparent transition-colors duration-200">
   <webai-studio-header>
-    <div header-title-row class="d-flex align-items-center me-3 w-100">
-      <h2 class="h6 flex-grow-1 m-0">Chat</h2>
-      <div class="d-flex align-items-center gap-2">
-        <div class="d-flex align-items-center gap-2">
-          <div><small>Local LLM status:</small></div>
-          <div><span class="badge text-bg-secondary"
-              [class.text-bg-secondary]="this.languageModelAvailability === 'downloadable'"
-              [class.text-bg-danger]="this.languageModelAvailability === 'unavailable'"
-              [class.text-bg-success]="this.languageModelAvailability === 'available'"
-              [class.text-bg-primary]="this.languageModelAvailability === 'downloading'">{{
-              this.languageModelAvailability }}</span>
-          </div>
+    <div header-title-row class="flex items-center w-full">
+      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex-grow">Writing Assistance</h2>
+      
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Local LLM Status -->
+        <div class="hidden sm:flex items-center gap-2 mr-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Local LLM status:</span>
+          <span class="px-2.5 py-1 text-xs font-bold rounded-md transition-colors capitalize tracking-wide"
+              [ngClass]="{
+                'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400': languageModelAvailability === 'loading...',
+                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': languageModelAvailability === 'downloadable' || languageModelAvailability === 'downloading',
+                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': languageModelAvailability === 'unavailable',
+                'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': languageModelAvailability === 'available'
+              }">
+              {{ languageModelAvailability === 'loading...' ? 'Checking...' : (languageModelAvailability === 'downloadable' || languageModelAvailability === 'downloading' ? 'Download Required' : languageModelAvailability) }}
+          </span>
         </div>
-        <button class="btn" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
-            class="bi bi-code-square"></i></button>
+
+        <button class="flex items-center gap-2 px-3 py-2 !rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors focus:outline-none border-none" 
+                (click)="openCodeModal()"
+                ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom">
+          <i class="bi bi-code-square"></i> <span class="hidden sm:inline">Get code</span>
+        </button>
       </div>
     </div>
   </webai-studio-header>
-  <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
-    <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
 
-      @if (output()) {
-      <div class="card p-3 flex-grow-1" style="height: calc(100vh - 190px); overflow:auto;">
-        <div [innerHTML]="output() | render_markdown | async"></div>
+  <!-- Main Area -->
+  <div class="flex-grow flex flex-col mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 overflow-hidden h-[calc(100vh-120px)]">
+    <div class="flex flex-col h-full gap-4 pb-4">
+
+      <!-- Output / Initial State -->
+      <div class="flex-grow flex flex-col relative" [ngClass]="{'justify-center items-center': !output()}">
+        
+        @if (output()) {
+          <div class="flex-grow overflow-y-auto bg-[#ffffff] dark:bg-zinc-800/90 !rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-6 md:p-8" autoScroll>
+             <div class="prose prose-slate dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-slate-50 dark:prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-slate-200 dark:prose-pre:border-zinc-800" 
+                  [innerHTML]="output() | render_markdown | async"></div>
+          </div>
+        } @else {
+          <div class="text-center opacity-70 dark:opacity-60 transition-opacity mt-[-10vh]">
+            <img src="images/webai-logo.png" alt="WebAI" class="w-24 h-24 mx-auto mb-6 drop-shadow-md">
+            <h1 class="text-4xl font-light tracking-tight text-slate-800 dark:text-slate-100 mb-2">Writing Assistance</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-sm">Summarize, write, and rewrite with local AI.</p>
+          </div>
+        }
+
       </div>
-      }
 
-      @if (!output()) {
-      <h1 class="display-4 text-center">Web AI Studio</h1>
-      }
-
-      <app-writing-assistance-input (apiSelection)="apiSelected($event)" (run)="run($event)" [state]="state"
-        (cancel)="onCancel()"></app-writing-assistance-input>
+      <!-- Input Area -->
+      <div class="w-full flex-shrink-0 relative z-10" [class.mt-auto]="!output()">
+        <app-writing-assistance-input 
+          #inputComponent
+          (apiSelection)="apiSelected($event)" 
+          (run)="run($event)" 
+          [state]="state"
+          (cancel)="onCancel()">
+        </app-writing-assistance-input>
+      </div>
 
     </div>
   </div>

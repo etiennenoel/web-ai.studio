@@ -1,50 +1,76 @@
-<div class="chat-container d-flex flex-column gap-3 p-3">
+<div class="flex flex-col gap-5 p-4 sm:p-6 pb-8 overflow-y-auto">
   @for (message of messages; track $index) {
 
   @if (message.role === 'system') {
-  <div class="d-flex justify-content-center my-2">
-    <span class="badge rounded-pill text-bg-light text-secondary border fw-normal px-3 py-2" style="font-size: 0.85rem">
-      <i class="bi bi-info-circle me-1"></i> {{ message.content }}
+  <div class="flex justify-center my-4">
+    <span class="px-4 py-2 text-xs font-medium rounded-full bg-slate-100 text-slate-500 border border-slate-200 dark:bg-zinc-800/80 dark:text-slate-400 dark:border-zinc-700/50 shadow-sm flex items-center gap-2">
+      <i class="bi bi-info-circle"></i> {{ message.content }}
     </span>
   </div>
   } @else {
-  <div class="d-flex" [class.justify-content-end]="message.role === 'user'">
-    <div class="card" [class.bg-primary]="message.role === 'user'" [class.text-white]="message.role === 'user'"
-      [class.w-100]="message.role !== 'user'" style="max-width: 80%;">
-      <div class="card-body p-2">
+  <div class="flex w-full" [class.justify-end]="message.role === 'user'">
+    
+    @if (message.role !== 'user') {
+    <div class="flex-shrink-0 mr-4 hidden sm:flex mt-1">
+      <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/50 shadow-sm">
+        <img src="images/webai-logo.png" alt="AI" class="w-5 h-5 object-contain">
+      </div>
+    </div>
+    }
+
+    <div class="group relative flex flex-col max-w-[85%] sm:max-w-[80%]" [class.w-full]="message.role !== 'user'">
+      
+      <!-- Message Header / Role -->
+      @if (message.role === 'user') {
+      <div class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mb-1.5 ml-auto mr-1 uppercase tracking-wide">You</div>
+      }
+
+      <div class="rounded-2xl px-5 py-4 shadow-sm"
+           [ngClass]="message.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-[#ffffff] dark:bg-zinc-800/90 text-slate-800 dark:text-slate-200 border border-slate-200/60 dark:border-zinc-700/50 rounded-tl-sm'">
+        
         @if (message.attachments && message.attachments.length > 0) {
-          <div class="d-flex gap-2 mb-2 flex-wrap">
+          <div class="flex gap-3 mb-3 flex-wrap">
             @for (att of message.attachments; track $index) {
               @if (att.type === 'image') {
-                <img [src]="att.safeUrl" [alt]="att.file?.name || 'Attached image'" [title]="att.file?.name || 'Attached image'" style="max-height: 150px; border-radius: 8px; object-fit: contain; background-color: rgba(0,0,0,0.1);"/>
+                <img [src]="att.safeUrl" [alt]="att.file.name || 'Attached image'" [title]="att.file.name || 'Attached image'" class="max-h-40 rounded-xl object-contain bg-black/5 dark:bg-black/20 ring-1 ring-black/5 dark:ring-white/10"/>
               }
               @if (att.type === 'audio') {
-                <audio [src]="att.safeUrl" controls style="height: 30px;" [title]="att.file?.name || 'Attached audio'"></audio>
+                <audio [src]="att.safeUrl" controls class="h-10 rounded-lg outline-none" [title]="att.file.name || 'Attached audio'"></audio>
               }
               @if (att.type === 'pdf') {
-                <div class="d-flex flex-column align-items-center justify-content-center bg-body-tertiary rounded p-2" style="width: 100px; height: 100px;" [title]="att.file?.name || 'Attached PDF'">
-                  <i class="bi bi-file-earmark-pdf fs-1"></i>
+                <div class="flex flex-col items-center justify-center bg-slate-100 dark:bg-zinc-900 rounded-xl p-3 w-24 h-24 ring-1 ring-slate-200 dark:ring-zinc-700 transition-transform hover:scale-105 cursor-pointer" [title]="att.file.name || 'Attached PDF'">
+                  <i class="bi bi-file-earmark-pdf text-4xl text-red-500 dark:text-red-400 mb-1"></i>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full text-center px-1" *ngIf="att.file.name">{{ att.file.name }}</span>
                 </div>
               }
             }
           </div>
         }
+        
         @if (message.role !== 'user' && !message.content && status === 'InProgress' && $index === messages.length - 1) {
         <app-latency-loader></app-latency-loader>
         }
-        <app-markdown-renderer [content]="message.content"></app-markdown-renderer>
+        
+        <div class="prose prose-sm max-w-none break-words leading-relaxed" 
+             [ngClass]="message.role === 'user' ? 'prose-invert text-white' : 'dark:prose-invert text-slate-800 dark:text-slate-200'">
+          <app-markdown-renderer [content]="message.content"></app-markdown-renderer>
+        </div>
       </div>
+
     </div>
   </div>
   }
 
   }
   @if (status === 'InProgress' && messages.length > 0 && messages[messages.length - 1].role === 'user') {
-  <div class="d-flex">
-    <div class="card w-100" style="max-width: 80%;">
-      <div class="card-body p-2">
-        <app-latency-loader></app-latency-loader>
+  <div class="flex w-full mt-2">
+    <div class="flex-shrink-0 mr-4 hidden sm:flex mt-1">
+      <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/50 shadow-sm">
+        <img src="images/webai-logo.png" alt="AI" class="w-5 h-5 object-contain animate-pulse">
       </div>
+    </div>
+    <div class="rounded-2xl px-5 py-4 shadow-sm bg-[#ffffff] dark:bg-zinc-800/90 border border-slate-200/60 dark:border-zinc-700/50 rounded-tl-sm w-full max-w-[85%] sm:max-w-[80%] flex items-center min-h-[60px]">
+      <app-latency-loader></app-latency-loader>
     </div>
   </div>
   }

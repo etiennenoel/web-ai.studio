@@ -1,154 +1,184 @@
-<div class="container-fluid h-100 d-flex flex-column" xmlns="http://www.w3.org/1999/html">
+<div class="flex flex-col h-full bg-transparent transition-colors duration-200">
   <webai-studio-header>
-
-    <div header-title-row class="d-flex align-items-center me-3 w-100">
-      <h2 class="h6 flex-grow-1 m-0">Chat</h2>
-      <div class="d-flex align-items-center gap-2">
-        <div class="d-flex align-items-center gap-2">
-          <div><small>Local LLM status:</small></div>
-          <div><span class="badge text-bg-secondary cursor-pointer"
-              [class.text-bg-warning]="this.languageModelAvailability === 'loading...'"
-              [class.text-bg-secondary]="this.languageModelAvailability === 'downloadable'"
-              [class.text-bg-danger]="this.languageModelAvailability === 'unavailable'"
-              [class.text-bg-success]="this.languageModelAvailability === 'available'"
-              [class.text-bg-primary]="this.languageModelAvailability === 'downloading'" placement="bottom"
-              [ngbTooltip]="capabilityTooltip">{{
-              this.languageModelAvailability }}</span>
-          </div>
+    <div header-title-row class="flex items-center w-full">
+      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex-grow">Chat</h2>
+      
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Local LLM Status -->
+        <div class="hidden sm:flex items-center gap-2 mr-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Local LLM status:</span>
+          <span class="px-2.5 py-1 text-xs font-bold rounded-md cursor-pointer transition-colors"
+              [ngClass]="{
+                'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400': languageModelAvailability === 'loading...',
+                'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-slate-400': languageModelAvailability === 'downloadable',
+                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': languageModelAvailability === 'unavailable',
+                'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': languageModelAvailability === 'available',
+                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': languageModelAvailability === 'downloading'
+              }" [ngbTooltip]="capabilityTooltip" placement="bottom">
+              {{ languageModelAvailability }}
+          </span>
         </div>
 
-        <button class="btn btn-soft" (click)="onNewChat()"
-          [disabled]="(conversationManager.status$ | async) === InferenceStateEnum.Initial" ngbTooltip="New chat"
-          placement="bottom">
-          <i class="bi bi-plus-lg"></i>
+        <!-- Buttons -->
+        <button class="p-2 !rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent" 
+                (click)="onNewChat()"
+                [disabled]="(conversationManager.status$ | async) === InferenceStateEnum.Initial" 
+                ngbTooltip="New chat" placement="bottom">
+          <i class="bi bi-plus-lg text-lg"></i>
         </button>
 
-        <div>
-          <button class="btn btn-settings btn-soft" [class.text-success]="settingsActive"
-            [class.badge-settings]="settingsActive" [class.active]="settingsActive" type="button"
-            data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-            <i class="bi bi-sliders2"></i>
-            <span
-              class="position-absolute translate-middle p-1 bg-success border border-light rounded-circle badge-settings">
-              <span class="visually-hidden">New alerts</span>
-            </span>
+        <div class="relative">
+          <button class="p-2 !rounded-xl transition-colors focus:outline-none border-none" 
+                  [ngClass]="settingsActive ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/20' : 'bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-zinc-800'"
+                  type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
+            <i class="bi bi-sliders2 text-lg"></i>
+            <span *ngIf="settingsActive" class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full border-2 border-white dark:border-[#121212]"></span>
           </button>
         </div>
 
-        <button class="btn btn-soft" (click)="openCodeModal()"
-          ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom"><i
-            class="bi bi-code-square"></i> Get code</button>
+        <button class="flex items-center gap-2 px-3 py-2 !rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors focus:outline-none border-none" 
+                (click)="openCodeModal()" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom">
+          <i class="bi bi-code-square"></i> <span class="hidden sm:inline">Get code</span>
+        </button>
       </div>
     </div>
-    @if (this.languageModelAvailability === "downloadable" || this.languageModelAvailability === "downloading") {
-    <div class="alert alert-warning">
-      <div>The Browser's LLM is not installed. Click here to trigger the download and installation in your
-        browser.
-      </div>
 
-      <div class="d-grid">
-        <button class="btn btn-primary mt-3" (click)="triggerDownload()">Trigger Local LLM Download</button>
+    <!-- Warnings / Alerts -->
+    @if (languageModelAvailability === "downloadable" || languageModelAvailability === "downloading") {
+    <div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30">
+      <div class="text-sm text-amber-800 dark:text-amber-400">
+        The Browser's LLM is not installed. Click here to trigger the download and installation in your browser.
       </div>
-
-      @if (this.languageModelAvailability === "downloading" || progress !== 0) {
-      Download in progress:
-      <div class="progress mt-4" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0"
-        aria-valuemax="100">
-        <div class="progress-bar" [style.width]="progress * 100 + '%'"></div>
+      <div class="mt-3">
+        <button class="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium !rounded-xl transition-colors shadow-sm border-none" (click)="triggerDownload()">
+          Trigger Local LLM Download
+        </button>
+      </div>
+      @if (languageModelAvailability === "downloading" || progress !== 0) {
+      <div class="mt-4">
+        <div class="text-xs font-medium text-amber-700 dark:text-amber-500 mb-2">Download in progress...</div>
+        <div class="w-full bg-amber-200/50 dark:bg-amber-900/50 rounded-full h-2.5 overflow-hidden">
+          <div class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" [style.width]="progress * 100 + '%'"></div>
+        </div>
       </div>
       }
     </div>
-    } @else if (this.languageModelAvailability === "unavailable") {
-    <div class="alert alert-danger">The "Prompt API" is not available. Make sure you are using a compatible hardware or
-      browser. <a href="https://developer.chrome.com/docs/ai/prompt-api#hardware-requirements">See more details</a>
+    } @else if (languageModelAvailability === "unavailable") {
+    <div class="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 text-sm text-red-800 dark:text-red-400">
+      The "Prompt API" is not available. Make sure you are using a compatible hardware or browser. 
+      <a href="https://developer.chrome.com/docs/ai/prompt-api#hardware-requirements" class="font-medium underline hover:text-red-900 dark:hover:text-red-300">See more details</a>
     </div>
     }
   </webai-studio-header>
 
-  <div class="container flex-grow-1" style="    height: calc(100vh - 120px);">
-    <div class="d-flex flex-column justify-content-center gap-5 h-100 ">
+  <!-- Main Chat Area -->
+  <div class="flex-grow flex flex-col mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 overflow-hidden h-[calc(100vh-120px)]">
+    <div class="flex flex-col h-full gap-4 pb-4">
 
+      <!-- Message History -->
       @if ((conversationManager.status$ | async) !== InferenceStateEnum.Initial) {
-      <app-chat class="flex-grow-1" [messages]="(conversationManager.messages$ | async) || []"
-        [status]="conversationManager.status$ | async"
-        style="height: calc(100vh - 190px); overflow:auto;overflow-anchor: none;" autoScroll></app-chat>
+      <div class="flex-grow overflow-y-auto" style="overflow-anchor: none;" autoScroll>
+        <app-chat class="block w-full pb-4" 
+                  [messages]="(conversationManager.messages$ | async) || []"
+                  [status]="conversationManager.status$ | async">
+        </app-chat>
+      </div>
       }
 
+      <!-- Initial State (No Messages) -->
       @if ((conversationManager.status$ | async) === InferenceStateEnum.Initial) {
-      <h1 class="display-4 text-center">Web AI Studio</h1>
+      <div class="flex-grow flex flex-col items-center justify-center">
+        <div class="text-center opacity-70 dark:opacity-60 transition-opacity">
+          <img src="images/webai-logo.png" alt="WebAI" class="w-24 h-24 mx-auto mb-6 drop-shadow-md">
+          <h1 class="text-4xl font-light tracking-tight text-slate-800 dark:text-slate-100 mb-2">WebAI Studio</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Experience the power of local LLMs.</p>
+        </div>
+      </div>
       }
 
-      <app-prompt-input [class.sticky-bottom]="(conversationManager.status$ | async) !== InferenceStateEnum.Initial"
-        [state]="state" [capabilities]="capabilities" (run)="onRun($event)" (cancel)="onCancel()"
-        (optionsChange)="onOptionsChange($event)"></app-prompt-input>
+      <!-- Prompt Input -->
+      <div class="w-full flex-shrink-0 relative z-10"
+           [class.mt-auto]="(conversationManager.status$ | async) === InferenceStateEnum.Initial">
+        <app-prompt-input 
+          [state]="state" 
+          [capabilities]="capabilities" 
+          (run)="onRun($event)" 
+          (cancel)="onCancel()"
+          (optionsChange)="onOptionsChange($event)">
+        </app-prompt-input>
+      </div>
 
     </div>
   </div>
 </div>
 
-<div #settingsOffcanvas class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas"
+<!-- Settings Offcanvas -->
+<div #settingsOffcanvas class="offcanvas offcanvas-end bg-[#ffffff] dark:bg-[#121212] !border-l !border-slate-200 dark:!border-zinc-800" tabindex="-1" id="settingsOffcanvas"
   aria-labelledby="settingsOffcanvasLabel" (hidden.bs.offcanvas)="applyPendingSettings()">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel">Run Settings</h5>
+  <div class="offcanvas-header border-b border-slate-200 dark:border-zinc-800">
+    <h5 class="offcanvas-title text-base font-semibold text-slate-900 dark:text-white" id="settingsOffcanvasLabel">Run Settings</h5>
     <div class="ms-auto me-2">
       @if (settingsActive) {
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="resetSettings()"><i
-          class="bi bi-arrow-counterclockwise"></i> Reset</button>
+      <button type="button" class="text-xs font-medium px-2 py-1.5 !rounded-lg text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors border-none" (click)="resetSettings()">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </button>
       }
     </div>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <button type="button" class="btn-close dark:invert" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-  <div class="offcanvas-body">
-    <div class="mb-4">
-      <h6 class="text-uppercase fw-bold text-secondary mb-3" style="letter-spacing: 0.05em; font-size: 0.95rem;">
-        Generation</h6>
-      <div class="d-flex align-items-center gap-5 mb-3">
-        <label class="form-check-label flex-grow-1" for="streamOutputSwitch">Stream response</label>
-        <div class="form-check form-switch ps-2 m-0" style="width: 70px; min-height: auto;">
-          <input class="form-check-input m-0" type="checkbox" role="switch" id="streamOutputSwitch"
-            [(ngModel)]="options.stream" (change)="onOptionsChange(options)" style="width: 40px;">
+  
+  <div class="offcanvas-body p-5">
+    <div class="mb-8">
+      <h6 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Generation</h6>
+      
+      <div class="flex items-center justify-between mb-6">
+        <label class="text-sm font-medium text-slate-700 dark:text-slate-300" for="streamOutputSwitch">Stream response</label>
+        <div class="form-check form-switch m-0 text-lg">
+          <input class="form-check-input cursor-pointer" type="checkbox" role="switch" id="streamOutputSwitch"
+            [(ngModel)]="options.stream" (change)="onOptionsChange(options)">
         </div>
       </div>
 
-      <div class="mb-3">
-        <div class="d-flex justify-content-between">
-          <label class="form-label mb-1">Temperature</label>
+      <div class="mb-6">
+        <div class="flex justify-between mb-2">
+          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Temperature</label>
         </div>
-        <div class="d-flex align-items-center gap-3">
-          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.temperature" [min]="0"
+        <div class="flex items-center gap-4">
+          <input type="range" class="form-range flex-grow" [(ngModel)]="options.temperature" [min]="0"
             [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm" style="width: 70px;"
+          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             [(ngModel)]="options.temperature" [min]="0" [max]="maxTemperature" [step]="0.1"
             (change)="onOptionsChange(options)">
         </div>
       </div>
 
-      <div class="mb-3">
-        <div class="d-flex justify-content-between">
-          <label class="form-label mb-1">TopK</label>
+      <div class="mb-6">
+        <div class="flex justify-between mb-2">
+          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">TopK</label>
         </div>
-        <div class="d-flex align-items-center gap-3">
-          <input type="range" class="form-range flex-grow-1" [(ngModel)]="options.topK" [min]="1" [max]="maxTopK"
+        <div class="flex items-center gap-4">
+          <input type="range" class="form-range flex-grow" [(ngModel)]="options.topK" [min]="1" [max]="maxTopK"
             [step]="1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm" style="width: 70px;" [(ngModel)]="options.topK"
-            [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
+          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
+                 [(ngModel)]="options.topK" [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
         </div>
       </div>
     </div>
 
-    <hr class="my-4">
+    <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 my-6"></div>
 
     <div>
-      <h6 class="text-uppercase fw-bold text-secondary mb-3" style="letter-spacing: 0.05em; font-size: 0.95rem;">Tools
-      </h6>
-      <div class="d-flex align-items-center gap-3">
-        <div class="form-check form-switch flex-grow-1">
-          <input class="form-check-input" type="checkbox" role="switch" id="structuredOutputSwitch"
+      <h6 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Tools</h6>
+      <div class="flex items-center justify-between">
+        <div class="form-check form-switch m-0 flex items-center gap-2 text-lg">
+          <input class="form-check-input cursor-pointer" type="checkbox" role="switch" id="structuredOutputSwitch"
             [(ngModel)]="options.structuredOutputEnabled" (change)="onOptionsChange(options)">
-          <label class="form-check-label" for="structuredOutputSwitch">Structured Output</label>
+          <label class="form-check-label text-sm font-medium text-slate-700 dark:text-slate-300 ml-1" for="structuredOutputSwitch">Structured Output</label>
         </div>
-        <button class="btn btn-sm btn-soft btn-white bg-primary-subtle" [disabled]="!options.structuredOutputEnabled"
-          (click)="editStructuredOutput()">Edit
+        <button class="px-3 py-1.5 !rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors disabled:opacity-50 border-none" 
+                [disabled]="!options.structuredOutputEnabled"
+                (click)="editStructuredOutput()">
+          Edit
         </button>
       </div>
     </div>

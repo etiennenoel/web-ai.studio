@@ -1,7 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
-@custom-variant dark (&:where([data-bs-theme="dark"], [data-bs-theme="dark"] *));
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:is([data-bs-theme="dark"], [data-bs-theme="dark"] *));
 
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
@@ -36,6 +37,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
+  @apply bg-white text-slate-900 dark:bg-[#121212] dark:text-slate-100;
 }
 
 .w-auto {

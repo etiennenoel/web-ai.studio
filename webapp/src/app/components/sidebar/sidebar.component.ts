@@ -2,7 +2,7 @@ import {Component, Inject, OnInit, Optional, PLATFORM_ID, DOCUMENT} from '@angul
 import {BaseComponent} from '../base.component';
 import {isPlatformServer} from '@angular/common';
 import {RouteEnum} from '../../enums/route.enum';
-import {WEBAI_STUDIO_BASE_URL} from '../../tokens/base-url.token';
+import {ThemeService, Theme} from '../../core/services/theme.service';
 
 @Component({
   selector: 'webai-studio-sidebar',
@@ -13,11 +13,14 @@ import {WEBAI_STUDIO_BASE_URL} from '../../tokens/base-url.token';
 export class SidebarComponent extends BaseComponent implements OnInit {
 
   routeEnum!: RouteEnum;
+  currentTheme$;
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
+              private themeService: ThemeService
   ) {
-    super(document)
+    super(document);
+    this.currentTheme$ = this.themeService.currentTheme$;
   }
 
   override ngOnInit() {
@@ -33,6 +36,10 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     window.navigation?.addEventListener("navigate", (event: any) => {
       this.determineCurrentActiveRoute((new URL(event.destination.url)).pathname);
     });
+  }
+
+  setTheme(theme: Theme) {
+    this.themeService.setTheme(theme);
   }
 
   getRouterLink(route: RouteEnum) {
