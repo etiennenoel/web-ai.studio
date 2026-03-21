@@ -4,6 +4,8 @@ import {LOCALES} from '../../constants/locales.constant';
 import {LOCALES_MAP} from '../../constants/locales-map.constant';
 import {isPlatformServer} from '@angular/common';
 import {FormControl} from '@angular/forms';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslationCodeModal} from '../../components/translation-code-modal/translation-code-modal';
 
 @Component({
   selector: 'lib-translation',
@@ -44,11 +46,24 @@ export class TranslationPage {
   sourceSearchTerm = '';
   destinationSearchTerm = '';
 
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object){
+  constructor(
+    @Inject(PLATFORM_ID) private readonly platformId: Object,
+    private readonly ngbModal: NgbModal,
+  ){
   }
 
   ngOnInit() {
     this.setupTranslator();
+  }
+
+  openCodeModal() {
+    const codeModalComponent = this.ngbModal.open(TranslationCodeModal, {
+      size: "xl",
+    });
+    const instance = codeModalComponent.componentInstance as TranslationCodeModal;
+    instance.sourceLanguage = this.sourceLocale;
+    instance.targetLanguage = this.destinationLocale;
+    instance.updateCode();
   }
 
   getFilteredLocales(term: string): LocaleInterface[] {
@@ -149,11 +164,11 @@ export class TranslationPage {
        // if we are detecting language we need to know if detection is available
        if (!this.sourceLocale) {
          try {
-            if ("languageDetector" in self) {
+            if ("LanguageDetector" in self && "availability" in (self as any).LanguageDetector) {
+              const availability = await (self as any).LanguageDetector.availability();
+              this.apiAvailabilityStatus = availability;
+            } else if ("languageDetector" in self) {
               const capabilities = await (self as any).languageDetector.capabilities();
-              this.apiAvailabilityStatus = capabilities.available;
-            } else if ("ai" in self && (self as any).ai.languageDetector) {
-              const capabilities = await (self as any).ai.languageDetector.capabilities();
               this.apiAvailabilityStatus = capabilities.available;
             } else {
               this.apiAvailabilityStatus = 'unknown';
@@ -168,12 +183,7 @@ export class TranslationPage {
     }
 
     try {
-        if ("translation" in self) {
-            this.apiAvailabilityStatus = await (self as any).translation.canTranslate({
-                sourceLanguage: this.sourceLocale.code,
-                targetLanguage: this.destinationLocale.code
-            });
-        } else if ("Translator" in self && "availability" in (self as any).Translator) {
+        if ("Translator" in self && "availability" in (self as any).Translator) {
             this.apiAvailabilityStatus = await (self as any).Translator.availability({
                 sourceLanguage: this.sourceLocale.code,
                 targetLanguage: this.destinationLocale.code

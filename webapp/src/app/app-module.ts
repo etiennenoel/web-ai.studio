@@ -17,6 +17,7 @@ import { BrowserModule, provideClientHydration, withEventReplay } from '@angular
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { PromptCodeModal } from './components/prompt-code-modal/prompt-code-modal';
+import { TranslationCodeModal } from './components/translation-code-modal/translation-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import { CortexPage } from './pages/cortex/cortex.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
@@ -97,6 +98,7 @@ import {HistoryListComponent} from './components/history-list/history-list.compo
     FirstCreateShouldFullyLoadTheModelPage,
     BugsPage,
     PromptCodeModal,
+    TranslationCodeModal,
     EvalsPage,
 
     AutoScrollDirective,
