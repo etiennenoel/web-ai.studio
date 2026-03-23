@@ -27,10 +27,11 @@ import { Component } from '@angular/core';
         <hr class="border-t border-slate-200 dark:border-zinc-800 mb-10 max-w-4xl">
 
         
+        
         <!-- Errors Table -->
         <div class="max-w-5xl overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm">
           <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-            <thead class="bg-slate-50 dark:bg-[#161616] border-b border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white">
+            <thead class="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white">
               <tr>
                 <th class="px-5 py-4 font-semibold w-1/5">Error</th>
                 <th class="px-5 py-4 font-semibold w-1/6">JS Type</th>
@@ -52,8 +53,8 @@ import { Component } from '@angular/core';
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Thrown when the combination of your system prompt, context, and input exceeds the maximum token limit. 
-                  <div class="mt-3 p-2 bg-slate-50 dark:bg-[#161616] rounded border border-slate-100 dark:border-zinc-800 text-xs">
+                  Thrown when the input is too large and the combination of your system prompt, context, and input exceeds the maximum token limit. 
+                  <div class="mt-3 p-2 bg-slate-50 dark:bg-zinc-900 rounded border border-slate-100 dark:border-zinc-800 text-xs">
                     <strong>Props:</strong><br>
                     <code>e.requested</code>: Total input tokens.<br>
                     <code>e.quota</code>: Tokens available.
@@ -61,6 +62,44 @@ import { Component } from '@angular/core';
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
                   Catch the error and inform the user that their input is too large. Use <code>measureInputUsage()</code> beforehand to truncate inputs proactively if needed.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-shield-slash text-rose-500"></i>
+                    <code class="font-mono font-bold text-rose-700 dark:text-rose-400">NotReadableError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Safety Filtered</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when the execution yielded an unsafe response. The built-in safety model intercepted the output due to toxicity or restricted topics.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Inform the user that the response violated safety guidelines and could not be displayed. Consider adjusting the system prompt to guide safer responses.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-person-lock text-pink-500"></i>
+                    <code class="font-mono font-bold text-pink-700 dark:text-pink-400">NotAllowedError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Permission Denied</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when a user permission error occurs (e.g., the user is not allowed to execute the model), or if an Enterprise Policy disables the feature.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Display a message indicating that the browser environment or administrator policy prohibits the use of local AI models. Handle the missing capability gracefully in your UI.
                 </td>
               </tr>
 
@@ -76,18 +115,79 @@ import { Component } from '@angular/core';
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Thrown when the implementation does not support the requested options (e.g., an unknown language, or multimodal inputs for the "assistant" role).
+                  Thrown when: <br>
+                  1. The request is invalid (input/options could not be processed).<br>
+                  2. The model attempted to output in an untested language.<br>
+                  3. The model attempted to output low quality text.<br>
+                  4. The response constraint JSON schema is not supported.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Fall back to a cloud-based API or remove the unsupported languages. Always use <code>availability(options)</code> to verify support before calling <code>create()</code>.
+                  Adjust your constraints or handle the unsupported state gracefully. Ensure you use the <code>availability(options)</code> check to verify base support before calling <code>create()</code>.
+                </td>
+              </tr>
+              
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-exclamation-triangle text-amber-500"></i>
+                    <code class="font-mono font-bold text-amber-700 dark:text-amber-400">InvalidStateError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">State Destroyed</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when the model execution session has been explicitly destroyed, the document is no longer active, or the execution context is invalid.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Ensure you are not calling <code>prompt()</code> on a session that has already been destroyed, and that the calling window context is still alive.
                 </td>
               </tr>
 
               <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
                 <td class="px-5 py-5 align-top">
                   <div class="flex items-center gap-2 mb-1">
-                    <i class="bi bi-wifi-off text-amber-500"></i>
-                    <code class="font-mono font-bold text-amber-700 dark:text-amber-400">NetworkError</code>
+                    <i class="bi bi-pc-display-horizontal text-emerald-500"></i>
+                    <code class="font-mono font-bold text-emerald-700 dark:text-emerald-400">OperationError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Service Unavailable</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when the underlying model execution service (the Chrome process managing the model) is not available or has crashed.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Treat this as a fatal crash of the local model and inform the user that the service is currently unavailable.
+                </td>
+              </tr>
+              
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-question-octagon text-cyan-500"></i>
+                    <code class="font-mono font-bold text-cyan-700 dark:text-cyan-400">UnknownError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Generic Failure</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when other generic, unclassified failures occur, or when an internal state like a "retryable" or "non-retryable" engine error is encountered.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Capture and log the error for telemetry and display a graceful failure message.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-wifi-off text-indigo-500"></i>
+                    <code class="font-mono font-bold text-indigo-700 dark:text-indigo-400">NetworkError</code>
                   </div>
                   <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Download Failure</span>
                 </td>
@@ -114,10 +214,10 @@ import { Component } from '@angular/core';
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Thrown intentionally when an operation is cancelled by the developer via an <code>AbortSignal</code>, or when a session is destroyed while operations are pending.
+                  Thrown when an operation is cancelled by the developer via an <code>AbortSignal</code>, the response was disabled, or the request was cancelled internally by Chrome.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  This is an expected state if your UI allows users to "Stop Generation". Catch it and silently reset your UI state to idle.
+                  This is usually an expected state if your UI allows users to "Stop Generation". Catch it and silently reset your UI state to idle.
                 </td>
               </tr>
 
@@ -163,8 +263,8 @@ import { Component } from '@angular/core';
               <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
                 <td class="px-5 py-5 align-top">
                   <div class="flex items-center gap-2 mb-1">
-                    <i class="bi bi-bug text-indigo-500"></i>
-                    <code class="font-mono font-bold text-indigo-700 dark:text-indigo-400">TypeError</code>
+                    <i class="bi bi-bug text-blue-500"></i>
+                    <code class="font-mono font-bold text-blue-700 dark:text-blue-400">TypeError</code>
                   </div>
                   <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Validation Errors</span>
                 </td>
