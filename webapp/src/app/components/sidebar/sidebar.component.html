@@ -45,6 +45,122 @@
         Developers
       </div>
 
+      <!-- Documentation Group -->
+      <div class="flex flex-col gap-1 mb-1">
+        <a [routerLink]="getRouterLink(RouteEnum.Docs)" class="!no-underline px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center hover:bg-slate-200/50 dark:hover:bg-zinc-800/50 rounded-lg cursor-pointer transition-colors" [ngClass]="routeEnum === RouteEnum.Docs ? 'bg-slate-200/50 dark:bg-zinc-800/50' : ''">
+          <i class="bi bi-book text-lg w-7 flex justify-start text-slate-500 dark:text-slate-400"></i>
+          <span>Documentation</span>
+        </a>
+        
+        <div class="flex flex-col gap-0.5 pl-7 relative before:content-[''] before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-200 dark:before:bg-zinc-700/80">
+          
+          <!-- Getting Started -->
+          <a [routerLink]="getRouterLink(RouteEnum.GetStarted)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.GetStarted ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.GetStarted) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Getting Started</span>
+          </a>
+
+          <!-- Check Availability -->
+          <a [routerLink]="getRouterLink(RouteEnum.CheckAvailability)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.CheckAvailability ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.CheckAvailability) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Check Availability</span>
+          </a>
+
+          <!-- Errors -->
+          <a [routerLink]="getRouterLink(RouteEnum.Errors)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.Errors ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.Errors) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Error Handling</span>
+          </a>
+
+          <div class="mt-3 mb-1.5 text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+            API References
+          </div>
+
+          <!-- Prompt API -->
+          <a [routerLink]="getRouterLink(RouteEnum.PromptApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.PromptApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.PromptApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Prompt API</span>
+          </a>
+
+          <!-- Summarizer -->
+          <a [routerLink]="getRouterLink(RouteEnum.SummarizerApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.SummarizerApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.SummarizerApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Summarizer</span>
+          </a>
+
+          <!-- Writer -->
+          <a [routerLink]="getRouterLink(RouteEnum.WriterApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.WriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.WriterApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Writer</span>
+          </a>
+
+          <!-- Rewriter -->
+          <a [routerLink]="getRouterLink(RouteEnum.RewriterApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.RewriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.RewriterApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Rewriter</span>
+          </a>
+
+          <!-- Translator -->
+          <a [routerLink]="getRouterLink(RouteEnum.TranslatorApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.TranslatorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.TranslatorApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Translator</span>
+          </a>
+
+          <!-- Language Detector -->
+          <a [routerLink]="getRouterLink(RouteEnum.LanguageDetectorApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.LanguageDetectorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.LanguageDetectorApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Language Detector</span>
+          </a>
+
+          <!-- Proofreader -->
+          <a [routerLink]="getRouterLink(RouteEnum.ProofreaderApi)"
+             class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+             [ngClass]="routeEnum === RouteEnum.ProofreaderApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            @if (routeEnum === RouteEnum.ProofreaderApi) {
+              <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+            }
+            <span>Proofreader</span>
+          </a>
+
+        </div>
+      </div>
+
       <!-- Demos -->
       <a [routerLink]="getRouterLink(RouteEnum.Demos)"
          class="!no-underline group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"

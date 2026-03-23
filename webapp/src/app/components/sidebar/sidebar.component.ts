@@ -71,6 +71,43 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       case "extension":
         this.routeEnum = RouteEnum.Extension;
         break;
+      case "docs":
+        this.routeEnum = RouteEnum.Docs;
+        break;
+      case "get-started":
+        this.routeEnum = RouteEnum.GetStarted;
+        break;
+      case "check-availability":
+        this.routeEnum = RouteEnum.CheckAvailability;
+        break;
+      case "errors":
+        this.routeEnum = RouteEnum.Errors;
+        break;
+      case "prompt-api":
+        this.routeEnum = RouteEnum.PromptApi;
+        break;
+      case "summarizer":
+        this.routeEnum = RouteEnum.SummarizerApi;
+        break;
+      case "writer":
+        this.routeEnum = RouteEnum.WriterApi;
+        break;
+      case "rewriter":
+        this.routeEnum = RouteEnum.RewriterApi;
+        break;
+      case "translator":
+        if (pathname.includes('/docs/')) {
+          this.routeEnum = RouteEnum.TranslatorApi;
+        } else {
+          this.routeEnum = RouteEnum.Translation;
+        }
+        break;
+      case "language-detector":
+        this.routeEnum = RouteEnum.LanguageDetectorApi;
+        break;
+      case "proofreader":
+        this.routeEnum = RouteEnum.ProofreaderApi;
+        break;
 
       default:
         this.routeEnum = RouteEnum.Chat;
