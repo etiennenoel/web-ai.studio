@@ -1,0 +1,207 @@
+import { Component, OnInit } from '@angular/core';
+import { BaseDemoComponent } from '../components/base-demo/base-demo.component';
+import { DEMOS_DATA } from '../../../core/services/demos.data';
+import { PromptInputStateEnum } from '../../../core/enums/prompt-input-state.enum';
+
+declare const LanguageModel: any;
+
+@Component({
+  selector: 'app-extract-entities-demo',
+  template: `
+    <app-demo-layout 
+      [title]="demo.title" 
+      [description]="demo.description" 
+      [icon]="demo.icon" 
+      [category]="demo.category" 
+      [onDeviceReason]="demo.onDeviceReason" 
+      [codeSnippet]="dynamicCodeSnippet"
+      [ttft]="ttft"
+      [totalTime]="totalTime">
+      <div demo-ui>
+        
+        <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
+          
+          <!-- Input Side -->
+          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 p-6">
+            
+            <label class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i class="bi bi-file-text text-indigo-500 text-lg"></i> Raw Text Input
+            </label>
+            
+            <textarea class="w-full flex-grow bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-lg p-5 leading-relaxed font-serif shadow-sm mb-6" 
+                      [(ngModel)]="sourceText" 
+                      placeholder="Enter a paragraph containing names and places..."></textarea>
+            
+            <div>
+              @if (state === 'Inferencing') {
+                <button class="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-lg shadow-md transition-all active:scale-95 border-none"
+                        (click)="onCancelGenerate()">
+                  <i class="bi bi-stop-fill text-xl"></i> Stop Extraction
+                </button>
+              } @else {
+                <button class="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50 border-none" 
+                        (click)="extractEntities()"
+                        [disabled]="!sourceText.trim()">
+                  <i class="bi bi-box-seam text-xl"></i> Extract Entities
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Entities Output Side -->
+          <div class="flex-[1.5] flex flex-col relative bg-white dark:bg-zinc-800">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-700 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-900/30">
+              <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <i class="bi bi-tags text-emerald-500 text-lg"></i> Discovered Entities
+              </span>
+              @if (state === 'Inferencing') {
+                <app-latency-loader></app-latency-loader>
+              }
+            </div>
+            
+            <div class="flex-grow relative overflow-y-auto p-6">
+              @if (extractedData || state === 'Inferencing') {
+                
+                @if (extractedData?.people && extractedData.people.length > 0) {
+                  <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">People</h4>
+                    <div class="flex flex-wrap gap-2">
+                      @for (person of extractedData.people; track person) {
+                        <span class="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                          <i class="bi bi-person-fill opacity-50"></i> {{ person }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+                
+                @if (extractedData?.locations && extractedData.locations.length > 0) {
+                  <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Locations</h4>
+                    <div class="flex flex-wrap gap-2">
+                      @for (location of extractedData.locations; track location) {
+                        <span class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                          <i class="bi bi-geo-alt-fill opacity-50"></i> {{ location }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (state !== 'Inferencing' && (!extractedData?.people?.length && !extractedData?.locations?.length)) {
+                  <div class="text-slate-500 italic p-4 bg-slate-50 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-700 text-center">
+                    No entities found in the text.
+                  </div>
+                }
+
+                <div class="mt-8 border-t border-slate-100 dark:border-zinc-700 pt-4">
+                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Raw JSON Data</span>
+                  <div class="bg-[#1e1e1e] rounded-xl overflow-hidden border border-zinc-700">
+                     <app-code-editor [code]="rawJson" [language]="'json'"></app-code-editor>
+                  </div>
+                </div>
+
+              } @else {
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-40 px-8">
+                  <i class="bi bi-diagram-3 text-6xl mb-4 text-slate-400 dark:text-zinc-500"></i>
+                  <p class="text-slate-500 dark:text-zinc-400 text-sm">Extracted people and locations will be categorized here.</p>
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </app-demo-layout>
+  `,
+  standalone: false,
+  host: { class: 'block h-full' }
+})
+export class ExtractEntitiesDemoComponent extends BaseDemoComponent implements OnInit {
+  demo = DEMOS_DATA.find(d => d.id === 'extract-entities')!;
+  
+  sourceText = '';
+  schemaText = '';
+  extractedData: any = null;
+  rawJson = '';
+  
+  override async ngOnInit() {
+    super.ngOnInit();
+    this.setTitle(`Demo: ${this.demo.title}`);
+    this.sourceText = this.demo.initialPrompt;
+    this.schemaText = this.demo.promptRunOptions.structuredOutputJsonSchema || '{}';
+    await this.checkAvailability();
+  }
+
+  get dynamicCodeSnippet() {
+    const escapedPrompt = this.sourceText.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    return `const schema = {
+  type: "object",
+  properties: {
+    people: { type: "array", items: { type: "string" } },
+    locations: { type: "array", items: { type: "string" } }
+  }
+};
+
+const session = await LanguageModel.create();
+const result = await session.prompt("${escapedPrompt}", {
+  responseConstraint: schema
+});
+const data = JSON.parse(result);
+console.log(data.people, data.locations);`;
+  }
+
+  async extractEntities() {
+    if (!this.sourceText.trim()) return;
+    
+    this.state = PromptInputStateEnum.Inferencing;
+    this.extractedData = null;
+    this.rawJson = '';
+    this.ttft = null;
+    this.totalTime = null;
+    this.abortController = new AbortController();
+    
+    const startTime = performance.now();
+    let firstTokenTime: number | null = null;
+    
+    try {
+      const session = await LanguageModel.create();
+      
+      const parsedSchema = JSON.parse(this.schemaText);
+      
+      const result = await session.prompt(this.sourceText, { 
+        signal: this.abortController.signal,
+        responseConstraint: parsedSchema
+      });
+      
+      firstTokenTime = performance.now();
+      this.ttft = Math.round(firstTokenTime - startTime);
+      
+      try {
+        this.extractedData = JSON.parse(result);
+        this.rawJson = JSON.stringify(this.extractedData, null, 2);
+      } catch (e) {
+        this.rawJson = result;
+      }
+      
+      const endTime = performance.now();
+      this.totalTime = Math.round(endTime - startTime);
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        console.error(e);
+        this.rawJson = '// Error parsing data:\n// ' + e.message;
+      }
+    } finally {
+      this.state = PromptInputStateEnum.Ready;
+      this.abortController = null;
+    }
+  }
+
+  onCancelGenerate() {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+    this.state = PromptInputStateEnum.Ready;
+  }
+}

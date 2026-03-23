@@ -1,0 +1,85 @@
+<div class="flex flex-col h-full bg-slate-50 dark:bg-[#121212] transition-colors duration-200 overflow-y-auto">
+  <div class="p-6 md:p-10 max-w-7xl mx-auto w-full">
+    
+    <!-- Breadcrumb & Header -->
+    <div class="mb-8">
+      <a routerLink="/demos" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all border border-slate-200 dark:border-zinc-700 no-underline mb-6 group shadow-sm">
+        <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i>
+        <span>Back to Demos</span>
+      </a>
+      
+      <div class="flex items-center gap-4 mt-2">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl shadow-sm">
+          <i class="bi {{ icon }}"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-white m-0">{{ title }}</h1>
+          <span class="inline-block mt-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-200/60 dark:bg-zinc-800 text-slate-600 dark:text-slate-400">
+            {{ category }}
+          </span>
+        </div>
+      </div>
+      <p class="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-3xl">{{ description }}</p>
+    </div>
+
+    <!-- Why On-Device -->
+    <div class="mb-8 bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-900/30 rounded-2xl p-5 shadow-sm max-w-3xl">
+      <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+        <i class="bi bi-shield-check text-lg"></i> Why On-Device?
+      </h3>
+      <p class="text-emerald-900 dark:text-emerald-100/90 text-sm m-0 leading-relaxed">
+        {{ onDeviceReason }}
+      </p>
+    </div>
+
+    <!-- Content Split -->
+    <div class="flex flex-col gap-10">
+      
+      <!-- Interactive Demo -->
+      <div class="flex flex-col gap-6">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Interactive Demo</h3>
+        <ng-content select="[demo-ui]"></ng-content>
+        
+        <!-- Performance Metrics -->
+        @if (totalTime !== null) {
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Time To First Token</div>
+              <div class="text-xl lg:text-2xl font-bold text-slate-800 dark:text-slate-200">{{ ttft ? ttft + 'ms' : 'N/A' }}</div>
+            </div>
+            <i class="bi bi-lightning-charge text-2xl lg:text-3xl text-amber-500 opacity-20"></i>
+          </div>
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Time</div>
+              <div class="text-xl lg:text-2xl font-bold text-slate-800 dark:text-slate-200">{{ totalTime }}ms</div>
+            </div>
+            <i class="bi bi-stopwatch text-2xl lg:text-3xl text-indigo-500 opacity-20"></i>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Code Snippet -->
+      <div class="flex flex-col gap-6">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Implementation Code</h3>
+        <div class="bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-xl border border-zinc-800 flex flex-col h-[500px]">
+          <div class="px-4 py-3 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+              <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+            </div>
+            <div class="text-xs font-medium text-zinc-400 font-mono">demo.js</div>
+          </div>
+          <div class="flex-grow">
+            <app-code-editor [code]="codeSnippet" [language]="'javascript'"></app-code-editor>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

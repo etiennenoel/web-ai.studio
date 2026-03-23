@@ -85,6 +85,33 @@ import {HistoryListComponent} from './components/history-list/history-list.compo
 
 import {CameraModalComponent} from './components/prompt-input/camera-modal/camera-modal.component';
 import {AudioRecordingModalComponent} from './components/prompt-input/audio-recording-modal/audio-recording-modal.component';
+import {DemosPage} from './pages/demos/demos.page';
+import {DemoLayoutComponent} from './pages/demos/components/demo-layout/demo-layout.component';
+import { TranslationDemoComponent } from './pages/demos/features/translation-demo.component';
+import { SummarizationDemoComponent } from './pages/demos/features/summarization-demo.component';
+import { ProofreadingDemoComponent } from './pages/demos/features/proofreading-demo.component';
+import { ToneChangerDemoComponent } from './pages/demos/features/tone-changer-demo.component';
+import { BrainstormingDemoComponent } from './pages/demos/features/brainstorming-demo.component';
+import { WriteJavascriptDemoComponent } from './pages/demos/features/write-javascript-demo.component';
+import { WriteHtmlCssDemoComponent } from './pages/demos/features/write-html-css-demo.component';
+import { Eli5DemoComponent } from './pages/demos/features/eli5-demo.component';
+import { SqlGeneratorDemoComponent } from './pages/demos/features/sql-generator-demo.component';
+import { WriteEmailDemoComponent } from './pages/demos/features/write-email-demo.component';
+import { OcrDemoComponent } from './pages/demos/features/ocr-demo.component';
+import { ImageDescriptionDemoComponent } from './pages/demos/features/image-description-demo.component';
+import { ExplainMemeDemoComponent } from './pages/demos/features/explain-meme-demo.component';
+import { FridgeRecipeDemoComponent } from './pages/demos/features/fridge-recipe-demo.component';
+import { ImageCategorizationDemoComponent } from './pages/demos/features/image-categorization-demo.component';
+import { AudioTranscriptionDemoComponent } from './pages/demos/features/audio-transcription-demo.component';
+import { MeetingNotesDemoComponent } from './pages/demos/features/meeting-notes-demo.component';
+import { AudioSummarizationDemoComponent } from './pages/demos/features/audio-summarization-demo.component';
+import { StructuredJsonDemoComponent } from './pages/demos/features/structured-json-demo.component';
+import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
+import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
+import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
+
+
+import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
 
 @NgModule({
   declarations: [
@@ -105,6 +132,32 @@ import {AudioRecordingModalComponent} from './components/prompt-input/audio-reco
     TranslationCodeModal,
     WritingAssistanceCodeModal,
     EvalsPage,
+    DemosPage,
+    DemoLayoutComponent,
+    SafeHtmlPipe,
+    TranslationDemoComponent,
+    SummarizationDemoComponent,
+    ProofreadingDemoComponent,
+    ToneChangerDemoComponent,
+    BrainstormingDemoComponent,
+    WriteJavascriptDemoComponent,
+    WriteHtmlCssDemoComponent,
+    Eli5DemoComponent,
+    SqlGeneratorDemoComponent,
+    WriteEmailDemoComponent,
+    OcrDemoComponent,
+    ImageDescriptionDemoComponent,
+    ExplainMemeDemoComponent,
+    FridgeRecipeDemoComponent,
+    ImageCategorizationDemoComponent,
+    AudioTranscriptionDemoComponent,
+    MeetingNotesDemoComponent,
+    AudioSummarizationDemoComponent,
+    StructuredJsonDemoComponent,
+    ExtractEntitiesDemoComponent,
+    ImageAudioQueryDemoComponent,
+    ReceiptToJsonDemoComponent,
+
 
     AutoScrollDirective,
      CortexPage,

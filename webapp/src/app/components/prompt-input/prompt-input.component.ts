@@ -46,11 +46,17 @@ export class PromptInputComponent implements OnInit {
   @Output()
   optionsChange = new EventEmitter<PromptRunOptions>();
 
+  @Output()
+  promptChange = new EventEmitter<string>();
+
   @Input()
   state: PromptInputStateEnum = PromptInputStateEnum.Ready;
 
   @Input()
   capabilities = { available: false, audio: false, image: false, text: false };
+
+  @Input()
+  initialPrompt: string = '';
 
   attachmentReadyForPromptMap = new Map<string, boolean>();
   
@@ -61,6 +67,15 @@ export class PromptInputComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer,
               @Inject(PLATFORM_ID) private readonly platformId: Object,
               private modalService: NgbModal) {
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialPrompt'] && changes['initialPrompt'].currentValue) {
+      if (!this.promptText) {
+        this.promptText = changes['initialPrompt'].currentValue;
+        this.onOptionsChange();
+      }
+    }
   }
 
   get buttonState(): ButtonState {
@@ -112,6 +127,7 @@ export class PromptInputComponent implements OnInit {
 
   async onOptionsChange() {
     this.optionsChange.emit(this.options);
+    this.promptChange.emit(this.promptText);
   }
 
   async onRunClick() {
