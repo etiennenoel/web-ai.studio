@@ -109,6 +109,17 @@ import { StructuredJsonDemoComponent } from './pages/demos/features/structured-j
 import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
 import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
 import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
+import { GetStartedPage } from './pages/docs/get-started/get-started.page';
+import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
+import { DocsErrorsPage } from './pages/docs/errors/errors.page';
+import { DocsHomePage } from './pages/docs/docs-home.page';
+import { PromptApiPage } from './pages/docs/apis/prompt-api.page';
+import { SummarizerApiPage } from './pages/docs/apis/summarizer-api.page';
+import { WriterApiPage } from './pages/docs/apis/writer-api.page';
+import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
+import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
+import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
+import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 
 
 import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
@@ -133,6 +144,17 @@ import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
     WritingAssistanceCodeModal,
     EvalsPage,
     DemosPage,
+    GetStartedPage,
+    CheckAvailabilityPage,
+    DocsErrorsPage,
+    DocsHomePage,
+    PromptApiPage,
+    SummarizerApiPage,
+    WriterApiPage,
+    RewriterApiPage,
+    TranslatorApiPage,
+    LanguageDetectorApiPage,
+    ProofreaderApiPage,
     DemoLayoutComponent,
     SafeHtmlPipe,
     TranslationDemoComponent,

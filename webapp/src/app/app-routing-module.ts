@@ -36,6 +36,17 @@ import { StructuredJsonDemoComponent } from './pages/demos/features/structured-j
 import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
 import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
 import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
+import { GetStartedPage } from './pages/docs/get-started/get-started.page';
+import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
+import { DocsErrorsPage } from './pages/docs/errors/errors.page';
+import { DocsHomePage } from './pages/docs/docs-home.page';
+import { PromptApiPage } from './pages/docs/apis/prompt-api.page';
+import { SummarizerApiPage } from './pages/docs/apis/summarizer-api.page';
+import { WriterApiPage } from './pages/docs/apis/writer-api.page';
+import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
+import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
+import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
+import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 
 const routes: Routes = [
   {
@@ -63,6 +74,83 @@ const routes: Routes = [
     path: "",
     component: LayoutComponent,
     children: [
+      {
+        path: "docs",
+        component: DocsHomePage,
+        data: {
+          route: RouteEnum.Docs
+        }
+      },
+      {
+        path: "docs/get-started",
+        component: GetStartedPage,
+        data: {
+          route: RouteEnum.GetStarted
+        }
+      },
+      {
+        path: "docs/check-availability",
+        component: CheckAvailabilityPage,
+        data: {
+          route: RouteEnum.CheckAvailability
+        }
+      },
+      {
+        path: "docs/errors",
+        component: DocsErrorsPage,
+        data: {
+          route: RouteEnum.Errors
+        }
+      },
+      {
+        path: "docs/prompt-api",
+        component: PromptApiPage,
+        data: {
+          route: RouteEnum.PromptApi
+        }
+      },
+      {
+        path: "docs/summarizer",
+        component: SummarizerApiPage,
+        data: {
+          route: RouteEnum.SummarizerApi
+        }
+      },
+      {
+        path: "docs/writer",
+        component: WriterApiPage,
+        data: {
+          route: RouteEnum.WriterApi
+        }
+      },
+      {
+        path: "docs/rewriter",
+        component: RewriterApiPage,
+        data: {
+          route: RouteEnum.RewriterApi
+        }
+      },
+      {
+        path: "docs/translator",
+        component: TranslatorApiPage,
+        data: {
+          route: RouteEnum.TranslatorApi
+        }
+      },
+      {
+        path: "docs/language-detector",
+        component: LanguageDetectorApiPage,
+        data: {
+          route: RouteEnum.LanguageDetectorApi
+        }
+      },
+      {
+        path: "docs/proofreader",
+        component: ProofreaderApiPage,
+        data: {
+          route: RouteEnum.ProofreaderApi
+        }
+      },
       {
         path: "extension",
         component: ExtensionLandingPage,

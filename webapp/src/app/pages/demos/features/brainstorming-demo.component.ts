@@ -25,7 +25,7 @@ declare const LanguageModel: any;
             <i class="bi bi-lightbulb-fill text-amber-400"></i> Topic or Problem
           </label>
           <div class="flex gap-3">
-            <input type="text" class="flex-grow bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            <input type="text" class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                    [(ngModel)]="sourceText"
                    placeholder="E.g., I want to build a new mobile app that helps people learn gardening"
                    (keydown.enter)="generate()">

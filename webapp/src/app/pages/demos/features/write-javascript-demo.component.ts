@@ -22,8 +22,8 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
           
           <!-- Requirements Input -->
-          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
-            <div class="px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center bg-white dark:bg-zinc-900">
+          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50">
+            <div class="px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center bg-[#ffffff] dark:bg-[#161616]">
               <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <i class="bi bi-list-check text-indigo-500"></i> Requirements
               </span>

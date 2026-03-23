@@ -22,9 +22,9 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
           
           <!-- Input Side -->
-          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
+          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50">
             
-            <div class="px-5 py-3 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center">
+            <div class="px-5 py-3 border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] flex justify-between items-center">
               <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Data Pipeline Source</span>
             </div>
 
@@ -42,7 +42,7 @@ declare const LanguageModel: any;
                <label class="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2 flex items-center gap-2">
                 <i class="bi bi-file-text text-amber-500"></i> Unstructured Text
               </label>
-              <textarea class="w-full flex-grow bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-sm p-4 leading-relaxed font-sans shadow-sm" 
+              <textarea class="w-full flex-grow bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-sm p-4 leading-relaxed font-sans shadow-sm" 
                         [(ngModel)]="sourceText" 
                         placeholder="Paste unstructured data here..."></textarea>
             </div>

@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col md:flex-row min-h-[450px] overflow-hidden relative">
           
           @if (languageModelAvailability === 'unavailable' || !capabilities.image) {
-            <div class="absolute inset-0 z-20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+            <div class="absolute inset-0 z-20 bg-[#ffffff]/80 dark:bg-[#161616]/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
               <i class="bi bi-x-circle text-5xl text-red-500 mb-4"></i>
               <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Multimodal AI Not Available</h3>
               <p class="text-slate-600 dark:text-slate-400 max-w-md">
@@ -32,9 +32,9 @@ declare const LanguageModel: any;
           }
 
           <!-- Image Upload Side -->
-          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-900/50 p-6">
+          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-[#161616]/50 p-6">
             
-            <div class="flex-grow border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors bg-white dark:bg-zinc-800"
+            <div class="flex-grow border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors bg-[#ffffff] dark:bg-zinc-800"
                  [ngClass]="{'border-purple-500 bg-purple-50/50 dark:bg-purple-900/20': isDragging}"
                  (dragover)="onDragOver($event)"
                  (dragleave)="onDragLeave($event)"
@@ -62,7 +62,7 @@ declare const LanguageModel: any;
             </div>
 
             <div class="mt-6 flex flex-col gap-3">
-              <input type="text" class="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              <input type="text" class="w-full bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                      [(ngModel)]="sourceText"
                      placeholder="Instructions (e.g., Explain the joke)">
               
@@ -83,7 +83,7 @@ declare const LanguageModel: any;
 
           <!-- Extraction Output -->
           <div class="flex-[1.5] flex flex-col bg-[#ffffff] dark:bg-zinc-800/90 relative">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <i class="bi bi-chat-left-text text-purple-500"></i> AI Explanation
               </span>

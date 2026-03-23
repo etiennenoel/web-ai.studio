@@ -96,7 +96,7 @@
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl px-4">
           @for (suggestion of suggestions; track $index) {
-            <button class="flex flex-col text-left p-4 !rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            <button class="flex flex-col text-left p-4 !rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] hover:bg-slate-50 dark:bg-[#161616] dark:hover:bg-zinc-800 transition-colors shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     [disabled]="!capabilities.available"
                     (click)="useSuggestion(suggestion)">
               <div class="flex items-center gap-2 mb-2 text-slate-700 dark:text-slate-300 font-medium text-sm">
@@ -160,7 +160,7 @@
         <div class="flex items-center gap-4">
           <input type="range" class="form-range flex-grow" [(ngModel)]="options.temperature" [min]="0"
             [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             [(ngModel)]="options.temperature" [min]="0" [max]="maxTemperature" [step]="0.1"
             (change)="onOptionsChange(options)">
         </div>
@@ -173,7 +173,7 @@
         <div class="flex items-center gap-4">
           <input type="range" class="form-range flex-grow" [(ngModel)]="options.topK" [min]="1" [max]="maxTopK"
             [step]="1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
+          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
                  [(ngModel)]="options.topK" [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
         </div>
       </div>

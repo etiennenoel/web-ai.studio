@@ -40,19 +40,19 @@
         
         <!-- Summarizer Options -->
         @if (api === WritingAssistanceApiEnum.SummarizerApi) {
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerType">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerType">
              <option [ngValue]="undefined" disabled>Type</option>
              @for (type of SummarizerTypeEnum | keyvalue; track type.key) {
                 <option [value]="type.value">{{ type.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerLength">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.summarizerLength">
              <option [ngValue]="undefined" disabled>Length</option>
              @for (len of SummarizerLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.summarizerFormat">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.summarizerFormat">
              <option [ngValue]="undefined" disabled>Format</option>
              @for (format of SummarizerFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
@@ -62,19 +62,19 @@
 
         <!-- Writer Options -->
         @if (api === WritingAssistanceApiEnum.WriterApi) {
-           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerTone">
+           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerTone">
              <option [ngValue]="undefined" disabled>Tone</option>
              @for (tone of WriterToneEnum | keyvalue; track tone.key) {
                 <option [value]="tone.value">{{ tone.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerLength">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.writerLength">
              <option [ngValue]="undefined" disabled>Length</option>
              @for (len of WriterLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.writerFormat">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.writerFormat">
              <option [ngValue]="undefined" disabled>Format</option>
              @for (format of WriterFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
@@ -84,19 +84,19 @@
 
         <!-- Rewriter Options -->
         @if (api === WritingAssistanceApiEnum.RewriterApi) {
-           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterTone">
+           <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterTone">
              <option [ngValue]="undefined" disabled>Tone</option>
              @for (tone of RewriterToneEnum | keyvalue; track tone.key) {
                 <option [value]="tone.value">{{ tone.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterLength">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto" [(ngModel)]="options.rewriterLength">
              <option [ngValue]="undefined" disabled>Length</option>
              @for (len of RewriterLengthEnum | keyvalue; track len.key) {
                 <option [value]="len.value">{{ len.value }}</option>
              }
           </select>
-          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-900/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.rewriterFormat">
+          <select class="form-select !rounded-xl bg-slate-50 border-slate-200 text-slate-700 text-sm py-1.5 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-[#161616]/50 dark:border-zinc-700 dark:text-slate-300 cursor-pointer shadow-sm w-auto hidden md:block" [(ngModel)]="options.rewriterFormat">
              <option [ngValue]="undefined" disabled>Format</option>
              @for (format of RewriterFormatEnum | keyvalue; track format.key) {
                 <option [value]="format.value">{{ format.value }}</option>
@@ -119,7 +119,7 @@
           <ul class="dropdown-menu p-4 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-2xl !min-w-[350px] mb-2" ngbDropdownMenu>
             <li class="mb-4">
               <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Output Language</label>
-              <select class="form-select form-select-sm !rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="options.outputLanguage">
+              <select class="form-select form-select-sm !rounded-lg bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="options.outputLanguage">
                   <option [ngValue]="undefined">Default</option>
                   @for (lang of LocaleEnum | keyvalue; track lang.key) {
                       <option [value]="lang.value">{{ lang.key }}</option>
@@ -144,7 +144,7 @@
               }
 
               <div class="dropdown" ngbDropdown>
-                <button class="w-full text-left bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="inputLangsSearchTerm = ''">
+                <button class="w-full text-left bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="inputLangsSearchTerm = ''">
                   <span class="text-slate-500 dark:text-slate-400">Add language...</span>
                   <i class="bi bi-chevron-down text-slate-400"></i>
                 </button>
@@ -152,7 +152,7 @@
                   <div class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                     <div class="relative">
                       <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                      <input type="text" class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 outline-none" 
+                      <input type="text" class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 outline-none" 
                              placeholder="Search languages..." 
                              [(ngModel)]="inputLangsSearchTerm" 
                              (click)="$event.stopPropagation()">
@@ -193,7 +193,7 @@
               }
 
               <div class="dropdown" ngbDropdown>
-                <button class="w-full text-left bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="contextLangsSearchTerm = ''">
+                <button class="w-full text-left bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg py-1.5 px-3 text-sm focus:outline-none flex justify-between items-center after:!hidden" type="button" ngbDropdownToggle (click)="contextLangsSearchTerm = ''">
                   <span class="text-slate-500 dark:text-slate-400">Add language...</span>
                   <i class="bi bi-chevron-down text-slate-400"></i>
                 </button>
@@ -201,7 +201,7 @@
                   <div class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                     <div class="relative">
                       <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                      <input type="text" class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500 outline-none" 
+                      <input type="text" class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-md py-1 pl-8 pr-3 text-sm text-slate-800 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500 outline-none" 
                              placeholder="Search languages..." 
                              [(ngModel)]="contextLangsSearchTerm" 
                              (click)="$event.stopPropagation()">
@@ -227,7 +227,7 @@
 
             <li>
               <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Additional Context</label>
-              <textarea class="form-control form-control-sm !rounded-lg bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none" rows="3" [(ngModel)]="options.context" placeholder="Add extra context..."></textarea>
+              <textarea class="form-control form-control-sm !rounded-lg bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none" rows="3" [(ngModel)]="options.context" placeholder="Add extra context..."></textarea>
             </li>
           </ul>
         </div>

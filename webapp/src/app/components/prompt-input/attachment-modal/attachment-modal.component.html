@@ -1,5 +1,5 @@
-<div class="bg-[#ffffff] dark:bg-zinc-900 !rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-zinc-800 flex flex-col">
-  <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-900/50">
+<div class="bg-[#ffffff] dark:bg-[#161616] !rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-zinc-800 flex flex-col">
+  <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-[#161616]/50">
     <h5 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex items-center gap-2">
       <i class="bi" [ngClass]="{'bi-image': attachment.type === AttachmentTypeEnum.Image, 'bi-file-earmark-pdf': attachment.type === AttachmentTypeEnum.Pdf, 'bi-music-note': attachment.type === AttachmentTypeEnum.Audio}"></i> 
       Attachment Preview
@@ -17,7 +17,7 @@
           @for (image of imageSafeUrls; track $index) {
             <ng-template ngbSlide>
               <div class="w-full h-full flex flex-col items-center justify-center">
-                <h6 class="text-xs font-medium text-slate-500 bg-white/80 dark:bg-black/50 px-3 py-1 !rounded-full absolute top-4 z-10 backdrop-blur-sm" *ngIf="imageSafeUrls.length > 1">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
+                <h6 class="text-xs font-medium text-slate-500 bg-[#ffffff]/80 dark:bg-black/50 px-3 py-1 !rounded-full absolute top-4 z-10 backdrop-blur-sm" *ngIf="imageSafeUrls.length > 1">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
                 <img [src]="image" class="w-full h-full object-contain">
               </div>
             </ng-template>
@@ -117,7 +117,7 @@
 
   </div>
   
-  <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 flex justify-end gap-3">
+  <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 flex justify-end gap-3">
     <button type="button" class="px-6 py-2.5 !rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="activeModal.close()">Done</button>
   </div>
 </div>

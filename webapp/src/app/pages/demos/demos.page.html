@@ -31,7 +31,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
           @for (demo of getDemosByCategory(category); track demo.id) {
             <a [routerLink]="['/demos', demo.id]" class="!no-underline group/card h-full block focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/50 rounded-3xl">
-              <div class="relative h-full bg-white dark:bg-[#18181b] rounded-3xl p-7 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden flex flex-col">
+              <div class="relative h-full bg-[#ffffff] dark:bg-[#18181b] rounded-3xl p-7 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden flex flex-col">
                 
                 <!-- Sleek Top Gradient Bar -->
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
@@ -50,7 +50,7 @@
                   <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-8 flex-grow font-medium">{{ demo.description }}</p>
 
                   <div class="flex items-center justify-between mt-auto">
-                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-zinc-800/80 group-hover/card:bg-slate-900 group-hover/card:text-white dark:group-hover/card:bg-white dark:group-hover/card:text-slate-900 transition-colors duration-300 shadow-sm border border-slate-200 dark:border-zinc-700/50 group-hover/card:border-transparent">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-zinc-800/80 group-hover/card:bg-slate-900 group-hover/card:text-white dark:group-hover/card:bg-[#ffffff] dark:group-hover/card:text-slate-900 transition-colors duration-300 shadow-sm border border-slate-200 dark:border-zinc-700/50 group-hover/card:border-transparent">
                       <i class="bi bi-arrow-right -rotate-45 group-hover/card:rotate-0 transition-transform duration-300"></i>
                     </div>
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 group-hover/card:text-slate-900 dark:group-hover/card:text-white transition-colors duration-300">Explore</span>

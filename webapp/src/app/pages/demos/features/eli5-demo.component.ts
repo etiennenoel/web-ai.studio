@@ -35,7 +35,7 @@ declare const LanguageModel: any;
                 <i class="bi bi-search text-slate-400 text-xl"></i>
               </div>
               <input type="text" 
-                     class="block w-full pl-14 pr-32 py-5 bg-white dark:bg-zinc-900 border-none rounded-full text-lg shadow-inner focus:ring-4 focus:ring-cyan-500/30 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none transition-all"
+                     class="block w-full pl-14 pr-32 py-5 bg-[#ffffff] dark:bg-[#161616] border-none rounded-full text-lg shadow-inner focus:ring-4 focus:ring-cyan-500/30 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none transition-all"
                      [(ngModel)]="sourceText"
                      placeholder="e.g., Quantum entanglement"
                      (keydown.enter)="explain()">
@@ -57,7 +57,7 @@ declare const LanguageModel: any;
 
             <!-- Answer Card -->
             <div class="mt-8 transition-all duration-500" [ngClass]="explanationText || state === 'Inferencing' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none hidden'">
-              <div class="bg-white dark:bg-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-100 dark:border-zinc-700 relative">
+              <div class="bg-[#ffffff] dark:bg-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-100 dark:border-zinc-700 relative">
                 
                 @if (state === 'Inferencing' && !explanationText) {
                   <div class="flex items-center justify-center py-8">

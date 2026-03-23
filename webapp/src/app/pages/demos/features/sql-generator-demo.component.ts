@@ -24,13 +24,13 @@ declare const LanguageModel: any;
             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
               <i class="bi bi-database-check text-indigo-500"></i> Natural Language to SQL
             </label>
-            <div class="text-xs font-mono text-slate-500 bg-slate-100 dark:bg-zinc-900 px-3 py-1 rounded-lg">
+            <div class="text-xs font-mono text-slate-500 bg-slate-100 dark:bg-[#161616] px-3 py-1 rounded-lg">
               Table: users (id, name, age, city)
             </div>
           </div>
           
           <div class="flex flex-col md:flex-row gap-4">
-            <input type="text" class="flex-grow bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm"
+            <input type="text" class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm"
                    [(ngModel)]="sourceText"
                    placeholder="E.g., Find the average age of users living in New York"
                    (keydown.enter)="generateSql()">

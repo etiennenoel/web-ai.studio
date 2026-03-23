@@ -50,7 +50,7 @@ declare const Proofreader: any;
           
           <!-- Source -->
           <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80">
-            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <i class="bi bi-x-circle text-red-500"></i> Original Text
               </span>

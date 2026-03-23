@@ -54,7 +54,7 @@ declare const LanguageModel: any;
           
           <!-- Source -->
           <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80">
-            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <select [(ngModel)]="sourceLang" (change)="checkApiAvailability()" class="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-300 border-none outline-none focus:ring-0 cursor-pointer">
                 <option value="auto">Auto-Detect {{ detectedLangName ? '(' + detectedLangName + ')' : '' }}</option>
                 @for (loc of topLocales; track loc.code) {
@@ -83,8 +83,8 @@ declare const LanguageModel: any;
           </div>
 
           <!-- Destination -->
-          <div class="flex-1 flex flex-col bg-slate-50/30 dark:bg-zinc-900/30">
-            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+          <div class="flex-1 flex flex-col bg-slate-50/30 dark:bg-[#161616]/30">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <select [(ngModel)]="targetLang" (change)="checkApiAvailability()" class="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-300 border-none outline-none focus:ring-0 cursor-pointer">
                 @for (loc of topLocales; track loc.code) {
                   <option [value]="loc.code">{{ loc.language }}</option>

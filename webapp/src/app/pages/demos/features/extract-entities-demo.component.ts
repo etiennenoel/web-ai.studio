@@ -22,13 +22,13 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
           
           <!-- Input Side -->
-          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 p-6">
+          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 p-6">
             
             <label class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
               <i class="bi bi-file-text text-indigo-500 text-lg"></i> Raw Text Input
             </label>
             
-            <textarea class="w-full flex-grow bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-lg p-5 leading-relaxed font-serif shadow-sm mb-6" 
+            <textarea class="w-full flex-grow bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-lg p-5 leading-relaxed font-serif shadow-sm mb-6" 
                       [(ngModel)]="sourceText" 
                       placeholder="Enter a paragraph containing names and places..."></textarea>
             
@@ -49,8 +49,8 @@ declare const LanguageModel: any;
           </div>
 
           <!-- Entities Output Side -->
-          <div class="flex-[1.5] flex flex-col relative bg-white dark:bg-zinc-800">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-700 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-900/30">
+          <div class="flex-[1.5] flex flex-col relative bg-[#ffffff] dark:bg-zinc-800">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-700 flex justify-between items-center bg-slate-50/50 dark:bg-[#161616]/30">
               <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <i class="bi bi-tags text-emerald-500 text-lg"></i> Discovered Entities
               </span>
@@ -89,7 +89,7 @@ declare const LanguageModel: any;
                 }
 
                 @if (state !== 'Inferencing' && (!extractedData?.people?.length && !extractedData?.locations?.length)) {
-                  <div class="text-slate-500 italic p-4 bg-slate-50 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-700 text-center">
+                  <div class="text-slate-500 italic p-4 bg-slate-50 dark:bg-[#161616] rounded-xl border border-slate-200 dark:border-zinc-700 text-center">
                     No entities found in the text.
                   </div>
                 }
