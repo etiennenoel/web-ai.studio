@@ -47,6 +47,29 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   options: PromptRunOptions = new PromptRunOptions();
 
+  suggestions = [
+    {
+      icon: 'bi-lightbulb',
+      title: 'Brainstorm ideas',
+      prompt: 'Give me 5 creative ideas for a weekend project using Chrome Built-in AI APIs.'
+    },
+    {
+      icon: 'bi-code-slash',
+      title: 'Write a script',
+      prompt: 'Write a Python script to parse a CSV file and output JSON.'
+    },
+    {
+      icon: 'bi-file-text',
+      title: 'Summarize text',
+      prompt: 'Summarize the main differences between Angular and React in 3 bullet points.'
+    },
+    {
+      icon: 'bi-translate',
+      title: 'Translate a phrase',
+      prompt: 'Translate "Hello, how are you?" into French, Spanish, and Japanese.'
+    }
+  ];
+
   get settingsActive() {
     return this.options.structuredOutputEnabled === true ||
       Number(this.options.temperature) !== Number(this.defaultTemperature) ||
@@ -175,6 +198,21 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   onNewChat() {
     this.conversationManager.resetSession(this.options);
+  }
+
+  async useSuggestion(suggestion: any) {
+    if (!this.capabilities.available) return;
+
+    if (suggestion.options) {
+      this.options = { ...this.options, ...suggestion.options };
+      this.onOptionsChange(this.options);
+    }
+    
+    const runOptions = new PromptRunOptions();
+    Object.assign(runOptions, this.options);
+    runOptions.prompt = suggestion.prompt;
+    
+    await this.onRun(runOptions);
   }
 
   editStructuredOutput() {

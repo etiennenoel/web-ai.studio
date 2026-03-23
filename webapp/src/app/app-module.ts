@@ -83,6 +83,9 @@ import {EvalsPage} from './pages/evals/evals.page';
 import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
 import {HistoryListComponent} from './components/history-list/history-list.component';
 
+import {CameraModalComponent} from './components/prompt-input/camera-modal/camera-modal.component';
+import {AudioRecordingModalComponent} from './components/prompt-input/audio-recording-modal/audio-recording-modal.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -116,6 +119,8 @@ import {HistoryListComponent} from './components/history-list/history-list.compo
      CodeEditorComponent,
      WritingAssistanceInputComponent,
      AttachmentModalComponent,
+     CameraModalComponent,
+     AudioRecordingModalComponent,
   ],
   imports: [
     BrowserModule,

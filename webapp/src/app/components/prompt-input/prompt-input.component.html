@@ -91,7 +91,7 @@
             <li>
               <button class="dropdown-item flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="openFileUpload()"
                 [disabled]="!capabilities.image && !capabilities.audio">
-                <i class="bi bi-upload mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Upload file
+                <i class="bi bi-upload mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Select File
               </button>
             </li>
             <li>
@@ -124,9 +124,9 @@
           }" 
           [ngbTooltip]="runBtnTooltip" placement="top" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">
 
-          <i class="bi text-xl transition-transform flex items-center justify-center leading-none" [ngClass]="{
+          <i class="bi transition-transform flex items-center justify-center leading-none" [ngClass]="{
             'bi-arrow-up-short text-[28px]': buttonState === 'Idle',
-            'bi-stop-fill': buttonState === 'Stop',
+            'bi-stop-fill text-2xl': buttonState === 'Stop',
             'bi-arrow-return-left text-lg': buttonState === 'Interject'
           }"></i>
 

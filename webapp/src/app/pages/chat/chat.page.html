@@ -91,7 +91,21 @@
         <div class="text-center opacity-70 dark:opacity-60 transition-opacity">
           <img src="images/webai-logo.png" alt="WebAI" class="w-24 h-24 mx-auto mb-6 drop-shadow-md">
           <h1 class="text-4xl font-light tracking-tight text-slate-800 dark:text-slate-100 mb-2">WebAI Studio</h1>
-          <p class="text-slate-500 dark:text-slate-400 text-sm">Experience the power of local LLMs.</p>
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Experience the power of On-Device Gemini Nano.</p>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl px-4">
+          @for (suggestion of suggestions; track $index) {
+            <button class="flex flex-col text-left p-4 !rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="!capabilities.available"
+                    (click)="useSuggestion(suggestion)">
+              <div class="flex items-center gap-2 mb-2 text-slate-700 dark:text-slate-300 font-medium text-sm">
+                <i class="bi {{ suggestion.icon }} text-indigo-500 dark:text-indigo-400 text-lg"></i>
+                {{ suggestion.title }}
+              </div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{{ suggestion.prompt }}</div>
+            </button>
+          }
         </div>
       </div>
       }

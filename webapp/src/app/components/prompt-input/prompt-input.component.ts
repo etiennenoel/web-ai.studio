@@ -17,6 +17,8 @@ import {Attachment} from '../../core/interfaces/attachment.interface';
 import {FramingAlgorithm} from '../../core/enums/framing-algorithm.enum';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AttachmentModalComponent} from './attachment-modal/attachment-modal.component';
+import {CameraModalComponent} from './camera-modal/camera-modal.component';
+import {AudioRecordingModalComponent} from './audio-recording-modal/audio-recording-modal.component';
 
 declare const LanguageModel: any;
 
@@ -194,15 +196,48 @@ export class PromptInputComponent implements OnInit {
   }
 
   openCamera() {
-     alert("Camera not implemented in this demo.");
+    const modalRef = this.modalService.open(CameraModalComponent, { size: 'lg', centered: true });
+    modalRef.result.then((file: File) => {
+      if (file) {
+        this.addAttachment(file);
+      }
+    }).catch(() => {}); // handle dismiss
   }
   
   recordAudio() {
-      alert("Audio recording not implemented in this demo.");
+    const modalRef = this.modalService.open(AudioRecordingModalComponent, { size: 'md', centered: true });
+    modalRef.result.then((file: File) => {
+      if (file) {
+        this.addAttachment(file);
+      }
+    }).catch(() => {}); // handle dismiss
   }
   
-  takeScreenshot() {
-      alert("Screenshot not implemented in this demo.");
+  async takeScreenshot() {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const file = new File([blob], 'screenshot.png', { type: 'image/png' });
+              this.addAttachment(file);
+            }
+            stream.getTracks().forEach(t => t.stop());
+          }, 'image/png');
+        }
+      };
+    } catch (e) {
+      console.error('Screenshot failed or was cancelled', e);
+    }
   }
 
   removeAttachment(index: number) {
