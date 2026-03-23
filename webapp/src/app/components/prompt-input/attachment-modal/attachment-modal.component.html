@@ -1,104 +1,123 @@
-<div class="modal-header">
-  <h4 class="modal-title">Attachment Preview</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
-</div>
-<div class="modal-body d-flex gap-4 justify-content-center">
+<div class="bg-[#ffffff] dark:bg-zinc-900 !rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-zinc-800 flex flex-col">
+  <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-900/50">
+    <h5 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex items-center gap-2">
+      <i class="bi" [ngClass]="{'bi-image': attachment.type === AttachmentTypeEnum.Image, 'bi-file-earmark-pdf': attachment.type === AttachmentTypeEnum.Pdf, 'bi-music-note': attachment.type === AttachmentTypeEnum.Audio}"></i> 
+      Attachment Preview
+    </h5>
+    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" (click)="activeModal.dismiss()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  
+  <div class="p-6 bg-slate-100 dark:bg-black/20 flex flex-col md:flex-row gap-6 justify-center items-start min-h-[400px]">
 
-  @if (attachment.type === AttachmentTypeEnum.Image || attachment.type === AttachmentTypeEnum.Pdf) {
-    <ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" style="width: 768px; height: 768px;">
-      @for (image of imageSafeUrls; track $index) {
-        <ng-template ngbSlide>
-          <h6 class="text-center">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
-          <img [src]="image" style="width: 768px; height: 768px; object-fit: contain;">
-        </ng-template>
-      }
-    </ngb-carousel>
+    @if (attachment.type === AttachmentTypeEnum.Image || attachment.type === AttachmentTypeEnum.Pdf) {
+      <div class="flex-shrink-0 bg-black/5 dark:bg-black/40 !rounded-2xl p-2 border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <ngb-carousel *ngIf="imageSafeUrls.length > 0" [showNavigationArrows]="imageSafeUrls.length > 1" [showNavigationIndicators]="imageSafeUrls.length > 1" class="w-full max-w-[768px] aspect-square flex items-center justify-center">
+          @for (image of imageSafeUrls; track $index) {
+            <ng-template ngbSlide>
+              <div class="w-full h-full flex flex-col items-center justify-center">
+                <h6 class="text-xs font-medium text-slate-500 bg-white/80 dark:bg-black/50 px-3 py-1 !rounded-full absolute top-4 z-10 backdrop-blur-sm" *ngIf="imageSafeUrls.length > 1">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
+                <img [src]="image" class="w-full h-full object-contain">
+              </div>
+            </ng-template>
+          }
+        </ngb-carousel>
+      </div>
 
-    <div>
-      @if (this.isAttachmentReadyForPrompt === false) {
+      <div class="flex flex-col w-full max-w-md">
+        @if (this.isAttachmentReadyForPrompt === false) {
 
-        @if(attachment.type === AttachmentTypeEnum.Image) {
-        <div class="alert alert-warning" role="alert">
-          <strong><i class="bi bi-exclamation-triangle"></i> Resolution issue</strong>.
+          @if(attachment.type === AttachmentTypeEnum.Image) {
+          <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 !rounded-xl mb-6">
+            <div class="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-bold mb-2">
+              <i class="bi bi-exclamation-triangle-fill"></i> Resolution issue
+            </div>
+            <p class="text-sm text-amber-700 dark:text-amber-300/90 mb-4">Your image doesn't have the expected resolution and will be resized into a square.</p>
 
-          <p>Your image doesn't have the expected resolution and will be resized into a square.</p>
+            <table class="w-full text-sm text-left mb-4 border border-amber-200 dark:border-amber-800/50 rounded-lg overflow-hidden">
+              <thead class="bg-amber-100/50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-400">
+              <tr>
+                <th class="px-3 py-2 font-medium border-b border-amber-200 dark:border-amber-800/50"></th>
+                <th class="px-3 py-2 font-medium border-b border-amber-200 dark:border-amber-800/50">Width</th>
+                <th class="px-3 py-2 font-medium border-b border-amber-200 dark:border-amber-800/50">Height</th>
+              </tr>
+              </thead>
+              <tbody class="text-amber-900 dark:text-amber-100">
+              <tr class="border-b border-amber-200/50 dark:border-amber-800/30">
+                <td class="px-3 py-2 font-medium text-amber-700 dark:text-amber-400/80">Expected</td>
+                <td class="px-3 py-2">768px</td>
+                <td class="px-3 py-2">768px</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium text-amber-700 dark:text-amber-400/80">Your image</td>
+                <td class="px-3 py-2 font-bold">{{ this.imageResolution?.width }}px</td>
+                <td class="px-3 py-2 font-bold">{{ this.imageResolution?.height }}px</td>
+              </tr>
+              </tbody>
+            </table>
 
-          <table class="table table-warning">
-            <thead>
-            <tr>
-              <th></th>
-              <th>Width(px)</th>
-              <th>Height(px)</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Expected</td>
-              <td>768px</td>
-              <td>768px</td>
-            </tr>
-            <tr>
-              <td>Your image</td>
-              <td><strong>{{ this.imageResolution?.width }}px</strong></td>
-              <td><strong>{{ this.imageResolution?.height }}px</strong></td>
-            </tr>
-            </tbody>
-          </table>
-
-
-          <div>To solve this issue, either:
-            <ul>
-              <li>Use an image that matches the expected resolution</li>
-              <li>Select a framing algorithm below (it will be applied on the image before passing it to the prompt
-                API.
-              </li>
-            </ul>
-          </div>
-        </div>
-        } @else if(attachment.type === AttachmentTypeEnum.Pdf) {
-          <div class="alert alert-warning" role="alert">
-            <strong><i class="bi bi-exclamation-triangle"></i> Resolution issue</strong>.
-
-            <p>Your pdf contains pages that don't have have the expected resolution (768px by 768px) and each page will be resized into a square.</p>
-
-            <div>To avoid this, either:
-              <ul>
-                <li>Make sure that each page has the expected 768px by 768px resolution</li>
-                <li>Select a framing algorithm below (it will be applied on each page before passing it to the prompt
-                  API).
-                </li>
+            <div class="text-sm text-amber-800 dark:text-amber-300">To solve this issue, either:
+              <ul class="list-disc list-inside mt-1 ml-1 space-y-1">
+                <li>Use an image that matches the expected resolution.</li>
+                <li>Select a framing algorithm below to auto-process the image.</li>
               </ul>
             </div>
           </div>
+          } @else if(attachment.type === AttachmentTypeEnum.Pdf) {
+            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4 !rounded-xl mb-6">
+              <div class="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-bold mb-2">
+                <i class="bi bi-exclamation-triangle-fill"></i> Resolution issue
+              </div>
+              <p class="text-sm text-amber-700 dark:text-amber-300/90 mb-3">Your pdf contains pages that don't have have the expected resolution (768px by 768px) and each page will be resized into a square.</p>
+              <div class="text-sm text-amber-800 dark:text-amber-300">To avoid this, either:
+                <ul class="list-disc list-inside mt-1 ml-1 space-y-1">
+                  <li>Ensure each page has the expected 768px by 768px resolution.</li>
+                  <li>Select a framing algorithm below to auto-process each page.</li>
+                </ul>
+              </div>
+            </div>
+          }
+
+          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">Framing Algorithm</h3>
+
+          <div class="flex bg-[#ffffff] dark:bg-zinc-800 !rounded-xl p-1 shadow-sm border border-slate-200 dark:border-zinc-700">
+            <label class="flex-1 text-center cursor-pointer">
+              <input type="radio" name="framingAlgorithm" class="peer sr-only" [value]="FramingAlgorithm.NoFraming" [checked]="attachment.framingAlgorithm === FramingAlgorithm.NoFraming" (change)="onAlgorithmChange(FramingAlgorithm.NoFraming)">
+              <div class="py-2 px-3 text-sm font-medium !rounded-lg text-slate-600 dark:text-slate-400 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 dark:peer-checked:bg-indigo-900/30 dark:peer-checked:text-indigo-400 transition-colors">
+                No Framing
+              </div>
+            </label>
+
+            <label class="flex-1 text-center cursor-pointer">
+              <input type="radio" name="framingAlgorithm" class="peer sr-only" [value]="FramingAlgorithm.Padding" [checked]="attachment.framingAlgorithm === FramingAlgorithm.Padding" (change)="onAlgorithmChange(FramingAlgorithm.Padding)">
+              <div class="py-2 px-3 text-sm font-medium !rounded-lg text-slate-600 dark:text-slate-400 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 dark:peer-checked:bg-indigo-900/30 dark:peer-checked:text-indigo-400 transition-colors">
+                Padding
+              </div>
+            </label>
+
+            <label class="flex-1 text-center cursor-pointer">
+              <input type="radio" name="framingAlgorithm" class="peer sr-only" [value]="FramingAlgorithm.Tiling" [checked]="attachment.framingAlgorithm === FramingAlgorithm.Tiling" (change)="onAlgorithmChange(FramingAlgorithm.Tiling)">
+              <div class="py-2 px-3 text-sm font-medium !rounded-lg text-slate-600 dark:text-slate-400 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 dark:peer-checked:bg-indigo-900/30 dark:peer-checked:text-indigo-400 transition-colors">
+                Tiling
+              </div>
+            </label>
+          </div>
+
         }
+      </div>
+    } @else if (attachment.type === AttachmentTypeEnum.Audio) {
+      <div class="flex flex-col items-center justify-center w-full min-h-[200px]">
+         <div class="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/30 !rounded-full flex items-center justify-center mb-6">
+           <i class="bi bi-music-note-beamed text-4xl text-indigo-600 dark:text-indigo-400"></i>
+         </div>
+         <audio controls [src]="attachment.safeUrl" class="w-full max-w-md shadow-sm !rounded-full"></audio>
+      </div>
+    }
 
-        <h3>Framing algorithm</h3>
-
-        <div class="btn-group mt-3" role="group" aria-label="Framing Algorithm">
-          <input type="radio" class="btn-check" name="framingAlgorithm" id="no-framing"
-                 [value]="FramingAlgorithm.NoFraming"
-                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.NoFraming"
-                 (change)="onAlgorithmChange(FramingAlgorithm.NoFraming)" autocomplete="off">
-          <label class="btn btn-outline-primary" for="no-framing">No Framing</label>
-
-          <input type="radio" class="btn-check" name="framingAlgorithm" id="padding"
-                 [value]="FramingAlgorithm.Padding"
-                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.Padding"
-                 (change)="onAlgorithmChange(FramingAlgorithm.Padding)" autocomplete="off">
-          <label class="btn btn-outline-primary" for="padding">Padding</label>
-
-          <input type="radio" class="btn-check" name="framingAlgorithm" id="tiling"
-                 [value]="FramingAlgorithm.Tiling"
-                 [checked]="attachment.framingAlgorithm === FramingAlgorithm.Tiling"
-                 (change)="onAlgorithmChange(FramingAlgorithm.Tiling)" autocomplete="off">
-          <label class="btn btn-outline-primary" for="tiling">Tiling</label>
-        </div>
-
-      }
-    </div>
-  }
-
-</div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-primary" (click)="activeModal.close('Close click')">Save</button>
+  </div>
+  
+  <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 flex justify-end gap-3">
+    <button type="button" class="px-6 py-2.5 !rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="activeModal.close()">Done</button>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PromptInputComponent } from './prompt-input.component';
-import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { AttachmentTypeEnum } from '../../core/enums/attachment-type.enum';
 import { FramingAlgorithm } from '../../core/enums/framing-algorithm.enum';
@@ -61,5 +61,23 @@ describe('PromptInputComponent', () => {
     expect(component.attachments.length).toBe(0);
     expect(component.attachmentWarnings).toBeFalse();
     expect(component.attachmentReadyForPromptMap.size).toBe(0);
+  });
+
+  it('should open camera modal when openCamera is called', () => {
+    const modalRefSpyObj = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
+    modalRefSpyObj.result = Promise.resolve();
+    modalServiceSpy.open.and.returnValue(modalRefSpyObj as NgbModalRef);
+
+    component.openCamera();
+    expect(modalServiceSpy.open).toHaveBeenCalled();
+  });
+
+  it('should open audio recording modal when recordAudio is called', () => {
+    const modalRefSpyObj = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
+    modalRefSpyObj.result = Promise.resolve();
+    modalServiceSpy.open.and.returnValue(modalRefSpyObj as NgbModalRef);
+
+    component.recordAudio();
+    expect(modalServiceSpy.open).toHaveBeenCalled();
   });
 });

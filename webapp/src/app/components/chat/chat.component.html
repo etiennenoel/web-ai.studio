@@ -32,10 +32,12 @@
           <div class="flex gap-3 mb-3 flex-wrap">
             @for (att of message.attachments; track $index) {
               @if (att.type === 'image') {
-                <img [src]="att.safeUrl" [alt]="att.file.name || 'Attached image'" [title]="att.file.name || 'Attached image'" class="max-h-40 rounded-xl object-contain bg-black/5 dark:bg-black/20 ring-1 ring-black/5 dark:ring-white/10"/>
+                <img [src]="att.safeUrl" [alt]="att.file.name || 'Attached image'" [title]="att.file.name || 'Attached image'" 
+                     class="max-h-40 rounded-xl object-contain bg-black/5 dark:bg-black/20 ring-1 ring-black/5 dark:ring-white/10 cursor-pointer hover:opacity-90 transition-opacity"
+                     (click)="openAttachment(att)"/>
               }
               @if (att.type === 'audio') {
-                <audio [src]="att.safeUrl" controls class="h-10 rounded-lg outline-none" [title]="att.file.name || 'Attached audio'"></audio>
+                <audio [src]="att.safeUrl" controls class="w-full max-w-xs rounded-lg outline-none" [title]="att.file.name || 'Attached audio'"></audio>
               }
               @if (att.type === 'pdf') {
                 <div class="flex flex-col items-center justify-center bg-slate-100 dark:bg-zinc-900 rounded-xl p-3 w-24 h-24 ring-1 ring-slate-200 dark:ring-zinc-700 transition-transform hover:scale-105 cursor-pointer" [title]="att.file.name || 'Attached PDF'">

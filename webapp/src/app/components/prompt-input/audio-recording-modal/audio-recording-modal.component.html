@@ -1,0 +1,42 @@
+<div class="bg-[#ffffff] dark:bg-zinc-900 !rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-zinc-800 flex flex-col h-full">
+  <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-900/50">
+    <h5 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex items-center gap-2"><i class="bi bi-mic"></i> Record Audio</h5>
+    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" (click)="activeModal.dismiss()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  <div class="p-8 bg-[#ffffff] dark:bg-black/20 flex flex-col items-center justify-center min-h-[250px] flex-grow">
+    @if (error) {
+      <div class="text-red-500 flex flex-col items-center gap-2 font-medium">
+        <i class="bi bi-exclamation-triangle text-3xl"></i> {{ error }}
+      </div>
+    } @else {
+      <div class="text-5xl font-mono mb-8 font-light text-slate-700 dark:text-slate-300 transition-colors" [ngClass]="{'text-red-500 dark:text-red-400 animate-pulse': isRecording}">
+        {{ formatTime(recordingTime) }}
+      </div>
+      
+      <div class="relative flex items-center justify-center w-32 h-32 mb-4">
+        <!-- Visualizer Ring -->
+        <div class="absolute inset-0 !rounded-full bg-red-200/50 dark:bg-red-900/30 transition-transform duration-75 ease-out pointer-events-none"
+             [style.transform]="'scale(' + visualizerScale + ')'"
+             [ngClass]="{'opacity-100': isRecording, 'opacity-0': !isRecording}"></div>
+             
+        @if (!isRecording) {
+          <button type="button" class="relative z-10 w-20 h-20 !rounded-full bg-red-100 dark:bg-red-900/30 border border-red-500 shadow-sm flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 hover:scale-105 transition-all focus:outline-none" (click)="startRecording()">
+            <i class="bi bi-mic-fill text-3xl"></i>
+          </button>
+        } @else {
+          <button type="button" class="relative z-10 w-20 h-20 !rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-500 shadow-sm flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:scale-105 transition-all focus:outline-none" (click)="stopRecording()">
+            <i class="bi bi-stop-fill text-4xl"></i>
+          </button>
+        }
+      </div>
+      
+      @if (!isRecording) {
+        <p class="text-sm font-medium text-slate-500">Tap to record</p>
+      } @else {
+        <p class="text-sm font-medium text-slate-500 animate-pulse">Recording...</p>
+      }
+    }
+  </div>
+</div>

@@ -124,9 +124,9 @@
           }" 
           [ngbTooltip]="runBtnTooltip" placement="top" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">
 
-          <i class="bi text-xl transition-transform flex items-center justify-center leading-none" [ngClass]="{
+          <i class="bi transition-transform flex items-center justify-center leading-none" [ngClass]="{
             'bi-arrow-up-short text-[28px]': buttonState === 'Idle',
-            'bi-stop-fill': buttonState === 'Stop',
+            'bi-stop-fill text-2xl': buttonState === 'Stop',
             'bi-arrow-return-left text-lg': buttonState === 'Interject'
           }"></i>
 
