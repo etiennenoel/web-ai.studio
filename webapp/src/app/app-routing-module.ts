@@ -13,6 +13,29 @@ import {BugsPage} from './pages/bugs/bugs.page';
 import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
 import {EvalsPage} from './pages/evals/evals.page';
 import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
+import {DemosPage} from './pages/demos/demos.page';
+import { TranslationDemoComponent } from './pages/demos/features/translation-demo.component';
+import { SummarizationDemoComponent } from './pages/demos/features/summarization-demo.component';
+import { ProofreadingDemoComponent } from './pages/demos/features/proofreading-demo.component';
+import { ToneChangerDemoComponent } from './pages/demos/features/tone-changer-demo.component';
+import { BrainstormingDemoComponent } from './pages/demos/features/brainstorming-demo.component';
+import { WriteJavascriptDemoComponent } from './pages/demos/features/write-javascript-demo.component';
+import { WriteHtmlCssDemoComponent } from './pages/demos/features/write-html-css-demo.component';
+import { Eli5DemoComponent } from './pages/demos/features/eli5-demo.component';
+import { SqlGeneratorDemoComponent } from './pages/demos/features/sql-generator-demo.component';
+import { WriteEmailDemoComponent } from './pages/demos/features/write-email-demo.component';
+import { OcrDemoComponent } from './pages/demos/features/ocr-demo.component';
+import { ImageDescriptionDemoComponent } from './pages/demos/features/image-description-demo.component';
+import { ExplainMemeDemoComponent } from './pages/demos/features/explain-meme-demo.component';
+import { FridgeRecipeDemoComponent } from './pages/demos/features/fridge-recipe-demo.component';
+import { ImageCategorizationDemoComponent } from './pages/demos/features/image-categorization-demo.component';
+import { AudioTranscriptionDemoComponent } from './pages/demos/features/audio-transcription-demo.component';
+import { MeetingNotesDemoComponent } from './pages/demos/features/meeting-notes-demo.component';
+import { AudioSummarizationDemoComponent } from './pages/demos/features/audio-summarization-demo.component';
+import { StructuredJsonDemoComponent } from './pages/demos/features/structured-json-demo.component';
+import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
+import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
+import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
 
 const routes: Routes = [
   {
@@ -37,16 +60,16 @@ const routes: Routes = [
     }
   },
   {
-    path: "extension",
-    component: ExtensionLandingPage,
-    data: {
-      route: RouteEnum.Extension
-    }
-  },
-  {
     path: "",
     component: LayoutComponent,
     children: [
+      {
+        path: "extension",
+        component: ExtensionLandingPage,
+        data: {
+          route: RouteEnum.Extension
+        }
+      },
       {
         path: "",
         component: ChatPage,
@@ -73,6 +96,167 @@ const routes: Routes = [
         component: WritingAssistancePage,
         data: {
           route: RouteEnum.Translation
+        }
+      },
+      {
+        path: "demos",
+        component: DemosPage,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+            {
+        path: "demos/translation",
+        component: TranslationDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/summarization",
+        component: SummarizationDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/proofreading",
+        component: ProofreadingDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/tone-changer",
+        component: ToneChangerDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/brainstorming",
+        component: BrainstormingDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/write-javascript",
+        component: WriteJavascriptDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/write-html-css",
+        component: WriteHtmlCssDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/eli5",
+        component: Eli5DemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/sql-generator",
+        component: SqlGeneratorDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/write-email",
+        component: WriteEmailDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/ocr",
+        component: OcrDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/image-description",
+        component: ImageDescriptionDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/explain-meme",
+        component: ExplainMemeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/fridge-recipe",
+        component: FridgeRecipeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/image-categorization",
+        component: ImageCategorizationDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/audio-transcription",
+        component: AudioTranscriptionDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/meeting-notes",
+        component: MeetingNotesDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/audio-summarization",
+        component: AudioSummarizationDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/structured-json",
+        component: StructuredJsonDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/extract-entities",
+        component: ExtractEntitiesDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/image-audio-query",
+        component: ImageAudioQueryDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/receipt-to-json",
+        component: ReceiptToJsonDemoComponent,
+        data: {
+          route: RouteEnum.Demos
         }
       },
       {

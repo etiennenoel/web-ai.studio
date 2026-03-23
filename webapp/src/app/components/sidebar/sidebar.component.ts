@@ -47,9 +47,12 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   }
 
   determineCurrentActiveRoute(pathname: string) {
-    const pathParts = pathname.split("/");
+    if (pathname.includes("/demos")) {
+      this.routeEnum = RouteEnum.Demos;
+      return;
+    }
 
-    // Get the latest path part
+    const pathParts = pathname.split("/");
     const latestPathPart = pathParts[pathParts.length - 1];
 
     switch (latestPathPart) {
@@ -64,6 +67,9 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         break;
       case "cortex":
         this.routeEnum = RouteEnum.Cortex;
+        break;
+      case "extension":
+        this.routeEnum = RouteEnum.Extension;
         break;
 
       default:
