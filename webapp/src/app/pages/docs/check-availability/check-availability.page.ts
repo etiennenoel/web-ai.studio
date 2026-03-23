@@ -64,7 +64,7 @@ declare const Proofreader: any;
                 <i class="bi bi-x-circle-fill text-red-500"></i> unavailable
               </h3>
               <p class="text-slate-500 dark:text-slate-400 text-sm">
-                The API is not supported on this device, or the required flags are not enabled. You should fall back to a cloud-based API or hide the feature.
+                The API is not supported on this device, or the required flags are not enabled. You should gracefully disable or hide the feature in your application.
               </p>
             </div>
           </div>

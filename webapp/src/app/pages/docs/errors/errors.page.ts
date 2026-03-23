@@ -96,10 +96,10 @@ import { Component } from '@angular/core';
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Thrown when a user permission error occurs (e.g., not signed-in, not allowed to execute the model), or if an Enterprise Policy disables the feature.
+                  Thrown when a user permission error occurs (e.g., the user is not allowed to execute the model), or if an Enterprise Policy disables the feature.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Display a message indicating that the browser environment or administrator policy prohibits the use of local AI models. Provide a cloud fallback if possible.
+                  Display a message indicating that the browser environment or administrator policy prohibits the use of local AI models. Handle the missing capability gracefully in your UI.
                 </td>
               </tr>
 
@@ -122,7 +122,7 @@ import { Component } from '@angular/core';
                   4. The response constraint JSON schema is not supported.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Fall back to a cloud-based API or adjust your constraints. Ensure you use the <code>availability(options)</code> check to verify base support before calling <code>create()</code>.
+                  Adjust your constraints or handle the unsupported state gracefully. Ensure you use the <code>availability(options)</code> check to verify base support before calling <code>create()</code>.
                 </td>
               </tr>
               
@@ -160,7 +160,7 @@ import { Component } from '@angular/core';
                   Thrown when the underlying model execution service (the Chrome process managing the model) is not available or has crashed.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Treat this as a fatal crash of the local model and automatically redirect the user's query to a cloud-based fallback.
+                  Treat this as a fatal crash of the local model and inform the user that the service is currently unavailable.
                 </td>
               </tr>
               
@@ -179,7 +179,7 @@ import { Component } from '@angular/core';
                   Thrown when other generic, unclassified failures occur, or when an internal state like a "retryable" or "non-retryable" engine error is encountered.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Capture and log the error for telemetry. Fall back to cloud services to preserve user experience.
+                  Capture and log the error for telemetry and display a graceful failure message.
                 </td>
               </tr>
 
