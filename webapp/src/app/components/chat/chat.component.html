@@ -40,7 +40,7 @@
                 <audio [src]="att.safeUrl" controls class="w-full max-w-xs rounded-lg outline-none" [title]="att.file.name || 'Attached audio'"></audio>
               }
               @if (att.type === 'pdf') {
-                <div class="flex flex-col items-center justify-center bg-slate-100 dark:bg-zinc-900 rounded-xl p-3 w-24 h-24 ring-1 ring-slate-200 dark:ring-zinc-700 transition-transform hover:scale-105 cursor-pointer" [title]="att.file.name || 'Attached PDF'">
+                <div class="flex flex-col items-center justify-center bg-slate-100 dark:bg-[#161616] rounded-xl p-3 w-24 h-24 ring-1 ring-slate-200 dark:ring-zinc-700 transition-transform hover:scale-105 cursor-pointer" [title]="att.file.name || 'Attached PDF'">
                   <i class="bi bi-file-earmark-pdf text-4xl text-red-500 dark:text-red-400 mb-1"></i>
                   <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full text-center px-1" *ngIf="att.file.name">{{ att.file.name }}</span>
                 </div>

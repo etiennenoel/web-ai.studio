@@ -92,7 +92,7 @@ declare const LanguageModel: any;
                 @if (state === 'Inferencing') {
                   <button class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-md transition-all active:scale-95 border-none flex justify-center items-center gap-2"
                           (click)="onCancelGenerate()">
-                    <div class="w-3 h-3 bg-white rounded-sm"></div> Stop
+                    <div class="w-3 h-3 bg-[#ffffff] rounded-sm"></div> Stop
                   </button>
                 } @else {
                   <button class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:bg-zinc-800 disabled:text-zinc-500 border-none flex justify-center items-center gap-2" 
@@ -129,7 +129,7 @@ declare const LanguageModel: any;
                       <div class="bg-indigo-600 text-white px-5 py-4 rounded-3xl rounded-tr-sm text-base leading-relaxed shadow-lg">
                         <app-markdown-renderer [content]="extractedText"></app-markdown-renderer>
                         @if (state === 'Inferencing') {
-                          <span class="inline-block w-2 h-4 bg-white/70 ml-1 animate-pulse align-middle"></span>
+                          <span class="inline-block w-2 h-4 bg-[#ffffff]/70 ml-1 animate-pulse align-middle"></span>
                         }
                       </div>
                     </div>

@@ -8,7 +8,7 @@
     @if (attachments.length > 0) {
     <div class="px-4 pt-4 flex flex-wrap gap-3">
       @for (attachment of attachments; track $index) {
-      <div class="relative group border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 !rounded-xl overflow-hidden w-20 h-20 shadow-sm transition-transform hover:-translate-y-0.5">
+      <div class="relative group border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-[#161616] !rounded-xl overflow-hidden w-20 h-20 shadow-sm transition-transform hover:-translate-y-0.5">
         
         <!-- Preview Image/Icon -->
         <div class="w-full h-full flex items-center justify-center overflow-hidden cursor-pointer" (click)="openAttachmentModal(attachment)">

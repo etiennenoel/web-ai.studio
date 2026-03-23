@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[550px] overflow-hidden">
           
           @if (languageModelAvailability === 'unavailable' || !capabilities.image) {
-            <div class="absolute inset-0 z-20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+            <div class="absolute inset-0 z-20 bg-[#ffffff]/80 dark:bg-[#161616]/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
               <i class="bi bi-x-circle text-5xl text-red-500 mb-4"></i>
               <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Multimodal AI Not Available</h3>
               <p class="text-slate-600 dark:text-slate-400 max-w-md">
@@ -32,7 +32,7 @@ declare const LanguageModel: any;
           }
 
           <!-- Image Upload Side -->
-          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 p-6">
+          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 p-6">
             
             <div class="flex justify-between items-center mb-4">
               <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
@@ -40,7 +40,7 @@ declare const LanguageModel: any;
               </span>
             </div>
 
-            <div class="flex-grow border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors bg-white dark:bg-zinc-800"
+            <div class="flex-grow border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors bg-[#ffffff] dark:bg-zinc-800"
                  [ngClass]="{'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20': isDragging}"
                  (dragover)="onDragOver($event)"
                  (dragleave)="onDragLeave($event)"

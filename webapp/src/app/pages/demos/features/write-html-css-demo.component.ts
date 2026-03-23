@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col min-h-[600px] overflow-hidden">
           
           <!-- Top Bar: Input -->
-          <div class="flex flex-col relative border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 lg:p-5">
+          <div class="flex flex-col relative border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] p-4 lg:p-5">
             <div class="flex items-center bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all shadow-sm">
               <i class="bi bi-magic text-indigo-500 text-xl mr-3"></i>
               <input type="text" class="flex-grow bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 text-lg font-mono py-2" 
@@ -79,14 +79,14 @@ declare const LanguageModel: any;
             </div>
 
             <!-- Live Preview -->
-            <div class="flex-1 flex flex-col bg-slate-50 dark:bg-zinc-900 relative min-h-[300px]">
-              <div class="px-4 py-2 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center">
+            <div class="flex-1 flex flex-col bg-slate-50 dark:bg-[#161616] relative min-h-[300px]">
+              <div class="px-4 py-2 border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] flex justify-between items-center">
                 <div class="flex items-center gap-2">
                   <i class="bi bi-browser-chrome text-blue-500"></i>
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-400 font-mono">Live Preview</span>
                 </div>
               </div>
-              <div class="flex-grow overflow-y-auto p-4 bg-white relative">
+              <div class="flex-grow overflow-y-auto p-4 bg-[#ffffff] dark:bg-[#161616] relative rounded-b-xl">
                 @if (generatedCode) {
                   <!-- Safe usage of innerHTML for a local browser demo. We use Tailwind via a CDN link in the system prompt. -->
                   <div [innerHTML]="generatedCode | safeHtml"></div>

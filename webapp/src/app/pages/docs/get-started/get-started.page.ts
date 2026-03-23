@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-get-started',
   template: `
-    <div class="h-full overflow-y-auto bg-white dark:bg-[#121212] transition-colors duration-200">
+    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200">
       <div class="w-full p-6 md:p-12 pb-32 font-sans">
         
         <!-- Header -->
@@ -94,7 +94,7 @@ import { Component, OnInit } from '@angular/core';
             </li>
           </ol>
 
-          <div class="bg-[#0e0e0e] rounded-xl overflow-hidden border border-zinc-800 shadow-sm">
+          <div class="bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 shadow-sm">
             <div class="px-4 py-2.5 border-b border-zinc-800/80 bg-[#161616] flex items-center">
               <span class="text-xs text-zinc-400 font-mono">inference.ts</span>
             </div>

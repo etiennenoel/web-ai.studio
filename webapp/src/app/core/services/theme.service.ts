@@ -56,5 +56,6 @@ export class ThemeService {
     }
     
     document.documentElement.setAttribute('data-bs-theme', themeToApply);
+    document.documentElement.style.colorScheme = themeToApply;
   }
 }

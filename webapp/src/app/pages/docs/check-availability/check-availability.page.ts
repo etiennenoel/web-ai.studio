@@ -11,7 +11,7 @@ declare const Proofreader: any;
 @Component({
   selector: 'app-check-availability',
   template: `
-    <div class="h-full overflow-y-auto bg-white dark:bg-[#121212] transition-colors duration-200">
+    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200">
       <div class="w-full p-6 md:p-12 pb-32 font-sans">
         
         <!-- Header -->
@@ -41,7 +41,7 @@ declare const Proofreader: any;
           </p>
 
           <div class="space-y-4">
-            <div class="bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
+            <div class="bg-slate-50 dark:bg-[#161616]/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
               <h3 class="font-semibold text-slate-900 dark:text-slate-200 mb-1 flex items-center gap-2">
                 <i class="bi bi-check-circle-fill text-emerald-500"></i> available
               </h3>
@@ -50,7 +50,7 @@ declare const Proofreader: any;
               </p>
             </div>
 
-            <div class="bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
+            <div class="bg-slate-50 dark:bg-[#161616]/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
               <h3 class="font-semibold text-slate-900 dark:text-slate-200 mb-1 flex items-center gap-2">
                 <i class="bi bi-cloud-arrow-down-fill text-blue-500"></i> downloadable
               </h3>
@@ -59,7 +59,7 @@ declare const Proofreader: any;
               </p>
             </div>
 
-            <div class="bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
+            <div class="bg-slate-50 dark:bg-[#161616]/50 p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80">
               <h3 class="font-semibold text-slate-900 dark:text-slate-200 mb-1 flex items-center gap-2">
                 <i class="bi bi-x-circle-fill text-red-500"></i> unavailable
               </h3>
@@ -85,8 +85,8 @@ declare const Proofreader: any;
           <div class="flex flex-col lg:flex-row gap-6">
             
             <!-- Widget -->
-            <div class="flex-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-              <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 flex justify-between items-center">
+            <div class="flex-1 bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+              <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Live Widget</span>
                 @if (status === 'checking') {
                   <app-latency-loader></app-latency-loader>
@@ -171,7 +171,7 @@ declare const Proofreader: any;
             </div>
 
             <!-- Code -->
-            <div class="flex-1 bg-[#0e0e0e] rounded-2xl overflow-hidden border border-zinc-800/80 shadow-md">
+            <div class="flex-1 bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800/80 shadow-md">
               <div class="px-4 py-2.5 border-b border-zinc-800/60 bg-[#161616] flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <i class="bi bi-filetype-ts text-blue-400 text-sm"></i>

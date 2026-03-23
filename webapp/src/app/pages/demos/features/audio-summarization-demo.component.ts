@@ -39,7 +39,7 @@ declare const LanguageModel: any;
               <!-- Audio Dropzone -->
               <div>
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Upload Lecture or Podcast</label>
-                <div class="border-2 border-dashed border-slate-300 dark:border-zinc-600 rounded-2xl flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors bg-slate-50 hover:bg-slate-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 cursor-pointer"
+                <div class="border-2 border-dashed border-slate-300 dark:border-zinc-600 rounded-2xl flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors bg-slate-50 hover:bg-slate-100 dark:bg-[#161616] dark:hover:bg-zinc-800 cursor-pointer"
                      (click)="fileInput.click()">
                   @if (audioUrl) {
                     <div class="flex flex-col items-center w-full z-10">
@@ -65,7 +65,7 @@ declare const LanguageModel: any;
               <!-- Options -->
               <div>
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 block">Summary Instructions</label>
-                <textarea class="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-20"
+                <textarea class="w-full bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-20"
                           [(ngModel)]="sourceText"
                           placeholder="e.g. Provide a 2-sentence summary of the main points"></textarea>
               </div>
@@ -75,7 +75,7 @@ declare const LanguageModel: any;
                 @if (state === 'Inferencing') {
                   <button class="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2"
                           (click)="onCancelGenerate()">
-                    <div class="w-3 h-3 bg-white rounded-sm"></div> Stop Summarizing
+                    <div class="w-3 h-3 bg-[#ffffff] rounded-sm"></div> Stop Summarizing
                   </button>
                 } @else {
                   <button class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md transition-all active:scale-95 disabled:opacity-50 border-none flex items-center justify-center gap-2" 
@@ -88,8 +88,8 @@ declare const LanguageModel: any;
             </div>
 
             <!-- Output Column -->
-            <div class="flex flex-col bg-slate-50 dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-hidden min-h-[300px]">
-              <div class="px-5 py-3 border-b border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex justify-between items-center">
+            <div class="flex flex-col bg-slate-50 dark:bg-[#161616] rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-hidden min-h-[300px]">
+              <div class="px-5 py-3 border-b border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800 flex justify-between items-center">
                 <span class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <i class="bi bi-card-text text-indigo-500"></i> AI Summary
                 </span>

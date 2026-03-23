@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col md:flex-row min-h-[400px] overflow-hidden relative">
           
           @if (languageModelAvailability === 'unavailable' || !capabilities.audio) {
-            <div class="absolute inset-0 z-20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+            <div class="absolute inset-0 z-20 bg-[#ffffff]/80 dark:bg-[#161616]/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
               <i class="bi bi-mic-mute text-5xl text-red-500 mb-4"></i>
               <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Audio AI Not Available</h3>
               <p class="text-slate-600 dark:text-slate-400 max-w-md">
@@ -32,11 +32,11 @@ declare const LanguageModel: any;
           }
 
           <!-- Audio Input Side -->
-          <div class="flex-[1] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-900/50 p-6 lg:p-8 justify-center items-center">
+          <div class="flex-[1] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-[#161616]/50 p-6 lg:p-8 justify-center items-center">
             
             <!-- Voice Memo App Mockup -->
-            <div class="w-full max-w-xs bg-white dark:bg-black rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col">
-              <div class="bg-slate-100 dark:bg-zinc-900 px-4 py-3 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
+            <div class="w-full max-w-xs bg-[#ffffff] dark:bg-black rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col">
+              <div class="bg-slate-100 dark:bg-[#161616] px-4 py-3 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
                 <span class="text-xs font-bold text-slate-500 dark:text-zinc-500 tracking-wider">VOICE MEMOS</span>
                 <i class="bi bi-mic text-red-500"></i>
               </div>
@@ -55,7 +55,7 @@ declare const LanguageModel: any;
                   </div>
                   <h4 class="text-slate-800 dark:text-slate-200 font-bold mb-2">No Audio Selected</h4>
                   
-                  <button class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-full text-sm font-bold shadow-md transition-colors border-none w-full"
+                  <button class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-[#ffffff] dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-full text-sm font-bold shadow-md transition-colors border-none w-full"
                           (click)="fileInput.click()">
                     Upload File
                   </button>
@@ -64,11 +64,11 @@ declare const LanguageModel: any;
                 
               </div>
               
-              <div class="p-4 bg-slate-50 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800">
+              <div class="p-4 bg-slate-50 dark:bg-[#161616] border-t border-slate-200 dark:border-zinc-800">
                 @if (state === 'Inferencing') {
                   <button class="w-full py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold shadow-sm transition-all active:scale-95 border-none flex items-center justify-center gap-2"
                           (click)="onCancelGenerate()">
-                    <div class="w-3 h-3 bg-white rounded-sm"></div> Stop
+                    <div class="w-3 h-3 bg-[#ffffff] rounded-sm"></div> Stop
                   </button>
                 } @else {
                   <button class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none flex items-center justify-center gap-2" 
@@ -84,7 +84,7 @@ declare const LanguageModel: any;
 
           <!-- Transcript Output -->
           <div class="flex-[1.5] flex flex-col bg-[#ffffff] dark:bg-zinc-800/90 relative">
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <i class="bi bi-card-text text-blue-500"></i> Transcript
               </span>

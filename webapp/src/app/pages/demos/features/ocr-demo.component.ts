@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col md:flex-row min-h-[450px] overflow-hidden relative">
           
           @if (languageModelAvailability === 'unavailable' || !capabilities.image) {
-            <div class="absolute inset-0 z-20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+            <div class="absolute inset-0 z-20 bg-[#ffffff]/80 dark:bg-[#161616]/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
               <i class="bi bi-x-circle text-5xl text-red-500 mb-4"></i>
               <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Multimodal AI Not Available</h3>
               <p class="text-slate-600 dark:text-slate-400 max-w-md">
@@ -32,7 +32,7 @@ declare const LanguageModel: any;
           }
 
           <!-- Image Upload Side -->
-          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-900/50 p-6">
+          <div class="flex-[1.2] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-[#161616]/50 p-6">
             
             <div class="flex-grow border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors"
                  [ngClass]="{'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20': isDragging}"
@@ -51,7 +51,7 @@ declare const LanguageModel: any;
                 <i class="bi bi-cloud-arrow-up text-5xl text-slate-300 dark:text-zinc-600 mb-4"></i>
                 <h4 class="text-slate-700 dark:text-slate-300 font-bold mb-1">Drag & drop an image</h4>
                 <p class="text-slate-500 dark:text-slate-500 text-sm mb-4">or click to browse</p>
-                <button class="px-4 py-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors"
+                <button class="px-4 py-2 bg-[#ffffff] dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors"
                         (click)="fileInput.click()">
                   Select File
                 </button>
@@ -60,7 +60,7 @@ declare const LanguageModel: any;
             </div>
 
             <div class="mt-6 flex flex-col gap-3">
-              <input type="text" class="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              <input type="text" class="w-full bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                      [(ngModel)]="sourceText"
                      placeholder="Instructions (e.g., Extract all text)">
               
@@ -81,7 +81,7 @@ declare const LanguageModel: any;
 
           <!-- Extraction Output -->
           <div class="flex-[1.5] flex flex-col bg-[#ffffff] dark:bg-zinc-800/90 relative">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <i class="bi bi-journal-text text-amber-500"></i> Extracted Document
               </span>

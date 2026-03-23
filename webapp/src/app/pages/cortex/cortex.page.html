@@ -6,7 +6,7 @@
         <i class="bi bi-browser-chrome text-[140px] text-blue-800 dark:text-blue-400"></i>
       </div>
       <div class="shrink-0 z-10">
-        <img src="images/extension-icon.png" class="w-14 h-14 rounded-xl shadow-md bg-white dark:bg-gray-800 p-1 border border-blue-100 dark:border-blue-700" alt="WebAI Extension">
+        <img src="images/extension-icon.png" class="w-14 h-14 rounded-xl shadow-md bg-[#ffffff] dark:bg-gray-800 p-1 border border-blue-100 dark:border-blue-700" alt="WebAI Extension">
       </div>
       <div class="flex-1 z-10">
         <h3 class="text-base sm:text-lg font-extrabold text-blue-900 dark:text-blue-100 m-0 mb-1">Supercharge Cortex with the WebAI Chrome Extension!</h3>
@@ -32,7 +32,7 @@
       <p class="text-lg text-gray-500 dark:text-gray-400 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
       
       @if (isImportedReport && importedTimestamp) {
-        <div class="mt-4 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm inline-block">
+        <div class="mt-4 p-3 bg-[#ffffff] dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm inline-block">
           <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Report Details</div>
           <div class="text-sm text-gray-800 dark:text-gray-200"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
           <div class="text-xs text-gray-500 font-mono mt-1 max-w-2xl truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
@@ -55,7 +55,7 @@
   </div>
 
     @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
+    <div class="bg-[#ffffff] dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
          [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:ring-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
@@ -165,7 +165,7 @@
     }
 
     <!-- Comparison Chart -->
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
+    <div class="bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
       <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
         <i class="bi bi-bar-chart"></i> Tests Comparison (TTFT & Total Response Time)
       </h3>
@@ -182,7 +182,7 @@
         <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight m-0">Performance Overview</h3>
       </div>
       
-      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="bg-[#ffffff] dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-200 dark:border-gray-700">
@@ -191,7 +191,7 @@
                   <div class="flex items-center gap-3">
                     <div class="shrink-0" (click)="$event.stopPropagation()">
                       <input type="checkbox" 
-                             class="w-4 h-4 text-blue-600 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 shadow-sm"
+                             class="w-4 h-4 text-blue-600 bg-[#ffffff] dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 shadow-sm"
                              [class.cursor-pointer]="!isTestingRunning"
                              [class.cursor-not-allowed]="isTestingRunning"
                              [class.opacity-50]="isTestingRunning"
@@ -204,12 +204,12 @@
                     <span>API Category / Test Name</span>
                   </div>
                 </th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider bg-white dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
+                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
               </tr>
               <tr class="divide-x divide-gray-200 border-t border-gray-100 dark:border-gray-800 text-xs shadow-sm">
                 <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
@@ -231,7 +231,7 @@
                 <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200">
+            <tbody class="bg-[#ffffff] dark:bg-gray-900 divide-y divide-gray-200">
               @for (element of builtInAiApis; track $index) {
                 @let api = getBuiltInAiAPIFromItemInterface(element);
                 @let tests = getTests(api);
@@ -261,7 +261,7 @@
                                  [disabled]="isTestingRunning"
                                  (change)="toggleCategorySelection(api, $event)">
                         </div>
-                        <div class="p-1.5 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 shadow-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors"
+                        <div class="p-1.5 rounded-md bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 shadow-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors"
                              [class.text-yellow-600]="progress.executing > 0" [class.dark:text-yellow-500]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0" [class.dark:border-yellow-600]="progress.executing > 0">
                              <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
                         </div>
@@ -342,7 +342,7 @@
                       <td colspan="13" class="p-0 border-b-4 border-gray-200 dark:border-gray-700">
                         <div class="px-4 py-4 pl-12">
                           <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Tests in {{ element.id }}</h4>
-                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-[#ffffff] dark:bg-gray-900">
                             <table class="min-w-full divide-y divide-gray-200">
                               <thead class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider !text-left">
                                 <tr>
@@ -426,16 +426,16 @@
                                               </span>
                                             </h4>
                                             <div class="flex flex-col sm:flex-row gap-4">
-                                              <div class="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 text-xs text-gray-700 dark:text-gray-300 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
+                                              <div class="flex-1 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 text-xs text-gray-700 dark:text-gray-300 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
                                                 {{ test.results.input }}
                                               </div>
                                               @if (test.results.inputImageDataUrl) {
-                                                <div class="shrink-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
+                                                <div class="shrink-0 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
                                                   <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
                                                 </div>
                                               }
                                               @if (test.results.inputAudioUrl) {
-                                                <div class="shrink-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 shadow-sm flex items-center justify-center">
+                                                <div class="shrink-0 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 shadow-sm flex items-center justify-center">
                                                   <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
                                                 </div>
                                               }
@@ -443,7 +443,7 @@
                                           </div>
                                           
                                           @if (isReportReady) {
-                                            <div class="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-4 shadow-sm">
+                                            <div class="mb-6 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-4 shadow-sm">
                                               <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center justify-between">
                                                 <span class="flex items-center gap-1.5"><i class="bi bi-graph-up text-blue-500"></i> Execution Time Plot</span>
                                                 <div class="flex items-center gap-4 text-[9px] text-gray-400 font-normal">
@@ -460,7 +460,7 @@
                                           <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                             <i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})
                                           </h4>
-                                          <div class="overflow-hidden rounded border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+                                          <div class="overflow-hidden rounded border border-gray-200 dark:border-gray-700 shadow-sm bg-[#ffffff] dark:bg-gray-900">
                                             <table class="min-w-full divide-y divide-gray-200 text-xs !text-center">
                                               <thead class="bg-gray-100 dark:bg-gray-800">
                                                 <tr>
@@ -576,7 +576,7 @@
 
 @if (showShareModal) {
   <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div class="bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
       <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 m-0 flex items-center gap-2">
           <i class="bi bi-share text-blue-600"></i> Share Report

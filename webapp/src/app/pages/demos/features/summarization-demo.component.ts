@@ -50,8 +50,8 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
           
           <!-- Article / Document -->
-          <div class="flex-[3] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-white dark:bg-zinc-900">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-900/50">
+          <div class="flex-[3] flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80 bg-[#ffffff] dark:bg-[#161616]">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 flex justify-between items-center bg-slate-50/50 dark:bg-[#161616]/50">
               <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <i class="bi bi-file-earmark-text text-indigo-500"></i> Original Document
               </span>
@@ -78,7 +78,7 @@ declare const LanguageModel: any;
               @if (apiChoice === 'summarizer') {
                 <div class="mb-4">
                   <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 block">Summary Type</label>
-                  <select [(ngModel)]="summaryType" class="w-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <select [(ngModel)]="summaryType" class="w-full bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="key-points">Key Points</option>
                     <option value="tl;dr">TL;DR</option>
                     <option value="teaser">Teaser</option>
@@ -89,7 +89,7 @@ declare const LanguageModel: any;
 
               <div class="flex-grow overflow-y-auto mt-2">
                 @if (summaryText) {
-                  <div class="prose prose-sm dark:prose-invert text-slate-800 dark:text-slate-200 leading-relaxed bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-sm">
+                  <div class="prose prose-sm dark:prose-invert text-slate-800 dark:text-slate-200 leading-relaxed bg-[#ffffff] dark:bg-[#161616] p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-sm">
                     <app-markdown-renderer [content]="summaryText"></app-markdown-renderer>
                   </div>
                 } @else {

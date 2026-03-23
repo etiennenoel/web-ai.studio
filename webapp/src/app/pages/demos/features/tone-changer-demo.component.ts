@@ -50,7 +50,7 @@ declare const LanguageModel: any;
           
           <!-- Source -->
           <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-700/80">
-            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <i class="bi bi-pencil"></i> Rough Draft
               </span>
@@ -59,7 +59,7 @@ declare const LanguageModel: any;
                       [(ngModel)]="sourceText" 
                       placeholder="Type a casual or rough draft..."></textarea>
             
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-100 dark:border-zinc-700/50 bg-white dark:bg-zinc-800 flex flex-col gap-3">
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-100 dark:border-zinc-700/50 bg-[#ffffff] dark:bg-zinc-800 flex flex-col gap-3">
               <div class="flex items-center gap-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase">Target Tone:</span>
                 <div class="flex gap-1 overflow-x-auto hide-scrollbar">
@@ -90,8 +90,8 @@ declare const LanguageModel: any;
           </div>
 
           <!-- Destination -->
-          <div class="flex-1 flex flex-col bg-slate-50/30 dark:bg-zinc-900/30 relative">
-            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-zinc-900/30 flex justify-between items-center">
+          <div class="flex-1 flex flex-col bg-slate-50/30 dark:bg-[#161616]/30 relative">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/30 flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <i class="bi bi-stars text-amber-500"></i> Polished Result
               </span>

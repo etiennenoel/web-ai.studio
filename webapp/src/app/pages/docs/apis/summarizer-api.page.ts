@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-summarizer-api-docs',
   template: `
-    <div class="h-full overflow-y-auto bg-white dark:bg-[#121212] transition-colors duration-200">
+    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200">
       <div class="w-full p-6 md:p-12 pb-32 font-sans">
         
         <!-- Header -->
@@ -56,7 +56,7 @@ import { Component } from '@angular/core';
             
             <!-- create() -->
             <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-50 dark:bg-zinc-900/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
+              <div class="bg-slate-50 dark:bg-[#161616]/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
                 <h3 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-200">
                   Summarizer.create(<span class="text-slate-500 font-normal">options?</span>)
                 </h3>
@@ -77,7 +77,7 @@ import { Component } from '@angular/core';
 
             <!-- summarizeStreaming() -->
             <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-50 dark:bg-zinc-900/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
+              <div class="bg-slate-50 dark:bg-[#161616]/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
                 <h3 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-200">
                   summarizer.summarizeStreaming(<span class="text-slate-500 font-normal">text, options?</span>)
                 </h3>

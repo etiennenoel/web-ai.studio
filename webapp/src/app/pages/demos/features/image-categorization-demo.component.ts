@@ -23,7 +23,7 @@ declare const LanguageModel: any;
           
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Local Photo Library</h3>
-            <button class="px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl shadow-sm transition-colors border border-slate-200 dark:border-zinc-700"
+            <button class="px-4 py-2 bg-[#ffffff] hover:bg-slate-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl shadow-sm transition-colors border border-slate-200 dark:border-zinc-700"
                     (click)="fileInput.click()">
               <i class="bi bi-plus-lg mr-1"></i> Add Photo
             </button>
@@ -43,7 +43,7 @@ declare const LanguageModel: any;
           } @else {
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               @for (img of images; track img.id) {
-                <div class="relative group bg-white dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-700 aspect-square">
+                <div class="relative group bg-[#ffffff] dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-700 aspect-square">
                   <img [src]="img.url" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   
                   <!-- Overlay gradient for text readability -->
@@ -51,12 +51,12 @@ declare const LanguageModel: any;
                   
                   <div class="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between">
                     @if (img.status === 'processing') {
-                      <div class="px-2 py-1 bg-white/20 backdrop-blur-md rounded-md flex items-center gap-2">
+                      <div class="px-2 py-1 bg-[#ffffff]/20 backdrop-blur-md rounded-md flex items-center gap-2">
                         <div class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                         <span class="text-xs font-medium text-white shadow-sm">Scanning...</span>
                       </div>
                     } @else if (img.status === 'done') {
-                      <span class="px-2.5 py-1 bg-white/90 dark:bg-black/70 backdrop-blur-md text-slate-900 dark:text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
+                      <span class="px-2.5 py-1 bg-[#ffffff]/90 dark:bg-black/70 backdrop-blur-md text-slate-900 dark:text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                         {{ img.category }}
                       </span>
                     } @else {

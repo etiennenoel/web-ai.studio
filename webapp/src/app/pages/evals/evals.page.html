@@ -30,7 +30,7 @@
         <i class="bi bi-lightning-charge-fill"></i> Run Evals
       </button>
 
-      <div class="border-2 border-dashed border-slate-300 dark:border-zinc-700 !rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-100 dark:bg-zinc-900/30 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
+      <div class="border-2 border-dashed border-slate-300 dark:border-zinc-700 !rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-100 dark:bg-[#161616]/30 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
         <i class="bi bi-mic text-4xl text-slate-400 dark:text-slate-500 mb-3 block"></i>
         <p class="text-lg font-medium text-slate-600 dark:text-slate-400 m-0">Drop audio files here to create rows</p>
       </div>
@@ -84,10 +84,10 @@
               @for (formRow of rows.controls; track $index) {
                 <tr [formGroupName]="$index" class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/50 transition-colors align-top">
                   <td class="p-3">
-                    <textarea class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="context" (paste)="onPaste($event, $index)" placeholder="Paste spreadsheet here..."></textarea>
+                    <textarea class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="context" (paste)="onPaste($event, $index)" placeholder="Paste spreadsheet here..."></textarea>
                   </td>
                   <td class="p-3">
-                    <textarea class="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
+                    <textarea class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
                   </td>
                   <td class="p-3" (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
                     <div class="border border-dashed border-slate-300 dark:border-zinc-600 !rounded-xl p-3 text-center mb-3 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" (click)="fileInput.click()">
@@ -114,7 +114,7 @@
                     </div>
                     <div class="flex flex-col gap-2">
                       @for (audio of formRow.value.audio; track $index) {
-                        <div class="relative border border-slate-200 dark:border-zinc-700 !rounded-lg p-1.5 flex items-center bg-slate-50 dark:bg-zinc-900 shadow-sm group">
+                        <div class="relative border border-slate-200 dark:border-zinc-700 !rounded-lg p-1.5 flex items-center bg-slate-50 dark:bg-[#161616] shadow-sm group">
                           <audio [src]="audio" controls class="w-full h-8 max-w-[200px]"></audio>
                           <button class="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full shadow-sm text-[10px] transition-transform scale-0 group-hover:scale-100" (click)="removeAudio($index, $index)">
                             <i class="bi bi-x"></i>
@@ -124,7 +124,7 @@
                     </div>
                   </td>
                   <td class="p-3">
-                    <select class="form-select w-full bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500" formControlName="api">
+                    <select class="form-select w-full bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500" formControlName="api">
                       <option [value]="'Summarizer'">Summarizer</option>
                       <option [value]="'Prompt'">Prompt</option>
                     </select>
@@ -158,7 +158,7 @@
       </div>
       
       <!-- Add Row Footer -->
-      <div class="bg-slate-50 dark:bg-zinc-900/50 border-t border-slate-200 dark:border-zinc-700 p-4 flex justify-center">
+      <div class="bg-slate-50 dark:bg-[#161616]/50 border-t border-slate-200 dark:border-zinc-700 p-4 flex justify-center">
         <button class="flex items-center gap-2 px-5 py-2 !rounded-xl border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" (click)="addRow()">
           <i class="bi bi-plus-lg"></i> Add Row
         </button>
@@ -170,8 +170,8 @@
 <!-- Reset Confirmation Modal -->
 @if (showResetConfirmation) {
   <div class="fixed inset-0 z-[1050] flex items-center justify-center bg-slate-900/50 dark:bg-black/60 backdrop-blur-sm p-4">
-    <div class="bg-[#ffffff] dark:bg-zinc-900 !rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-zinc-800 transform transition-all">
-      <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-900/50">
+    <div class="bg-[#ffffff] dark:bg-[#161616] !rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-zinc-800 transform transition-all">
+      <div class="p-5 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-[#161616]/50">
         <h5 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">Reset Rows?</h5>
         <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none" (click)="cancelReset()">
           <i class="bi bi-x-lg"></i>
@@ -180,7 +180,7 @@
       <div class="p-6">
         <p class="text-slate-600 dark:text-slate-300 mb-0">Dropping audio files will reset the existing rows. Are you sure you want to continue?</p>
       </div>
-      <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 flex justify-end gap-3">
+      <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 flex justify-end gap-3">
         <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-[#ffffff] dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors focus:outline-none" (click)="cancelReset()">Cancel</button>
         <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-red-600 hover:bg-red-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="processAudioFiles()">Reset</button>
       </div>
@@ -193,7 +193,7 @@
   <div class="fixed inset-0 z-[1060] flex items-center justify-center bg-slate-900/90 dark:bg-black/90 backdrop-blur-md p-4" (click)="closePreview()">
     <div class="relative max-w-5xl w-full h-full flex items-center justify-center">
       <img [src]="previewImageSrc" class="max-w-full max-h-[90vh] !rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
-      <button class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
+      <button class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-[#ffffff]/20 hover:bg-[#ffffff]/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>

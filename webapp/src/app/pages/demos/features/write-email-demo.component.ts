@@ -49,7 +49,7 @@ const systemPrompt = `You are an intelligent email writer. You are tasked to wri
         </div>
 
         <!-- Mock Email Client -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col">
+        <div class="bg-[#ffffff] dark:bg-[#161616] rounded-xl shadow-lg border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col">
           
           <!-- Email Header -->
           <div class="bg-slate-100 dark:bg-zinc-800 border-b border-slate-200 dark:border-zinc-700 p-4 flex items-center justify-between">
@@ -78,7 +78,7 @@ const systemPrompt = `You are an intelligent email writer. You are tasked to wri
           <div class="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 border-b border-indigo-100 dark:border-indigo-900/30 flex items-center gap-3">
             <i class="bi bi-stars text-indigo-500 text-xl flex-shrink-0"></i>
             <input type="text" 
-                   class="flex-grow bg-white dark:bg-zinc-800 border border-indigo-200 dark:border-indigo-800/50 rounded-full px-4 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-inner"
+                   class="flex-grow bg-[#ffffff] dark:bg-zinc-800 border border-indigo-200 dark:border-indigo-800/50 rounded-full px-4 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-inner"
                    [(ngModel)]="sourceText"
                    placeholder="What should this email be about?"
                    (keydown.enter)="draftEmail()">

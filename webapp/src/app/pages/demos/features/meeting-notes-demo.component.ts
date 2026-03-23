@@ -22,7 +22,7 @@ declare const LanguageModel: any;
         <div class="bg-[#ffffff] dark:bg-[#121212] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
           
           @if (languageModelAvailability === 'unavailable' || !capabilities.audio) {
-            <div class="absolute inset-0 z-20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+            <div class="absolute inset-0 z-20 bg-[#ffffff]/80 dark:bg-[#161616]/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
               <i class="bi bi-mic-mute text-5xl text-red-500 mb-4"></i>
               <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Audio AI Not Available</h3>
               <p class="text-slate-600 dark:text-slate-400 max-w-md">
@@ -32,14 +32,14 @@ declare const LanguageModel: any;
           }
 
           <!-- Player & Input -->
-          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 p-6">
+          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 p-6">
             
             <div class="mb-6">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Recording</span>
                 <span class="px-2 py-0.5 bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-[10px] font-bold rounded uppercase">Confidential</span>
               </div>
-              <div class="bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col gap-4">
+              <div class="bg-[#ffffff] dark:bg-zinc-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col gap-4">
                 
                 @if (audioUrl) {
                   <audio [src]="audioUrl" controls class="w-full"></audio>
@@ -60,7 +60,7 @@ declare const LanguageModel: any;
 
             <div class="flex flex-col gap-3">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Instructions</label>
-              <textarea class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-24"
+              <textarea class="w-full bg-[#ffffff] dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-24"
                         [(ngModel)]="sourceText"></textarea>
               
               @if (state === 'Inferencing') {
@@ -80,7 +80,7 @@ declare const LanguageModel: any;
 
           <!-- Notes Output -->
           <div class="flex-[1.5] flex flex-col bg-[#ffffff] dark:bg-[#121212] relative">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-800 bg-white dark:bg-[#18181b] flex justify-between items-center">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#18181b] flex justify-between items-center">
               <div class="flex flex-col">
                 <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Action Items & Summary</span>
                 <span class="text-xs text-slate-500">Generated locally</span>
@@ -90,7 +90,7 @@ declare const LanguageModel: any;
               }
             </div>
             
-            <div class="flex-grow p-6 lg:p-8 overflow-y-auto bg-slate-50/50 dark:bg-zinc-900/30">
+            <div class="flex-grow p-6 lg:p-8 overflow-y-auto bg-slate-50/50 dark:bg-[#161616]/30">
               @if (extractedText || state === 'Inferencing') {
                 <div class="prose prose-indigo dark:prose-invert text-slate-800 dark:text-slate-200 leading-relaxed max-w-none">
                   <app-markdown-renderer [content]="extractedText"></app-markdown-renderer>

@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-docs-errors',
   template: `
-    <div class="h-full overflow-y-auto bg-white dark:bg-[#121212] transition-colors duration-200">
+    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200">
       <div class="w-full p-6 md:p-12 pb-32 font-sans">
         
         <!-- Header -->
@@ -30,7 +30,7 @@ import { Component } from '@angular/core';
         <!-- Errors Table -->
         <div class="max-w-5xl overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm">
           <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-            <thead class="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white">
+            <thead class="bg-slate-50 dark:bg-[#161616] border-b border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white">
               <tr>
                 <th class="px-5 py-4 font-semibold w-1/5">Error</th>
                 <th class="px-5 py-4 font-semibold w-1/6">JS Type</th>
@@ -38,7 +38,7 @@ import { Component } from '@angular/core';
                 <th class="px-5 py-4 font-semibold w-1/3">Resolution</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/80 bg-white dark:bg-[#121212]">
+            <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/80 bg-[#ffffff] dark:bg-[#121212]">
               
               <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
                 <td class="px-5 py-5 align-top">
@@ -53,7 +53,7 @@ import { Component } from '@angular/core';
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
                   Thrown when the combination of your system prompt, context, and input exceeds the maximum token limit. 
-                  <div class="mt-3 p-2 bg-slate-50 dark:bg-zinc-900 rounded border border-slate-100 dark:border-zinc-800 text-xs">
+                  <div class="mt-3 p-2 bg-slate-50 dark:bg-[#161616] rounded border border-slate-100 dark:border-zinc-800 text-xs">
                     <strong>Props:</strong><br>
                     <code>e.requested</code>: Total input tokens.<br>
                     <code>e.quota</code>: Tokens available.
