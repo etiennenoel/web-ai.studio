@@ -61,6 +61,8 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       RouteEnum.Docs,
       RouteEnum.GetStarted,
       RouteEnum.CheckAvailability,
+      RouteEnum.TrackingDownload,
+      RouteEnum.AbortingOperations,
       RouteEnum.Errors,
       RouteEnum.PromptApi,
       RouteEnum.SummarizerApi,
@@ -120,6 +122,12 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         break;
       case "check-availability":
         this.routeEnum = RouteEnum.CheckAvailability;
+        break;
+      case "tracking-download":
+        this.routeEnum = RouteEnum.TrackingDownload;
+        break;
+      case "aborting-operations":
+        this.routeEnum = RouteEnum.AbortingOperations;
         break;
       case "errors":
         this.routeEnum = RouteEnum.Errors;

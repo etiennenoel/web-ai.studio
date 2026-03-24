@@ -11,6 +11,8 @@ export enum RouteEnum {
   Docs = "/docs",
   GetStarted = "/docs/get-started",
   CheckAvailability = "/docs/check-availability",
+  TrackingDownload = "/docs/tracking-download",
+  AbortingOperations = "/docs/aborting-operations",
   Errors = "/docs/errors",
   PromptApi = "/docs/prompt-api",
   SummarizerApi = "/docs/summarizer",
