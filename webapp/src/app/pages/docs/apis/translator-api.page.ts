@@ -1,132 +1,286 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-translator-api-docs',
+  selector: 'app-translator-api',
   template: `
-    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200">
-      <div class="w-full p-6 md:p-12 pb-32 font-sans">
+    <div class="max-w-4xl mx-auto pb-16">
+      <!-- Header -->
+      <div class="mb-10">
+        <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Translator API</h1>
+        <p class="text-lg text-slate-600 dark:text-slate-400 mb-6">
+          The Translator API translates text between different languages completely on-device, preserving privacy and enabling offline usage.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://github.com/webmachinelearning/translation-api" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors">
+            <i class="bi bi-github"></i>
+            GitHub Repository
+          </a>
+          <a href="https://github.com/webmachinelearning/translation-api/issues" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors">
+            <i class="bi bi-bug"></i>
+            Issues
+          </a>
+          <a href="https://webmachinelearning.github.io/translation-api" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors">
+            <i class="bi bi-file-earmark-text"></i>
+            W3C Spec
+          </a>
+        </div>
+      </div>
+
+      <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 mb-10"></div>
+
+      <!-- Main Content -->
+      <div class="space-y-12">
         
-        <!-- Header -->
-        <div class="mb-10">
-          <nav class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
-            <a routerLink="/docs" class="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
-            <i class="bi bi-chevron-right text-[10px] opacity-70"></i>
-            <span class="text-slate-900 dark:text-slate-200">Translator</span>
-          </nav>
-          
-          <div class="mb-8">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center text-xl">
-                  <i class="bi bi-translate"></i>
-                </div>
-                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">Translator API</h1>
-              </div>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 mt-2">Last updated: March 23, 2026</p>
-            
-            <div class="flex flex-wrap items-center gap-3">
-              <a href="https://github.com/webmachinelearning/translation-api" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors flex items-center gap-2">
-                <i class="bi bi-github"></i> W3C Spec
-              </a>
-              <a href="https://github.com/webmachinelearning/translation-api/issues" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors flex items-center gap-2">
-                <i class="bi bi-bug"></i> File an Issue
-              </a>
-              
-            </div>
-          </div>
-          <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
-            The Translator API exposes the browser's existing language translation abilities to web pages. It allows you to translate user input, arbitrary DOM elements, or offline content in real-time. It operates using dynamic language packs downloaded on-the-fly to minimize initial footprint.
+        <!-- availability -->
+        <section id="availability" class="scroll-mt-6">
+          <app-docs-section-header anchorId="availability" title="Translator.availability()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Checks if the user agent can support translating between the specified <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-pink-600 dark:text-pink-400">sourceLanguage</code> and <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-pink-600 dark:text-pink-400">targetLanguage</code>.
           </p>
-        </div>
-
-        <hr class="border-t border-slate-200 dark:border-zinc-800 mb-10 max-w-4xl">
-
-        <!-- Global Object -->
-        <div class="mb-12 max-w-4xl">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Global Object</h2>
-          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            The API is exposed via the <code class="font-mono text-xs bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Translator</code> global object.
-          </p>
-        </div>
-
-        <!-- Methods -->
-        <div class="mb-12 max-w-4xl">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Methods</h2>
-          
-          <div class="space-y-8">
-            
-            <!-- availability() -->
-            <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-50 dark:bg-[#161616]/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
-                <h3 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-200">
-                  Translator.availability(<span class="text-slate-500 font-normal">options</span>)
-                </h3>
-              </div>
-              <div class="p-5">
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                  Unlike most APIs, checking the availability of the Translator requires specifying the desired languages, as the browser needs to check if that specific language pack pair is supported.
-                </p>
-                <h4 class="text-xs font-bold text-slate-900 dark:text-slate-300 mb-2 uppercase tracking-wider">Options</h4>
-                <ul class="list-disc pl-5 text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                  <li><code>sourceLanguage</code> (string): The BCP 47 language tag of the input (e.g., <code>"en"</code>, <code>"ja"</code>).</li>
-                  <li><code>targetLanguage</code> (string): The BCP 47 language tag of the desired output.</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- create() -->
-            <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-50 dark:bg-[#161616]/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
-                <h3 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-200">
-                  Translator.create(<span class="text-slate-500 font-normal">options</span>)
-                </h3>
-              </div>
-              <div class="p-5">
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                  Initializes a translation session for a specific language pair. Triggers a language pack download if the availability check returned <code>downloadable</code>.
-                </p>
-                <h4 class="text-xs font-bold text-slate-900 dark:text-slate-300 mb-2 uppercase tracking-wider">Options</h4>
-                <ul class="list-disc pl-5 text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                  <li><code>sourceLanguage</code> (string): Required.</li>
-                  <li><code>targetLanguage</code> (string): Required.</li>
-                  <li><code>monitor</code> (function): An optional callback that receives a <code>ProgressEvent</code> to track language pack download state.</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- translate() -->
-            <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-50 dark:bg-[#161616]/50 px-5 py-3 border-b border-slate-200 dark:border-zinc-800">
-                <h3 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-200">
-                  translator.translate(<span class="text-slate-500 font-normal">text</span>)
-                </h3>
-              </div>
-              <div class="p-5">
-                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                  Translates the text in a single shot. Returns a Promise that resolves to the fully translated string. A <code>translateStreaming()</code> counterpart is also available.
-                </p>
-              </div>
-            </div>
-
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-indigo-400">static</span> <span class="text-blue-400">availability</span>(options: <span class="text-emerald-400">TranslatorCreateCoreOptions</span>): Promise&lt;<span class="text-emerald-400">Availability</span>&gt;;
+            </code>
           </div>
-        </div>
 
-        <!-- Page Navigation -->
-        <div class="mt-16 pt-8 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center">
-          <a routerLink="/docs/rewriter" class="!no-underline group flex flex-col items-start px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
-            <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1"><i class="bi bi-chevron-left text-[10px]"></i> Previous</span>
-            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Rewriter API</span>
-          </a>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Parameters (TranslatorCreateCoreOptions)</h3>
+          <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800">
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Property</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Type</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">sourceLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400 mb-1">Required</span><br>
+                    A BCP 47 language tag identifying the source language (e.g., 'en', 'ja').
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">targetLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400 mb-1">Required</span><br>
+                    A BCP 47 language tag identifying the target language.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Returns</h3>
+          <p class="text-slate-600 dark:text-slate-400 mb-6">
+            A promise that resolves to an <code class="text-sm font-mono text-emerald-600 dark:text-emerald-400">Availability</code> string: 
+            <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'available'</code>, 
+            <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloadable'</code>, 
+            <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloading'</code>, or 
+            <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'unavailable'</code>.
+          </p>
+          <app-code-snippet>const availability = await Translator.availability(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'fr'
+&#125;);
+if (availability !== "unavailable") &#123;
+  // Proceed with creation
+&#125;</app-code-snippet>
+        </section>
 
-          <a routerLink="/docs/language-detector" class="!no-underline group flex flex-col items-end px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700 text-right">
-            <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">Next <i class="bi bi-chevron-right text-[10px]"></i></span>
-            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Language Detector API</span>
-          </a>
-        </div>
+        <!-- create -->
+        <section id="create" class="scroll-mt-6">
+          <app-docs-section-header anchorId="create" title="Translator.create()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Instantiates a new <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">Translator</code> object, initiating any necessary model or language pack downloads.
+          </p>
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-indigo-400">static</span> <span class="text-blue-400">create</span>(options: <span class="text-emerald-400">TranslatorCreateOptions</span>): Promise&lt;<span class="text-emerald-400">Translator</span>&gt;;
+            </code>
+          </div>
+
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Parameters (TranslatorCreateOptions)</h3>
+          <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800">
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Property</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Type</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">sourceLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400 mb-1">Required</span><br>
+                    The source language code (e.g. 'en').
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">targetLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400 mb-1">Required</span><br>
+                    The target language code (e.g. 'fr').
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">signal</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">AbortSignal</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Allows aborting the creation and download process.</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">monitor</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">CreateMonitorCallback</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Callback to listen to <code class="font-mono text-xs">downloadprogress</code> events.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <app-code-snippet>const translator = await Translator.create(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'ja',
+  monitor(m) &#123;
+    m.addEventListener("downloadprogress", e => &#123;
+      console.log(\`Downloaded \$\&#123;e.loaded * 100&#125;%\`);
+    &#125;);
+  &#125;
+&#125;);</app-code-snippet>
+        </section>
+
+        <!-- translate -->
+        <section id="translate" class="scroll-mt-6">
+          <app-docs-section-header anchorId="translate" title="translator.translate()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Translates the given input string from the configured source language to the target language.
+          </p>
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-blue-400">translate</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">TranslatorTranslateOptions</span>): Promise&lt;<span class="text-emerald-400">DOMString</span>&gt;;
+            </code>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Parameters</h3>
+          <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800">
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Property</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Type</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">input</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The string to translate.</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">options.signal</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">AbortSignal</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Optional signal to abort the translation request.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <app-code-snippet>const result = await translator.translate("Hello, how are you today?");
+console.log(result); // e.g. "Bonjour, comment allez-vous aujourd'hui ?"</app-code-snippet>
+        </section>
+
+        <!-- translateStreaming -->
+        <section id="translate-streaming" class="scroll-mt-6">
+          <app-docs-section-header anchorId="translate-streaming" title="translator.translateStreaming()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Returns a <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">ReadableStream</code> that yields the translated string in chunks as it's generated. Note that translation chunking requires building enough context, so stream chunks might arrive irregularly.
+          </p>
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-blue-400">translateStreaming</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">TranslatorTranslateOptions</span>): <span class="text-emerald-400">ReadableStream</span>;
+            </code>
+          </div>
+          <app-code-snippet>const stream = translator.translateStreaming("A very long document...");
+let fullTranslation = "";
+for await (const chunk of stream) &#123;
+  fullTranslation += chunk;
+  updateUI(fullTranslation);
+&#125;</app-code-snippet>
+        </section>
+
+        <!-- measureInputUsage -->
+        <section id="measure-input" class="scroll-mt-6">
+          <app-docs-section-header anchorId="measure-input" title="translator.measureInputUsage()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Calculates how much quota the translation string would consume without executing the translation. If this returns a value greater than <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">inputQuota</code>, translating it will throw a <code class="text-sm font-mono">QuotaExceededError</code>.
+          </p>
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-blue-400">measureInputUsage</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">TranslatorTranslateOptions</span>): Promise&lt;<span class="text-emerald-400">double</span>&gt;;
+            </code>
+          </div>
+          <app-code-snippet>const usage = await translator.measureInputUsage(largeText);
+if (usage &lt; translator.inputQuota) &#123;
+  await translator.translate(largeText);
+&#125; else &#123;
+  console.error("Text is too long to translate in one pass.");
+&#125;</app-code-snippet>
+        </section>
+
+        <!-- destroy -->
+        <section id="destroy" class="scroll-mt-6">
+          <app-docs-section-header anchorId="destroy" title="translator.destroy()"></app-docs-section-header>
+          <p class="text-slate-600 dark:text-slate-400 mb-4">
+            Destroys the translator instance, aborting any active requests and allowing the browser to unload the underlying machine learning models from memory if no other references exist.
+          </p>
+          <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
+            <code class="text-sm text-slate-300 font-mono">
+              <span class="text-blue-400">destroy</span>(): <span class="text-emerald-400">undefined</span>;
+            </code>
+          </div>
+          <app-code-snippet>translator.destroy();</app-code-snippet>
+        </section>
+
+        <!-- Properties -->
+        <section id="properties" class="scroll-mt-6">
+          <app-docs-section-header anchorId="properties" title="Properties"></app-docs-section-header>
+          <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800">
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Property</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Type</th>
+                  <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">sourceLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString (readonly)</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The canonicalized BCP 47 language tag of the source language.</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">targetLanguage</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString (readonly)</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The canonicalized BCP 47 language tag of the target language.</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">inputQuota</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double (readonly)</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The maximum input usage allowed per translation operation. Can be <code class="font-mono text-xs">+Infinity</code> if the implementation uses iterative chunking.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
       </div>
     </div>
   `,
-  standalone: false,
-  host: { class: 'block h-full' }
+  standalone: false
 })
 export class TranslatorApiPage {}

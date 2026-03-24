@@ -84,6 +84,15 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     this.router.navigate([this.RouteEnum.Docs]);
   }
 
+  scrollTo(elementId: string, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const element = this.document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   determineCurrentActiveRoute(pathname: string) {
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
