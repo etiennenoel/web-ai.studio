@@ -2,8 +2,10 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-translator-api',
+  host: { class: 'block h-full' },
   template: `
-    <div class="max-w-4xl mx-auto pb-16">
+    <div class="h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212] transition-colors duration-200 scroll-smooth">
+      <div class="max-w-5xl w-full p-6 md:p-12 pb-32 font-sans">
       <!-- Header -->
       <div class="mb-10">
         <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Translator API</h1>
@@ -284,8 +286,8 @@ console.log(&quot;Translator destroyed.&quot;);"></app-code-snippet>
         </section>
 
       </div>
-    </div>
-  `,
+      </div>
+    </div>`,
   standalone: false
 })
 export class TranslatorApiPage {}
