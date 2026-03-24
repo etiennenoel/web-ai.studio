@@ -70,12 +70,8 @@ import { Component } from '@angular/core';
           <p class="text-slate-600 dark:text-slate-400 mb-6">
             A promise resolving to <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'available'</code>, <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloadable'</code>, <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloading'</code>, or <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'unavailable'</code>.
           </p>
-          <app-code-snippet>const availability = await LanguageDetector.availability(&#123;
-  expectedInputLanguages: ['en', 'ja', 'ko']
-&#125;);
-if (availability !== "unavailable") &#123;
-  // Proceed with creation
-&#125;</app-code-snippet>
+          <app-code-snippet code="const availability = await LanguageDetector.availability();
+console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         </section>
 
         <!-- create -->
@@ -122,13 +118,8 @@ if (availability !== "unavailable") &#123;
               </tbody>
             </table>
           </div>
-          <app-code-snippet>const detector = await LanguageDetector.create(&#123;
-  monitor(m) &#123;
-    m.addEventListener("downloadprogress", e => &#123;
-      console.log(\`Downloaded \$\&#123;e.loaded * 100&#125;%\`);
-    &#125;);
-  &#125;
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const detector = await LanguageDetector.create();
+console.log(&quot;Detector created&quot;);"></app-code-snippet>
         </section>
 
         <!-- detect -->
@@ -172,12 +163,11 @@ if (availability !== "unavailable") &#123;
             A promise that resolves to an array of objects containing <code class="font-mono text-xs">detectedLanguage</code> (a BCP 47 string) and <code class="font-mono text-xs">confidence</code> (a double between 0 and 1).
           </p>
 
-          <app-code-snippet>const results = await detector.detect("Bonjour, comment allez-vous?");
+          <app-code-snippet code="const detector = await LanguageDetector.create();
+const results = await detector.detect(&quot;Bonjour, comment allez-vous?&quot;);
 for (const result of results) &#123;
   console.log(result.detectedLanguage, result.confidence);
-&#125;
-// e.g. "fr", 0.99
-//      "und", 0.01</app-code-snippet>
+&#125;"></app-code-snippet>
         </section>
 
         <!-- measureInputUsage -->
@@ -191,12 +181,9 @@ for (const result of results) &#123;
               <span class="text-blue-400">measureInputUsage</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">LanguageDetectorDetectOptions</span>): Promise&lt;<span class="text-emerald-400">double</span>&gt;;
             </code>
           </div>
-          <app-code-snippet>const usage = await detector.measureInputUsage(largeText);
-if (usage &lt; detector.inputQuota) &#123;
-  await detector.detect(largeText);
-&#125; else &#123;
-  console.error("Text is too long to analyze in one pass.");
-&#125;</app-code-snippet>
+          <app-code-snippet code="const detector = await LanguageDetector.create();
+const usage = await detector.measureInputUsage(&quot;Some large text&quot;);
+console.log(&quot;Tokens:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- destroy -->
@@ -210,7 +197,9 @@ if (usage &lt; detector.inputQuota) &#123;
               <span class="text-blue-400">destroy</span>(): <span class="text-emerald-400">undefined</span>;
             </code>
           </div>
-          <app-code-snippet>detector.destroy();</app-code-snippet>
+          <app-code-snippet code="const detector = await LanguageDetector.create();
+detector.destroy();
+console.log(&quot;Detector destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Properties -->

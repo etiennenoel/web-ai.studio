@@ -93,10 +93,8 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const availability = await Summarizer.availability(&#123;
-  type: 'key-points',
-  length: 'short'
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const availability = await Writer.availability();
+console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         </section>
 
         <!-- Writer.create() -->
@@ -137,11 +135,11 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const summarizer = await Summarizer.create(&#123;
-  type: 'key-points',
-  format: 'markdown',
-  length: 'medium'
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const writer = await Writer.create(&#123;
+  tone: 'formal',
+  format: 'markdown'
+&#125;);
+console.log(&quot;Writer created&quot;);"></app-code-snippet>
         </section>
 
         <!-- session.write() -->
@@ -176,10 +174,12 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const draft = await writer.write(
-  "An email to my boss asking for a deadline extension.",
-  &#123; context: "The project is Project Apollo." &#125;
-);</app-code-snippet>
+          <app-code-snippet code="const writer = await Writer.create();
+const draft = await writer.write(
+  &quot;An email to my boss asking for a deadline extension.&quot;,
+  &#123; context: &quot;The project is Project Apollo.&quot; &#125;
+);
+console.log(draft);"></app-code-snippet>
         </section>
 
         <!-- session.writeStreaming() -->
@@ -192,10 +192,11 @@ import { Component } from '@angular/core';
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>writeStreaming(input: DOMString, options?: WriterWriteOptions): ReadableStream;</code></pre>
           </div>
         
-          <app-code-snippet>const stream = writer.writeStreaming("A blog post about AI.");
+          <app-code-snippet code="const writer = await Writer.create();
+const stream = writer.writeStreaming(&quot;A haiku about AI.&quot;);
 for await (const chunk of stream) &#123;
-  processChunk(chunk);
-&#125;</app-code-snippet>
+  console.log(&quot;Chunk:&quot;, chunk);
+&#125;"></app-code-snippet>
         </section>
 
         <!-- session.measureInputUsage() -->
@@ -208,7 +209,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureInputUsage(input: DOMString, options?: WriterWriteOptions): Promise&lt;double&gt;;</code></pre>
           </div>
         
-          <app-code-snippet>const tokens = await summarizer.measureInputUsage("Text to summarize...");</app-code-snippet>
+          <app-code-snippet code="const writer = await Writer.create();
+const tokens = await writer.measureInputUsage(&quot;Prompt to write about...&quot;);
+console.log(&quot;Tokens:&quot;, tokens);"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
@@ -221,7 +224,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
           </div>
         
-          <app-code-snippet>summarizer.destroy();</app-code-snippet>
+          <app-code-snippet code="const writer = await Writer.create();
+writer.destroy();
+console.log(&quot;Writer destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Properties -->

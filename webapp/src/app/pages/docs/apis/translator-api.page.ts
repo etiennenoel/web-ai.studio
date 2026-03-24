@@ -82,13 +82,11 @@ import { Component } from '@angular/core';
             <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloading'</code>, or 
             <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'unavailable'</code>.
           </p>
-          <app-code-snippet>const availability = await Translator.availability(&#123;
+          <app-code-snippet code="const availability = await Translator.availability(&#123;
   sourceLanguage: 'en',
   targetLanguage: 'fr'
 &#125;);
-if (availability !== "unavailable") &#123;
-  // Proceed with creation
-&#125;</app-code-snippet>
+console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         </section>
 
         <!-- create -->
@@ -143,15 +141,11 @@ if (availability !== "unavailable") &#123;
               </tbody>
             </table>
           </div>
-          <app-code-snippet>const translator = await Translator.create(&#123;
+          <app-code-snippet code="const translator = await Translator.create(&#123;
   sourceLanguage: 'en',
-  targetLanguage: 'ja',
-  monitor(m) &#123;
-    m.addEventListener("downloadprogress", e => &#123;
-      console.log(\`Downloaded \$\&#123;e.loaded * 100&#125;%\`);
-    &#125;);
-  &#125;
-&#125;);</app-code-snippet>
+  targetLanguage: 'fr'
+&#125;);
+console.log(&quot;Translator created&quot;);"></app-code-snippet>
         </section>
 
         <!-- translate -->
@@ -189,8 +183,12 @@ if (availability !== "unavailable") &#123;
               </tbody>
             </table>
           </div>
-          <app-code-snippet>const result = await translator.translate("Hello, how are you today?");
-console.log(result); // e.g. "Bonjour, comment allez-vous aujourd'hui ?"</app-code-snippet>
+          <app-code-snippet code="const translator = await Translator.create(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'fr'
+&#125;);
+const result = await translator.translate(&quot;Hello, how are you today?&quot;);
+console.log(result);"></app-code-snippet>
         </section>
 
         <!-- translateStreaming -->
@@ -204,12 +202,14 @@ console.log(result); // e.g. "Bonjour, comment allez-vous aujourd'hui ?"</app-co
               <span class="text-blue-400">translateStreaming</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">TranslatorTranslateOptions</span>): <span class="text-emerald-400">ReadableStream</span>;
             </code>
           </div>
-          <app-code-snippet>const stream = translator.translateStreaming("A very long document...");
-let fullTranslation = "";
+          <app-code-snippet code="const translator = await Translator.create(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'fr'
+&#125;);
+const stream = translator.translateStreaming(&quot;A very long document that needs translating...&quot;);
 for await (const chunk of stream) &#123;
-  fullTranslation += chunk;
-  updateUI(fullTranslation);
-&#125;</app-code-snippet>
+  console.log(&quot;Chunk:&quot;, chunk);
+&#125;"></app-code-snippet>
         </section>
 
         <!-- measureInputUsage -->
@@ -223,12 +223,12 @@ for await (const chunk of stream) &#123;
               <span class="text-blue-400">measureInputUsage</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">TranslatorTranslateOptions</span>): Promise&lt;<span class="text-emerald-400">double</span>&gt;;
             </code>
           </div>
-          <app-code-snippet>const usage = await translator.measureInputUsage(largeText);
-if (usage &lt; translator.inputQuota) &#123;
-  await translator.translate(largeText);
-&#125; else &#123;
-  console.error("Text is too long to translate in one pass.");
-&#125;</app-code-snippet>
+          <app-code-snippet code="const translator = await Translator.create(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'fr'
+&#125;);
+const usage = await translator.measureInputUsage(&quot;Some text&quot;);
+console.log(&quot;Tokens:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- destroy -->
@@ -242,7 +242,12 @@ if (usage &lt; translator.inputQuota) &#123;
               <span class="text-blue-400">destroy</span>(): <span class="text-emerald-400">undefined</span>;
             </code>
           </div>
-          <app-code-snippet>translator.destroy();</app-code-snippet>
+          <app-code-snippet code="const translator = await Translator.create(&#123;
+  sourceLanguage: 'en',
+  targetLanguage: 'fr'
+&#125;);
+translator.destroy();
+console.log(&quot;Translator destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Properties -->

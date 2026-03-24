@@ -90,13 +90,13 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const availability = await LanguageModel.availability();
-if (availability !== "unavailable") &#123;
-  if (availability !== "available") &#123;
-    console.log("Requires download.");
+          <app-code-snippet code="const availability = await LanguageModel.availability();
+if (availability !== &quot;unavailable&quot;) &#123;
+  if (availability !== &quot;available&quot;) &#123;
+    console.log(&quot;Requires download.&quot;);
   &#125;
-  // Safe to call create()
-&#125;</app-code-snippet>
+  console.log(&quot;Language Model is available!&quot;);
+&#125;"></app-code-snippet>
         </section>
 
         <!-- LanguageModel.create() -->
@@ -137,10 +137,11 @@ if (availability !== "unavailable") &#123;
             </table>
           </div>
         
-          <app-code-snippet>const session = await LanguageModel.create(&#123;
-  initialPrompts: [&#123; role: "system", content: "You are a helpful assistant." &#125;],
-  expectedInputs: [&#123; type: "text" &#125;]
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const session = await LanguageModel.create(&#123;
+  initialPrompts: [&#123; role: &quot;system&quot;, content: &quot;You are a helpful assistant.&quot; &#125;],
+  expectedInputs: [&#123; type: &quot;text&quot; &#125;]
+&#125;);
+console.log(&quot;Session created:&quot;, session);"></app-code-snippet>
         </section>
 
         <!-- session.prompt() -->
@@ -198,10 +199,11 @@ if (availability !== "unavailable") &#123;
             </table>
           </div>
         
-          <app-code-snippet>const response = await session.prompt([
-  &#123; role: "user", content: "What is the capital of France?" &#125;
+          <app-code-snippet code="const session = await LanguageModel.create();
+const response = await session.prompt([
+  &#123; role: &quot;user&quot;, content: &quot;What is the capital of France?&quot; &#125;
 ]);
-console.log(response); // "The capital of France is Paris."</app-code-snippet>
+console.log(response);"></app-code-snippet>
         </section>
 
         <!-- session.promptStreaming() -->
@@ -217,12 +219,14 @@ console.log(response); // "The capital of France is Paris."</app-code-snippet>
             Must be consumed using an async iterator (e.g., <code>for await (const chunk of stream)</code>). Highly recommended for improving perceived latency (TTFT).
           </p>
         
-          <app-code-snippet>const stream = session.promptStreaming("Write a short poem about the ocean.");
-let fullResponse = "";
+          <app-code-snippet code="const session = await LanguageModel.create();
+const stream = session.promptStreaming(&quot;Write a short poem about the ocean.&quot;);
+let fullResponse = &quot;&quot;;
 for await (const chunk of stream) &#123;
   fullResponse += chunk;
-  updateUI(fullResponse); // Updates as words generate
-&#125;</app-code-snippet>
+  console.log(&quot;Chunk:&quot;, chunk);
+&#125;
+console.log(&quot;Final:&quot;, fullResponse);"></app-code-snippet>
         </section>
 
         <!-- session.append() -->
@@ -235,12 +239,12 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>append(input: LanguageModelPrompt, options?: LanguageModelAppendOptions): Promise&lt;undefined&gt;;</code></pre>
           </div>
         
-          <app-code-snippet>// Pre-load context into the model's memory
+          <app-code-snippet code="const session = await LanguageModel.create();
 await session.append([
-  &#123; role: "user", content: "Here is my long document: ..." &#125;
+  &#123; role: &quot;user&quot;, content: &quot;Remember this secret word: BANANA&quot; &#125;
 ]);
-// Now later prompts will process instantly
-const response = await session.prompt("Summarize the document I gave you.");</app-code-snippet>
+const response = await session.prompt(&quot;What was the secret word?&quot;);
+console.log(response);"></app-code-snippet>
         </section>
 
         <!-- session.measureContextUsage() -->
@@ -260,9 +264,10 @@ const response = await session.prompt("Summarize the document I gave you.");</ap
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">oncontextoverflow</code> - Event fired when a prompt causes the session history to overflow and evict older messages.</li>
           </ul>
         
-          <app-code-snippet>const tokenCount = await session.measureContextUsage("This is a test prompt.");
-  console.log("This prompt will cost " + tokenCount + " tokens.");
-  console.log("Total usage: " + session.contextUsage + " / " + session.contextWindow);</app-code-snippet>
+          <app-code-snippet code="const session = await LanguageModel.create();
+const tokenCount = await session.measureContextUsage(&quot;This is a test prompt.&quot;);
+console.log(&quot;This prompt will cost &quot; + tokenCount + &quot; tokens.&quot;);
+console.log(&quot;Total usage: &quot; + session.contextUsage + &quot; / &quot; + session.contextWindow);"></app-code-snippet>
         </section>
 
         <!-- session.clone() -->
@@ -276,13 +281,12 @@ const response = await session.prompt("Summarize the document I gave you.");</ap
           </div>
           <p class="text-xs text-slate-500 mb-3 italic">Options takes an optional <code>AbortSignal</code>.</p>
         
-          <app-code-snippet>// Create a base session
-const baseSession = await LanguageModel.create(&#123; initialPrompts: [...] &#125;);
-await baseSession.append("Common knowledge base.");
-
-// Branch into multiple independent conversations cheaply
+          <app-code-snippet code="const baseSession = await LanguageModel.create();
+await baseSession.append([
+  &#123; role: &quot;user&quot;, content: &quot;Your name is Bob.&quot; &#125;
+]);
 const user1Session = await baseSession.clone();
-const user2Session = await baseSession.clone();</app-code-snippet>
+console.log(await user1Session.prompt(&quot;What is your name?&quot;));"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
@@ -295,8 +299,9 @@ const user2Session = await baseSession.clone();</app-code-snippet>
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
           </div>
         
-          <app-code-snippet>// Unload from memory when finished
-session.destroy();</app-code-snippet>
+          <app-code-snippet code="const session = await LanguageModel.create();
+session.destroy();
+console.log(&quot;Session destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Deprecations -->

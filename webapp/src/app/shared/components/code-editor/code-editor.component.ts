@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit, OnChanges, SimpleChanges, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { Component, ElementRef, Input, Output, EventEmitter, ViewChild, AfterViewInit, OnChanges, SimpleChanges, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
@@ -12,9 +12,12 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   @Input() code: string = '';
   @Input() height: string = '400px';
   @Input() language: string = 'typescript';
+  @Input() readOnly: boolean = true;
+  @Output() codeChange = new EventEmitter<string>();
 
   private editor: any;
   private themeObserver?: MutationObserver;
+  private isInternalChange = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -34,11 +37,18 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
       this.updateTheme();
       this.editor.session.setMode(`ace/mode/${this.language}`);
       this.editor.setValue(this.code, -1);
-      this.editor.setReadOnly(true);
+      this.editor.setReadOnly(this.readOnly);
       
       // Customize standard styles to blend with our UI
       this.editor.container.style.lineHeight = 1.5;
       this.editorRef.nativeElement.style.height = this.height;
+
+      // Watch for user edits
+      this.editor.session.on('change', () => {
+        if (!this.isInternalChange) {
+          this.codeChange.emit(this.editor.getValue());
+        }
+      });
 
       // Watch for theme changes
       this.themeObserver = new MutationObserver((mutations) => {
@@ -66,11 +76,20 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.editor && changes['code']) {
       if (this.editor.getValue() !== this.code) {
+        this.isInternalChange = true;
         this.editor.setValue(this.code, -1);
+        this.isInternalChange = false;
       }
     }
     if(this.editor && changes['language']) {
       this.editor.session.setMode(`ace/mode/${this.language}`);
+    }
+    if(this.editor && changes['readOnly']) {
+      this.editor.setReadOnly(this.readOnly);
+    }
+    if (this.editor && changes['height']) {
+      this.editorRef.nativeElement.style.height = this.height;
+      this.editor.resize();
     }
   }
 

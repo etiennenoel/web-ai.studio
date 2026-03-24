@@ -98,10 +98,11 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const availability = await Summarizer.availability(&#123;
+          <app-code-snippet code="const availability = await Summarizer.availability(&#123;
   type: 'key-points',
   length: 'short'
-&#125;);</app-code-snippet>
+&#125;);
+console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         </section>
 
         <!-- Summarizer.create() -->
@@ -142,11 +143,12 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const summarizer = await Summarizer.create(&#123;
+          <app-code-snippet code="const summarizer = await Summarizer.create(&#123;
   type: 'key-points',
   format: 'markdown',
   length: 'medium'
-&#125;);</app-code-snippet>
+&#125;);
+console.log(&quot;Summarizer created&quot;);"></app-code-snippet>
         </section>
 
         <!-- session.summarize() -->
@@ -181,11 +183,12 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const summary = await summarizer.summarize(
-  "A very long news article text...",
-  &#123; context: "Focus only on the financial aspects." &#125;
+          <app-code-snippet code="const summarizer = await Summarizer.create();
+const summary = await summarizer.summarize(
+  &quot;Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to intelligence of humans and other animals. Example tasks in which this is done include speech recognition, computer vision, translation between (natural) languages, as well as other mappings of inputs.&quot;,
+  &#123; context: &quot;Keep it under 10 words.&quot; &#125;
 );
-console.log(summary);</app-code-snippet>
+console.log(summary);"></app-code-snippet>
         </section>
 
         <!-- session.summarizeStreaming() -->
@@ -198,10 +201,11 @@ console.log(summary);</app-code-snippet>
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>summarizeStreaming(input: DOMString, options?: SummarizerSummarizeOptions): ReadableStream;</code></pre>
           </div>
         
-          <app-code-snippet>const stream = summarizer.summarizeStreaming("Long text...");
+          <app-code-snippet code="const summarizer = await Summarizer.create();
+const stream = summarizer.summarizeStreaming(&quot;Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to intelligence of humans and other animals.&quot;);
 for await (const chunk of stream) &#123;
-  processChunk(chunk);
-&#125;</app-code-snippet>
+  console.log(&quot;Chunk:&quot;, chunk);
+&#125;"></app-code-snippet>
         </section>
 
         <!-- session.measureInputUsage() -->
@@ -214,7 +218,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureInputUsage(input: DOMString, options?: SummarizerSummarizeOptions): Promise&lt;double&gt;;</code></pre>
           </div>
         
-          <app-code-snippet>const tokens = await summarizer.measureInputUsage("Text to summarize...");</app-code-snippet>
+          <app-code-snippet code="const summarizer = await Summarizer.create();
+const tokens = await summarizer.measureInputUsage(&quot;Text to summarize...&quot;);
+console.log(&quot;Tokens:&quot;, tokens);"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
@@ -227,7 +233,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
           </div>
         
-          <app-code-snippet>summarizer.destroy();</app-code-snippet>
+          <app-code-snippet code="const summarizer = await Summarizer.create();
+summarizer.destroy();
+console.log(&quot;Summarizer destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Properties -->

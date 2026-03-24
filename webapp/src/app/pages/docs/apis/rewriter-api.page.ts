@@ -93,10 +93,8 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const availability = await Summarizer.availability(&#123;
-  type: 'key-points',
-  length: 'short'
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const availability = await Rewriter.availability();
+console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         </section>
 
         <!-- Rewriter.create() -->
@@ -137,11 +135,8 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const summarizer = await Summarizer.create(&#123;
-  type: 'key-points',
-  format: 'markdown',
-  length: 'medium'
-&#125;);</app-code-snippet>
+          <app-code-snippet code="const rewriter = await Rewriter.create(&#123; tone: 'more-formal' &#125;);
+console.log(&quot;Rewriter created&quot;);"></app-code-snippet>
         </section>
 
         <!-- session.rewrite() -->
@@ -176,10 +171,11 @@ import { Component } from '@angular/core';
             </table>
           </div>
         
-          <app-code-snippet>const polishedText = await rewriter.rewrite(
-  "this app is pretty good but crashes sometimes",
-  &#123; context: "Make it sound like a professional bug report." &#125;
-);</app-code-snippet>
+          <app-code-snippet code="const rewriter = await Rewriter.create(&#123; tone: 'more-formal' &#125;);
+const polishedText = await rewriter.rewrite(
+  &quot;this app is pretty good but crashes sometimes&quot;
+);
+console.log(polishedText);"></app-code-snippet>
         </section>
 
         <!-- session.rewriteStreaming() -->
@@ -192,10 +188,11 @@ import { Component } from '@angular/core';
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>rewriteStreaming(input: DOMString, options?: RewriterRewriteOptions): ReadableStream;</code></pre>
           </div>
         
-          <app-code-snippet>const stream = rewriter.rewriteStreaming("Some text");
+          <app-code-snippet code="const rewriter = await Rewriter.create();
+const stream = rewriter.rewriteStreaming(&quot;Some text to rewrite&quot;);
 for await (const chunk of stream) &#123;
-  processChunk(chunk);
-&#125;</app-code-snippet>
+  console.log(&quot;Chunk:&quot;, chunk);
+&#125;"></app-code-snippet>
         </section>
 
         <!-- session.measureInputUsage() -->
@@ -208,7 +205,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureInputUsage(input: DOMString, options?: RewriterRewriteOptions): Promise&lt;double&gt;;</code></pre>
           </div>
         
-          <app-code-snippet>const tokens = await summarizer.measureInputUsage("Text to summarize...");</app-code-snippet>
+          <app-code-snippet code="const rewriter = await Rewriter.create();
+const tokens = await rewriter.measureInputUsage(&quot;Text to rewrite...&quot;);
+console.log(&quot;Tokens:&quot;, tokens);"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
@@ -221,7 +220,9 @@ for await (const chunk of stream) &#123;
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
           </div>
         
-          <app-code-snippet>summarizer.destroy();</app-code-snippet>
+          <app-code-snippet code="const rewriter = await Rewriter.create();
+rewriter.destroy();
+console.log(&quot;Rewriter destroyed.&quot;);"></app-code-snippet>
         </section>
 
         <!-- Properties -->
