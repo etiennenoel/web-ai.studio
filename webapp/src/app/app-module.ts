@@ -111,6 +111,8 @@ import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio
 import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
+import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
+import { AbortingOperationsPage } from './pages/docs/aborting-operations/aborting-operations.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
 import { DocsHomePage } from './pages/docs/docs-home.page';
 import { PromptApiPage } from './pages/docs/apis/prompt-api.page';
@@ -146,6 +148,8 @@ import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
     DemosPage,
     GetStartedPage,
     CheckAvailabilityPage,
+    TrackingDownloadPage,
+    AbortingOperationsPage,
     DocsErrorsPage,
     DocsHomePage,
     PromptApiPage,

@@ -40,6 +40,8 @@ import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
 import { DocsHomePage } from './pages/docs/docs-home.page';
+import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
+import { AbortingOperationsPage } from './pages/docs/aborting-operations/aborting-operations.page';
 import { PromptApiPage } from './pages/docs/apis/prompt-api.page';
 import { SummarizerApiPage } from './pages/docs/apis/summarizer-api.page';
 import { WriterApiPage } from './pages/docs/apis/writer-api.page';
@@ -93,6 +95,20 @@ const routes: Routes = [
         component: CheckAvailabilityPage,
         data: {
           route: RouteEnum.CheckAvailability
+        }
+      },
+      {
+        path: "docs/tracking-download",
+        component: TrackingDownloadPage,
+        data: {
+          route: RouteEnum.TrackingDownload
+        }
+      },
+      {
+        path: "docs/aborting-operations",
+        component: AbortingOperationsPage,
+        data: {
+          route: RouteEnum.AbortingOperations
         }
       },
       {
