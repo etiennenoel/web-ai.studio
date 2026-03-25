@@ -122,6 +122,8 @@ import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
 import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
+import { CodeSnippetComponent } from './components/code-snippet/code-snippet.component';
+import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
 
 
 import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
@@ -183,11 +185,11 @@ import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
     ExtractEntitiesDemoComponent,
     ImageAudioQueryDemoComponent,
     ReceiptToJsonDemoComponent,
-
-
     AutoScrollDirective,
-     CortexPage,
-     AxonTestStatusBadgeComponent,
+    CortexPage,
+    AxonTestStatusBadgeComponent,
+    CodeSnippetComponent,
+    DocsSectionHeaderComponent,
 
     // Modals
      CodeModal,

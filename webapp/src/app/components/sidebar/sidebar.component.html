@@ -117,74 +117,163 @@
             </div>
 
             <!-- Prompt API -->
-            <a [routerLink]="getRouterLink(RouteEnum.PromptApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.PromptApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.PromptApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.PromptApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.PromptApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Prompt API</span>
+              </a>
               @if (routeEnum === RouteEnum.PromptApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('language-model-availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">LanguageModel.availability()</button>
+                  <button (click)="scrollTo('language-model-create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">LanguageModel.create()</button>
+                  <button (click)="scrollTo('session-prompt', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.prompt()</button>
+                  <button (click)="scrollTo('session-prompt-streaming', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.promptStreaming()</button>
+                  <button (click)="scrollTo('session-append', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.append()</button>
+                  <button (click)="scrollTo('session-measure-context', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.measureContextUsage()</button>
+                  <button (click)="scrollTo('session-clone', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.clone()</button>
+                  <button (click)="scrollTo('session-destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.destroy()</button>
+                </div>
               }
-              <span>Prompt API</span>
-            </a>
+            </div>
 
             <!-- Summarizer -->
-            <a [routerLink]="getRouterLink(RouteEnum.SummarizerApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.SummarizerApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.SummarizerApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.SummarizerApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.SummarizerApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Summarizer</span>
+              </a>
               @if (routeEnum === RouteEnum.SummarizerApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Summarizer.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Summarizer.create()</button>
+                  <button (click)="scrollTo('summarize', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.summarize()</button>
+                  <button (click)="scrollTo('summarize-streaming', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.summarizeStreaming()</button>
+                  <button (click)="scrollTo('measure-input', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.measureInputUsage()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Summarizer</span>
-            </a>
+            </div>
 
             <!-- Writer -->
-            <a [routerLink]="getRouterLink(RouteEnum.WriterApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.WriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.WriterApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.WriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.WriterApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Writer</span>
+              </a>
               @if (routeEnum === RouteEnum.WriterApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Writer.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Writer.create()</button>
+                  <button (click)="scrollTo('write', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.write()</button>
+                  <button (click)="scrollTo('write-streaming', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.writeStreaming()</button>
+                  <button (click)="scrollTo('measure-input', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.measureInputUsage()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Writer</span>
-            </a>
+            </div>
 
             <!-- Rewriter -->
-            <a [routerLink]="getRouterLink(RouteEnum.RewriterApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.RewriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.RewriterApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.RewriterApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.RewriterApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Rewriter</span>
+              </a>
               @if (routeEnum === RouteEnum.RewriterApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Rewriter.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Rewriter.create()</button>
+                  <button (click)="scrollTo('rewrite', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.rewrite()</button>
+                  <button (click)="scrollTo('rewrite-streaming', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.rewriteStreaming()</button>
+                  <button (click)="scrollTo('measure-input', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.measureInputUsage()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">session.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Rewriter</span>
-            </a>
+            </div>
 
             <!-- Translator -->
-            <a [routerLink]="getRouterLink(RouteEnum.TranslatorApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.TranslatorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.TranslatorApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.TranslatorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.TranslatorApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Translator</span>
+              </a>
               @if (routeEnum === RouteEnum.TranslatorApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Translator.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Translator.create()</button>
+                  <button (click)="scrollTo('translate', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">translator.translate()</button>
+                  <button (click)="scrollTo('translate-streaming', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">translator.translateStreaming()</button>
+                  <button (click)="scrollTo('measure-input', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">translator.measureInputUsage()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">translator.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Translator</span>
-            </a>
+            </div>
 
             <!-- Language Detector -->
-            <a [routerLink]="getRouterLink(RouteEnum.LanguageDetectorApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.LanguageDetectorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.LanguageDetectorApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.LanguageDetectorApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.LanguageDetectorApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Language Detector</span>
+              </a>
               @if (routeEnum === RouteEnum.LanguageDetectorApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">LanguageDetector.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">LanguageDetector.create()</button>
+                  <button (click)="scrollTo('detect', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">detector.detect()</button>
+                  <button (click)="scrollTo('measure-input', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">detector.measureInputUsage()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">detector.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Language Detector</span>
-            </a>
+            </div>
 
             <!-- Proofreader -->
-            <a [routerLink]="getRouterLink(RouteEnum.ProofreaderApi)"
-               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.ProofreaderApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+            <div>
+              <a [routerLink]="getRouterLink(RouteEnum.ProofreaderApi)"
+                 class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+                 [ngClass]="routeEnum === RouteEnum.ProofreaderApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.ProofreaderApi) {
+                  <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                }
+                <span>Proofreader</span>
+              </a>
               @if (routeEnum === RouteEnum.ProofreaderApi) {
-                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+                <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Proofreader.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Proofreader.create()</button>
+                  <button (click)="scrollTo('proofread', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">proofreader.proofread()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">proofreader.destroy()</button>
+                  <button (click)="scrollTo('properties', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Properties</button>
+                </div>
               }
-              <span>Proofreader</span>
-            </a>
+            </div>
 
           </div>
         }
