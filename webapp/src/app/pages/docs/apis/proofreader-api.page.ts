@@ -9,34 +9,49 @@ import { Component } from '@angular/core';
         <!-- Header -->
         <div class="mb-10">
           <nav class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
-            <a routerLink="/docs" class="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
+            <a routerLink="/docs" class="!no-underline hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
             <i class="bi bi-chevron-right text-[10px] opacity-70"></i>
             <span class="text-slate-900 dark:text-slate-200">Proofreader API</span>
           </nav>
           
-          <div class="flex items-start justify-between">
+          <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
                 <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Proofreader API
                 </h1>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 uppercase tracking-wider border border-amber-200 dark:border-amber-500/30">
+                  Dev Trial
+                </span>
               </div>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Last updated: March 24, 2026</p>
             </div>
             
-            <div class="flex gap-2">
-              <a href="https://github.com/webmachinelearning/proofreader-api" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
-                <i class="bi bi-github"></i> GitHub Repository
+
+            <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
+              <a href="https://github.com/webmachinelearning/proofreader-api/blob/main/README.md" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-file-earmark-text"></i> Explainer
               </a>
-              <a href="https://github.com/webmachinelearning/proofreader-api/issues" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
-                <i class="bi bi-bug"></i> Issues
+              <a href="https://webmachinelearning.github.io/proofreader-api/" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-journal-code"></i> Specifications
               </a>
+              <a href="https://github.com/webmachinelearning/proofreader-api/issues" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-bug"></i> File an issue
+              </a>
+              
             </div>
           </div>
           
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
             The Proofreader API allows web pages to check for grammar, spelling, and punctuation errors. It goes beyond returning corrected text by providing structured annotations detailing the error type and plain-language explanations of why the correction was made.
           </p>
+
+          <!-- Dev Trial Notice -->
+          <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
+            <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+            <div>
+              <strong>Developer Trial:</strong> This API is currently in active development. To use it, you must enable the <strong>#proofreader-api</strong> flag in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>.
+            </div>
+          </div>
         </div>
 
         <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 mb-10 max-w-4xl"></div>

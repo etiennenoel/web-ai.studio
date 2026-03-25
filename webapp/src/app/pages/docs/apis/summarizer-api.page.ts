@@ -9,28 +9,32 @@ import { Component } from '@angular/core';
         <!-- Header -->
         <div class="mb-10">
           <nav class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
-            <a routerLink="/docs" class="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
+            <a routerLink="/docs" class="!no-underline hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
             <i class="bi bi-chevron-right text-[10px] opacity-70"></i>
             <span class="text-slate-900 dark:text-slate-200">Summarizer API</span>
           </nav>
           
-          <div class="flex items-start justify-between">
+          <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
                 <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Summarizer API
                 </h1>
               </div>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Last updated: March 24, 2026</p>
             </div>
             
-            <div class="flex gap-2">
-              <a href="https://webmachinelearning.github.io/writing-assistance-apis/#summarizer-api" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
-                <i class="bi bi-file-earmark-text"></i> W3C Spec
+
+            <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
+              <a href="https://github.com/webmachinelearning/writing-assistance-apis/blob/main/README.md" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-file-earmark-text"></i> Explainer
               </a>
-              <a href="https://github.com/webmachinelearning/writing-assistance-apis/issues" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
-                <i class="bi bi-github"></i> Issues
+              <a href="https://webmachinelearning.github.io/writing-assistance-apis/" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-journal-code"></i> Specifications
               </a>
+              <a href="https://github.com/webmachinelearning/writing-assistance-apis/issues" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-bug"></i> File an issue
+              </a>
+              
             </div>
           </div>
           

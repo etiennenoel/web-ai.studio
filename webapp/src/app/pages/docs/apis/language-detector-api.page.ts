@@ -8,24 +8,37 @@ import { Component } from '@angular/core';
       <div class="max-w-5xl w-full p-6 md:p-12 pb-32 font-sans">
       <!-- Header -->
       <div class="mb-10">
-        <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Language Detector API</h1>
-        <p class="text-lg text-slate-600 dark:text-slate-400 mb-6">
+        <nav class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
+          <a routerLink="/docs" class="!no-underline hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
+          <i class="bi bi-chevron-right text-[10px] opacity-70"></i>
+          <span class="text-slate-900 dark:text-slate-200">Language Detector API</span>
+        </nav>
+        
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  Language Detector API
+                </h1>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
+              <a href="https://github.com/webmachinelearning/translation-api/blob/main/README.md" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-file-earmark-text"></i> Explainer
+              </a>
+              <a href="https://webmachinelearning.github.io/translation-api/" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-journal-code"></i> Specifications
+              </a>
+              <a href="https://github.com/webmachinelearning/translation-api/issues" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+                <i class="bi bi-bug"></i> File an issue
+              </a>
+              
+            </div>
+          </div>
+          <p class="text-base text-slate-600 dark:text-slate-400 mb-6">
           The Language Detector API identifies the human languages used in a given text on-device, returning a list of probable BCP 47 language tags with confidence scores.
         </p>
-        <div class="flex flex-wrap gap-3">
-          <a href="https://github.com/webmachinelearning/translation-api" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors">
-            <i class="bi bi-github"></i>
-            GitHub Repository
-          </a>
-          <a href="https://github.com/webmachinelearning/translation-api/issues" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors">
-            <i class="bi bi-bug"></i>
-            Issues
-          </a>
-          <a href="https://webmachinelearning.github.io/translation-api" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors">
-            <i class="bi bi-file-earmark-text"></i>
-            W3C Spec
-          </a>
-        </div>
       </div>
 
       <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 mb-10"></div>
