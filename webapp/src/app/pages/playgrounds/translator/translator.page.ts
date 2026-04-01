@@ -8,7 +8,7 @@ declare const window: any;
   selector: 'app-translator-playground',
   templateUrl: './translator.page.html',
   standalone: false,
-  host: { class: 'flex flex-col h-full w-full min-h-0' }
+  host: { class: 'block w-full h-full overflow-y-auto bg-[#ffffff] dark:bg-[#121212]' }
 })
 export class TranslatorPlaygroundPage implements OnInit, OnDestroy {
   playgroundForm!: FormGroup;

@@ -1,191 +1,238 @@
-<div class="h-full flex flex-col bg-[#ffffff] dark:bg-[#121212] font-sans">
-  <!-- Header -->
-  <div class="p-6 border-b border-slate-200 dark:border-zinc-800 shrink-0">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Summarizer API Playground</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Test text summarization interactively.</p>
+<div class="w-full font-sans pb-32 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="py-8 px-6 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121212] sticky top-0 z-20 shadow-sm">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-4 text-left">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-inner border border-indigo-100 dark:border-indigo-500/20 shrink-0">
+          <i class="bi bi-file-earmark-zip text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Summarizer</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Distill long-form content into concise summaries using the browser's built-in AI.</p>
+        </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button (click)="checkAvailability()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg">
+      <div class="flex items-center gap-3 shrink-0">
+        <button (click)="checkAvailability()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-sm font-semibold rounded-xl transition-all shadow-md">
           Check Availability
         </button>
-        <span *ngIf="availabilityStatus" class="text-xs font-mono px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded border border-indigo-200">
+        <span *ngIf="availabilityStatus" class="px-3 py-2.5 rounded-xl text-xs font-mono font-medium border"
+              [ngClass]="{'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20': availabilityStatus === 'available', 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20': availabilityStatus !== 'available'}">
           {{availabilityStatus}}
         </span>
       </div>
     </div>
   </div>
 
-  <div class="flex-1 overflow-hidden flex flex-col lg:flex-row">
-    <!-- Left Column: Controls -->
-    <div class="w-full lg:w-1/2 h-full overflow-y-auto p-6 pb-32 border-r border-slate-200 dark:border-zinc-800">
-      <form [formGroup]="playgroundForm" class="space-y-8 max-w-2xl mx-auto">
+  <div class="max-w-4xl mx-auto px-6 pt-10 space-y-10">
+    <form [formGroup]="playgroundForm" class="space-y-10">
+      
+      <!-- 1. Input -->
+      <div class="space-y-4 relative">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs">1</div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">The Input</h2>
+        </div>
         
-        <!-- Create Options Section -->
-        <section class="bg-slate-50 dark:bg-zinc-900/50 p-5 rounded-xl border border-slate-200 dark:border-zinc-800">
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Create Options</h2>
-
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
-              <select formControlName="type" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
-                <option value="key-points">key-points</option>
-                <option value="tl;dr">tl;dr</option>
-                <option value="teaser">teaser</option>
-                <option value="headline">headline</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Format</label>
-              <select formControlName="format" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
-                <option value="markdown">markdown</option>
-                <option value="plain-text">plain-text</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Length</label>
-              <select formControlName="length" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
-                <option value="short">short</option>
-                <option value="medium">medium</option>
-                <option value="long">long</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Preference</label>
-              <select formControlName="preference" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
-                <option value="auto">auto</option>
-                <option value="speed">speed</option>
-                <option value="capability">capability</option>
-              </select>
-            </div>
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
+          <div class="px-4 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/30 flex justify-between items-center">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Document to Summarize</span>
+            <input type="text" formControlName="context" placeholder="Optional context..." class="text-xs bg-transparent border-none focus:ring-0 text-right text-slate-600 dark:text-slate-400 w-1/2 placeholder-slate-400 dark:placeholder-zinc-600">
           </div>
+          <textarea formControlName="promptInput" class="w-full p-6 text-slate-700 dark:text-slate-300 bg-transparent border-none focus:ring-0 resize-none min-h-[240px] leading-relaxed text-base outline-none" placeholder="Paste the article or text you want to summarize here..."></textarea>
+        </div>
+      </div>
 
-          <div class="mb-4">
-            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Shared Context</label>
-            <input type="text" formControlName="sharedContext" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
-          </div>
+      <!-- 2. Shaping -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs">2</div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Configuration</h2>
+        </div>
+        
+        <div class="flex flex-wrap gap-4">
           
-          <div class="mb-4">
-            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Output Language (BCP-47)</label>
-            <input type="text" formControlName="outputLanguage" placeholder="e.g. en, fr, es" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Type</label>
+          <div class="flex p-1 bg-slate-100 dark:bg-zinc-800/80 rounded-xl gap-1">
+            
+          <button type="button" (click)="playgroundForm.patchValue({type: 'key-points'})"
+                  [ngClass]="playgroundForm.value.type === 'key-points' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Key Points
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({type: 'tl;dr'})"
+                  [ngClass]="playgroundForm.value.type === 'tl;dr' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            TL;DR
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({type: 'teaser'})"
+                  [ngClass]="playgroundForm.value.type === 'teaser' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Teaser
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({type: 'headline'})"
+                  [ngClass]="playgroundForm.value.type === 'headline' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Headline
+          </button>
           </div>
-
-          <!-- Expected Input Languages -->
-          <div class="mb-5">
-            <div class="flex justify-between items-center mb-2">
-              <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Expected Input Languages</label>
-              <button type="button" (click)="addExpectedInputLanguage()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Add</button>
-            </div>
-            <div formArrayName="expectedInputLanguages" class="flex flex-wrap gap-2">
-              <div *ngFor="let l of expectedInputLanguages.controls; let i=index" class="flex items-center gap-1">
-                <input type="text" [formControlName]="i" class="w-16 text-xs text-center border border-slate-300 rounded px-2 py-1 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
-                <button type="button" (click)="removeExpectedInputLanguage(i)" class="text-red-500 text-xs"><i class="bi bi-x"></i></button>
+        </div>
+          
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Length</label>
+          <div class="flex p-1 bg-slate-100 dark:bg-zinc-800/80 rounded-xl gap-1">
+            
+          <button type="button" (click)="playgroundForm.patchValue({length: 'short'})"
+                  [ngClass]="playgroundForm.value.length === 'short' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Short
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({length: 'medium'})"
+                  [ngClass]="playgroundForm.value.length === 'medium' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Medium
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({length: 'long'})"
+                  [ngClass]="playgroundForm.value.length === 'long' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Long
+          </button>
+          </div>
+        </div>
+          
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Format</label>
+          <div class="flex p-1 bg-slate-100 dark:bg-zinc-800/80 rounded-xl gap-1">
+            
+          <button type="button" (click)="playgroundForm.patchValue({format: 'markdown'})"
+                  [ngClass]="playgroundForm.value.format === 'markdown' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Markdown
+          </button>
+          <button type="button" (click)="playgroundForm.patchValue({format: 'plain-text'})"
+                  [ngClass]="playgroundForm.value.format === 'plain-text' ? 'bg-white dark:bg-zinc-700 shadow-sm text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-zinc-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="flex-1 py-2 text-sm font-medium rounded-lg transition-all capitalize">
+            Plain Text
+          </button>
+          </div>
+        </div>
+        </div>
+        
+        <details class="group bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <summary class="px-6 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none flex items-center justify-between transition-colors">
+            <span class="flex items-center gap-2"><i class="bi bi-sliders2"></i> Advanced Session Configuration</span>
+            <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="p-6 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/30 space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Preference</label>
+                <select formControlName="preference" class="w-full text-sm bg-white border border-slate-300 rounded-xl px-3 py-2.5 dark:bg-[#121212] dark:border-zinc-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="auto">Auto</option><option value="speed">Speed</option><option value="capability">Capability</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Output Language (BCP-47)</label>
+                <input type="text" formControlName="outputLanguage" placeholder="e.g. en, fr, es" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white outline-none">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Shared Context (Applied to entire session)</label>
+                <textarea formControlName="sharedContext" rows="2" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white outline-none resize-none"></textarea>
               </div>
             </div>
-          </div>
-          
-          <div class="flex items-center gap-3">
-            <button *ngIf="!session && !isCreating" type="button" (click)="createSession()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">
-              Create Session
-            </button>
-            <button *ngIf="isCreating" type="button" disabled class="flex-1 py-2.5 bg-indigo-400 text-white text-sm font-semibold rounded-lg cursor-not-allowed">
-              Creating...
-            </button>
-            <button *ngIf="isCreating && playgroundForm.value.useAbortSignal" type="button" (click)="abortCreation()" class="px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-semibold rounded-lg">
-              Abort
-            </button>
-            <button *ngIf="session" type="button" (click)="destroySession()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg">
-              Destroy Session
-            </button>
-          </div>
-          
-          <div *ngIf="isDownloading" class="mt-3">
-            <div class="w-full bg-slate-200 rounded-full h-1.5 mb-1 dark:bg-zinc-700">
-              <div class="bg-indigo-600 h-1.5 rounded-full dark:bg-indigo-500" [style.width]="downloadProgress + '%'"></div>
+            <div class="flex items-center gap-2 mt-4">
+              <input type="checkbox" formControlName="useAbortSignal" class="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-800 dark:border-zinc-600">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
             </div>
           </div>
-          
-        </section>
+        </details>
+      </div>
 
-        <!-- Execution Section -->
-        <section class="bg-slate-50 dark:bg-zinc-900/50 p-5 rounded-xl border border-slate-200 dark:border-zinc-800" [class.opacity-50]="!session">
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Execution</h2>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Text to Summarize</label>
-            <textarea formControlName="promptInput" rows="4" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none resize-none"></textarea>
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Context (Request Specific)</label>
-            <input type="text" formControlName="context" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
-          </div>
-
-          <div class="mb-5">
-            <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-              <input type="checkbox" formControlName="useAbortSignal" class="rounded text-indigo-600 dark:bg-zinc-800 dark:border-zinc-600">
-              Use Abort Signal
-            </label>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3 mb-3">
-            <button type="button" [disabled]="!session || isSummarizing" (click)="runPrompt(false)" class="py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg">
-              {{ isSummarizing ? 'Running...' : 'Summarize' }}
-            </button>
-            <button type="button" [disabled]="!session || isSummarizing" (click)="runPrompt(true)" class="py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg">
-              Summarize Streaming
-            </button>
-          </div>
-          
-          <div class="flex gap-3 mb-3">
-            <button type="button" [disabled]="!session || isMeasuring" (click)="measureUsage()" class="flex-1 py-2 bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 disabled:opacity-50 text-slate-800 dark:text-white text-xs font-semibold rounded-lg">
-              {{ isMeasuring ? '...' : 'Measure Usage' }}
-            </button>
-          </div>
-          
-          <button *ngIf="isSummarizing && playgroundForm.value.useAbortSignal" type="button" (click)="abortPrompt()" class="w-full py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-semibold rounded-lg">
-            Abort Summarization
+      <!-- 3. Action -->
+      <div class="pt-4 pb-8 flex flex-col items-center gap-4">
+        <div *ngIf="!session && !isCreating" class="w-full flex justify-center">
+          <button type="button" (click)="createSession()" class="group relative px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-600/20 transition-all overflow-hidden w-full sm:w-auto">
+            <span class="relative flex items-center justify-center gap-2"><i class="bi bi-lightning-charge-fill text-indigo-300"></i> Create Session</span>
           </button>
+        </div>
+
+        <div *ngIf="isCreating" class="px-8 py-4 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-2xl font-bold text-lg shadow-sm flex flex-col items-center justify-center gap-3 w-full sm:w-auto min-w-[250px]">
+          <div class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin"></i> Creating & Downloading...</div>
+          <div *ngIf="isDownloading" class="w-full bg-indigo-200 dark:bg-indigo-900/50 rounded-full h-1.5 mt-1">
+            <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 rounded-full transition-all duration-300" [style.width]="downloadProgress + '%'"></div>
+          </div>
+        </div>
+
+        <div *ngIf="session" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
           
-        </section>
+          <button type="button" (click)="runPrompt(false)" [disabled]="isSummarizing" class="flex-1 w-full sm:w-auto group relative px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-lg shadow-xl hover:scale-105 transition-all overflow-hidden disabled:opacity-50 disabled:hover:scale-100">
+            <span class="relative flex items-center justify-center gap-2"><i class="bi" [ngClass]="isSummarizing ? 'bi-hourglass-split' : 'bi-play-fill'"></i> {{ isSummarizing ? 'Summarizing...' : 'Summarize Document' }}</span>
+          </button>
+          <button type="button" (click)="runPrompt(true)" [disabled]="isSummarizing" class="flex-1 w-full sm:w-auto px-6 py-4 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 rounded-2xl font-semibold text-lg border border-slate-200 dark:border-zinc-700 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+            <i class="bi bi-stream text-indigo-500"></i> Stream
+          </button>
+          <button type="button" (click)="destroySession()" [disabled]="isSummarizing" class="px-5 py-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-2xl font-semibold text-lg border border-red-200 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-all flex items-center justify-center disabled:opacity-50" title="Destroy Session">
+            <i class="bi bi-trash3"></i>
+          </button>
+        </div>
+      </div>
+    </form>
 
-      </form>
-    </div>
-
-    <!-- Right Column: Results & Code -->
-    <div class="w-full lg:w-1/2 h-full flex flex-col bg-slate-50 dark:bg-[#161616]">
-      <div class="flex-1 p-6 pb-32 overflow-y-auto">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-slate-300 mb-3 tracking-wider uppercase">Execution Output</h3>
+    <!-- 4. Results -->
+    <div id="output-section" class="bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-zinc-800/80 overflow-hidden relative transition-all" [class.opacity-50]="!session && !fullOutput && !errorMessage">
+      <div class="absolute -inset-4 bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-900/10 rounded-[2rem] -z-10 pointer-events-none"></div>
+      
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner border border-indigo-200 dark:border-indigo-500/30">
+            <i class="bi bi-stars"></i>
+          </div>
+          <span class="font-bold text-slate-900 dark:text-white tracking-wide">Execution Output</span>
+        </div>
+        <div class="flex gap-2" *ngIf="session">
+          <button (click)="measureUsage()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 text-xs font-semibold flex items-center gap-1 transition-colors">
+            <i class="bi bi-rulers"></i> Measure
+          </button>
+          <span *ngIf="tokensMeasured" class="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-xs font-mono font-semibold flex items-center gap-1 animate-pulse">
+            <i class="bi bi-activity"></i> Measured: {{tokensMeasured}}
+          </span>
+        </div>
+      </div>
+      
+      <div class="p-6 md:p-8 text-base md:text-lg leading-relaxed text-slate-800 dark:text-slate-200 min-h-[150px]">
+        <div *ngIf="errorMessage" class="p-4 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-xl text-sm border border-red-200 dark:border-red-500/20 mb-4 flex items-start gap-3">
+          <i class="bi bi-exclamation-triangle-fill mt-0.5"></i>
+          <div>{{errorMessage}}</div>
+        </div>
         
-        <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 text-red-700 rounded-xl text-sm border border-red-200">
-          <i class="bi bi-exclamation-triangle-fill mr-2"></i> {{errorMessage}}
-        </div>
-
-        <div *ngIf="session" class="mb-4 flex flex-wrap gap-2">
-          <span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs font-mono rounded">
-            Quota: {{inputQuota}}
-          </span>
-          <span *ngIf="tokensMeasured" class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 text-xs font-mono rounded">
-            Measured: {{tokensMeasured}}
-          </span>
-        </div>
-
-        <div class="bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-zinc-800 rounded-xl p-4 min-h-[200px] whitespace-pre-wrap text-sm text-slate-800 dark:text-slate-200 shadow-sm">
-          <span *ngIf="!fullOutput && !isSummarizing" class="text-slate-400 italic">Output will appear here...</span>
-          <span *ngIf="isSummarizing && !fullOutput" class="text-slate-400 italic animate-pulse">Generating...</span>
-          {{fullOutput}}
-        </div>
+        
+        <span *ngIf="!fullOutput && !isSummarizing && !errorMessage" class="text-slate-400 dark:text-slate-500 italic font-medium flex items-center justify-center h-full min-h-[150px]">Click summarize to generate output.</span>
+        <span *ngIf="isSummarizing && !fullOutput" class="text-indigo-400 italic animate-pulse flex items-center justify-center h-full gap-2 min-h-[150px]"><i class="bi bi-magic"></i> Thinking...</span>
+        <div class="whitespace-pre-wrap">{{fullOutput}}</div>
       </div>
+    </div>
 
-      <div class="h-1/2 border-t border-slate-200 dark:border-zinc-800 bg-[#1e1e1e] flex flex-col">
-        <div class="p-3 border-b border-zinc-800 bg-zinc-900 flex justify-between items-center shrink-0">
-          <h3 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Generated Code</h3>
+    <!-- 5. Code -->
+    <div class="pt-8 pb-8">
+      <div class="flex items-center gap-4 mb-6 opacity-60">
+        <div class="h-px bg-slate-300 dark:bg-zinc-700 flex-1"></div>
+        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase"><i class="bi bi-code-slash mr-1"></i> Integration Code</span>
+        <div class="h-px bg-slate-300 dark:bg-zinc-700 flex-1"></div>
+      </div>
+      
+      <div class="bg-[#0d1117] rounded-2xl shadow-2xl border border-zinc-800 relative group overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 flex gap-2 items-center bg-black/40">
+           <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+           <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+           <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+           <span class="ml-4 text-[10px] font-mono text-slate-500">integration.js</span>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 pb-32">
-          <pre class="text-xs text-emerald-400 font-mono"><code>{{generatedCode}}</code></pre>
+        <div class="p-6 overflow-x-auto">
+          <pre class="text-sm font-mono text-blue-300/90 leading-relaxed tracking-tight"><code>{{generatedCode}}</code></pre>
         </div>
       </div>
     </div>
+
   </div>
 </div>
