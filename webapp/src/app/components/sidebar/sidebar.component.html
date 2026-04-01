@@ -278,6 +278,105 @@
         }
       </div>
 
+      <!-- Playgrounds Group -->
+      <div class="flex flex-col gap-1 mb-1">
+        <div (click)="togglePlaygrounds($event)"
+             class="select-none px-3 py-2 text-sm font-medium flex justify-between items-center rounded-lg cursor-pointer transition-colors" 
+             [ngClass]="isPlaygroundsActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40'">
+          <div class="flex items-center">
+            <i class="bi bi-play-circle text-lg w-7 flex justify-start" [ngClass]="isPlaygroundsActive ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'"></i>
+            <span class="mr-2">Playgrounds</span>
+          </div>
+          <i class="bi text-xs transition-transform duration-200"
+             [ngClass]="[isPlaygroundsExpanded ? 'bi-chevron-down' : 'bi-chevron-right', isPlaygroundsActive ? 'text-indigo-400' : 'text-slate-400 dark:text-slate-500']"></i>
+        </div>
+        
+        @if (isPlaygroundsExpanded) {
+          <div class="flex flex-col gap-0.5 pl-7 relative before:content-[''] before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-200 dark:before:bg-zinc-700/80 mt-1">
+            
+            <!-- Prompt API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsPrompt)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsPrompt ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsPrompt) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Prompt API</span>
+            </a>
+
+            <!-- Multimodal Prompt API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsMultimodalPrompt)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsMultimodalPrompt ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsMultimodalPrompt) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Multimodal Prompt API</span>
+            </a>
+
+            <!-- Summarizer API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsSummarizer)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsSummarizer ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsSummarizer) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Summarizer API</span>
+            </a>
+
+            <!-- Writer API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsWriter)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsWriter ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsWriter) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Writer API</span>
+            </a>
+
+            <!-- Rewriter API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsRewriter)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsRewriter ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsRewriter) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Rewriter API</span>
+            </a>
+
+            <!-- Translator API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsTranslator)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsTranslator ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsTranslator) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Translator API</span>
+            </a>
+
+            <!-- Language Detector API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsLanguageDetector)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsLanguageDetector ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsLanguageDetector) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Language Detector API</span>
+            </a>
+
+            <!-- Proofreader API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsProofreader)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsProofreader ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsProofreader) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Proofreader API</span>
+            </a>
+          </div>
+        }
+      </div>
+
       <!-- Demos -->
       <a [routerLink]="getRouterLink(RouteEnum.Demos)"
          class="!no-underline group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"

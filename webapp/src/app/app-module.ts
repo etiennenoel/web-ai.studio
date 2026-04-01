@@ -126,7 +126,15 @@ import { CodeSnippetComponent } from './components/code-snippet/code-snippet.com
 import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
 
 
-import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
+import { SafeHtmlPipe } from './shared/pipes/safe-html.pipe';
+import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
+import { MultimodalPromptPlaygroundPage } from './pages/playgrounds/multimodal-prompt/multimodal-prompt.page';
+import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
+import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
+import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.page';
+import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/translator.page';
+import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
+import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 
 @NgModule({
   declarations: [
@@ -161,6 +169,14 @@ import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
     TranslatorApiPage,
     LanguageDetectorApiPage,
     ProofreaderApiPage,
+    PromptPlaygroundPage,
+    MultimodalPromptPlaygroundPage,
+    SummarizerPlaygroundPage,
+    WriterPlaygroundPage,
+    RewriterPlaygroundPage,
+    TranslatorPlaygroundPage,
+    LanguageDetectorPlaygroundPage,
+    ProofreaderPlaygroundPage,
     DemoLayoutComponent,
     SafeHtmlPipe,
     TranslationDemoComponent,

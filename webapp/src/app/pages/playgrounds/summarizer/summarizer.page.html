@@ -1,0 +1,191 @@
+<div class="h-full flex flex-col bg-[#ffffff] dark:bg-[#121212] font-sans">
+  <!-- Header -->
+  <div class="p-6 border-b border-slate-200 dark:border-zinc-800 shrink-0">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Summarizer API Playground</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Test text summarization interactively.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button (click)="checkAvailability()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg">
+          Check Availability
+        </button>
+        <span *ngIf="availabilityStatus" class="text-xs font-mono px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded border border-indigo-200">
+          {{availabilityStatus}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 overflow-hidden flex flex-col lg:flex-row">
+    <!-- Left Column: Controls -->
+    <div class="w-full lg:w-1/2 h-full overflow-y-auto p-6 pb-32 border-r border-slate-200 dark:border-zinc-800">
+      <form [formGroup]="playgroundForm" class="space-y-8 max-w-2xl mx-auto">
+        
+        <!-- Create Options Section -->
+        <section class="bg-slate-50 dark:bg-zinc-900/50 p-5 rounded-xl border border-slate-200 dark:border-zinc-800">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Create Options</h2>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
+              <select formControlName="type" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
+                <option value="key-points">key-points</option>
+                <option value="tl;dr">tl;dr</option>
+                <option value="teaser">teaser</option>
+                <option value="headline">headline</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Format</label>
+              <select formControlName="format" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
+                <option value="markdown">markdown</option>
+                <option value="plain-text">plain-text</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Length</label>
+              <select formControlName="length" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
+                <option value="short">short</option>
+                <option value="medium">medium</option>
+                <option value="long">long</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Preference</label>
+              <select formControlName="preference" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
+                <option value="auto">auto</option>
+                <option value="speed">speed</option>
+                <option value="capability">capability</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Shared Context</label>
+            <input type="text" formControlName="sharedContext" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Output Language (BCP-47)</label>
+            <input type="text" formControlName="outputLanguage" placeholder="e.g. en, fr, es" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+          </div>
+
+          <!-- Expected Input Languages -->
+          <div class="mb-5">
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Expected Input Languages</label>
+              <button type="button" (click)="addExpectedInputLanguage()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Add</button>
+            </div>
+            <div formArrayName="expectedInputLanguages" class="flex flex-wrap gap-2">
+              <div *ngFor="let l of expectedInputLanguages.controls; let i=index" class="flex items-center gap-1">
+                <input type="text" [formControlName]="i" class="w-16 text-xs text-center border border-slate-300 rounded px-2 py-1 dark:bg-[#121212] dark:border-zinc-700 dark:text-white">
+                <button type="button" (click)="removeExpectedInputLanguage(i)" class="text-red-500 text-xs"><i class="bi bi-x"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <button *ngIf="!session && !isCreating" type="button" (click)="createSession()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">
+              Create Session
+            </button>
+            <button *ngIf="isCreating" type="button" disabled class="flex-1 py-2.5 bg-indigo-400 text-white text-sm font-semibold rounded-lg cursor-not-allowed">
+              Creating...
+            </button>
+            <button *ngIf="isCreating && playgroundForm.value.useAbortSignal" type="button" (click)="abortCreation()" class="px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-semibold rounded-lg">
+              Abort
+            </button>
+            <button *ngIf="session" type="button" (click)="destroySession()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg">
+              Destroy Session
+            </button>
+          </div>
+          
+          <div *ngIf="isDownloading" class="mt-3">
+            <div class="w-full bg-slate-200 rounded-full h-1.5 mb-1 dark:bg-zinc-700">
+              <div class="bg-indigo-600 h-1.5 rounded-full dark:bg-indigo-500" [style.width]="downloadProgress + '%'"></div>
+            </div>
+          </div>
+          
+        </section>
+
+        <!-- Execution Section -->
+        <section class="bg-slate-50 dark:bg-zinc-900/50 p-5 rounded-xl border border-slate-200 dark:border-zinc-800" [class.opacity-50]="!session">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Execution</h2>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Text to Summarize</label>
+            <textarea formControlName="promptInput" rows="4" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none resize-none"></textarea>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Context (Request Specific)</label>
+            <input type="text" formControlName="context" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+          </div>
+
+          <div class="mb-5">
+            <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+              <input type="checkbox" formControlName="useAbortSignal" class="rounded text-indigo-600 dark:bg-zinc-800 dark:border-zinc-600">
+              Use Abort Signal
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <button type="button" [disabled]="!session || isSummarizing" (click)="runPrompt(false)" class="py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg">
+              {{ isSummarizing ? 'Running...' : 'Summarize' }}
+            </button>
+            <button type="button" [disabled]="!session || isSummarizing" (click)="runPrompt(true)" class="py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg">
+              Summarize Streaming
+            </button>
+          </div>
+          
+          <div class="flex gap-3 mb-3">
+            <button type="button" [disabled]="!session || isMeasuring" (click)="measureUsage()" class="flex-1 py-2 bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 disabled:opacity-50 text-slate-800 dark:text-white text-xs font-semibold rounded-lg">
+              {{ isMeasuring ? '...' : 'Measure Usage' }}
+            </button>
+          </div>
+          
+          <button *ngIf="isSummarizing && playgroundForm.value.useAbortSignal" type="button" (click)="abortPrompt()" class="w-full py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-semibold rounded-lg">
+            Abort Summarization
+          </button>
+          
+        </section>
+
+      </form>
+    </div>
+
+    <!-- Right Column: Results & Code -->
+    <div class="w-full lg:w-1/2 h-full flex flex-col bg-slate-50 dark:bg-[#161616]">
+      <div class="flex-1 p-6 pb-32 overflow-y-auto">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-slate-300 mb-3 tracking-wider uppercase">Execution Output</h3>
+        
+        <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 text-red-700 rounded-xl text-sm border border-red-200">
+          <i class="bi bi-exclamation-triangle-fill mr-2"></i> {{errorMessage}}
+        </div>
+
+        <div *ngIf="session" class="mb-4 flex flex-wrap gap-2">
+          <span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs font-mono rounded">
+            Quota: {{inputQuota}}
+          </span>
+          <span *ngIf="tokensMeasured" class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 text-xs font-mono rounded">
+            Measured: {{tokensMeasured}}
+          </span>
+        </div>
+
+        <div class="bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-zinc-800 rounded-xl p-4 min-h-[200px] whitespace-pre-wrap text-sm text-slate-800 dark:text-slate-200 shadow-sm">
+          <span *ngIf="!fullOutput && !isSummarizing" class="text-slate-400 italic">Output will appear here...</span>
+          <span *ngIf="isSummarizing && !fullOutput" class="text-slate-400 italic animate-pulse">Generating...</span>
+          {{fullOutput}}
+        </div>
+      </div>
+
+      <div class="h-1/2 border-t border-slate-200 dark:border-zinc-800 bg-[#1e1e1e] flex flex-col">
+        <div class="p-3 border-b border-zinc-800 bg-zinc-900 flex justify-between items-center shrink-0">
+          <h3 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Generated Code</h3>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 pb-32">
+          <pre class="text-xs text-emerald-400 font-mono"><code>{{generatedCode}}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
