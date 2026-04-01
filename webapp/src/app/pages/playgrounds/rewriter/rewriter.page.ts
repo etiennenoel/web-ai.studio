@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 
 declare const window: any;
 
 @Component({
   selector: 'app-rewriter-playground',
   templateUrl: './rewriter.page.html',
-  standalone: false
+  standalone: false,
+  host: { class: 'flex flex-col h-full w-full min-h-0' }
 })
 export class RewriterPlaygroundPage implements OnInit, OnDestroy {
   playgroundForm!: FormGroup;
@@ -32,15 +34,80 @@ export class RewriterPlaygroundPage implements OnInit, OnDestroy {
   private activeAbortController: AbortController | null = null;
   private creationAbortController: AbortController | null = null;
 
-  constructor(private fb: FormBuilder, private ngZone: NgZone, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private fb: FormBuilder, 
+    private ngZone: NgZone, 
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     this.initForm();
+
+    const queryParams = this.route.snapshot.queryParams;
+    if (Object.keys(queryParams).length > 0) {
+      this.patchFormFromUrl(queryParams);
+    }
+
     this.updateGeneratedCode();
     
-    this.playgroundForm.valueChanges.subscribe(() => {
+    this.playgroundForm.valueChanges.subscribe(val => {
       this.updateGeneratedCode();
+      this.updateUrl(val);
     });
+  }
+
+  updateUrl(val: any) {
+    const queryParamsToSave: any = {};
+    for (const key of Object.keys(val)) {
+      const value = val[key];
+      if (Array.isArray(value)) {
+        if (value.length > 0) queryParamsToSave[key] = JSON.stringify(value);
+      } else if (typeof value === 'object' && value !== null) {
+        if (Object.keys(value).length > 0) queryParamsToSave[key] = JSON.stringify(value);
+      } else if (value !== null && value !== '') {
+        queryParamsToSave[key] = value;
+      }
+    }
+    
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParamsToSave,
+      replaceUrl: true
+    });
+  }
+
+  patchFormFromUrl(queryParams: any) {
+    const patchValue: any = {};
+    for (const key of Object.keys(queryParams)) {
+      const value = queryParams[key];
+      const control = this.playgroundForm.get(key);
+      if (control instanceof FormArray) {
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) {
+            control.clear();
+            parsed.forEach((item: any) => {
+              if (key === 'initialPrompts') {
+                control.push(this.fb.group({ role: item.role || 'user', content: item.content || '' }));
+              } else if (key === 'expectedInputs' || key === 'expectedOutputs') {
+                control.push(this.fb.group({ type: item.type || 'text', languages: item.languages || '' }));
+              } else if (key === 'tools') {
+                control.push(this.fb.group({ name: item.name || '', description: item.description || '', inputSchema: item.inputSchema || '' }));
+              } else {
+                control.push(this.fb.control(item));
+              }
+            });
+          }
+        } catch (e) {}
+      } else {
+        if (value === 'true') patchValue[key] = true;
+        else if (value === 'false') patchValue[key] = false;
+        else patchValue[key] = value;
+      }
+    }
+    this.playgroundForm.patchValue(patchValue);
   }
 
   ngOnDestroy() {
