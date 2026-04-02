@@ -105,8 +105,6 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
             parsed.forEach((item: any) => {
               if (key === 'initialPrompts') {
                 control.push(this.fb.group({ role: item.role || 'user', content: item.content || '' }));
-              } else if (key === 'expectedInputs' || key === 'expectedOutputs') {
-                control.push(this.fb.group({ type: item.type || 'text', languages: item.languages || '' }));
               } else if (key === 'tools') {
                 control.push(this.fb.group({ name: item.name || '', description: item.description || '', inputSchema: item.inputSchema || '' }));
               } else {
@@ -116,7 +114,9 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
           }
         } catch (e) {}
       } else {
-        if (value === 'true') patchValue[key] = true;
+        if (key === 'expectedInputs' || key === 'expectedOutputs') {
+           try { patchValue[key] = JSON.parse(value); } catch(e) { patchValue[key] = []; }
+        } else if (value === 'true') patchValue[key] = true;
         else if (value === 'false') patchValue[key] = false;
         else patchValue[key] = value;
       }
@@ -129,6 +129,19 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     this.destroyClonedSession();
   }
 
+  isInputDropdownOpen = false;
+  isOutputDropdownOpen = false;
+
+  availableInputModalities = [
+    { value: 'text', label: 'Text' },
+    { value: 'image', label: 'Image' },
+    { value: 'audio', label: 'Audio' }
+  ];
+
+  availableOutputModalities = [
+    { value: 'text', label: 'Text' }
+  ];
+
   initForm() {
     this.playgroundForm = this.fb.group({
       // Create Options
@@ -139,8 +152,8 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
         this.createMessageGroup('system', 'You are a helpful assistant.')
       ]),
       
-      expectedInputs: this.fb.array([]),
-      expectedOutputs: this.fb.array([]),
+      expectedInputs: [[]],
+      expectedOutputs: [[]],
       tools: this.fb.array([]),
       
       // Execution Options
@@ -158,16 +171,57 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     return this.playgroundForm.get('initialPrompts') as FormArray;
   }
 
-  get expectedInputs() {
-    return this.playgroundForm.get('expectedInputs') as FormArray;
-  }
-  
-  get expectedOutputs() {
-    return this.playgroundForm.get('expectedOutputs') as FormArray;
-  }
-
   get tools() {
     return this.playgroundForm.get('tools') as FormArray;
+  }
+
+  toggleInputDropdown(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isInputDropdownOpen = !this.isInputDropdownOpen;
+    if (this.isInputDropdownOpen) this.isOutputDropdownOpen = false;
+  }
+
+  toggleOutputDropdown(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isOutputDropdownOpen = !this.isOutputDropdownOpen;
+    if (this.isOutputDropdownOpen) this.isInputDropdownOpen = false;
+  }
+
+  toggleInputModality(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedInputs')?.value || [];
+    if (current.includes(val)) {
+      this.playgroundForm.get('expectedInputs')?.setValue(current.filter((v: string) => v !== val));
+    } else {
+      this.playgroundForm.get('expectedInputs')?.setValue([...current, val]);
+    }
+  }
+
+  toggleOutputModality(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedOutputs')?.value || [];
+    if (current.includes(val)) {
+      this.playgroundForm.get('expectedOutputs')?.setValue(current.filter((v: string) => v !== val));
+    } else {
+      this.playgroundForm.get('expectedOutputs')?.setValue([...current, val]);
+    }
+  }
+
+  removeInputModality(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedInputs')?.value || [];
+    this.playgroundForm.get('expectedInputs')?.setValue(current.filter((v: string) => v !== val));
+  }
+
+  removeOutputModality(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedOutputs')?.value || [];
+    this.playgroundForm.get('expectedOutputs')?.setValue(current.filter((v: string) => v !== val));
+  }
+
+  getLabelForModality(val: string, type: 'input' | 'output') {
+    const list = type === 'input' ? this.availableInputModalities : this.availableOutputModalities;
+    return list.find(m => m.value === val)?.label || val;
   }
 
   createMessageGroup(role: string = 'user', content: string = '') {
@@ -183,28 +237,6 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
 
   removeInitialPrompt(index: number) {
     this.initialPrompts.removeAt(index);
-  }
-
-  addExpectedInput() {
-    this.expectedInputs.push(this.fb.group({
-      type: ['text', Validators.required],
-      languages: ['en']
-    }));
-  }
-
-  removeExpectedInput(index: number) {
-    this.expectedInputs.removeAt(index);
-  }
-  
-  addExpectedOutput() {
-    this.expectedOutputs.push(this.fb.group({
-      type: ['text', Validators.required],
-      languages: ['en']
-    }));
-  }
-
-  removeExpectedOutput(index: number) {
-    this.expectedOutputs.removeAt(index);
   }
 
   addTool() {
@@ -249,18 +281,12 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       }));
     }
 
-    if (val.expectedInputs.length > 0) {
-      options.expectedInputs = val.expectedInputs.map((e: any) => ({
-        type: e.type,
-        languages: e.languages ? e.languages.split(',').map((l: string) => l.trim()) : undefined
-      }));
+    if (val.expectedInputs && val.expectedInputs.length > 0) {
+      options.expectedInputs = val.expectedInputs.map((e: string) => ({ type: e }));
     }
     
-    if (val.expectedOutputs.length > 0) {
-      options.expectedOutputs = val.expectedOutputs.map((e: any) => ({
-        type: e.type,
-        languages: e.languages ? e.languages.split(',').map((l: string) => l.trim()) : undefined
-      }));
+    if (val.expectedOutputs && val.expectedOutputs.length > 0) {
+      options.expectedOutputs = val.expectedOutputs.map((e: string) => ({ type: e }));
     }
 
     if (val.tools.length > 0) {
@@ -658,18 +684,18 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       code += `  ],\n`;
     }
     
-    if (val.expectedInputs.length > 0) {
+    if (val.expectedInputs && val.expectedInputs.length > 0) {
       code += `  expectedInputs: [\n`;
-      val.expectedInputs.forEach((e: any) => {
-        code += `    { type: "${e.type}"${e.languages ? `, languages: [${e.languages.split(',').map((l:any) => `"${l.trim()}"`).join(', ')}]` : ''} },\n`;
+      val.expectedInputs.forEach((e: string) => {
+        code += `    { type: "${e}" },\n`;
       });
       code += `  ],\n`;
     }
     
-    if (val.expectedOutputs.length > 0) {
+    if (val.expectedOutputs && val.expectedOutputs.length > 0) {
       code += `  expectedOutputs: [\n`;
-      val.expectedOutputs.forEach((e: any) => {
-        code += `    { type: "${e.type}"${e.languages ? `, languages: [${e.languages.split(',').map((l:any) => `"${l.trim()}"`).join(', ')}]` : ''} },\n`;
+      val.expectedOutputs.forEach((e: string) => {
+        code += `    { type: "${e}" },\n`;
       });
       code += `  ],\n`;
     }
