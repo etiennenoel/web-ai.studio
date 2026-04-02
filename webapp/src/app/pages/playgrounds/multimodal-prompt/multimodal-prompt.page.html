@@ -11,9 +11,14 @@
           <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Supply image and audio data alongside your text prompts.</p>
         </div>
       </div>
-      <a routerLink="/docs/prompt-api" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="border-radius: 9999px !important; text-decoration: none;">
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="sharePlayground()" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0" style="border-radius: 9999px !important;">
+          <i class="bi" [ngClass]="shareText === 'Copied!' ? 'bi-check2' : 'bi-share'"></i> {{shareText}}
+        </button>
+        <a routerLink="/docs/prompt-api" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="border-radius: 9999px !important; text-decoration: none;">
         <i class="bi bi-book"></i> Read the docs
       </a>
+      </div>
     </div>
   </div>
 

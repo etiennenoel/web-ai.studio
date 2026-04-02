@@ -27,6 +27,8 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   outputChunks: string[] = [];
   fullOutput = '';
   errorMessage = '';
+  shareText = 'Share';
+  constraintValidationResult: { valid: boolean, errors: string[] } | null = null;
   
   contextUsage = 0;
   contextWindow = 0;
@@ -62,6 +64,7 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     
     this.playgroundForm.valueChanges.subscribe(val => {
       this.updateGeneratedCode();
+      this.validateConstraint();
       this.updateUrl(val);
     });
   }
@@ -139,6 +142,7 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       
       // Execution Options
       promptInput: ['Tell me a joke about a programmer.', Validators.required],
+      responseConstraintType: ['regex'],
       responseConstraint: [null],
       omitResponseConstraintInput: [false],
       
@@ -263,6 +267,89 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     return options;
   }
 
+  validateConstraint() {
+    const val = this.playgroundForm.value.responseConstraint;
+    const type = this.playgroundForm.value.responseConstraintType;
+    if (!val) {
+      this.constraintValidationResult = null;
+      return;
+    }
+    const errors: string[] = [];
+    let valid = true;
+    
+    if (type === 'regex') {
+      try {
+        const m = val.match(/\/(.*)\/(.*)?/);
+        if (m) new RegExp(m[1], m[2] || '');
+        else new RegExp(val);
+      } catch (e: any) {
+        valid = false;
+        errors.push("Invalid Regular Expression: " + e.message);
+      }
+    } else if (type === 'json_schema') {
+      let parsed: any;
+      try {
+        parsed = JSON.parse(val);
+      } catch (e: any) {
+        valid = false;
+        errors.push("Invalid JSON: " + e.message);
+      }
+      
+      if (parsed) {
+        const checkNode = (node: any) => {
+          if (!node || typeof node !== 'object') return;
+          
+          if (node.oneOf) errors.push("Warning: 'oneOf' is only 68% supported (converted to anyOf when equivalent).");
+          if (node.allOf) errors.push("Warning: 'allOf' is only 98% supported.");
+          if (node.$ref && typeof node.$ref === 'string' && !node.$ref.startsWith('#')) {
+            valid = false;
+            errors.push("Error: External/remote '$ref' unsupported: " + node.$ref);
+          }
+          if (node.patternProperties) errors.push("Warning: 'patternProperties' 98% supported.");
+          if (node.minProperties !== undefined || node.maxProperties !== undefined) {
+            errors.push("Warning: 'minProperties'/'maxProperties' 90% supported.");
+          }
+          if (node.pattern && typeof node.pattern === 'string') {
+            if (node.pattern.includes('(?=') || node.pattern.includes('(?!') || node.pattern.includes('(?<=') || node.pattern.includes('(?<!')) {
+               valid = false;
+               errors.push("Error: Lookarounds not supported in 'pattern'.");
+            }
+          }
+          if (node.format && typeof node.format === 'string') {
+            const supportedFormats = ['date-time', 'time', 'date', 'duration', 'email', 'hostname', 'ipv4', 'ipv6', 'uuid', 'uri'];
+            if (!supportedFormats.includes(node.format)) {
+               errors.push("Warning: format '" + node.format + "' not officially supported.");
+            }
+          }
+          
+          for (const key in node) {
+            if (Object.prototype.hasOwnProperty.call(node, key)) {
+              checkNode(node[key]);
+            }
+          }
+        };
+        
+        checkNode(parsed);
+      }
+    }
+    
+    const uniqueErrors = Array.from(new Set(errors));
+    this.constraintValidationResult = { valid, errors: uniqueErrors };
+  }
+
+  setConstraintType(type: string) {
+    this.playgroundForm.get('responseConstraintType')?.setValue(type);
+    if (type === 'json_schema' && !this.playgroundForm.get('responseConstraint')?.value) {
+      this.playgroundForm.get('responseConstraint')?.setValue('{\n  "type": "object",\n  "properties": {}\n}');
+    } else if (type === 'regex' && !this.playgroundForm.get('responseConstraint')?.value) {
+      this.playgroundForm.get('responseConstraint')?.setValue('');
+    }
+  }
+
+  onConstraintCodeChange(code: string) {
+    this.playgroundForm.get('responseConstraint')?.setValue(code, { emitEvent: true });
+  }
+
   async checkAvailability() {
     const ai = this.getLanguageModel();
     if (!ai) {
@@ -380,15 +467,19 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       }
       
       if (val.responseConstraint) {
-        try {
-          options.responseConstraint = JSON.parse(val.responseConstraint);
-        } catch (e) {
+        if (val.responseConstraintType === 'json_schema') {
+          try {
+            options.responseConstraint = JSON.parse(val.responseConstraint);
+          } catch (e) {
+             console.warn('Could not parse responseConstraint as JSON');
+          }
+        } else {
           try {
              const m = val.responseConstraint.match(/\/(.*)\/(.*)?/);
              if (m) options.responseConstraint = new RegExp(m[1], m[2] || '');
              else options.responseConstraint = new RegExp(val.responseConstraint);
           } catch (e) {
-             console.warn('Could not parse responseConstraint');
+             console.warn('Could not parse responseConstraint as RegExp');
           }
         }
       }
@@ -488,6 +579,17 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       this.contextWindow = this.session.contextWindow || this.session.inputQuota || 0;
     }
   }
+  sharePlayground() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.shareText = 'Copied!';
+      if (this.cdr) this.cdr.detectChanges();
+      setTimeout(() => {
+        this.shareText = 'Share';
+        if (this.cdr) this.cdr.detectChanges();
+      }, 2000);
+    });
+  }
+
 
   updateGeneratedCode() {
     const val = this.playgroundForm.value;

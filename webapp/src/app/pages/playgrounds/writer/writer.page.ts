@@ -22,6 +22,7 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
   
   fullOutput = '';
   errorMessage = '';
+  shareText = 'Share';
   
   inputQuota = 0;
   tokensMeasured = 0;
@@ -324,6 +325,17 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
       this.isMeasuring = false;
     }
   }
+  sharePlayground() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.shareText = 'Copied!';
+      if (this.cdr) this.cdr.detectChanges();
+      setTimeout(() => {
+        this.shareText = 'Share';
+        if (this.cdr) this.cdr.detectChanges();
+      }, 2000);
+    });
+  }
+
 
   updateGeneratedCode() {
     const val = this.playgroundForm.value;

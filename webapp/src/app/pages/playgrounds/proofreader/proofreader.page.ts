@@ -21,6 +21,7 @@ export class ProofreaderPlaygroundPage implements OnInit, OnDestroy {
   
   result: { correctedInput: string; corrections: any[] } | null = null;
   errorMessage = '';
+  shareText = 'Share';
   
   downloadProgress = 0;
   isDownloading = false;
@@ -261,6 +262,17 @@ export class ProofreaderPlaygroundPage implements OnInit, OnDestroy {
       this.activeAbortController.abort('User aborted proofreading');
     }
   }
+  sharePlayground() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.shareText = 'Copied!';
+      if (this.cdr) this.cdr.detectChanges();
+      setTimeout(() => {
+        this.shareText = 'Share';
+        if (this.cdr) this.cdr.detectChanges();
+      }, 2000);
+    });
+  }
+
 
   updateGeneratedCode() {
     const val = this.playgroundForm.value;
