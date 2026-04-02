@@ -296,29 +296,39 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       }
       
       if (parsed) {
+        if (parsed['x-guidance']) {
+          const validKeys = ['item_separator', 'key_separator', 'whitespace_flexible', 'whitespace_pattern', 'coerce_one_of', 'json_allowed_escapes', 'lenient'];
+          for (const k in parsed['x-guidance']) {
+            if (!validKeys.includes(k)) {
+              errors.push(`Warning: Unrecognized 'x-guidance' key '${k}'.`);
+            }
+          }
+        }
+        
         const checkNode = (node: any) => {
           if (!node || typeof node !== 'object') return;
           
           if (node.oneOf) errors.push("Warning: 'oneOf' is only 68% supported (converted to anyOf when equivalent).");
-          if (node.allOf) errors.push("Warning: 'allOf' is only 98% supported.");
+          if (node.allOf) errors.push("Warning: 'allOf' is only 98% supported (intersection of certain schemas unsupported).");
           if (node.$ref && typeof node.$ref === 'string' && !node.$ref.startsWith('#')) {
             valid = false;
             errors.push("Error: External/remote '$ref' unsupported: " + node.$ref);
           }
-          if (node.patternProperties) errors.push("Warning: 'patternProperties' 98% supported.");
+          if (node.patternProperties) errors.push("Warning: 'patternProperties' (98% supported) must be disjoint.");
           if (node.minProperties !== undefined || node.maxProperties !== undefined) {
-            errors.push("Warning: 'minProperties'/'maxProperties' 90% supported.");
+            errors.push("Warning: 'minProperties'/'maxProperties' (90% supported) only work when all defined 'properties' are 'required'.");
           }
           if (node.pattern && typeof node.pattern === 'string') {
             if (node.pattern.includes('(?=') || node.pattern.includes('(?!') || node.pattern.includes('(?<=') || node.pattern.includes('(?<!')) {
                valid = false;
-               errors.push("Error: Lookarounds not supported in 'pattern'.");
+               errors.push("Error: Lookarounds not supported in string 'pattern'.");
             }
           }
           if (node.format && typeof node.format === 'string') {
             const supportedFormats = ['date-time', 'time', 'date', 'duration', 'email', 'hostname', 'ipv4', 'ipv6', 'uuid', 'uri'];
             if (!supportedFormats.includes(node.format)) {
-               errors.push("Warning: format '" + node.format + "' not officially supported.");
+               valid = false;
+               errors.push("Error: string format '" + node.format + "' not officially supported.");
             }
           }
           
@@ -347,7 +357,9 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   }
 
   onConstraintCodeChange(code: string) {
-    this.playgroundForm.get('responseConstraint')?.setValue(code, { emitEvent: true });
+    this.ngZone.run(() => {
+      this.playgroundForm.get('responseConstraint')?.setValue(code, { emitEvent: true });
+    });
   }
 
   async checkAvailability() {
@@ -647,7 +659,15 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     
     code += `// 3. Execution\n`;
     code += `const promptOptions = {};\n`;
-    if (val.responseConstraint) code += `promptOptions.responseConstraint = ${val.responseConstraint.includes('{') ? JSON.stringify(JSON.parse(val.responseConstraint)) : `/${val.responseConstraint}/`};\n`;
+    if (val.responseConstraint) {
+      if (val.responseConstraintType === 'json_schema') {
+        let parsed = val.responseConstraint;
+        try { parsed = JSON.stringify(JSON.parse(val.responseConstraint)); } catch(e) {}
+        code += `promptOptions.responseConstraint = ${parsed};\n`;
+      } else {
+        code += `promptOptions.responseConstraint = /${val.responseConstraint}/;\n`;
+      }
+    }
     if (val.omitResponseConstraintInput) code += `promptOptions.omitResponseConstraintInput = true;\n`;
     if (val.useAbortSignal) code += `promptOptions.signal = new AbortController().signal;\n`;
     

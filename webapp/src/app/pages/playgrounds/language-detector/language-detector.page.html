@@ -47,9 +47,11 @@
         </div>
         
         <details class="group bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mt-4">
-          <summary class="px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-sliders2 text-lg"></i> Advanced Session Configuration</span>
+          <summary class="px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-sliders2 text-lg"></i> Advanced Session Configuration</span>
             <i class="bi bi-chevron-down text-lg group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
           <div class="p-5 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
             
@@ -80,11 +82,13 @@
           </div>
         </div>
         <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Initialization Code</span>
+          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Initialization Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[250px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeAvailability" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
@@ -122,11 +126,13 @@
         </div>
 
         <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Session Creation Code</span>
+          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Session Creation Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[250px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeSession" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
@@ -164,11 +170,13 @@
         </div>
 
         <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Execution Code</span>
+          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Execution Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[250px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeExecution" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>

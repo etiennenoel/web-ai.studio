@@ -88,9 +88,11 @@
         </div>
         
         <details class="group bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
-          <summary class="px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-sliders2 text-lg"></i> Advanced Session Configuration</span>
+          <summary class="px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-sliders2 text-lg"></i> Advanced Session Configuration</span>
             <i class="bi bi-chevron-down text-lg group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
           <div class="p-3 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-3">
             
@@ -121,11 +123,13 @@
           </div>
         </div>
         <details class="group bg-white dark:bg-[#121212] rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Initialization Code</span>
+          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Initialization Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[150px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[150px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeAvailability" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
@@ -163,11 +167,13 @@
         </div>
 
         <details class="group bg-white dark:bg-[#121212] rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Session Creation Code</span>
+          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Session Creation Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[150px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[150px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeSession" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
@@ -208,7 +214,7 @@
           
           <input *ngIf="playgroundForm.get('responseConstraintType')?.value === 'regex'" type="text" formControlName="responseConstraint" placeholder='/^[a-z]+$/' class="w-full text-sm font-mono font-medium bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-full px-3 py-1.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" style="border-radius: 9999px !important;">
           
-          <div *ngIf="playgroundForm.get('responseConstraintType')?.value === 'json_schema'" class="h-[150px] rounded-lg border border-slate-200 dark:border-zinc-700 overflow-hidden relative bg-white dark:bg-[#1e1e1e] focus-within:ring-2 focus-within:ring-indigo-500 transition-all shadow-sm">
+          <div *ngIf="playgroundForm.get('responseConstraintType')?.value === 'json_schema'" class="h-[250px] min-h-[150px] resize-y rounded-lg border border-slate-200 dark:border-zinc-700 overflow-auto relative bg-white dark:bg-[#1e1e1e] focus-within:ring-2 focus-within:ring-indigo-500 transition-all shadow-sm">
             <app-code-editor [code]="playgroundForm.get('responseConstraint')?.value || ''" (codeChange)="onConstraintCodeChange($event)" [language]="'json'" [readOnly]="false" [height]="'100%'"></app-code-editor>
           </div>
           
@@ -218,9 +224,12 @@
             </div>
           </div>
           
-          <label class="flex items-center gap-3 text-xs text-slate-700 dark:text-slate-300 mt-3 cursor-pointer font-bold p-3 bg-slate-50 dark:bg-zinc-800/50 rounded-lg border border-slate-100 dark:border-zinc-700 hover:bg-slate-100 transition-colors">
-            <input type="checkbox" formControlName="omitResponseConstraintInput" class="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer w-4 h-4">
-            Omit Response Constraint Input
+          <label class="flex items-start gap-3 text-xs text-slate-700 dark:text-slate-300 mt-3 cursor-pointer font-bold p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-lg border border-slate-100 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors shadow-sm">
+            <input type="checkbox" formControlName="omitResponseConstraintInput" class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer w-4 h-4">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Omit Response Constraint Input</span>
+              <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">By default, the implementation may include the schema or regular expression as part of the message sent to the underlying language model. Check this box to prevent the constraint from being automatically appended to your prompt.</span>
+            </div>
           </label>
         </div>
       </div>
@@ -257,11 +266,13 @@
         </div>
 
         <details class="group bg-white dark:bg-[#121212] rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors flex items-center justify-between w-full [&::-webkit-details-marker]:hidden">
-<span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Execution Code</span>
+          <summary class="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+<div class="flex items-center justify-between w-full">
+  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Execution Code</span>
             <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+</div>
 </summary>
-          <div class="h-[150px] border-t border-slate-200 dark:border-zinc-800 overflow-hidden relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[150px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeExecution" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
