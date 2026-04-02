@@ -33,17 +33,28 @@
         </div>
         
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800">
+          
           <div class="flex justify-between items-center mb-4">
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider pl-1">Expected Input Languages</label>
-            <button type="button" (click)="addExpectedInputLanguage()" class="px-4 py-2 text-xs font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors shadow-sm" style="border-radius: 9999px !important;"><i class="bi bi-plus-lg mr-1"></i> Add</button>
+            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Expected Input Languages</label>
           </div>
-          <div formArrayName="expectedInputLanguages" class="flex flex-wrap gap-3">
-            <div *ngFor="let l of expectedInputLanguages.controls; let i=index" class="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800 p-1.5 pl-3 border border-slate-200 dark:border-zinc-700 shadow-sm" style="border-radius: 9999px !important;">
-              <input type="text" [formControlName]="i" class="w-12 text-sm font-bold text-center bg-transparent border-none p-0 outline-none focus:ring-0 text-slate-900 dark:text-white uppercase tracking-widest">
-              <button type="button" (click)="removeExpectedInputLanguage(i)" class="w-6 h-6 flex items-center justify-center bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-200 transition-colors" style="border-radius: 9999px !important;"><i class="bi bi-x-lg text-xs"></i></button>
+          <div class="relative">
+            <div (click)="toggleInputLangDropdown($event)" class="w-full min-h-[36px] text-sm font-bold bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 flex flex-wrap gap-1.5 items-center cursor-pointer shadow-sm">
+              <span *ngFor="let val of playgroundForm.get('expectedInputLanguages')?.value" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs shadow-sm">
+                {{getLabelForLanguage(val)}}
+                <i class="bi bi-x cursor-pointer hover:text-indigo-900 dark:hover:text-indigo-100" (click)="removeInputLanguage(val, $event)"></i>
+              </span>
+              <span *ngIf="!playgroundForm.get('expectedInputLanguages')?.value?.length" class="text-slate-400 dark:text-slate-500 font-medium">Select languages...</span>
             </div>
-            <div *ngIf="expectedInputLanguages.length === 0" class="text-sm text-slate-400 italic py-2 px-1 font-medium">No expected languages set. Defaults to base capabilities.</div>
+            <div *ngIf="isInputLangDropdownOpen" class="absolute z-10 w-full mt-1 bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-zinc-700 shadow-lg rounded-xl overflow-hidden py-1 max-h-60 overflow-y-auto">
+              <label *ngFor="let lang of availableLanguages" class="flex items-center px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                <input type="checkbox" class="mr-3 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                       [checked]="playgroundForm.get('expectedInputLanguages')?.value?.includes(lang.value)"
+                       (change)="toggleInputLanguage(lang.value, $event)">
+                {{lang.label}} ({{lang.value}})
+              </label>
+            </div>
           </div>
+
         </div>
         
         <details class="group bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mt-4">

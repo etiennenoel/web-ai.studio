@@ -105,7 +105,8 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
           }
         } catch (e) {}
       } else {
-        if (value === 'true') patchValue[key] = true;
+        if (key === 'expectedInputLanguages' || key === 'expectedContextLanguages') { try { patchValue[key] = JSON.parse(value); } catch(e) { patchValue[key] = []; } }
+        else if (value === 'true') patchValue[key] = true;
         else if (value === 'false') patchValue[key] = false;
         else patchValue[key] = value;
       }
@@ -117,6 +118,73 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
     this.destroySession();
   }
 
+  
+  isInputLangDropdownOpen = false;
+  isContextLangDropdownOpen = false;
+
+  availableLanguages = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'fr', label: 'French' },
+    { value: 'ja', label: 'Japanese' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'de', label: 'German' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'it', label: 'Italian' },
+    { value: 'ar', label: 'Arabic' },
+    { value: 'hi', label: 'Hindi' }
+  ];
+
+  toggleInputLangDropdown(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isInputLangDropdownOpen = !this.isInputLangDropdownOpen;
+    if (this.isInputLangDropdownOpen) this.isContextLangDropdownOpen = false;
+  }
+
+  toggleContextLangDropdown(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isContextLangDropdownOpen = !this.isContextLangDropdownOpen;
+    if (this.isContextLangDropdownOpen) this.isInputLangDropdownOpen = false;
+  }
+
+  toggleInputLanguage(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedInputLanguages')?.value || [];
+    if (current.includes(val)) {
+      this.playgroundForm.get('expectedInputLanguages')?.setValue(current.filter((v: string) => v !== val));
+    } else {
+      this.playgroundForm.get('expectedInputLanguages')?.setValue([...current, val]);
+    }
+  }
+
+  toggleContextLanguage(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedContextLanguages')?.value || [];
+    if (current.includes(val)) {
+      this.playgroundForm.get('expectedContextLanguages')?.setValue(current.filter((v: string) => v !== val));
+    } else {
+      this.playgroundForm.get('expectedContextLanguages')?.setValue([...current, val]);
+    }
+  }
+
+  removeInputLanguage(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedInputLanguages')?.value || [];
+    this.playgroundForm.get('expectedInputLanguages')?.setValue(current.filter((v: string) => v !== val));
+  }
+
+  removeContextLanguage(val: string, event: Event) {
+    event.stopPropagation();
+    const current = this.playgroundForm.get('expectedContextLanguages')?.value || [];
+    this.playgroundForm.get('expectedContextLanguages')?.setValue(current.filter((v: string) => v !== val));
+  }
+
+  getLabelForLanguage(val: string) {
+    return this.availableLanguages.find(l => l.value === val)?.label || val;
+  }
+
   initForm() {
     this.playgroundForm = this.fb.group({
       // Create Options
@@ -126,8 +194,8 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
       sharedContext: [''],
       outputLanguage: [''],
       
-      expectedInputLanguages: this.fb.array([]),
-      expectedContextLanguages: this.fb.array([]),
+      expectedInputLanguages: [[]],
+      expectedContextLanguages: [[]],
       
       // Execution Options
       promptInput: ['An email to my boss asking for a deadline extension.', Validators.required],
@@ -135,30 +203,6 @@ export class WriterPlaygroundPage implements OnInit, OnDestroy {
       
       useAbortSignal: [true]
     });
-  }
-
-  get expectedInputLanguages() {
-    return this.playgroundForm.get('expectedInputLanguages') as FormArray;
-  }
-  
-  get expectedContextLanguages() {
-    return this.playgroundForm.get('expectedContextLanguages') as FormArray;
-  }
-
-  addExpectedInputLanguage() {
-    this.expectedInputLanguages.push(this.fb.control('en'));
-  }
-
-  removeExpectedInputLanguage(index: number) {
-    this.expectedInputLanguages.removeAt(index);
-  }
-  
-  addExpectedContextLanguage() {
-    this.expectedContextLanguages.push(this.fb.control('en'));
-  }
-
-  removeExpectedContextLanguage(index: number) {
-    this.expectedContextLanguages.removeAt(index);
   }
 
   getWriter() {
