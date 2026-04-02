@@ -28,7 +28,9 @@ export class TranslatorPlaygroundPage implements OnInit, OnDestroy {
   downloadProgress = 0;
   isDownloading = false;
   
-  generatedCode = '';
+  codeAvailability = '';
+  codeSession = '';
+  codeExecution = '';
   
   private activeAbortController: AbortController | null = null;
   private creationAbortController: AbortController | null = null;
@@ -304,6 +306,26 @@ export class TranslatorPlaygroundPage implements OnInit, OnDestroy {
     code += `const tokens = await translator.measureInputUsage(${JSON.stringify(val.promptInput)});\n`;
     code += `translator.destroy();\n`;
 
-    this.generatedCode = code;
+    
+    // Split the monolithic generated code into step-specific variables
+    let tempCode = code;
+
+    const availabilityMatch = tempCode.match(/([\s\S]*?await [A-Za-z]+\.availability[\s\S]*?\n\n)/);
+    if (availabilityMatch) {
+      this.codeAvailability = availabilityMatch[1].trim();
+      tempCode = tempCode.substring(availabilityMatch[1].length);
+    } else {
+      this.codeAvailability = '// Availability check code not found';
+    }
+
+    const createMatch = tempCode.match(/([\s\S]*?await [A-Za-z]+\.create[\s\S]*?\n\n)/);
+    if (createMatch) {
+      this.codeSession = createMatch[1].trim();
+      this.codeExecution = tempCode.substring(createMatch[1].length).trim();
+    } else {
+      this.codeSession = '// Session creation code not found';
+      this.codeExecution = tempCode.trim();
+    }
+
   }
 }
