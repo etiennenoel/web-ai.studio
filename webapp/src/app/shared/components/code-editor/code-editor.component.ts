@@ -29,6 +29,7 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
       // but don't execute in the Node SSR environment
       await import('ace-builds/src-noconflict/mode-javascript');
       await import('ace-builds/src-noconflict/mode-typescript');
+      await import('ace-builds/src-noconflict/mode-json');
       await import('ace-builds/src-noconflict/theme-chrome');
       await import('ace-builds/src-noconflict/theme-one_dark');
 

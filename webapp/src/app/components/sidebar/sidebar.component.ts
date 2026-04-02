@@ -17,6 +17,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   routeEnum!: RouteEnum;
   currentTheme$;
   isDocsExpanded = false;
+  isPlaygroundsExpanded = false;
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
@@ -93,9 +94,39 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     }
   }
 
+  get isPlaygroundsActive(): boolean {
+    return [
+      RouteEnum.PlaygroundsPrompt,
+      RouteEnum.PlaygroundsSummarizer,
+      RouteEnum.PlaygroundsWriter,
+      RouteEnum.PlaygroundsRewriter,
+      RouteEnum.PlaygroundsTranslator,
+      RouteEnum.PlaygroundsLanguageDetector,
+      RouteEnum.PlaygroundsProofreader
+    ].includes(this.routeEnum);
+  }
+
+  togglePlaygrounds(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isPlaygroundsExpanded = !this.isPlaygroundsExpanded;
+  }
+
   determineCurrentActiveRoute(pathname: string) {
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
+      return;
+    }
+
+    if (pathname.includes('/playgrounds')) {
+      this.isPlaygroundsExpanded = true;
+      if (pathname.includes('prompt')) this.routeEnum = RouteEnum.PlaygroundsPrompt;
+      else if (pathname.includes('summarizer')) this.routeEnum = RouteEnum.PlaygroundsSummarizer;
+      else if (pathname.includes('writer')) this.routeEnum = RouteEnum.PlaygroundsWriter;
+      else if (pathname.includes('rewriter')) this.routeEnum = RouteEnum.PlaygroundsRewriter;
+      else if (pathname.includes('translator')) this.routeEnum = RouteEnum.PlaygroundsTranslator;
+      else if (pathname.includes('language-detector')) this.routeEnum = RouteEnum.PlaygroundsLanguageDetector;
+      else if (pathname.includes('proofreader')) this.routeEnum = RouteEnum.PlaygroundsProofreader;
       return;
     }
 

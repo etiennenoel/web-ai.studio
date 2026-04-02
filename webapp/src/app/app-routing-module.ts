@@ -49,6 +49,13 @@ import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
 import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
+import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
+import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
+import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
+import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.page';
+import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/translator.page';
+import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
+import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 
 const routes: Routes = [
   {
@@ -165,6 +172,55 @@ const routes: Routes = [
         component: ProofreaderApiPage,
         data: {
           route: RouteEnum.ProofreaderApi
+        }
+      },
+      {
+        path: "playgrounds/prompt",
+        component: PromptPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsPrompt
+        }
+      },
+      {
+        path: "playgrounds/summarizer",
+        component: SummarizerPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsSummarizer
+        }
+      },
+      {
+        path: "playgrounds/writer",
+        component: WriterPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsWriter
+        }
+      },
+      {
+        path: "playgrounds/rewriter",
+        component: RewriterPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsRewriter
+        }
+      },
+      {
+        path: "playgrounds/translator",
+        component: TranslatorPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsTranslator
+        }
+      },
+      {
+        path: "playgrounds/language-detector",
+        component: LanguageDetectorPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsLanguageDetector
+        }
+      },
+      {
+        path: "playgrounds/proofreader",
+        component: ProofreaderPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsProofreader
         }
       },
       {

@@ -25,4 +25,11 @@ export enum RouteEnum {
   TermsOfService = "/terms-of-service",
   Bugs = "/bugs",
   Extension = "/extension",
+  PlaygroundsPrompt = "/playgrounds/prompt",
+  PlaygroundsSummarizer = "/playgrounds/summarizer",
+  PlaygroundsWriter = "/playgrounds/writer",
+  PlaygroundsRewriter = "/playgrounds/rewriter",
+  PlaygroundsTranslator = "/playgrounds/translator",
+  PlaygroundsLanguageDetector = "/playgrounds/language-detector",
+  PlaygroundsProofreader = "/playgrounds/proofreader",
 }
