@@ -44,6 +44,9 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   private activeAbortController: AbortController | null = null;
   private creationAbortController: AbortController | null = null;
 
+  uploadedImage: File | null = null;
+  uploadedAudio: File | null = null;
+
   constructor(
     private fb: FormBuilder, 
     private ngZone: NgZone, 
@@ -214,6 +217,18 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
 
   removeTool(index: number) {
     this.tools.removeAt(index);
+  }
+
+  onImageSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.uploadedImage = event.target.files[0];
+    }
+  }
+
+  onAudioSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.uploadedAudio = event.target.files[0];
+    }
   }
 
   getLanguageModel() {
@@ -471,9 +486,16 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
 
     try {
       const val = this.playgroundForm.value;
-      const promptInput = val.promptInput;
+      let promptInput = val.promptInput;
       const options: any = {};
       
+      if (this.uploadedImage || this.uploadedAudio) {
+         const contentParts: any[] = [{ type: 'text', value: promptInput }];
+         if (this.uploadedImage) contentParts.push({ type: 'image', value: this.uploadedImage });
+         if (this.uploadedAudio) contentParts.push({ type: 'audio', value: this.uploadedAudio });
+         promptInput = [{ role: 'user', content: contentParts }];
+      }
+
       if (this.activeAbortController) {
         options.signal = this.activeAbortController.signal;
       }
@@ -536,7 +558,14 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     this.errorMessage = '';
     
     const val = this.playgroundForm.value;
-    const promptInput = val.promptInput;
+    let promptInput = val.promptInput;
+    
+    if (this.uploadedImage || this.uploadedAudio) {
+       const contentParts: any[] = [{ type: 'text', value: promptInput }];
+       if (this.uploadedImage) contentParts.push({ type: 'image', value: this.uploadedImage });
+       if (this.uploadedAudio) contentParts.push({ type: 'audio', value: this.uploadedAudio });
+       promptInput = [{ role: 'user', content: contentParts }];
+    }
     
     try {
       await this.session.append(promptInput);
@@ -557,7 +586,14 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     this.tokensMeasured = 0;
     
     const val = this.playgroundForm.value;
-    const promptInput = val.promptInput;
+    let promptInput = val.promptInput;
+
+    if (this.uploadedImage || this.uploadedAudio) {
+       const contentParts: any[] = [{ type: 'text', value: promptInput }];
+       if (this.uploadedImage) contentParts.push({ type: 'image', value: this.uploadedImage });
+       if (this.uploadedAudio) contentParts.push({ type: 'audio', value: this.uploadedAudio });
+       promptInput = [{ role: 'user', content: contentParts }];
+    }
     
     try {
       this.tokensMeasured = await this.session.measureContextUsage(promptInput);
@@ -671,16 +707,26 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     if (val.omitResponseConstraintInput) code += `promptOptions.omitResponseConstraintInput = true;\n`;
     if (val.useAbortSignal) code += `promptOptions.signal = new AbortController().signal;\n`;
     
+    code += `\n// Input\n`;
+    code += `let promptInput = ${JSON.stringify(val.promptInput)};\n`;
+    if (this.uploadedImage || this.uploadedAudio) {
+      code += `const contentParts = [{ type: 'text', value: promptInput }];\n`;
+      code += `// Assume imageBlob and audioBlob are obtained via input files\n`;
+      if (this.uploadedImage) code += `if (imageBlob) contentParts.push({ type: 'image', value: imageBlob });\n`;
+      if (this.uploadedAudio) code += `if (audioBlob) contentParts.push({ type: 'audio', value: audioBlob });\n`;
+      code += `promptInput = [{ role: 'user', content: contentParts }];\n`;
+    }
+    
     code += `\n// Streaming\n`;
-    code += `const stream = session.promptStreaming(${JSON.stringify(val.promptInput)}, promptOptions);\n`;
+    code += `const stream = session.promptStreaming(promptInput, promptOptions);\n`;
     code += `for await (const chunk of stream) {\n  console.log(chunk);\n}\n\n`;
     
     code += `// Non-Streaming\n`;
-    code += `const result = await session.prompt(${JSON.stringify(val.promptInput)}, promptOptions);\n\n`;
+    code += `const result = await session.prompt(promptInput, promptOptions);\n\n`;
     
     code += `// Other Methods\n`;
-    code += `await session.append(${JSON.stringify(val.promptInput)});\n`;
-    code += `const tokens = await session.measureContextUsage(${JSON.stringify(val.promptInput)});\n`;
+    code += `await session.append(promptInput);\n`;
+    code += `const tokens = await session.measureContextUsage(promptInput);\n`;
     code += `const clonedSession = await session.clone();\n`;
     code += `session.destroy();\n`;
 

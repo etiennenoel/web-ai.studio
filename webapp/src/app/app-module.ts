@@ -128,7 +128,6 @@ import { DocsSectionHeaderComponent } from './components/docs-section-header/doc
 
 import { SafeHtmlPipe } from './shared/pipes/safe-html.pipe';
 import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
-import { MultimodalPromptPlaygroundPage } from './pages/playgrounds/multimodal-prompt/multimodal-prompt.page';
 import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
 import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
 import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.page';
@@ -170,7 +169,6 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
     LanguageDetectorApiPage,
     ProofreaderApiPage,
     PromptPlaygroundPage,
-    MultimodalPromptPlaygroundPage,
     SummarizerPlaygroundPage,
     WriterPlaygroundPage,
     RewriterPlaygroundPage,

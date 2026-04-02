@@ -50,7 +50,6 @@ import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
-import { MultimodalPromptPlaygroundPage } from './pages/playgrounds/multimodal-prompt/multimodal-prompt.page';
 import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
 import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
 import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.page';
@@ -180,13 +179,6 @@ const routes: Routes = [
         component: PromptPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsPrompt
-        }
-      },
-      {
-        path: "playgrounds/multimodal-prompt",
-        component: MultimodalPromptPlaygroundPage,
-        data: {
-          route: RouteEnum.PlaygroundsMultimodalPrompt
         }
       },
       {

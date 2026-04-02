@@ -26,7 +26,6 @@ export enum RouteEnum {
   Bugs = "/bugs",
   Extension = "/extension",
   PlaygroundsPrompt = "/playgrounds/prompt",
-  PlaygroundsMultimodalPrompt = "/playgrounds/multimodal-prompt",
   PlaygroundsSummarizer = "/playgrounds/summarizer",
   PlaygroundsWriter = "/playgrounds/writer",
   PlaygroundsRewriter = "/playgrounds/rewriter",

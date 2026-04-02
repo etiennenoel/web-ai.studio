@@ -97,7 +97,6 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   get isPlaygroundsActive(): boolean {
     return [
       RouteEnum.PlaygroundsPrompt,
-      RouteEnum.PlaygroundsMultimodalPrompt,
       RouteEnum.PlaygroundsSummarizer,
       RouteEnum.PlaygroundsWriter,
       RouteEnum.PlaygroundsRewriter,
@@ -121,8 +120,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
 
     if (pathname.includes('/playgrounds')) {
       this.isPlaygroundsExpanded = true;
-      if (pathname.includes('multimodal-prompt')) this.routeEnum = RouteEnum.PlaygroundsMultimodalPrompt;
-      else if (pathname.includes('prompt')) this.routeEnum = RouteEnum.PlaygroundsPrompt;
+      if (pathname.includes('prompt')) this.routeEnum = RouteEnum.PlaygroundsPrompt;
       else if (pathname.includes('summarizer')) this.routeEnum = RouteEnum.PlaygroundsSummarizer;
       else if (pathname.includes('writer')) this.routeEnum = RouteEnum.PlaygroundsWriter;
       else if (pathname.includes('rewriter')) this.routeEnum = RouteEnum.PlaygroundsRewriter;
