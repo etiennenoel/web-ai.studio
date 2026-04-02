@@ -1,6 +1,6 @@
 <div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
   <!-- Hero Header -->
-  <div class="h-16 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
     <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
       <div class="flex items-center gap-3 text-left">
         <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0" style="border-radius: 9999px !important;">
@@ -27,7 +27,7 @@
       
       <!-- 1. Configuration -->
       <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 px-4 sm:px-6 pb-6 pt-6 space-y-6 overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-transparent px-6 py-4 flex items-center gap-3 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">1</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Configuration</h2></div>
+        <div class="flex items-center gap-3 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">1</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Configuration</h2></div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
@@ -43,49 +43,25 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Expected Inputs</label>
-            <div class="relative">
-              <div (click)="toggleInputDropdown($event)" class="w-full min-h-[42px] bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow flex flex-wrap gap-1.5 items-center cursor-pointer relative shadow-sm">
-                <span *ngFor="let val of playgroundForm.get('expectedInputs')?.value" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-xs shadow-sm">
-                  {{getLabelForModality(val, 'input')}}
-                  <i class="bi bi-x cursor-pointer hover:text-indigo-900 dark:hover:text-indigo-100" (click)="removeInputModality(val, $event)"></i>
-                </span>
-                <span *ngIf="!playgroundForm.get('expectedInputs')?.value?.length" class="text-slate-400 dark:text-slate-500 font-medium">Select modalities...</span>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                  <i class="bi bi-chevron-down text-xs"></i>
-                </div>
-              </div>
-              <div *ngIf="isInputDropdownOpen" class="absolute z-10 w-full mt-1 bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-zinc-700 shadow-lg rounded-xl overflow-hidden py-1">
-                <label *ngFor="let mod of availableInputModalities" class="flex items-center px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
-                  <input type="checkbox" class="mr-3 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                         [checked]="playgroundForm.get('expectedInputs')?.value?.includes(mod.value)"
-                         (change)="toggleInputModality(mod.value, $event)">
-                  {{mod.label}}
-                </label>
-              </div>
+            <div class="w-full min-h-[42px] bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 flex flex-wrap gap-x-5 gap-y-2 items-center shadow-sm">
+              <label *ngFor="let mod of availableInputModalities" class="flex items-center cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                       [checked]="playgroundForm.get('expectedInputs')?.value?.includes(mod.value)"
+                       (change)="toggleInputModality(mod.value, $event)">
+                {{mod.label}}
+              </label>
             </div>
           </div>
           
           <div class="flex flex-col gap-1.5">
             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Expected Outputs</label>
-            <div class="relative">
-              <div (click)="toggleOutputDropdown($event)" class="w-full min-h-[42px] bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow flex flex-wrap gap-1.5 items-center cursor-pointer relative shadow-sm">
-                <span *ngFor="let val of playgroundForm.get('expectedOutputs')?.value" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-xs shadow-sm">
-                  {{getLabelForModality(val, 'output')}}
-                  <i class="bi bi-x cursor-pointer hover:text-emerald-900 dark:hover:text-emerald-100" (click)="removeOutputModality(val, $event)"></i>
-                </span>
-                <span *ngIf="!playgroundForm.get('expectedOutputs')?.value?.length" class="text-slate-400 dark:text-slate-500 font-medium">Select modalities...</span>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                  <i class="bi bi-chevron-down text-xs"></i>
-                </div>
-              </div>
-              <div *ngIf="isOutputDropdownOpen" class="absolute z-10 w-full mt-1 bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-zinc-700 shadow-lg rounded-xl overflow-hidden py-1">
-                <label *ngFor="let mod of availableOutputModalities" class="flex items-center px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
-                  <input type="checkbox" class="mr-3 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                         [checked]="playgroundForm.get('expectedOutputs')?.value?.includes(mod.value)"
-                         (change)="toggleOutputModality(mod.value, $event)">
-                  {{mod.label}}
-                </label>
-              </div>
+            <div class="w-full min-h-[42px] bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 flex flex-wrap gap-x-5 gap-y-2 items-center shadow-sm">
+              <label *ngFor="let mod of availableOutputModalities" class="flex items-center cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                <input type="checkbox" class="mr-2 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                       [checked]="playgroundForm.get('expectedOutputs')?.value?.includes(mod.value)"
+                       (change)="toggleOutputModality(mod.value, $event)">
+                {{mod.label}}
+              </label>
             </div>
           </div>
         </div>
@@ -95,9 +71,9 @@
         </p>
 
         <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <div class="bg-slate-50 dark:bg-[#121212] px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
+          <div class="bg-slate-50 dark:bg-[#121212] px-4 py-3 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Initial Prompts (History)</span>
-            <button type="button" (click)="addInitialPrompt()" class="rounded-md px-3 py-1.5 text-sm font-medium bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 transition-colors">+ Add Message</button>
+            <button type="button" (click)="addInitialPrompt()" class="px-4 py-1.5 text-sm font-medium bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 transition-colors shadow-sm border border-indigo-100 dark:border-indigo-500/20" style="border-radius: 9999px !important;">+ Add Message</button>
           </div>
           <div formArrayName="initialPrompts" class="p-5 space-y-4">
             <div *ngFor="let p of initialPrompts.controls; let i=index" [formGroupName]="i" class="flex flex-col md:flex-row gap-3 relative group items-center">
@@ -121,9 +97,9 @@
         </div>
 
         <div class="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <div class="bg-slate-50 dark:bg-[#121212] px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
+          <div class="bg-slate-50 dark:bg-[#121212] px-4 py-3 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Tools (Function Calling)</span>
-            <button type="button" (click)="addTool()" class="rounded-md px-3 py-1.5 text-sm font-medium bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors">+ Add Tool</button>
+            <button type="button" (click)="addTool()" class="px-4 py-1.5 text-sm font-medium bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors shadow-sm" style="border-radius: 9999px !important;">+ Add Tool</button>
           </div>
           <div formArrayName="tools" class="p-5 space-y-4">
             <div *ngFor="let t of tools.controls; let i=index" [formGroupName]="i" class="p-4 bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-800 rounded-lg relative group">
@@ -145,7 +121,7 @@
           <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
 <div class="flex items-center justify-between w-full">
   <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced Session Configuration</span>
-            <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
 </div>
 </summary>
           <div class="p-3 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-3">
@@ -160,9 +136,9 @@
 
       <!-- 2. Check Availability -->
       <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 px-4 sm:px-6 pb-6 pt-6 space-y-6 relative overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-transparent px-6 py-4 flex items-center gap-3 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">2</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Check Availability</h2></div>
+        <div class="flex items-center gap-3 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">2</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Check Availability</h2></div>
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-          <button type="button" (click)="checkAvailability()" class="rounded-md px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit" >
+          <button type="button" (click)="checkAvailability()" class="px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit" style="border-radius: 9999px !important;">
             <i class="bi bi-activity"></i> Check Availability
           </button>
           <div *ngIf="availabilityStatus" class="flex items-center gap-2">
@@ -188,13 +164,13 @@
 
       <!-- 3. Create Session -->
       <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 px-4 sm:px-6 pb-6 pt-6 space-y-6 overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-transparent px-6 py-4 flex items-center gap-3 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">3</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Create Session</h2></div>
+        <div class="flex items-center gap-3 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">3</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Create Session</h2></div>
 
         <p class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-4">Initialize the session with the configuration defined above to start interacting with the model.</p>
         
         <div class="flex flex-col items-center gap-3">
           <div *ngIf="!session && !isCreating" class="w-full flex justify-center">
-            <button type="button" (click)="createSession()" class="rounded-md group relative px-5 py-3 w-full bg-indigo-600 text-white text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2" >
+            <button type="button" (click)="createSession()" class="group relative px-6 py-3 w-full bg-indigo-600 text-white text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2" style="border-radius: 9999px !important;">
               <i class="bi bi-play-circle text-lg"></i> Create & Start Session
             </button>
           </div>
@@ -231,7 +207,7 @@
 
       <!-- 4. Input -->
       <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 px-4 sm:px-6 pb-6 pt-6 space-y-6 relative overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-transparent px-6 py-4 flex items-center gap-3 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">4</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">The Input</h2></div>
+        <div class="flex items-center gap-3 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">4</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">The Input</h2></div>
         
         <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all mb-3">
           <div class="px-3 py-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/30 flex justify-between items-center">
@@ -296,7 +272,7 @@
 
       <!-- 5. Execution -->
       <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 px-4 sm:px-6 pb-6 pt-6 space-y-6 overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-transparent px-6 py-4 flex items-center gap-3 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">5</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Execution</h2></div>
+        <div class="flex items-center gap-3 mb-6"><div class="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-bold">5</div><h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Execution</h2></div>
 
         <div class="py-4 flex flex-col items-center gap-3">
           <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center transition-all" [class.opacity-50]="!session" [class.pointer-events-none]="!session">
