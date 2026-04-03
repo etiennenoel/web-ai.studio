@@ -41,76 +41,6 @@
 
   <main class="max-w-7xl mx-auto px-6 sm:px-8 py-8 flex flex-col gap-6">
 
-<!-- Setup Accordion -->
-    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors"
-           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
-          <div class="flex items-center gap-4">
-            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-              <span class="text-xs font-bold text-slate-500">1</span>
-            </div>
-            <h3 class="text-sm font-bold text-slate-800 mb-0">Setup Details & Availability</h3>
-            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2">
-                <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Checking...
-              </span>
-            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2">
-                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
-              </span>
-            }
-          </div>
-          <i class="bi text-slate-400 text-lg" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
-        </div>
-        
-        <div class="px-6 py-4 bg-white border-t border-slate-100" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
-              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm">
-                <div class="font-bold text-sm text-slate-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
-                <div class="shrink-0">
-                  @switch (result.apiAvailability) {
-                    @case ("unknown") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
-                        <svg class="animate-spin h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
-                      </span>
-                    }
-                    @case ("available") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
-                        <i class="bi bi-check-circle-fill"></i> Ready
-                      </span>
-                    }
-                    @case ("downloading") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse">
-                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
-                      </span>
-                    }
-                    @case ("downloadable") {
-                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
-                        <i class="bi bi-download"></i> Download
-                      </button>
-                    }
-                    @case ("unavailable") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
-                        <i class="bi bi-x-circle-fill"></i> Unavailable
-                      </span>
-                    }
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Cortex Report & Chart -->
-
 <!-- Suite Execution Planner -->
     <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-10 shadow-sm">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -179,6 +109,76 @@
         </button>
       </div>
     </div>
+
+    <!-- Cortex Report & Chart -->
+
+<!-- Setup Accordion -->
+    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors"
+           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
+        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
+          <div class="flex items-center gap-4">
+            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+              <span class="text-xs font-bold text-slate-500">1</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 mb-0">Setup Details & Availability</h3>
+            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2">
+                <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Checking...
+              </span>
+            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2">
+                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
+              </span>
+            }
+          </div>
+          <i class="bi text-slate-400 text-lg" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
+        </div>
+        
+        <div class="px-6 py-4 bg-white border-t border-slate-100" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
+              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm">
+                <div class="font-bold text-sm text-slate-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
+                <div class="shrink-0">
+                  @switch (result.apiAvailability) {
+                    @case ("unknown") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
+                        <svg class="animate-spin h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
+                      </span>
+                    }
+                    @case ("available") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                        <i class="bi bi-check-circle-fill"></i> Ready
+                      </span>
+                    }
+                    @case ("downloading") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse">
+                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
+                      </span>
+                    }
+                    @case ("downloadable") {
+                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
+                        <i class="bi bi-download"></i> Download
+                      </button>
+                    }
+                    @case ("unavailable") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+                        <i class="bi bi-x-circle-fill"></i> Unavailable
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- API Categories -->
 
@@ -308,25 +308,30 @@
 
         <div class="mb-14">
           <!-- Category Header -->
-          <div class="flex items-center justify-between gap-3 mb-6 px-1">
-            <div class="flex items-center gap-3">
-              <i class="bi text-2xl text-slate-800" [ngClass]="getIconForApi(api)"></i>
-              <h2 class="text-2xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-2">
+          <div class="flex items-center justify-between gap-3 mb-6 px-1 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0">
+                <i class="bi text-lg text-slate-700" [ngClass]="getIconForApi(api)"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3">
                 {{ element.id }}
                 <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
               </h2>
             </div>
-            <label class="flex items-center gap-2 cursor-pointer group mb-0">
+            <label class="flex items-center gap-2 cursor-pointer group mb-0 bg-white px-3 py-1.5 rounded-lg border border-transparent hover:border-slate-200 hover:shadow-sm transition-all">
               <input type="checkbox"
                      class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                      [checked]="isCategorySelected(api)"
                      [indeterminate]="isCategoryPartiallySelected(api)"
                      [disabled]="isTestingRunning"
                      (change)="toggleCategorySelection(api, $event)">
-              <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All {{ tests.length }} Tests</span>
+              <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All</span>
             </label>
           </div>
 
+          <!-- Indented Grouping Container -->
+          <div class="ml-5 pl-8 border-l-2 border-slate-200/80 pb-4 flex flex-col relative">
+            
           <!-- Aggregate Overview Container -->
           @let catStatus = getCategoryStatus(api);
           @let catSelected = isCategorySelected(api) || isCategoryPartiallySelected(api);
@@ -337,7 +342,7 @@
                [class.border-indigo-300]="catStatus === TestStatus.Idle && catSelected"
                [class.border-slate-200]="catStatus === TestStatus.Idle && !catSelected"
                [class.border-green-300]="catStatus === TestStatus.Success">
-            <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Aggregate Performance (Average)</h3>
+            <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Category Aggregate Performance</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <!-- Avg TTFT Card -->
               @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
@@ -471,16 +476,16 @@
           </div>
 
           <!-- Collapsible Divider for Tests -->
-          <div class="flex items-center gap-4 py-4">
-            <div class="flex-1 h-px bg-slate-200/80"></div>
-            <button (click)="toggleApi(api, progress)" class="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 shadow-sm rounded-full text-xs font-bold text-slate-600 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all active:scale-95">
+          <div class="flex items-center py-4 relative -ml-8">
+            <div class="w-8 h-px bg-slate-200/80 mr-4"></div>
+            <button (click)="toggleApi(api, progress)" class="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 shadow-sm rounded-full text-[10px] uppercase tracking-wider font-bold text-slate-600 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all active:scale-95">
               @if (isCollapsed) {
-                <i class="bi bi-chevron-down"></i> View {{ tests.length }} Detailed Tests
+                <i class="bi bi-chevron-down"></i> Expand {{ tests.length }} Tests
               } @else {
-                <i class="bi bi-chevron-up"></i> Hide Detailed Tests
+                <i class="bi bi-chevron-up"></i> Collapse Tests
               }
             </button>
-            <div class="flex-1 h-px bg-slate-200/80"></div>
+            <div class="flex-1 h-px bg-slate-200/80 ml-4"></div>
           </div>
 
           <!-- Detailed Tests List -->
@@ -488,8 +493,11 @@
             <div class="mt-4 flex flex-col gap-2">
               @for (test of tests; track $index) {
                 @let isTestExpanded = !isTestCollapsed(test);
-                <!-- Test Block -->
-                <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-6 transition-all duration-300"
+                <div class="relative">
+                  <!-- Horizontal connecting line -->
+                  <div class="absolute w-8 h-px bg-slate-200/80 -left-8 top-7"></div>
+                  <!-- Test Block -->
+                  <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-6 transition-all duration-300"
                      [class.border-red-300]="test.results.status === TestStatus.Fail || test.results.status === TestStatus.Error"
                      [class.border-blue-300]="test.results.status === TestStatus.Executing"
                      [class.border-indigo-300]="test.results.status === TestStatus.Idle && selectedTestIds.has(test.id)"
@@ -680,9 +688,11 @@
                     </div>
                   }
                 </div>
+                </div>
               }
             </div>
           }
+          </div> <!-- End Indented Grouping Container -->
         </div>
       }
     }
