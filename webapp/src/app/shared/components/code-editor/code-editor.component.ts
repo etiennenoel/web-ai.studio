@@ -3,7 +3,19 @@ import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-code-editor',
-  template: '<div #editor style="width: 100%; height: 100%;"></div>',
+  template: `
+    <div class="relative w-full h-full group">
+      <button 
+        type="button" 
+        (click)="copyCode()" 
+        class="absolute top-3 right-5 z-[50] px-3 py-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-[#1e1e1e]/90 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-zinc-700 shadow-sm backdrop-blur-md transition-all flex items-center gap-2 text-xs font-bold font-sans cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50 opacity-0 group-hover:opacity-100"
+        [title]="copyText === 'Copied!' ? 'Copied!' : 'Copy to clipboard'">
+        <i class="bi text-sm" [ngClass]="copyText === 'Copied!' ? 'bi-check2-all text-emerald-600 dark:text-emerald-400' : 'bi-clipboard'"></i>
+        <span [ngClass]="copyText === 'Copied!' ? 'text-emerald-600 dark:text-emerald-400' : ''">{{ copyText }}</span>
+      </button>
+      <div #editor style="width: 100%; height: 100%;"></div>
+    </div>
+  `,
   styles: [':host { display: block; width: 100%; height: 100%; }'],
   standalone: false
 })
@@ -18,8 +30,18 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   private editor: any;
   private themeObserver?: MutationObserver;
   private isInternalChange = false;
+  copyText = 'Copy';
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  copyCode() {
+    navigator.clipboard.writeText(this.code).then(() => {
+      this.copyText = 'Copied!';
+      setTimeout(() => {
+        this.copyText = 'Copy';
+      }, 2000);
+    });
+  }
 
   async ngAfterViewInit(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
