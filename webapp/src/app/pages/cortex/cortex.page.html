@@ -517,6 +517,7 @@
           <!-- Aggregate Overview Container -->
           @let catStatus = getCategoryStatus(api);
           @let catSelected = isCategorySelected(api) || isCategoryPartiallySelected(api);
+          @if (catSelected) {
           <div class="bg-slate-50/80 rounded-2xl border p-5 sm:p-6 mb-2 shadow-sm transition-colors"
                [class.border-dashed]="isCategoryPartiallySelected(api)"
                [class.border-red-300]="catStatus === TestStatus.Fail || catStatus === TestStatus.Error"
@@ -656,6 +657,7 @@
               </div>
             </div>
           </div>
+          }
 
           <!-- Collapsible Divider for Tests -->
           <div class="flex items-center py-4 relative -ml-8">
