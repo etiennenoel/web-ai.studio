@@ -1,149 +1,155 @@
 <div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
   <!-- Hero Header -->
-  <div class="py-6 px-6 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121212] sticky top-0 z-20 shadow-sm">
-    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4 text-left">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-inner border border-indigo-100 dark:border-indigo-500/20 shrink-0" style="border-radius: 9999px !important;">
-        <i class="bi bi-input-cursor-text text-2xl"></i>
-      </div>
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <i class="bi bi-input-cursor-text text-2xl"></i>
+        </div>
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Rewriter</h1>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Rewriter</h1>
           <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Transform, rephrase, or adjust the tone of existing text.</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button type="button" (click)="sharePlayground()" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0" style="border-radius: 9999px !important;">
+        <button type="button" (click)="sharePlayground()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0">
           <i class="bi" [ngClass]="shareText === 'Copied!' ? 'bi-check2' : 'bi-share'"></i> {{shareText}}
         </button>
-        <a routerLink="/docs/rewriter" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="border-radius: 9999px !important; text-decoration: none;">
+        <a routerLink="/docs/rewriter" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="text-decoration: none;">
         <i class="bi bi-book"></i> Read the docs
       </a>
       </div>
     </div>
   </div>
 
-  <div class="max-w-4xl mx-auto px-6 pt-8 space-y-8">
+  <div class="max-w-4xl mx-auto p-8 space-y-8">
     <form [formGroup]="playgroundForm" class="space-y-8">
       
       <!-- 1. Configuration -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="flex items-center justify-center w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-sm" style="border-radius: 9999px !important;">1</div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Configuration</h2>
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">1</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Configuration</h2>
         </div>
+        <div class="p-6 space-y-6">
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          
-        <div class="bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
-          <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider pl-1">Tone</label>
-          <div class="relative">
-            <select formControlName="tone" class="w-full text-sm font-semibold bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none" style="border-radius: 9999px !important;">
-              <option value="as-is">As-is</option>\n              <option value="more-formal">More Formal</option>\n              <option value="more-casual">More Casual</option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
-              <i class="bi bi-chevron-down text-sm"></i>
+          <div class="flex flex-col gap-1.5">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Tone</label>
+            <div class="relative">
+              <select formControlName="tone" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none">
+                <option value="as-is">As-is</option>\n              <option value="more-formal">More Formal</option>\n              <option value="more-casual">More Casual</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                <i class="bi bi-chevron-down text-xs"></i>
+              </div>
             </div>
           </div>
-        </div>
           
-        <div class="bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
-          <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider pl-1">Length</label>
-          <div class="relative">
-            <select formControlName="length" class="w-full text-sm font-semibold bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none" style="border-radius: 9999px !important;">
-              <option value="as-is">As-is</option>\n              <option value="shorter">Shorter</option>\n              <option value="longer">Longer</option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
-              <i class="bi bi-chevron-down text-sm"></i>
+          <div class="flex flex-col gap-1.5">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Length</label>
+            <div class="relative">
+              <select formControlName="length" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none">
+                <option value="as-is">As-is</option>\n              <option value="shorter">Shorter</option>\n              <option value="longer">Longer</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                <i class="bi bi-chevron-down text-xs"></i>
+              </div>
             </div>
           </div>
-        </div>
           
-        <div class="bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex-1 min-w-[200px]">
-          <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider pl-1">Format</label>
-          <div class="relative">
-            <select formControlName="format" class="w-full text-sm font-semibold bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none" style="border-radius: 9999px !important;">
-              <option value="as-is">As-is</option>\n              <option value="markdown">Markdown</option>\n              <option value="plain-text">Plain Text</option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
-              <i class="bi bi-chevron-down text-sm"></i>
+          <div class="flex flex-col gap-1.5">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Format</label>
+            <div class="relative">
+              <select formControlName="format" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm cursor-pointer appearance-none">
+                <option value="as-is">As-is</option>\n              <option value="markdown">Markdown</option>\n              <option value="plain-text">Plain Text</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                <i class="bi bi-chevron-down text-xs"></i>
+              </div>
             </div>
           </div>
-        </div>
         </div>
         
-        <details class="group bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mt-4">
-          <summary class="px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+        <details class="group bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+          <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
 <div class="flex items-center justify-between w-full">
-  <span class="flex items-center gap-2"><i class="bi bi-sliders2 text-lg"></i> Advanced Session Configuration</span>
-            <i class="bi bi-chevron-down text-lg group-open:rotate-180 transition-transform"></i>
+  <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced Session Configuration</span>
+  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
 </div>
 </summary>
-          <div class="p-5 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
+          <div class="p-3 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-3">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider pl-1">Output Language (BCP-47)</label>
-                <input type="text" formControlName="outputLanguage" placeholder="e.g. en, fr, es" class="w-full text-sm font-semibold bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 rounded-full px-4 py-2.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all" style="border-radius: 9999px !important;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Output Language (BCP-47)</label>
+                <input type="text" formControlName="outputLanguage" placeholder="e.g. en, fr, es" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
               </div>
-              <div class="md:col-span-2">
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider pl-1">Shared Context (Applied to entire session)</label>
-                <textarea formControlName="sharedContext" rows="2" placeholder="e.g. You are an expert editor..." class="w-full text-sm font-medium bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 rounded-2xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all resize-none"></textarea>
+              <div class="md:col-span-2 flex flex-col gap-1.5">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Shared Context (Applied to entire session)</label>
+                <textarea formControlName="sharedContext" rows="2" placeholder="e.g. You are an expert editor..." class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all resize-none"></textarea>
               </div>
             </div>
-            <div class="flex items-center gap-3 mt-4 bg-white dark:bg-zinc-800 p-4 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-sm">
+            <div class="flex items-center gap-3 mt-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
               <input type="checkbox" formControlName="useAbortSignal" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
             </div>
           </div>
         </details>
+        </div>
       </div>
 
       <!-- 2. Check Availability -->
-      <div class="space-y-4 relative">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="flex items-center justify-center w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-sm" style="border-radius: 9999px !important;">2</div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Check Availability</h2>
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">2</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Check Availability</h2>
         </div>
-        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center gap-4">
-          <button type="button" (click)="checkAvailability()" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-sm font-bold transition-all shadow-sm" style="border-radius: 9999px !important;">
-            Check Availability
+        <div class="p-6 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <button type="button" (click)="checkAvailability()" class="rounded-lg px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit">
+            <i class="bi bi-activity"></i> Check Availability
           </button>
           <div *ngIf="availabilityStatus" class="flex items-center gap-2">
             <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Status:</span>
-            <span class="px-3 py-1.5 text-xs font-mono font-bold tracking-wide border shadow-sm" style="border-radius: 9999px !important;"
+            <span class="rounded-lg px-3 py-1.5 text-xs font-mono font-bold tracking-wide border shadow-sm"
                   [ngClass]="{'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20': availabilityStatus === 'available', 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20': availabilityStatus !== 'available'}">
               {{availabilityStatus}}
             </span>
           </div>
         </div>
-        <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
 <div class="flex items-center justify-between w-full">
-  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Initialization Code</span>
-            <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+  <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Initialization Code</span>
+            <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
 </div>
 </summary>
-          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[300px] min-h-[200px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeAvailability" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
+        </div>
       </div>
 
       <!-- 3. Create Session -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="flex items-center justify-center w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-sm" style="border-radius: 9999px !important;">3</div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Create Session</h2>
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">3</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Create Session</h2>
         </div>
+        <div class="p-6 space-y-6">
 
-        <div class="py-4 flex flex-col items-center gap-4 bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800">
+        <p class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-4">Initialize the session with the configuration defined above to start interacting with the model.</p>
+        
+        <div class="flex flex-col items-center gap-3">
           <div *ngIf="!session && !isCreating" class="w-full flex justify-center">
-            <button type="button" (click)="createSession()" class="group relative px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-600/20 transition-all overflow-hidden w-full sm:w-auto transform hover:-translate-y-0.5" style="border-radius: 9999px !important;">
-              <span class="relative flex items-center justify-center gap-2"><i class="bi bi-lightning-charge-fill text-indigo-300"></i> Create AI Session</span>
+            <button type="button" (click)="createSession()" class="rounded-lg group relative px-6 py-3 w-full bg-indigo-600 text-white text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+              <i class="bi bi-play-circle text-lg"></i> Create AI Session
             </button>
           </div>
 
-          <div *ngIf="isCreating" class="px-8 py-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-500/20 shadow-sm flex flex-col items-center justify-center gap-2 w-full sm:w-auto min-w-[280px]" style="border-radius: 9999px !important;">
+          <div *ngIf="isCreating" class="rounded-lg px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-500/20 shadow-sm flex flex-col items-center justify-center gap-2 w-full sm:w-auto min-w-[280px]">
             <div class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin text-lg"></i> Initializing Session...</div>
             <div *ngIf="isDownloading" class="w-full bg-indigo-200 dark:bg-indigo-900/50 h-1.5 mt-1 overflow-hidden shadow-inner" style="border-radius: 9999px !important;">
               <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 transition-all duration-300 ease-out" style="border-radius: 9999px !important;" [style.width]="downloadProgress + '%'"></div>
@@ -151,100 +157,107 @@
           </div>
 
           <div *ngIf="session" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
-             <div class="px-8 py-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto" style="border-radius: 9999px !important;">
+             <div class="rounded-lg px-5 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
                 <i class="bi bi-check-circle-fill"></i> Session Active
              </div>
-             <button type="button" (click)="destroySession()" [disabled]="isRewriting" class="px-4 py-3 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm" style="border-radius: 9999px !important;" title="Destroy Session">
+             <button type="button" (click)="destroySession()" [disabled]="isRewriting" class="rounded-md px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm"  title="Destroy Session">
               <i class="bi bi-trash3 text-lg"></i>
              </button>
           </div>
         </div>
 
-        <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
 <div class="flex items-center justify-between w-full">
-  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Session Creation Code</span>
-            <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+  <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Session Creation Code</span>
+            <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
 </div>
 </summary>
-          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[300px] min-h-[200px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeSession" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
+        </div>
       </div>
 
       <!-- 4. Input -->
-      <div class="space-y-4 relative">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="flex items-center justify-center w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-sm" style="border-radius: 9999px !important;">4</div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">The Input</h2>
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">4</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">The Input</h2>
         </div>
+        <div class="p-6 space-y-6">
         
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
-          <div class="px-4 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/30 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Draft Text</span>
-            <input type="text" formControlName="context" placeholder="Optional context constraint..." class="text-xs font-medium bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-full px-3 py-1.5 focus:ring-2 focus:ring-indigo-500/50 text-slate-700 dark:text-slate-300 w-full md:w-1/2 outline-none transition-all shadow-sm" style="border-radius: 9999px !important;">
+        <div class="mb-3">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Draft Text</label>
+            <input type="text" formControlName="context" placeholder="Optional context constraint..." class="w-full md:w-1/2 text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-sm placeholder-slate-400 dark:placeholder-zinc-600 font-medium">
           </div>
-          <textarea formControlName="promptInput" class="w-full p-5 text-slate-700 dark:text-slate-300 bg-transparent border-none focus:ring-0 resize-none min-h-[150px] leading-relaxed text-sm outline-none placeholder-slate-300 dark:placeholder-zinc-700 font-medium" placeholder="This app is pretty good but crashes sometimes..."></textarea>
+          <textarea formControlName="promptInput" class="w-full p-4 text-slate-700 dark:text-slate-300 bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y min-h-[150px] leading-relaxed text-sm outline-none placeholder-slate-400 dark:placeholder-zinc-600 font-medium transition-all shadow-sm" placeholder="This app is pretty good but crashes sometimes..."></textarea>
+        </div>
+
         </div>
       </div>
 
       <!-- 5. Execution -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="flex items-center justify-center w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs shadow-sm" style="border-radius: 9999px !important;">5</div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Execution</h2>
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">5</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Execution</h2>
         </div>
+        <div class="p-6 space-y-6">
 
-        <div class="py-4 flex flex-col items-center gap-4">
+        <div class="py-4 flex flex-col items-center gap-3">
           <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center transition-all" [class.opacity-50]="!session" [class.pointer-events-none]="!session">
             
-          <button type="button" (click)="runPrompt(false)" [disabled]="isRewriting" class="flex-1 w-full sm:w-auto group relative px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all overflow-hidden disabled:opacity-50 disabled:hover:-translate-y-0" style="border-radius: 9999px !important;">
-            <span class="relative flex items-center justify-center gap-2"><i class="bi" [ngClass]="isRewriting ? 'bi-hourglass-split animate-spin' : 'bi-arrow-repeat text-lg'"></i> {{ isRewriting ? 'Rewriting...' : 'Rewrite Draft' }}</span>
-          </button>
-          <button type="button" (click)="runPrompt(true)" [disabled]="isRewriting" class="flex-1 w-full sm:w-auto px-6 py-3 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:-translate-y-0.5" style="border-radius: 9999px !important;">
-            <i class="bi bi-stream text-indigo-500 text-lg"></i> Stream Output
-          </button>
+          <div class="flex flex-wrap items-center justify-center gap-3 w-full bg-slate-50/50 dark:bg-zinc-900/30 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+            <button  type="button" (click)="runPrompt(false)" [disabled]="isRewriting" class="rounded-lg flex-1 sm:flex-none px-6 py-2.5 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden disabled:opacity-50">
+              <span class="flex items-center justify-center gap-2"><i class="bi" [ngClass]="isRewriting ? 'bi-hourglass-split animate-spin' : 'bi-arrow-repeat text-lg'"></i> {{ isRewriting ? 'Rewriting...' : 'Rewrite Draft' }}</span>
+            </button>
+            <button  type="button" (click)="runPrompt(true)" [disabled]="isRewriting" class="rounded-lg flex-1 sm:flex-none px-6 py-2.5 bg-white dark:bg-[#121212] text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm">
+               Stream
+            </button>
+          </div>
+          
           </div>
         </div>
 
-        <details class="group bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-          <summary class="px-4 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
 <div class="flex items-center justify-between w-full">
-  <span class="flex items-center gap-2"><i class="bi bi-code-slash"></i> View Execution Code</span>
-            <i class="bi bi-chevron-down group-open:rotate-180 transition-transform"></i>
+  <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Execution Code</span>
+            <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
 </div>
 </summary>
-          <div class="h-[250px] min-h-[100px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+          <div class="h-[600px] min-h-[400px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
             <app-code-editor [code]="codeExecution" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
           </div>
         </details>
+        
+        <div id="output-section" class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden relative transition-all mt-6" [class.opacity-50]="!session && !fullOutput && !errorMessage">
+          <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/50">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 dark:text-indigo-400 rounded">
+                <i class="bi bi-stars text-sm"></i>
+              </div>
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Execution Output</span>
+            </div>
+          </div>
+          
+          <div class="p-6 md:p-8 text-base leading-relaxed text-slate-800 dark:text-slate-200 min-h-[120px] flex flex-col justify-center">
+            <div *ngIf="errorMessage" class="p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 mb-3 flex items-start gap-3 shadow-sm">
+              <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+              <div>{{errorMessage}}</div>
+            </div>
+            
+            <span *ngIf="!fullOutput && !isRewriting && !errorMessage" class="text-slate-400 dark:text-slate-500 italic font-semibold flex items-center justify-center text-sm w-full">Click rewrite to generate output.</span>
+            <span *ngIf="isRewriting && !fullOutput" class="text-indigo-500 dark:text-indigo-400 italic animate-pulse flex items-center justify-center gap-2 text-base font-medium w-full"><i class="bi bi-magic text-xl"></i> Polishing...</span>
+            <div class="whitespace-pre-wrap font-medium text-sm text-left w-full h-full" [ngClass]="{'hidden': !fullOutput}">{{fullOutput}}</div>
+          </div>
+        </div>
+
+        </div>
       </div>
     </form>
-
-    <!-- 6. Results -->
-    <div id="output-section" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden relative transition-all mt-8" [class.opacity-50]="!session && !fullOutput && !errorMessage">
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/50">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner border border-indigo-200 dark:border-indigo-500/30" style="border-radius: 9999px !important;">
-            <i class="bi bi-stars text-base"></i>
-          </div>
-          <span class="font-bold text-slate-900 dark:text-white tracking-wide text-base">Execution Output</span>
-        </div>
-      </div>
-      
-      <div class="p-6 md:p-8 text-base leading-relaxed text-slate-800 dark:text-slate-200 min-h-[150px]">
-        <div *ngIf="errorMessage" class="p-4 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-2xl text-sm font-medium border border-red-200 dark:border-red-500/20 mb-4 flex items-start gap-3 shadow-sm">
-          <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
-          <div>{{errorMessage}}</div>
-        </div>
-        
-        
-        <span *ngIf="!fullOutput && !isRewriting && !errorMessage" class="text-slate-400 dark:text-slate-500 italic font-semibold flex items-center justify-center h-full min-h-[150px] text-sm">Click rewrite to generate output.</span>
-        <span *ngIf="isRewriting && !fullOutput" class="text-indigo-500 dark:text-indigo-400 italic animate-pulse flex items-center justify-center h-full gap-2 min-h-[150px] text-base font-medium"><i class="bi bi-magic text-xl"></i> Polishing...</span>
-        <div class="whitespace-pre-wrap font-medium text-sm">{{fullOutput}}</div>
-      </div>
-    </div>
-
   </div>
 </div>

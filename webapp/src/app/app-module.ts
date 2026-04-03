@@ -1,6 +1,6 @@
 import {ChatPage} from './pages/chat/chat.page';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {NgbCarouselModule, NgbDropdownModule, NgbOffcanvas, NgbOffcanvasModule, NgbTooltip, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {DialogModule} from '@angular/cdk/dialog';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -222,10 +222,7 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    NgbTooltipModule,
-    NgbOffcanvasModule,
-    NgbCarouselModule,
-    NgbDropdownModule,
+    DialogModule,
     LatencyLoaderComponent,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),

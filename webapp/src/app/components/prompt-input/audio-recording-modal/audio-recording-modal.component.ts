@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-audio-recording-modal',
@@ -21,7 +21,7 @@ export class AudioRecordingModalComponent implements OnInit, OnDestroy {
   animationFrameId: number | null = null;
   volumeLevel = 0;
 
-  constructor(public activeModal: NgbActiveModal) {}
+  constructor(public dialogRef: DialogRef<any>) {}
 
   async ngOnInit() {
     try {
@@ -93,7 +93,7 @@ export class AudioRecordingModalComponent implements OnInit, OnDestroy {
       const extension = mimeType.includes('mp4') ? 'mp4' : (mimeType.includes('ogg') ? 'ogg' : 'webm');
       const file = new File([blob], `audio-recording.${extension}`, { type: mimeType });
       
-      this.activeModal.close(file);
+      this.dialogRef.close(file);
     };
     
     // Start data collection (no timeslice means it fires ondataavailable once when stopped)

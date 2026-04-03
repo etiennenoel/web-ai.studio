@@ -1,24 +1,32 @@
-<div class="flex flex-col h-full bg-transparent transition-colors duration-200">
-  <webai-studio-header>
-    <div header-title-row class="flex items-center w-full">
-      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 flex-grow">Translation</h2>
-
+<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <i class="bi bi-translate text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Translator</h1>
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Translate text seamlessly between languages.</p>
+        </div>
+      </div>
       <div class="flex items-center gap-2 sm:gap-3">
-        <button class="flex items-center gap-2 px-3 py-2 !rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors focus:outline-none border-none" 
-                (click)="openCodeModal()" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom">
+        <button class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0" 
+                (click)="openCodeModal()" title="Get the JS code to integrate this on your site!">
           <i class="bi bi-code-square"></i> <span class="hidden sm:inline">Get code</span>
         </button>
       </div>
     </div>
-  </webai-studio-header>
+  </div>
 
-  <div class="flex-grow flex flex-col mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
+  <div class="max-w-4xl mx-auto p-8 space-y-8">
     
     <!-- Translation Card -->
-    <div class="bg-[#ffffff] dark:bg-zinc-800/90 !rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col min-h-[400px]">
+    <div class="bg-[#ffffff] dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col min-h-[400px]">
       
       <!-- Top Bar: Language Selectors -->
-      <div class="flex flex-col lg:flex-row items-center border-b border-slate-200 dark:border-zinc-700/80 bg-slate-50/50 dark:bg-[#161616]/30 !rounded-t-3xl relative">
+      <div class="flex flex-col lg:flex-row items-center border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 rounded-t-xl relative">
         
         <!-- Source Languages -->
         <div class="flex-1 flex items-center justify-center lg:justify-start w-full px-3 py-3 lg:px-4 lg:py-2 border-b border-slate-200 dark:border-zinc-700/50 lg:border-none">
@@ -41,12 +49,12 @@
             </button>
             }
             
-            <div class="dropdown">
+            <div class="relative">
               <button class="px-3 py-2 !rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent flex items-center justify-center h-full after:!hidden" 
-                      data-bs-toggle="dropdown" aria-expanded="false" (click)="sourceSearchTerm = ''">
+                      (click)="isSourceDropdownOpen = !isSourceDropdownOpen; sourceSearchTerm = ''">
                 <i class="bi bi-chevron-down"></i>
               </button>
-              <ul class="dropdown-menu bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
+              <ul *ngIf="isSourceDropdownOpen" class="absolute top-full left-0 mt-1 z-50 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
                 <li class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                   <div class="relative">
                     <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -59,8 +67,8 @@
                 <div class="max-h-64 overflow-y-auto mt-1">
                   @for (locale of getFilteredLocales(sourceSearchTerm); track locale.code) {
                   <li>
-                    <button class="dropdown-item px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
-                            type="button" (click)="onSourceLanguageSelect(locale)">
+                    <button class="w-full text-left px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
+                            type="button" (click)="onSourceLanguageSelect(locale); isSourceDropdownOpen = false">
                       {{ locale.language }}
                     </button>
                   </li>
@@ -77,7 +85,7 @@
         <!-- Swap Button & Status Badge -->
         <div class="py-3 lg:py-2 flex flex-col items-center justify-center gap-2 min-w-[120px] w-full lg:w-auto border-b border-slate-200 dark:border-zinc-700/50 lg:border-none bg-slate-100/30 dark:bg-zinc-800/30 lg:bg-transparent">
           @let apiStatus = getApiAvailability();
-          <div class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest !rounded-full shadow-sm border text-center"
+          <div class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-lg shadow-sm border text-center"
                [ngClass]="{
                  'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50': apiStatus === 'available',
                  'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50': apiStatus === 'downloadable' || apiStatus === 'downloading',
@@ -86,7 +94,7 @@
                }">
             {{ apiStatus === 'loading...' ? 'Checking...' : (apiStatus === 'unknown' ? 'Select pair' : (apiStatus === 'downloadable' || apiStatus === 'downloading' ? 'Download Req.' : apiStatus)) }}
           </div>
-          <button class="w-9 h-9 flex items-center justify-center !rounded-full bg-[#ffffff] hover:bg-slate-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-500 dark:text-slate-400 shadow-sm border border-slate-200 dark:border-zinc-600 transition-transform active:scale-95 focus:outline-none" 
+          <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-white hover:bg-slate-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-500 dark:text-slate-400 shadow-sm border border-slate-200 dark:border-zinc-600 transition-transform active:scale-95 focus:outline-none" 
                   (click)="onSwapLanguagesClick()" title="Swap languages">
             <i class="bi bi-arrow-left-right"></i>
           </button>
@@ -103,12 +111,12 @@
             </button>
             }
             
-            <div class="dropdown">
+            <div class="relative">
               <button class="px-3 py-2 !rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent flex items-center justify-center h-full after:!hidden" 
-                      data-bs-toggle="dropdown" aria-expanded="false" (click)="destinationSearchTerm = ''">
+                      (click)="isDestinationDropdownOpen = !isDestinationDropdownOpen; destinationSearchTerm = ''">
                 <i class="bi bi-chevron-down"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
+              <ul *ngIf="isDestinationDropdownOpen" class="absolute top-full right-0 lg:left-0 mt-1 z-50 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
                 <li class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                   <div class="relative">
                     <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -121,8 +129,8 @@
                 <div class="max-h-64 overflow-y-auto mt-1">
                   @for (locale of getFilteredLocales(destinationSearchTerm); track locale.code) {
                   <li>
-                    <button class="dropdown-item px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
-                            type="button" (click)="onDestinationLanguageSelect(locale)">
+                    <button class="w-full text-left px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
+                            type="button" (click)="onDestinationLanguageSelect(locale); isDestinationDropdownOpen = false">
                       {{ locale.language }}
                     </button>
                   </li>
@@ -150,7 +158,7 @@
           
           <!-- Translate Action Footer -->
           <div class="absolute bottom-0 left-0 right-0 p-3 lg:p-4 flex justify-end pointer-events-none">
-            <button class="flex items-center gap-2 px-5 py-2.5 !rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none pointer-events-auto" 
+            <button class="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none pointer-events-auto" 
                     (click)="translate()"
                     [disabled]="!textareaFormControl.value || !destinationLocale">
               <i class="bi bi-translate text-lg"></i>
@@ -177,7 +185,7 @@
     <!-- Language Packs History / Downloads Table -->
     <div class="mt-8 mb-4">
       <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 px-1">Language Pack Downloads</h3>
-      <div class="bg-[#ffffff] dark:bg-zinc-800/90 !rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
         @if (languagePacksDownload.length > 0) {
         <div class="overflow-x-auto w-full">
           <table class="w-full text-left border-collapse min-w-[500px]">

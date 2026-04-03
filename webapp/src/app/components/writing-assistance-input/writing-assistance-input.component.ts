@@ -8,7 +8,6 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import {isPlatformServer} from '@angular/common';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {WritingAssistanceApiEnum} from '../../core/enums/writing-assistance-api.enum';
 import {LocaleEnum} from '../../core/enums/locale.enum';
@@ -94,6 +93,10 @@ export class WritingAssistanceInputComponent implements OnInit {
   inputLangsSearchTerm = '';
   contextLangsSearchTerm = '';
 
+  isSettingsOpen = false;
+  isInputLangOpen = false;
+  isContextLangOpen = false;
+
   // Expose Enums
   WritingAssistanceApiEnum = WritingAssistanceApiEnum;
   PromptInputStateEnum = PromptInputStateEnum;
@@ -119,8 +122,7 @@ export class WritingAssistanceInputComponent implements OnInit {
       this.options.outputLanguage;
   }
 
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object,
-              private modalService: NgbModal) {
+  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object) {
   }
 
   getFilteredLocales(term: string) {

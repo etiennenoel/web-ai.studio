@@ -14,7 +14,7 @@
                 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': languageModelAvailability === 'unavailable',
                 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': languageModelAvailability === 'available',
                 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': languageModelAvailability === 'downloading'
-              }" [ngbTooltip]="capabilityTooltip" placement="bottom">
+              }" [title]="capabilityTooltip">
               {{ languageModelAvailability }}
           </span>
         </div>
@@ -23,21 +23,21 @@
         <button class="p-2 !rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent" 
                 (click)="onNewChat()"
                 [disabled]="(conversationManager.status$ | async) === InferenceStateEnum.Initial" 
-                ngbTooltip="New chat" placement="bottom">
+                title="New chat">
           <i class="bi bi-plus-lg text-lg"></i>
         </button>
 
         <div class="relative">
           <button class="p-2 !rounded-xl transition-colors focus:outline-none border-none" 
                   [ngClass]="settingsActive ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/20' : 'bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-zinc-800'"
-                  type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
+                  type="button" (click)="toggleSettingsOffcanvas()">
             <i class="bi bi-sliders2 text-lg"></i>
             <span *ngIf="settingsActive" class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full border-2 border-white dark:border-[#121212]"></span>
           </button>
         </div>
 
         <button class="flex items-center gap-2 px-3 py-2 !rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors focus:outline-none border-none" 
-                (click)="openCodeModal()" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom">
+                (click)="openCodeModal()" title="Get the JS code to integrate this on your site!">
           <i class="bi bi-code-square"></i> <span class="hidden sm:inline">Get code</span>
         </button>
       </div>
@@ -127,18 +127,19 @@
 </div>
 
 <!-- Settings Offcanvas -->
-<div #settingsOffcanvas class="offcanvas offcanvas-end bg-[#ffffff] dark:bg-[#121212] !border-l !border-slate-200 dark:!border-zinc-800" tabindex="-1" id="settingsOffcanvas"
-  aria-labelledby="settingsOffcanvasLabel" (hidden.bs.offcanvas)="applyPendingSettings()">
-  <div class="offcanvas-header border-b border-slate-200 dark:border-zinc-800">
-    <h5 class="offcanvas-title text-base font-semibold text-slate-900 dark:text-white" id="settingsOffcanvasLabel">Run Settings</h5>
-    <div class="ms-auto me-2">
+<div *ngIf="isSettingsOpen" class="fixed inset-y-0 right-0 z-50 w-80 bg-[#ffffff] dark:bg-[#121212] !border-l !border-slate-200 dark:!border-zinc-800 shadow-2xl flex flex-col transform transition-transform" tabindex="-1">
+  <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-zinc-800">
+    <h5 class="text-base font-semibold text-slate-900 dark:text-white m-0">Run Settings</h5>
+    <div class="flex items-center gap-2">
       @if (settingsActive) {
       <button type="button" class="text-xs font-medium px-2 py-1.5 !rounded-lg text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors border-none" (click)="resetSettings()">
         <i class="bi bi-arrow-counterclockwise"></i> Reset
       </button>
       }
+      <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" (click)="toggleSettingsOffcanvas()">
+         <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    <button type="button" class="btn-close dark:invert" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   
   <div class="offcanvas-body p-5">

@@ -7,7 +7,7 @@ import {PromptRunOptions} from '../../core/models/prompt-run.options';
 import {InferenceStateEnum} from '../../core/enums/inference-state.enum';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {BasePage} from '../base-page';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Dialog} from '@angular/cdk/dialog';
 import {PromptCodeModal} from '../../components/prompt-code-modal/prompt-code-modal';
 
 declare const LanguageModel: any;
@@ -85,7 +85,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     title: Title,
     public readonly conversationManager: ConversationManager,
     private readonly cdr: ChangeDetectorRef,
-    private readonly ngbModal: NgbModal,
+    private readonly dialog: Dialog,
   ) {
     super(document, title)
 
@@ -170,6 +170,16 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
     this.options = options;
   }
 
+  isSettingsOpen = false;
+
+  toggleSettingsOffcanvas() {
+    this.isSettingsOpen = !this.isSettingsOpen;
+    if (!this.isSettingsOpen) {
+      this.applyPendingSettings();
+    }
+    this.cdr.detectChanges();
+  }
+
   applyPendingSettings() {
     if (this.lastOptionsRunStr === this.pendingOptionsStr) {
       return;
@@ -181,11 +191,14 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   }
 
   openCodeModal() {
-    const codeModalComponent = this.ngbModal.open(PromptCodeModal, {
-      size: "xl",
+    this.dialog.open(PromptCodeModal, {
+      panelClass: ['w-[90vw]', 'max-w-6xl', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+      data: {
+        options: this.options
+      }
     });
-    (codeModalComponent.componentInstance as PromptCodeModal).options = this.options;
-    codeModalComponent.componentInstance.updateCode();
   }
 
   async onRun(options: PromptRunOptions) {

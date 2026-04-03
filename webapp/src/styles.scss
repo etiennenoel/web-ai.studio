@@ -4,34 +4,23 @@
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:is([data-bs-theme="dark"], [data-bs-theme="dark"] *));
 
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-
 .code {
-  background-color: $primary-bg-subtle;
-  border: 1px solid $primary-border-subtle;
-  padding: 3px;
-  border-radius: 6px;
+  @apply bg-indigo-50 border-indigo-100 dark:bg-indigo-900/30 dark:border-indigo-800/50 px-1 py-0.5 rounded-md border text-indigo-700 dark:text-indigo-300 font-mono text-sm;
 
   &.code-warning {
-    background-color: $warning-bg-subtle;
-    border: 1px solid $warning-border-subtle;
+    @apply bg-amber-50 border-amber-100 dark:bg-amber-900/30 dark:border-amber-800/50 text-amber-700 dark:text-amber-300;
   }
   &.code-info {
-    background-color: $info-bg-subtle;
-    border: 1px solid $info-border-subtle;
+    @apply bg-sky-50 border-sky-100 dark:bg-sky-900/30 dark:border-sky-800/50 text-sky-700 dark:text-sky-300;
   }
   &.code-success {
-    background-color: $success-bg-subtle;
-    border: 1px solid $success-border-subtle;
+    @apply bg-emerald-50 border-emerald-100 dark:bg-emerald-900/30 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300;
   }
   &.code-danger {
-    background-color: $danger-bg-subtle;
-    border: 1px solid $danger-border-subtle;
+    @apply bg-red-50 border-red-100 dark:bg-red-900/30 dark:border-red-800/50 text-red-700 dark:text-red-300;
   }
   &.code-dark {
-    background-color: $dark-bg-subtle;
-    border: 1px solid $dark-border-subtle;
+    @apply bg-slate-100 border-slate-200 dark:bg-zinc-800 dark:border-zinc-700 text-slate-800 dark:text-slate-200;
   }
 }
 
@@ -40,18 +29,11 @@ body {
   @apply bg-white text-slate-900 dark:bg-[#121212] dark:text-slate-100;
 }
 
+button {
+  cursor: pointer;
+}
+
 .w-auto {
   width: auto !important;
 }
 
-.btn-soft {
-  transition: none;
-
-  &:hover, &:active {
-    background-color: var(--bs-dark-bg-subtle) !important;
-  }
-
-  &.disabled, &:disabled, &.active, &:active, &.show {
-    border: 1px solid transparent !important;
-  }
-}

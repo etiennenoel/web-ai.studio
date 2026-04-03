@@ -4,7 +4,7 @@
       <i class="bi" [ngClass]="{'bi-image': attachment.type === AttachmentTypeEnum.Image, 'bi-file-earmark-pdf': attachment.type === AttachmentTypeEnum.Pdf, 'bi-music-note': attachment.type === AttachmentTypeEnum.Audio}"></i> 
       Attachment Preview
     </h5>
-    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" (click)="activeModal.dismiss()">
+    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" (click)="dialogRef.close()">
       <i class="bi bi-x-lg"></i>
     </button>
   </div>
@@ -12,18 +12,14 @@
   <div class="p-6 bg-slate-100 dark:bg-black/20 flex flex-col md:flex-row gap-6 justify-center items-start min-h-[400px]">
 
     @if (attachment.type === AttachmentTypeEnum.Image || attachment.type === AttachmentTypeEnum.Pdf) {
-      <div class="flex-shrink-0 bg-black/5 dark:bg-black/40 !rounded-2xl p-2 border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-        <ngb-carousel *ngIf="imageSafeUrls.length > 0" [showNavigationArrows]="imageSafeUrls.length > 1" [showNavigationIndicators]="imageSafeUrls.length > 1" class="w-full max-w-[768px] aspect-square flex items-center justify-center">
+        <div *ngIf="imageSafeUrls.length > 0" class="w-full max-w-[768px] aspect-square flex overflow-x-auto snap-x snap-mandatory hide-scrollbar relative bg-black/5 dark:bg-black/40 !rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm items-center">
           @for (image of imageSafeUrls; track $index) {
-            <ng-template ngbSlide>
-              <div class="w-full h-full flex flex-col items-center justify-center">
+              <div class="w-full h-full flex-shrink-0 snap-center flex flex-col items-center justify-center relative">
                 <h6 class="text-xs font-medium text-slate-500 bg-[#ffffff]/80 dark:bg-black/50 px-3 py-1 !rounded-full absolute top-4 z-10 backdrop-blur-sm" *ngIf="imageSafeUrls.length > 1">Image {{ $index + 1 }} of {{ imageSafeUrls.length }}</h6>
-                <img [src]="image" class="w-full h-full object-contain">
+                <img [src]="image" class="w-full h-full object-contain p-2">
               </div>
-            </ng-template>
           }
-        </ngb-carousel>
-      </div>
+        </div>
 
       <div class="flex flex-col w-full max-w-md">
         @if (this.isAttachmentReadyForPrompt === false) {
@@ -118,6 +114,6 @@
   </div>
   
   <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 flex justify-end gap-3">
-    <button type="button" class="px-6 py-2.5 !rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="activeModal.close()">Done</button>
+    <button type="button" class="px-6 py-2.5 !rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="dialogRef.close()">Done</button>
   </div>
 </div>

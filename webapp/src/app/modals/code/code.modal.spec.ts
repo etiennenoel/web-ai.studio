@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef } from '@angular/cdk/dialog';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 
 import { CodeModal } from './code.modal';
@@ -16,7 +16,7 @@ describe('CodeModal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [CodeModal, MockRenderMarkdownPipe],
-      providers: [NgbActiveModal],
+      providers: [{provide: DialogRef, useValue: {}}],
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();

@@ -122,8 +122,8 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       this.isPlaygroundsExpanded = true;
       if (pathname.includes('prompt')) this.routeEnum = RouteEnum.PlaygroundsPrompt;
       else if (pathname.includes('summarizer')) this.routeEnum = RouteEnum.PlaygroundsSummarizer;
-      else if (pathname.includes('writer')) this.routeEnum = RouteEnum.PlaygroundsWriter;
       else if (pathname.includes('rewriter')) this.routeEnum = RouteEnum.PlaygroundsRewriter;
+      else if (pathname.includes('writer')) this.routeEnum = RouteEnum.PlaygroundsWriter;
       else if (pathname.includes('translator')) this.routeEnum = RouteEnum.PlaygroundsTranslator;
       else if (pathname.includes('language-detector')) this.routeEnum = RouteEnum.PlaygroundsLanguageDetector;
       else if (pathname.includes('proofreader')) this.routeEnum = RouteEnum.PlaygroundsProofreader;

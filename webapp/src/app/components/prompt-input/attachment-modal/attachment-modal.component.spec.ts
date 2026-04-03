@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AttachmentModalComponent } from './attachment-modal.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { ImageProcessingService } from '../../../core/services/image-processing.service';
 import { PdfProcessingService } from '../../../core/services/pdf-processing.service';
 import { EventStore } from '../../../core/stores/event.store';
@@ -13,14 +13,14 @@ import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 describe('AttachmentModalComponent', () => {
   let component: AttachmentModalComponent;
   let fixture: ComponentFixture<AttachmentModalComponent>;
-  let mockActiveModal: jasmine.SpyObj<NgbActiveModal>;
+  let mockActiveModal: jasmine.SpyObj<DialogRef>;
   let mockImageProcessingService: jasmine.SpyObj<ImageProcessingService>;
   let mockPdfProcessingService: jasmine.SpyObj<PdfProcessingService>;
   let mockDomSanitizer: jasmine.SpyObj<DomSanitizer>;
   let mockEventStore: jasmine.SpyObj<EventStore>;
 
   beforeEach(async () => {
-    mockActiveModal = jasmine.createSpyObj('NgbActiveModal', ['close', 'dismiss']);
+    mockActiveModal = jasmine.createSpyObj('DialogRef', ['close', 'dismiss']);
     mockImageProcessingService = jasmine.createSpyObj('ImageProcessingService', ['frame']);
     mockPdfProcessingService = jasmine.createSpyObj('PdfProcessingService', ['getPagesAsImageBlobs']);
     mockDomSanitizer = jasmine.createSpyObj('DomSanitizer', ['bypassSecurityTrustUrl']);
@@ -31,7 +31,8 @@ describe('AttachmentModalComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ AttachmentModalComponent ],
       providers: [
-        { provide: NgbActiveModal, useValue: mockActiveModal },
+        { provide: DialogRef, useValue: mockActiveModal },
+        { provide: DIALOG_DATA, useValue: {} },
         { provide: ImageProcessingService, useValue: mockImageProcessingService },
         { provide: PdfProcessingService, useValue: mockPdfProcessingService },
         { provide: DomSanitizer, useValue: mockDomSanitizer },

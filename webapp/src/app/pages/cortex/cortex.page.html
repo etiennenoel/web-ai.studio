@@ -1,4 +1,37 @@
-<div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
+<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+          <i class="bi bi-speedometer2 text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-3">
+            Cortex Test Suite
+            @if (isImportedReport) {
+              <span class="text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 px-2.5 py-0.5 rounded-md uppercase tracking-wider align-middle border border-purple-200 dark:border-purple-800 shadow-sm">Imported Report</span>
+            }
+          </h1>
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Measure raw, uncontended speed of the AI APIs.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        @if (isImportedReport) {
+          <button type="button" (click)="resetState()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-400 text-sm font-bold shadow-sm transition-colors border border-slate-200 dark:border-zinc-700 shrink-0">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        } @else {
+          <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
+          <button type="button" (click)="triggerImport()" [disabled]="isTestingRunning" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-400 text-sm font-bold shadow-sm transition-colors border border-slate-200 dark:border-zinc-700 shrink-0">
+            <i class="bi bi-upload"></i> Import Report
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto p-8 space-y-8">
 
   @if (!isExtensionInstalled) {
     <div class="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-sm relative overflow-hidden">
@@ -20,67 +53,52 @@
     </div>
   }
   
-  <!-- Top Header with Actions -->
-  <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
-    <div class="flex-1">
-      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-2 flex items-center gap-3">
-        Cortex Test Suite
-        @if (isImportedReport) {
-          <span class="text-sm font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 px-3 py-1 rounded-full uppercase tracking-wider align-middle border border-purple-200 dark:border-purple-800">Imported Report</span>
-        }
-      </h1>
-      <p class="text-lg text-gray-500 dark:text-gray-400 max-w-4xl">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
+  <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mb-8">
+    <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+      <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">i</div>
+      <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">About the Benchmark</h2>
+    </div>
+    <div class="p-6">
+      <p class="text-sm text-slate-600 dark:text-slate-400 max-w-4xl font-medium leading-relaxed">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
       
       @if (isImportedReport && importedTimestamp) {
-        <div class="mt-4 p-3 bg-[#ffffff] dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm inline-block">
-          <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Report Details</div>
-          <div class="text-sm text-gray-800 dark:text-gray-200"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
-          <div class="text-xs text-gray-500 font-mono mt-1 max-w-2xl truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
+        <div class="mt-4 p-4 bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-lg shadow-sm inline-block">
+          <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Report Details</div>
+          <div class="text-sm text-slate-800 dark:text-slate-200 font-medium"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
+          <div class="text-xs text-slate-500 font-mono mt-1.5 max-w-2xl truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
         </div>
-      }
-    </div>
-    
-    <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-      @if (isImportedReport) {
-        <button class="btn btn-outline-secondary flex items-center gap-2 px-4 py-2" (click)="resetState()">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset & Run New Test
-        </button>
-      } @else {
-        <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
-        <button class="btn btn-outline-secondary flex items-center gap-2 px-4 py-2 shadow-sm" (click)="triggerImport()" [disabled]="isTestingRunning">
-          <i class="bi bi-upload"></i> Import Report
-        </button>
       }
     </div>
   </div>
 
     @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-    <div class="bg-[#ffffff] dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
-         [class.border-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
+         [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-indigo-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
          [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.ring-blue-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:ring-blue-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.border-gray-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing" [class.dark:border-gray-700]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-      <button class="w-full px-4 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none"
+         [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:ring-indigo-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+         [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing" [class.dark:border-zinc-800]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
+      <button class="w-full px-6 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 flex items-center justify-between transition-colors focus:outline-none"
               (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
-        <div class="flex items-center gap-4">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-0">
-            <i class="bi bi-card-checklist text-blue-600"></i> Setup Details & Availability
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">!</div>
+          <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0 flex items-center gap-2">
+            Setup Details & Availability
           </h3>
           @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400">
-              <svg class="animate-spin h-3 w-3 text-yellow-700 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 ml-2">
+              <svg class="animate-spin h-3 w-3 text-amber-700 dark:text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
               Checking Environment...
             </span>
           } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 ml-2">
               <i class="bi bi-check-circle-fill"></i> Setup Complete
             </span>
           }
         </div>
-        <i class="bi text-gray-500 dark:text-gray-400 font-bold" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
+        <i class="bi text-slate-500 dark:text-slate-400 font-bold" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
       </button>
       
-      <div class="px-4 py-2.5 border-t border-gray-200 dark:border-gray-700" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
+      <div class="px-6 py-4 bg-white dark:bg-[#121212]" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
             <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 shadow-sm">
@@ -124,14 +142,14 @@
 
   @if (isReportReady) {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-8">
-      <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-3">
-        <i class="bi bi-file-earmark-bar-graph text-blue-600"></i> Cortex Report
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+        <i class="bi bi-file-earmark-bar-graph text-indigo-600 dark:text-indigo-400"></i> Cortex Report
       </h2>
       <div class="flex flex-col sm:flex-row gap-3">
-        <button class="btn btn-outline-primary flex items-center gap-2 px-6 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="saveReportToUrl()">
+        <button type="button" class="rounded-lg bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/30 flex items-center gap-2 px-6 py-2.5 shadow-sm transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="saveReportToUrl()">
           <i class="bi bi-link-45deg text-lg"></i> Share via URL
         </button>
-        <button class="btn btn-primary flex items-center gap-2 px-6 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="downloadResults()">
+        <button type="button" class="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 px-6 py-2.5 shadow-md transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="downloadResults()">
           <i class="bi bi-download text-lg"></i> Download JSON
         </button>
       </div>
@@ -139,38 +157,44 @@
 
     <!-- Hardware Info -->
     @if (hardwareInfo) {
-      <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-          <i class="bi bi-cpu"></i> Hardware Information
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div>
-            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
-            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
-          </div>
-          <div class="md:col-span-2">
-            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
-            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Cores</div>
-            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
-            <div class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
+      <div class="bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-800 rounded-xl mb-10 shadow-sm overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold"><i class="bi bi-cpu"></i></div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Hardware Information</h2>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
+              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
+            </div>
+            <div class="md:col-span-2">
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
+              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Cores</div>
+              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
+              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
+            </div>
           </div>
         </div>
       </div>
     }
 
     <!-- Comparison Chart -->
-    <div class="bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-10 shadow-sm">
-      <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-        <i class="bi bi-bar-chart"></i> Tests Comparison (TTFT & Total Response Time)
-      </h3>
-      <div class="relative w-full h-[400px]">
-        <canvas id="cortex-comparison-chart"></canvas>
+    <div class="bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-800 rounded-xl mb-10 shadow-sm overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold"><i class="bi bi-bar-chart"></i></div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Tests Comparison (TTFT & Total Response Time)</h2>
+      </div>
+      <div class="p-6">
+        <div class="relative w-full h-[400px]">
+          <canvas id="cortex-comparison-chart"></canvas>
+        </div>
       </div>
     </div>
   }
@@ -178,11 +202,11 @@
   <!-- Master Performance Table -->
     <div class="mb-12">
       <div class="flex items-center gap-3 mb-6 px-2">
-        <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
-        <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight m-0">Performance Overview</h3>
+        <div class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
+        <h3 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight m-0">Performance Overview</h3>
       </div>
       
-      <div class="bg-[#ffffff] dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-200 dark:border-gray-700">
@@ -532,13 +556,13 @@
 
     @if (!isImportedReport) {
       <div class="mt-8 flex flex-col items-center justify-center">
-        <div class="mb-4 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2">
-          <i class="bi bi-ui-checks text-blue-500"></i>
+        <div class="mb-4 text-sm font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-zinc-800 px-4 py-1.5 rounded-full border border-slate-200 dark:border-zinc-700 shadow-sm flex items-center gap-2">
+          <i class="bi bi-ui-checks text-indigo-500"></i>
           <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
         </div>
         
         <div class="flex items-center gap-4">
-          <button class="relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-blue-600 border border-transparent !rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
+          <button type="button" class="rounded-lg relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-indigo-600 border border-transparent shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
                   (click)="start()"
                   [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
             @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
@@ -554,9 +578,9 @@
         @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
           @let overallProgress = getOverallProgress();
           <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
-            <div class="text-sm font-bold text-gray-600 dark:text-gray-400">{{ overallProgress.percentage }}% Complete</div>
-            <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-              <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
+            <div class="text-sm font-bold text-slate-600 dark:text-slate-400">{{ overallProgress.percentage }}% Complete</div>
+            <div class="flex-1 bg-slate-200 dark:bg-zinc-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+              <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
             </div>
           </div>
         }

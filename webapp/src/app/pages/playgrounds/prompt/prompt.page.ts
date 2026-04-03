@@ -668,114 +668,90 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   updateGeneratedCode() {
     const val = this.playgroundForm.value;
     
-    let code = `// Prompt API Playground Configuration\n\n`;
+    let optionsCode = `const options = {\n`;
     
-    code += `// 1. Check availability (Optional)\n`;
-    code += `const options = {\n`;
-    
-    if (val.temperature !== null) code += `  temperature: ${val.temperature},\n`;
-    if (val.topK !== null) code += `  topK: ${val.topK},\n`;
+    if (val.temperature !== null) optionsCode += `  temperature: ${val.temperature},\n`;
+    if (val.topK !== null) optionsCode += `  topK: ${val.topK},\n`;
     
     if (val.initialPrompts.length > 0) {
-      code += `  initialPrompts: [\n`;
+      optionsCode += `  initialPrompts: [\n`;
       val.initialPrompts.forEach((p: any) => {
-        code += `    { role: "${p.role}", content: ${JSON.stringify(p.content)} },\n`;
+        optionsCode += `    { role: "${p.role}", content: ${JSON.stringify(p.content)} },\n`;
       });
-      code += `  ],\n`;
+      optionsCode += `  ],\n`;
     }
     
     if (val.expectedInputs && val.expectedInputs.length > 0) {
-      code += `  expectedInputs: [\n`;
+      optionsCode += `  expectedInputs: [\n`;
       val.expectedInputs.forEach((e: string) => {
-        code += `    { type: "${e}" },\n`;
+        optionsCode += `    { type: "${e}" },\n`;
       });
-      code += `  ],\n`;
+      optionsCode += `  ],\n`;
     }
     
     if (val.expectedOutputs && val.expectedOutputs.length > 0) {
-      code += `  expectedOutputs: [\n`;
+      optionsCode += `  expectedOutputs: [\n`;
       val.expectedOutputs.forEach((e: string) => {
-        code += `    { type: "${e}" },\n`;
+        optionsCode += `    { type: "${e}" },\n`;
       });
-      code += `  ],\n`;
+      optionsCode += `  ],\n`;
     }
     
     if (val.tools.length > 0) {
-      code += `  tools: [\n`;
+      optionsCode += `  tools: [\n`;
       val.tools.forEach((t: any) => {
-        code += `    {\n      name: "${t.name}",\n      description: "${t.description}",\n`;
-        code += `      inputSchema: ${t.inputSchema || '{}'},\n`;
-        code += `      execute: async (args) => JSON.stringify({ status: "success" })\n    },\n`;
+        optionsCode += `    {\n      name: "${t.name}",\n      description: "${t.description}",\n`;
+        optionsCode += `      inputSchema: ${t.inputSchema || '{}'},\n`;
+        optionsCode += `      execute: async (args) => JSON.stringify({ status: "success" })\n    },\n`;
       });
-      code += `  ]\n`;
+      optionsCode += `  ]\n`;
     }
     
-    code += `};\n\n`;
-    
-    code += `const availability = await LanguageModel.availability(options);\n\n`;
-    
-    code += `// 2. Create Session\n`;
-    if (val.useAbortSignal) code += `const controller = new AbortController();\noptions.signal = controller.signal;\n`;
-    code += `options.monitor = (m) => m.addEventListener("downloadprogress", e => console.log(e.loaded));\n`;
-    code += `const session = await LanguageModel.create(options);\n\n`;
-    
-    code += `// 3. Execution\n`;
-    code += `const promptOptions = {};\n`;
+    optionsCode += `};\n`;
+
+    // 1. Availability Code
+    this.codeAvailability = optionsCode + `\nconst availability = await LanguageModel.availability(options);\nconsole.log("Availability:", availability);`;
+
+    // 2. Session Creation Code
+    let sessionCode = optionsCode + `\n`;
+    if (val.useAbortSignal) sessionCode += `const controller = new AbortController();\noptions.signal = controller.signal;\n`;
+    sessionCode += `options.monitor = (m) => m.addEventListener("downloadprogress", e => console.log(e.loaded));\n`;
+    sessionCode += `\nconst session = await LanguageModel.create(options);\n`;
+
+    this.codeSession = sessionCode;
+
+    // 3. Execution Code
+    let execCode = sessionCode + `\n// Execution Configuration\n`;
+    execCode += `const promptOptions = {};\n`;
     if (val.responseConstraint) {
       if (val.responseConstraintType === 'json_schema') {
         let parsed = val.responseConstraint;
         try { parsed = JSON.stringify(JSON.parse(val.responseConstraint)); } catch(e) {}
-        code += `promptOptions.responseConstraint = ${parsed};\n`;
+        execCode += `promptOptions.responseConstraint = ${parsed};\n`;
       } else {
-        code += `promptOptions.responseConstraint = /${val.responseConstraint}/;\n`;
+        execCode += `promptOptions.responseConstraint = /${val.responseConstraint}/;\n`;
       }
     }
-    if (val.omitResponseConstraintInput) code += `promptOptions.omitResponseConstraintInput = true;\n`;
-    if (val.useAbortSignal) code += `promptOptions.signal = new AbortController().signal;\n`;
+    if (val.omitResponseConstraintInput) execCode += `promptOptions.omitResponseConstraintInput = true;\n`;
+    if (val.useAbortSignal) execCode += `promptOptions.signal = new AbortController().signal;\n`;
     
-    code += `\n// Input\n`;
-    code += `let promptInput = ${JSON.stringify(val.promptInput)};\n`;
+    execCode += `\n// Input\n`;
+    execCode += `let promptInput = ${JSON.stringify(val.promptInput)};\n`;
     if (this.uploadedImage || this.uploadedAudio) {
-      code += `const contentParts = [{ type: 'text', value: promptInput }];\n`;
-      code += `// Assume imageBlob and audioBlob are obtained via input files\n`;
-      if (this.uploadedImage) code += `if (imageBlob) contentParts.push({ type: 'image', value: imageBlob });\n`;
-      if (this.uploadedAudio) code += `if (audioBlob) contentParts.push({ type: 'audio', value: audioBlob });\n`;
-      code += `promptInput = [{ role: 'user', content: contentParts }];\n`;
+      execCode += `const contentParts = [{ type: 'text', value: promptInput }];\n`;
+      execCode += `// Assume imageBlob and audioBlob are obtained via input files\n`;
+      if (this.uploadedImage) execCode += `if (imageBlob) contentParts.push({ type: 'image', value: imageBlob });\n`;
+      if (this.uploadedAudio) execCode += `if (audioBlob) contentParts.push({ type: 'audio', value: audioBlob });\n`;
+      execCode += `promptInput = [{ role: 'user', content: contentParts }];\n`;
     }
     
-    code += `\n// Streaming\n`;
-    code += `const stream = session.promptStreaming(promptInput, promptOptions);\n`;
-    code += `for await (const chunk of stream) {\n  console.log(chunk);\n}\n\n`;
+    execCode += `\n// Run Prompt (Streaming)\n`;
+    execCode += `const stream = session.promptStreaming(promptInput, promptOptions);\n`;
+    execCode += `for await (const chunk of stream) {\n  console.log(chunk);\n}\n\n`;
     
-    code += `// Non-Streaming\n`;
-    code += `const result = await session.prompt(promptInput, promptOptions);\n\n`;
-    
-    code += `// Other Methods\n`;
-    code += `await session.append(promptInput);\n`;
-    code += `const tokens = await session.measureContextUsage(promptInput);\n`;
-    code += `const clonedSession = await session.clone();\n`;
-    code += `session.destroy();\n`;
+    execCode += `// Run Prompt (Non-Streaming)\n`;
+    execCode += `const result = await session.prompt(promptInput, promptOptions);\nconsole.log(result);\n`;
 
-    
-    // Split the monolithic generated code into step-specific variables
-    let tempCode = code;
-
-    const availabilityMatch = tempCode.match(/([\s\S]*?await [A-Za-z]+\.availability[\s\S]*?\n\n)/);
-    if (availabilityMatch) {
-      this.codeAvailability = availabilityMatch[1].trim();
-      tempCode = tempCode.substring(availabilityMatch[1].length);
-    } else {
-      this.codeAvailability = '// Availability check code not found';
-    }
-
-    const createMatch = tempCode.match(/([\s\S]*?await [A-Za-z]+\.create[\s\S]*?\n\n)/);
-    if (createMatch) {
-      this.codeSession = createMatch[1].trim();
-      this.codeExecution = tempCode.substring(createMatch[1].length).trim();
-    } else {
-      this.codeSession = '// Session creation code not found';
-      this.codeExecution = tempCode.trim();
-    }
-
+    this.codeExecution = execCode;
   }
 }

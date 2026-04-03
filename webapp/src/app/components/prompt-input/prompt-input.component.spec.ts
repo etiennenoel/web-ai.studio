@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PromptInputComponent } from './prompt-input.component';
-import { NgbModal, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef, Dialog } from '@angular/cdk/dialog';
 import { FormsModule } from '@angular/forms';
 import { AttachmentTypeEnum } from '../../core/enums/attachment-type.enum';
 import { FramingAlgorithm } from '../../core/enums/framing-algorithm.enum';
@@ -8,16 +8,16 @@ import { FramingAlgorithm } from '../../core/enums/framing-algorithm.enum';
 describe('PromptInputComponent', () => {
   let component: PromptInputComponent;
   let fixture: ComponentFixture<PromptInputComponent>;
-  let modalServiceSpy: jasmine.SpyObj<NgbModal>;
+  let modalServiceSpy: jasmine.SpyObj<Dialog>;
 
   beforeEach(async () => {
-    modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    modalServiceSpy = jasmine.createSpyObj('Dialog', ['open']);
 
     await TestBed.configureTestingModule({
       declarations: [PromptInputComponent],
-      imports: [FormsModule, NgbTooltipModule],
+      imports: [FormsModule],
       providers: [
-        { provide: NgbModal, useValue: modalServiceSpy }
+        { provide: Dialog, useValue: modalServiceSpy }
       ]
     })
     .compileComponents();
@@ -64,18 +64,18 @@ describe('PromptInputComponent', () => {
   });
 
   it('should open camera modal when openCamera is called', () => {
-    const modalRefSpyObj = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
-    modalRefSpyObj.result = Promise.resolve();
-    modalServiceSpy.open.and.returnValue(modalRefSpyObj as NgbModalRef);
+    const modalRefSpyObj = jasmine.createSpyObj('DialogRef', ['close']);
+    modalRefSpyObj.closed = { subscribe: () => {} };
+    modalServiceSpy.open.and.returnValue(modalRefSpyObj as any);
 
     component.openCamera();
     expect(modalServiceSpy.open).toHaveBeenCalled();
   });
 
   it('should open audio recording modal when recordAudio is called', () => {
-    const modalRefSpyObj = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
-    modalRefSpyObj.result = Promise.resolve();
-    modalServiceSpy.open.and.returnValue(modalRefSpyObj as NgbModalRef);
+    const modalRefSpyObj = jasmine.createSpyObj('DialogRef', ['close']);
+    modalRefSpyObj.closed = { subscribe: () => {} };
+    modalServiceSpy.open.and.returnValue(modalRefSpyObj as any);
 
     component.recordAudio();
     expect(modalServiceSpy.open).toHaveBeenCalled();

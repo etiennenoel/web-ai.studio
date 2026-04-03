@@ -1,5 +1,5 @@
 import {Component, DOCUMENT, Inject, Input, OnInit} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DialogRef, DIALOG_DATA} from '@angular/cdk/dialog';
 import {FormControl} from '@angular/forms';
 import {BaseComponent} from '../base.component';
 import {LocaleInterface} from '../../interfaces/locale.interface';
@@ -23,9 +23,14 @@ export class TranslationCodeModal extends BaseComponent implements OnInit {
 
   constructor(
     @Inject(DOCUMENT) document: Document,
-    public activeModal: NgbActiveModal,
+    public dialogRef: DialogRef<TranslationCodeModal>,
+    @Inject(DIALOG_DATA) public data: { sourceLanguage?: LocaleInterface, targetLanguage?: LocaleInterface }
   ) {
     super(document);
+    if(data) {
+      this.sourceLanguage = data.sourceLanguage;
+      this.targetLanguage = data.targetLanguage;
+    }
   }
 
   override ngOnInit() {
