@@ -1,5 +1,11 @@
 {
   "general": {
     "maxAttempts": 10
+  },
+  "tools": {
+    "exclude": [
+      "run_shell_command(git checkout)",
+      "run_shell_command(git reset)"
+    ]
   }
 }

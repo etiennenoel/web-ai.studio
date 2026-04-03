@@ -1,539 +1,863 @@
-<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
-  <!-- Hero Header -->
-  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 w-full">
-      <div class="flex items-center gap-3 text-left">
-        <div class="rounded-md w-8 h-8 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-          <i class="bi bi-speedometer2 text-2xl"></i>
+<div class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-32">
+  <!-- Top Navigation -->
+  <header class="bg-white/90 border-b border-slate-200 px-6 sm:px-8 py-4 sticky top-0 z-30 shadow-sm backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
         </div>
         <div>
-          <h1 class="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-3">
+          <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
             Cortex Test Suite
             @if (isImportedReport) {
-              <span class="text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 px-2.5 py-0.5 rounded-md uppercase tracking-wider align-middle border border-purple-200 dark:border-purple-800 shadow-sm">Imported Report</span>
+              <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border">Imported Report</span>
             }
           </h1>
-          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Measure raw, uncontended speed of the AI APIs.</p>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Measure raw, unconstrained speed of the AI APIs.</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
+        @if (!isExtensionInstalled) {
+          <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 bg-blue-600 border border-blue-700 text-sm font-semibold text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm active:scale-95">
+            <i class="bi bi-browser-chrome"></i> Add to Chrome
+          </a>
+        }
         @if (isImportedReport) {
-          <button type="button" (click)="resetState()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-400 text-sm font-bold shadow-sm transition-colors border border-slate-200 dark:border-zinc-700 shrink-0">
-            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          <button type="button" (click)="resetState()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95">
+            <i class="bi bi-arrow-counterclockwise text-slate-400"></i> Reset
           </button>
         } @else {
           <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
-          <button type="button" (click)="triggerImport()" [disabled]="isTestingRunning" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-400 text-sm font-bold shadow-sm transition-colors border border-slate-200 dark:border-zinc-700 shrink-0">
-            <i class="bi bi-upload"></i> Import Report
+          <button type="button" (click)="triggerImport()" [disabled]="isTestingRunning" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="bi bi-upload text-slate-400"></i> Import Report
+          </button>
+          <button type="button" (click)="openAboutModal()" class="flex items-center justify-center w-10 h-10 bg-white border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 hover:text-slate-700 transition-all shadow-sm active:scale-95" title="About the Benchmark">
+            <i class="bi bi-question-circle text-lg"></i>
           </button>
         }
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="max-w-7xl mx-auto p-8 space-y-8">
+  <main class="max-w-7xl mx-auto px-6 sm:px-8 py-8 flex flex-col gap-6">
 
-  @if (!isExtensionInstalled) {
-    <div class="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-sm relative overflow-hidden">
-      <div class="absolute -right-6 -top-10 opacity-[0.07] dark:opacity-10 pointer-events-none">
-        <i class="bi bi-browser-chrome text-[140px] text-blue-800 dark:text-blue-400"></i>
-      </div>
-      <div class="shrink-0 z-10">
-        <img src="images/extension-icon.png" class="w-14 h-14 rounded-xl shadow-md bg-[#ffffff] dark:bg-gray-800 p-1 border border-blue-100 dark:border-blue-700" alt="WebAI Extension">
-      </div>
-      <div class="flex-1 z-10">
-        <h3 class="text-base sm:text-lg font-extrabold text-blue-900 dark:text-blue-100 m-0 mb-1">Supercharge Cortex with the WebAI Chrome Extension!</h3>
-        <p class="text-sm text-blue-800 dark:text-blue-200 m-0">Unlock the complete benchmarking experience. Install the official Chrome Extension to enable deep hardware diagnostics, pinpoint your device's capabilities, and generate comprehensive performance exports.</p>
-      </div>
-      <div class="shrink-0 z-10 mt-2 sm:mt-0 w-full sm:w-auto">
-        <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex sm:inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap">
-          <i class="bi bi-browser-chrome text-lg"></i> Add to Chrome
-        </a>
-      </div>
-    </div>
-  }
-  
-  <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden mb-8">
-    <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
-      <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">i</div>
-      <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">About the Benchmark</h2>
-    </div>
-    <div class="p-6">
-      <p class="text-sm text-slate-600 dark:text-slate-400 max-w-4xl font-medium leading-relaxed">The <strong>Cortex Test</strong> measures the raw, uncontended speed of the AI API. It evaluates the API's fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.</p>
-      
-      @if (isImportedReport && importedTimestamp) {
-        <div class="mt-4 p-4 bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-lg shadow-sm inline-block">
-          <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Report Details</div>
-          <div class="text-sm text-slate-800 dark:text-slate-200 font-medium"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
-          <div class="text-xs text-slate-500 font-mono mt-1.5 max-w-2xl truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
-        </div>
-      }
-    </div>
-  </div>
-
-    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border overflow-hidden mb-10 transition-all duration-300"
-         [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:border-indigo-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing" [class.dark:ring-indigo-500]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-         [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing" [class.dark:border-zinc-800]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-      <button class="w-full px-6 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 flex items-center justify-between transition-colors focus:outline-none"
-              (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
+<!-- Suite Execution Planner -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-10 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">!</div>
-          <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0 flex items-center gap-2">
-            Setup Details & Availability
-          </h3>
-          @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 ml-2">
-              <svg class="animate-spin h-3 w-3 text-amber-700 dark:text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-              Checking Environment...
-            </span>
-          } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 ml-2">
-              <i class="bi bi-check-circle-fill"></i> Setup Complete
-            </span>
-          }
+          <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-indigo-600 shadow-sm">
+            <i class="bi bi-check2-square text-lg"></i>
+          </div>
+          <h2 class="text-lg font-bold text-slate-800 tracking-tight mb-0">Suite Execution Planner</h2>
+          <span class="bg-indigo-100 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border">{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Selected</span>
         </div>
-        <i class="bi text-slate-500 dark:text-slate-400 font-bold" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
-      </button>
-      
-      <div class="px-6 py-4 bg-white dark:bg-[#121212]" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
-            <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 shadow-sm">
-              <div class="font-bold text-sm text-gray-700 dark:text-gray-300 truncate pr-4" [title]="result.id">{{ result.id }}</div>
-              <div class="shrink-0">
-                @switch (result.apiAvailability) {
-                  @case ("unknown") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 shadow-sm">
-                      <svg class="animate-spin h-3.5 w-3.5 text-blue-700 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      Checking...
-                    </span>
-                  }
-                  @case ("available") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50 shadow-sm">
-                      <i class="bi bi-check-circle-fill"></i> Ready
-                    </span>
-                  }
-                  @case ("downloading") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50 shadow-sm animate-pulse">
-                      <i class="bi bi-cloud-arrow-down-fill"></i> Downloading...
-                    </span>
-                  }
-                  @case ("downloadable") {
-                    <button class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-transparent text-xs font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 animate-bounce" (click)="this.forceSetup(result.id)">
-                      <i class="bi bi-download"></i> Click to Download
-                    </button>
-                  }
-                  @case ("unavailable") {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800/50 shadow-sm">
-                      <i class="bi bi-x-circle-fill"></i> Unavailable
-                    </span>
-                  }
-                }
+        <label class="flex items-center gap-2 cursor-pointer group mb-0">
+          <input type="checkbox"
+                 class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                 [checked]="isAllSelected()"
+                 [indeterminate]="isPartiallySelected()"
+                 [disabled]="isTestingRunning"
+                 (change)="toggleAllSelection($event)">
+          <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All API Suites</span>
+        </label>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (element of builtInAiApis; track $index) {
+          @let api = getBuiltInAiAPIFromItemInterface(element);
+          @let tests = getTests(api);
+          @if (tests.length > 0) {
+            @let selectedCount = getSelectedTestsCountForApi(api);
+            <label class="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-indigo-300 transition-colors cursor-pointer" [class.border-dashed]="isCategoryPartiallySelected(api)" [class.ring-1]="selectedCount > 0" [class.ring-indigo-500]="selectedCount > 0" [class.border-indigo-500]="selectedCount > 0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">
+                  <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
+                </div>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-0">
+                    <h3 class="text-sm font-bold text-slate-800 tracking-tight">{{ element.id }}</h3>
+                    <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
+                  </div>
+                  <span class="text-xs text-slate-500 font-medium">{{ tests.length }} Total Tests Available</span>
+                </div>
               </div>
-            </div>
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-bold text-indigo-600">{{ selectedCount }} / {{ tests.length }}</span>
+                <input type="checkbox"
+                       class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                       [checked]="isCategorySelected(api)"
+                       [indeterminate]="isCategoryPartiallySelected(api)"
+                       [disabled]="isTestingRunning"
+                       (change)="toggleCategorySelection(api, $event)">
+              </div>
+            </label>
           }
-        </div>
+        }
       </div>
-    </div>
-  }
 
-  @if (isReportReady) {
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-8">
-      <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-        <i class="bi bi-file-earmark-bar-graph text-indigo-600 dark:text-indigo-400"></i> Cortex Report
-      </h2>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button type="button" class="rounded-lg bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/30 flex items-center gap-2 px-6 py-2.5 shadow-sm transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="saveReportToUrl()">
-          <i class="bi bi-link-45deg text-lg"></i> Share via URL
-        </button>
-        <button type="button" class="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 px-6 py-2.5 shadow-md transition-all text-sm font-bold w-full sm:w-auto justify-center" (click)="downloadResults()">
-          <i class="bi bi-download text-lg"></i> Download JSON
+      <div class="mt-8 flex justify-center border-t border-slate-200 pt-6">
+        <button type="button" class="w-full max-w-xs py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
+                (click)="start()"
+                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span>Running...</span>
+          } @else {
+            <i class="bi bi-play-fill text-lg"></i>
+            <span>Run Cortex Test</span>
+          }
         </button>
       </div>
     </div>
 
-    <!-- Hardware Info -->
-    @if (hardwareInfo) {
-      <div class="bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-800 rounded-xl mb-10 shadow-sm overflow-hidden">
-        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
-          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold"><i class="bi bi-cpu"></i></div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Hardware Information</h2>
+    <!-- Cortex Report & Chart -->
+
+<!-- Setup Accordion -->
+    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors"
+           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
+        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
+          <div class="flex items-center gap-4">
+            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+              <span class="text-xs font-bold text-slate-500">1</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 mb-0">Setup Details & Availability</h3>
+            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2">
+                <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Checking...
+              </span>
+            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2">
+                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
+              </span>
+            }
+          </div>
+          <i class="bi text-slate-400 text-lg" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
         </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Architecture</div>
-              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.archName || 'Unknown' }}</div>
-            </div>
-            <div class="md:col-span-2">
-              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">CPU Model</div>
-              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.modelName || 'Unknown' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Cores</div>
-              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.cpu?.numOfProcessors || 'Unknown' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Total Memory</div>
-              <div class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ hardwareInfo.memory?.capacity ? (hardwareInfo.memory.capacity / (1024 * 1024 * 1024) | number:'1.0-2') + ' GB' : 'Unknown' }}</div>
-            </div>
+        
+        <div class="px-6 py-4 bg-white border-t border-slate-100" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
+              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm">
+                <div class="font-bold text-sm text-slate-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
+                <div class="shrink-0">
+                  @switch (result.apiAvailability) {
+                    @case ("unknown") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
+                        <svg class="animate-spin h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
+                      </span>
+                    }
+                    @case ("available") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                        <i class="bi bi-check-circle-fill"></i> Ready
+                      </span>
+                    }
+                    @case ("downloading") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse">
+                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
+                      </span>
+                    }
+                    @case ("downloadable") {
+                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
+                        <i class="bi bi-download"></i> Download
+                      </button>
+                    }
+                    @case ("unavailable") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+                        <i class="bi bi-x-circle-fill"></i> Unavailable
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>
     }
 
-    <!-- Comparison Chart -->
-    <div class="bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-800 rounded-xl mb-10 shadow-sm overflow-hidden">
-      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
-        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold"><i class="bi bi-bar-chart"></i></div>
-        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Tests Comparison (TTFT & Total Response Time)</h2>
+    <!-- API Categories -->
+
+<!-- Cortex Report & Chart -->
+    @if (isReportReady) {
+      <section class="mt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+              <i class="bi bi-bar-chart-fill text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0">Cortex Report</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm" (click)="saveReportToUrl()">
+              <i class="bi bi-share text-indigo-600"></i> Share via URL
+            </button>
+            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white border border-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200" (click)="triggerDownloadResults()">
+              <i class="bi bi-download"></i> Download Report
+            </button>
+          </div>
+        </div>
+
+        @if (hardwareInfo) {
+        }
+
+      </section>
+    }
+
+    <!-- Legend / Context -->
+
+<!-- Local System Environment Card -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 bg-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i class="bi bi-lightning-charge-fill text-lg"></i>
+          </div>
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-0">Local System Environment</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status:</span>
+          @if (isExtensionInstalled) {
+            <span class="bg-emerald-50 text-emerald-700 border-emerald-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border">
+              <i class="bi bi-check-circle"></i> Extension installed
+            </span>
+          } @else {
+            <span class="bg-amber-50 text-amber-700 border-amber-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border">
+              Extension not found
+            </span>
+            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
+              <i class="bi bi-browser-chrome"></i> Install Extension
+            </a>
+          }
+        </div>
       </div>
-      <div class="p-6">
-        <div class="relative w-full h-[400px]">
-          <canvas id="cortex-comparison-chart"></canvas>
+      
+      <div class="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-white">
+        <div class="p-5 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <i class="bi bi-cpu text-slate-400"></i> Compute Unit
+          </div>
+          @if (isExtensionInstalled) {
+            <div class="font-medium text-[15px] text-slate-800 mt-1">{{ getComputeUnit() }}</div>
+          } @else {
+            <div class="mt-1">
+              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100">
+                <i class="bi bi-browser-chrome"></i> Install Extension
+              </a>
+            </div>
+          }
+        </div>
+        <div class="p-5 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <i class="bi bi-motherboard text-slate-400"></i> NPU / AI Accel
+          </div>
+          @if (isExtensionInstalled) {
+            <div class="font-medium text-[15px] text-slate-800 mt-1">{{ getNpuInfo() }}</div>
+          } @else {
+            <div class="mt-1">
+              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100">
+                <i class="bi bi-browser-chrome"></i> Install Extension
+              </a>
+            </div>
+          }
+        </div>
+        <div class="p-5 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <i class="bi bi-memory text-slate-400"></i> Memory
+          </div>
+          @if (isExtensionInstalled) {
+            <div class="font-medium text-[15px] text-slate-800 mt-1">{{ getMemoryInfo() }}</div>
+          } @else {
+            <div class="mt-1">
+              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100">
+                <i class="bi bi-browser-chrome"></i> Install Extension
+              </a>
+            </div>
+          }
+        </div>
+        <div class="p-5 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <i class="bi bi-pc-display text-slate-400"></i> OS Profile
+          </div>
+          <div class="font-medium text-[15px] text-slate-800 mt-1">{{ getOsProfile() }}</div>
+        </div>
+        <div class="p-5 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <i class="bi bi-globe text-slate-400"></i> Browser
+          </div>
+          <div class="font-medium text-[15px] text-slate-800 mt-1">{{ getBrowserInfo() }}</div>
         </div>
       </div>
     </div>
-  }
 
-  <!-- Master Performance Table -->
-    <div class="mb-12">
-      <div class="flex items-center gap-3 mb-6 px-2">
-        <div class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 p-2 rounded-lg shadow-sm"><i class="bi bi-bar-chart-fill text-xl"></i></div>
-        <h3 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight m-0">Performance Overview</h3>
+    <!-- Global Suite Performance Card -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-6 mb-2">
+      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl border border-indigo-100 flex items-center justify-center shrink-0" style="background-color: #F8F9FC;">
+            <i class="bi bi-globe2 text-lg text-indigo-600"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3">
+              Global Suite Performance
+            </h2>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+              Aggregate across all {{ getTestedApiCategoriesCount() }} API categories
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          @let passFail = getGlobalPassedAndFailed();
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="bi bi-check-circle text-lg"></i>
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Passed</span>
+              <span class="text-sm font-bold leading-none mt-1">{{ passFail.passed }}</span>
+            </div>
+          </div>
+          <div class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="bi bi-exclamation-circle text-lg"></i>
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Failed</span>
+              <span class="text-sm font-bold leading-none mt-1">{{ passFail.failed }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       
-      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-200 dark:border-gray-700">
-              <tr>
-                <th scope="col" rowspan="2" class="px-3 py-2 !text-left font-extrabold text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 align-bottom w-1/4 min-w-[300px]">
-                  <div class="flex items-center gap-3">
-                    <div class="shrink-0" (click)="$event.stopPropagation()">
-                      <input type="checkbox" 
-                             class="w-4 h-4 text-blue-600 bg-[#ffffff] dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 shadow-sm"
-                             [class.cursor-pointer]="!isTestingRunning"
-                             [class.cursor-not-allowed]="isTestingRunning"
-                             [class.opacity-50]="isTestingRunning"
-                             [checked]="isAllSelected()"
-                             [indeterminate]="isPartiallySelected()"
-                             [disabled]="isTestingRunning"
-                             (change)="toggleAllSelection($event)"
-                             title="Select/Deselect All">
-                    </div>
-                    <span>API Category / Test Name</span>
+      <div class="p-6 bg-slate-50/50">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          @let globalCold = getGlobalSummaryResults('cold');
+          @let globalWarm = getGlobalSummaryResults('warm');
+          @let ttftColdLocal = globalCold?.averageTimeToFirstToken || 0;
+          @let ttftWarmLocal = globalWarm?.averageTimeToFirstToken || 0;
+          @let totalColdLocal = globalCold?.averageTotalResponseTime || 0;
+          @let totalWarmLocal = globalWarm?.averageTotalResponseTime || 0;
+          @let speedColdLocal = globalCold?.averageTokenPerSecond || 0;
+          @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
+          
+          <!-- Global Avg TTFT Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-stopwatch text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg TTFT</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ ttftColdLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+              
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ ttftWarmLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Avg Total Time Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-activity text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg Total Time</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ totalColdLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ totalWarmLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Avg Generation Speed Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-speedometer text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg Speed</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup Accordion -->
+
+    <!-- API Categories -->
+    @for (element of builtInAiApis; track $index) {
+      @let api = getBuiltInAiAPIFromItemInterface(element);
+      @let tests = getTests(api);
+      @if (tests.length > 0) {
+        @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
+        @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
+        @let progress = getApiProgress(api);
+        @let isCollapsed = isApiCollapsed(api, progress);
+
+        <div class="mb-14">
+          <!-- Category Header -->
+          <div class="flex items-center justify-between gap-3 mb-6 px-1 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0">
+                <i class="bi text-lg text-slate-700" [ngClass]="getIconForApi(api)"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3">
+                {{ element.id }}
+                <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
+              </h2>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer group mb-0 bg-white px-3 py-1.5 rounded-lg border border-transparent hover:border-slate-200 hover:shadow-sm transition-all">
+              <input type="checkbox"
+                     class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                     [checked]="isCategorySelected(api)"
+                     [indeterminate]="isCategoryPartiallySelected(api)"
+                     [disabled]="isTestingRunning"
+                     (change)="toggleCategorySelection(api, $event)">
+              <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All</span>
+            </label>
+          </div>
+
+          <!-- Indented Grouping Container -->
+          <div class="ml-5 pl-8 border-l-2 border-slate-200/80 pb-4 flex flex-col relative">
+            
+          <!-- Aggregate Overview Container -->
+          @let catStatus = getCategoryStatus(api);
+          @let catSelected = isCategorySelected(api) || isCategoryPartiallySelected(api);
+          @if (catSelected) {
+          <div class="bg-slate-50/80 rounded-2xl border p-5 sm:p-6 mb-2 shadow-sm transition-colors"
+               [class.border-dashed]="isCategoryPartiallySelected(api)"
+               [class.border-red-300]="catStatus === TestStatus.Fail || catStatus === TestStatus.Error"
+               [class.border-blue-300]="catStatus === TestStatus.Executing"
+               [class.border-indigo-300]="catStatus === TestStatus.Idle && catSelected"
+               [class.border-slate-200]="catStatus === TestStatus.Idle && !catSelected"
+               [class.border-green-300]="catStatus === TestStatus.Success">
+            <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Category Aggregate Performance</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Avg TTFT Card -->
+              @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
+              @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
+              @let maxTtft = getMax(coldTtft, warmTtft);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-stopwatch text-slate-600"></i>
                   </div>
-                </th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Avg TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-stopwatch text-blue-500"></i> Med TTFT (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Avg Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-clock-history text-purple-500"></i> Med Total (ms)</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-600 bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Avg Char/s</div></th>
-                <th scope="col" colspan="2" class="px-2 py-1.5 !text-center font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider bg-[#ffffff] dark:bg-gray-900"><div class="flex items-center justify-center gap-1.5"><i class="bi bi-activity text-emerald-500"></i> Med Char/s</div></th>
-              </tr>
-              <tr class="divide-x divide-gray-200 border-t border-gray-100 dark:border-gray-800 text-xs shadow-sm">
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-                
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-                
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-                
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-                
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4 border-r-2 border-gray-300 dark:border-gray-600"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-                
-                <th scope="col" class="px-2 py-1 text-blue-700 dark:text-blue-400 font-bold !text-right bg-blue-50/50 dark:bg-blue-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-snow mr-1"></i> Cold</th>
-                <th scope="col" class="px-2 py-1 text-orange-700 dark:text-orange-400 font-bold !text-right bg-orange-50/50 dark:bg-orange-900/30 uppercase tracking-widest pr-4"><i class="bi bi-thermometer-sun mr-1"></i> Warm</th>
-              </tr>
-            </thead>
-            <tbody class="bg-[#ffffff] dark:bg-gray-900 divide-y divide-gray-200">
-              @for (element of builtInAiApis; track $index) {
-                @let api = getBuiltInAiAPIFromItemInterface(element);
-                @let tests = getTests(api);
-                @if (tests.length > 0) {
-                  @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
-                  @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
-                  @let progress = getApiProgress(api);
-                  @let isCollapsed = isApiCollapsed(api, progress);
-                  
-                  <!-- API Category Header Row -->
-                  <tr class="transition-colors divide-x divide-gray-200 group cursor-pointer" 
-                      [class.bg-yellow-50]="progress.executing > 0" [class.dark:bg-yellow-900/30]="progress.executing > 0"
-                      [class.hover:bg-yellow-100]="progress.executing > 0" [class.dark:hover:bg-yellow-900/50]="progress.executing > 0"
-                      [class.bg-gray-50]="progress.executing === 0" [class.dark:bg-gray-800]="progress.executing === 0"
-                      [class.hover:bg-blue-50]="progress.executing === 0" [class.dark:hover:bg-blue-900/30]="progress.executing === 0"
-                      (click)="toggleApi(api, progress)">
-                    <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 !text-left border-r border-gray-200 dark:border-gray-700 transition-colors">
-                      <div class="flex items-center gap-3">
-                        <div class="shrink-0" (click)="$event.stopPropagation()">
-                          <input type="checkbox" 
-                                 class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
-                                 [class.cursor-pointer]="!isTestingRunning"
-                                 [class.cursor-not-allowed]="isTestingRunning"
-                                 [class.opacity-50]="isTestingRunning"
-                                 [checked]="isCategorySelected(api)"
-                                 [indeterminate]="isCategoryPartiallySelected(api)"
-                                 [disabled]="isTestingRunning"
-                                 (change)="toggleCategorySelection(api, $event)">
-                        </div>
-                        <div class="p-1.5 rounded-md bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 shadow-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-colors"
-                             [class.text-yellow-600]="progress.executing > 0" [class.dark:text-yellow-500]="progress.executing > 0" [class.border-yellow-300]="progress.executing > 0" [class.dark:border-yellow-600]="progress.executing > 0">
-                             <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
-                        </div>
-                        <div class="flex-1">
-                          <div class="flex items-center justify-between gap-4">
-                            <span>{{ element.id }}</span>
-                            <i class="bi text-gray-400" [class.bi-chevron-up]="!isCollapsed" [class.bi-chevron-down]="isCollapsed"></i>
-                          </div>
-                          <div class="flex items-center gap-1.5 mt-1 text-[10px]">
-                            <span class="text-gray-500 dark:text-gray-400 font-normal mr-1">{{ progress.selected }}/{{ progress.total }} Selected</span>
-                            @if (progress.passed > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-green-200 dark:border-green-800/50" title="Passed">
-                                <i class="bi bi-check-circle-fill"></i> {{ progress.passed }}
-                              </span>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Time To First Token</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.text-slate-500]="!isWinner('cold', coldTtft, warmTtft, 'ttft')">
+                         Cold @if (isWinner('cold', coldTtft, warmTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.text-slate-700]="!isWinner('cold', coldTtft, warmTtft, 'ttft')">{{ coldTtft ? (coldTtft | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.bg-slate-300]="!isWinner('cold', coldTtft, warmTtft, 'ttft')" [style.width]="getPercentage(coldTtft, maxTtft) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.text-slate-500]="!isWinner('warm', coldTtft, warmTtft, 'ttft')">
+                         Warm @if (isWinner('warm', coldTtft, warmTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.text-slate-700]="!isWinner('warm', coldTtft, warmTtft, 'ttft')">{{ warmTtft ? (warmTtft | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.bg-slate-300]="!isWinner('warm', coldTtft, warmTtft, 'ttft')" [style.width]="getPercentage(warmTtft, maxTtft) + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avg Execution Time Card -->
+              @let coldTotal = coldSummaryResults?.averageTotalResponseTime;
+              @let warmTotal = warmSummaryResults?.averageTotalResponseTime;
+              @let maxTotal = getMax(coldTotal, warmTotal);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-activity text-slate-600"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Execution Time</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.text-slate-500]="!isWinner('cold', coldTotal, warmTotal, 'total')">
+                         Cold @if (isWinner('cold', coldTotal, warmTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.text-slate-700]="!isWinner('cold', coldTotal, warmTotal, 'total')">{{ coldTotal ? (coldTotal | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.bg-slate-300]="!isWinner('cold', coldTotal, warmTotal, 'total')" [style.width]="getPercentage(coldTotal, maxTotal) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.text-slate-500]="!isWinner('warm', coldTotal, warmTotal, 'total')">
+                         Warm @if (isWinner('warm', coldTotal, warmTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.text-slate-700]="!isWinner('warm', coldTotal, warmTotal, 'total')">{{ warmTotal ? (warmTotal | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.bg-slate-300]="!isWinner('warm', coldTotal, warmTotal, 'total')" [style.width]="getPercentage(warmTotal, maxTotal) + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avg Generation Speed Card -->
+              @let coldSpeed = coldSummaryResults?.averageTokenPerSecond;
+              @let warmSpeed = warmSummaryResults?.averageTokenPerSecond;
+              @let maxSpeed = getMax(coldSpeed, warmSpeed);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-speedometer text-slate-600"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Generation Speed</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.text-slate-500]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')">
+                         Cold @if (isWinner('cold', coldSpeed, warmSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.text-slate-700]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')">{{ coldSpeed ? (coldSpeed >= 1000 ? ((coldSpeed/1000) | number:'1.1-1') + 'k' : (coldSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.bg-slate-300]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')" [style.width]="getPercentage(coldSpeed, maxSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.text-slate-500]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')">
+                         Warm @if (isWinner('warm', coldSpeed, warmSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.text-slate-700]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')">{{ warmSpeed ? (warmSpeed >= 1000 ? ((warmSpeed/1000) | number:'1.1-1') + 'k' : (warmSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.bg-slate-300]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')" [style.width]="getPercentage(warmSpeed, maxSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+
+          <!-- Collapsible Divider for Tests -->
+          <div class="flex items-center py-4 relative -ml-8">
+            <div class="w-8 h-px bg-slate-200/80 mr-4"></div>
+            <button (click)="toggleApi(api, progress)" class="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 shadow-sm rounded-full text-[10px] uppercase tracking-wider font-bold text-slate-600 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all active:scale-95">
+              @if (isCollapsed) {
+                <i class="bi bi-chevron-down"></i> Expand {{ tests.length }} Tests
+              } @else {
+                <i class="bi bi-chevron-up"></i> Collapse Tests
+              }
+            </button>
+            <div class="flex-1 h-px bg-slate-200/80 ml-4"></div>
+          </div>
+
+          <!-- Detailed Tests List -->
+          @if (!isCollapsed) {
+            <div class="mt-4 flex flex-col gap-2">
+              @for (test of tests; track $index) {
+                @let isTestExpanded = !isTestCollapsed(test);
+                <div class="relative">
+                  <!-- Horizontal connecting line -->
+                  <div class="absolute w-8 h-px bg-slate-200/80 -left-8 top-7"></div>
+                  <!-- Test Block -->
+                  <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-6 transition-all duration-300"
+                     [class.border-red-300]="test.results.status === TestStatus.Fail || test.results.status === TestStatus.Error"
+                     [class.border-blue-300]="test.results.status === TestStatus.Executing"
+                     [class.border-indigo-300]="test.results.status === TestStatus.Idle && selectedTestIds.has(test.id)"
+                     [class.border-slate-200]="test.results.status === TestStatus.Idle && !selectedTestIds.has(test.id)"
+                     [class.border-green-300]="test.results.status === TestStatus.Success">
+                  <!-- Test Header -->
+                  <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-100 transition-colors" (click)="toggleTestSelection(test.id, $event)">
+                    <div class="flex items-start gap-3">
+                      <div class="mt-0.5">
+                        <input type="checkbox"
+                               class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                               [checked]="selectedTestIds.has(test.id)"
+                               [disabled]="isTestingRunning"
+                               (click)="$event.stopPropagation()"
+                               (change)="toggleTestSelection(test.id, $event)">
+                      </div>
+                      <div>
+                        <h3 class="text-sm font-bold text-slate-800 tracking-tight">{{ test.id }}</h3>
+                        <div class="flex flex-wrap gap-2 mt-1.5 items-center">
+                          <axon-test-status-badge [status]="test.results.status" [selected]="selectedTestIds.has(test.id)"></axon-test-status-badge>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                            @if (test.results.inputAudioDuration) {
+                              {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
+                            } @else {
+                              {{ test.results.input.length | number:'1.0-0' }} chars
                             }
-                            @if (progress.failed > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-red-200 dark:border-red-800/50" title="Failed">
-                                <i class="bi bi-x-circle-fill"></i> {{ progress.failed }}
-                              </span>
-                            }
-                            @if (progress.executing > 0) {
-                              <span class="inline-flex items-center gap-1 font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-1.5 py-[1px] rounded uppercase tracking-wider border border-yellow-200 dark:border-yellow-800/50" title="Executing">
-                                <svg class="animate-spin h-3 w-3 text-yellow-700 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                {{ progress.executing }}
-                              </span>
-                            }
-                          </div>
+                          </span>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                            @if (test.results.inputImageDataUrl) { Image }
+                            @else if (test.results.inputAudioUrl) { Audio }
+                            @else { Text }
+                          </span>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" [ngClass]="test.results.startType === 'cold' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-orange-50 text-orange-700 border border-orange-200'">
+                            <i class="bi" [ngClass]="test.results.startType === 'cold' ? 'bi-thermometer-snow' : 'bi-thermometer-sun'"></i> {{ test.results.startType }} Start
+                          </span>
                         </div>
                       </div>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.averageTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.medianTimeToFirstToken | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.averageTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-gray-800]="coldSummaryResults" [class.dark:text-gray-200]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-gray-800]="warmSummaryResults" [class.dark:text-gray-200]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.medianTotalResponseTime | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-gray-400 font-normal ml-0.5">ms</span>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults" [class.dark:text-emerald-400]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20 border-r-2 border-gray-300 dark:border-gray-600" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults" [class.dark:text-emerald-400]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.averageTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
-                    </td>
-                    
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-blue-50/10 dark:bg-blue-900/20" [class.text-gray-400]="!coldSummaryResults" [class.dark:text-gray-600]="!coldSummaryResults" [class.text-emerald-700]="coldSummaryResults" [class.dark:text-emerald-400]="coldSummaryResults">
-                      {{ coldSummaryResults ? (coldSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="coldSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
-                    </td>
-                    <td class="px-2 py-1.5 pr-4 whitespace-nowrap !text-right text-sm font-mono font-medium tabular-nums tracking-tight bg-orange-50/10 dark:bg-orange-900/20" [class.text-gray-400]="!warmSummaryResults" [class.dark:text-gray-600]="!warmSummaryResults" [class.text-emerald-700]="warmSummaryResults" [class.dark:text-emerald-400]="warmSummaryResults">
-                      {{ warmSummaryResults ? (warmSummaryResults.medianTokenPerSecond | number:'1.0-0') : '---' }} <span *ngIf="warmSummaryResults" class="text-xs text-emerald-600/60 dark:text-emerald-400/60 font-normal ml-0.5">c/s</span>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
 
-                  <!-- Expanded Tests List within the Master Table -->
-                  @if (!isCollapsed) {
-                    <tr class="bg-gray-50/80 dark:bg-gray-800/80 shadow-inner">
-                      <td colspan="13" class="p-0 border-b-4 border-gray-200 dark:border-gray-700">
-                        <div class="px-4 py-4 pl-12">
-                          <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Tests in {{ element.id }}</h4>
-                          <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-[#ffffff] dark:bg-gray-900">
-                            <table class="min-w-full divide-y divide-gray-200">
-                              <thead class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider !text-left">
-                                <tr>
-                                  <th scope="col" class="px-3 py-2 w-10 !text-center">Run</th>
-                                  <th scope="col" class="px-3 py-2">Test ID</th>
-                                  <th scope="col" class="px-3 py-2 !text-center w-24">Type</th>
-                                  <th scope="col" class="px-3 py-2 !text-center">Status</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Avg TTFT</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Avg Total</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Input Size</th>
-                                  <th scope="col" class="px-3 py-2 !text-right">Avg Speed</th>
-                                  <th scope="col" class="px-3 py-2 w-10"></th>
+                  <!-- Test Metric Overview (Always Visible) -->
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead>
+                        <tr class="bg-white border-b border-slate-200">
+                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance Metric</th>
+                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold uppercase tracking-widest border-l border-slate-100" [ngClass]="test.results.startType === 'cold' ? 'text-blue-600 bg-blue-50/30' : 'text-orange-600 bg-orange-50/30'">Local Result</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Time To First Token -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-stopwatch text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Time To First Token</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Total Execution Time -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-activity text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Total Execution Time</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Generation Speed -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-speedometer text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Generation Speed</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">c/s</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Deep Dive Expander -->
+                  <button (click)="toggleTest(test.id)" class="w-full py-2.5 bg-slate-50 border-t border-slate-200 text-[11px] font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                    @if (isTestExpanded) {
+                      <i class="bi bi-chevron-up"></i> Hide Deep Dive Details
+                    } @else {
+                      <i class="bi bi-chevron-down"></i> View Test Deep Dive
+                    }
+                  </button>
+
+                  <!-- Expanded Details Area -->
+                  @if (isTestExpanded) {
+                    <div class="border-t border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                      
+                      <!-- Left Col: Payload -->
+                      <div class="flex-1 p-5 lg:w-1/2">
+                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                          <i class="bi bi-terminal"></i> Input Payload
+                        </h4>
+                        <div class="bg-slate-900 rounded-lg p-4 shadow-inner border border-slate-800 flex flex-col gap-3">
+                          <pre class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto custom-scrollbar">{{ test.results.input }}</pre>
+                          @if (test.results.inputImageDataUrl) {
+                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all self-start" (click)="openImage(test.results.inputImageDataUrl, $event)">
+                              <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                            </div>
+                          }
+                          @if (test.results.inputAudioUrl) {
+                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-3 shadow-sm flex items-center justify-center self-start">
+                              <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Right Col: Iterations & Chart -->
+                      <div class="flex-1 p-5 lg:w-1/2 flex flex-col gap-6">
+
+                        <!-- Micro Iterations Log -->
+                        <div>
+                          <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                            <i class="bi bi-list"></i> Local Iteration Log
+                          </h4>
+                          <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+                            <table class="w-full text-left">
+                              <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                  <th class="px-3 py-2 w-10">#</th>
+                                  <th class="px-3 py-2 text-right">TTFT</th>
+                                  <th class="px-3 py-2 text-right">Total</th>
+                                  <th class="px-3 py-2 text-right">Speed</th>
+                                  <th class="px-3 py-2 text-center">Output</th>
                                 </tr>
                               </thead>
-                              <tbody class="divide-y divide-gray-100">
-                                @for (test of tests; track $index) {
-                                  @let isTestExpanded = !isTestCollapsed(test);
-                                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer group"
-                                      [class.bg-yellow-50]="test.results.status === TestStatus.Executing" [class.dark:bg-yellow-900/30]="test.results.status === TestStatus.Executing"
-                                      [class.opacity-40]="!selectedTestIds.has(test.id)"
-                                      [class.bg-gray-50]="!selectedTestIds.has(test.id)" [class.dark:bg-gray-800]="!selectedTestIds.has(test.id)"
-                                      (click)="toggleTest(test.id)">
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center" (click)="$event.stopPropagation()">
-                                      <input type="checkbox" 
-                                             class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
-                                             [class.cursor-pointer]="!isTestingRunning"
-                                             [class.cursor-not-allowed]="isTestingRunning"
-                                             [class.opacity-50]="isTestingRunning"
-                                             [checked]="selectedTestIds.has(test.id)"
-                                             [disabled]="isTestingRunning"
-                                             (change)="toggleTestSelection(test.id, $event)">
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-left">
-                                      <div class="text-xs font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ test.id }}</div>
-                                      <div class="text-[10px] text-gray-400 truncate max-w-sm font-mono mt-0.5">{{ test.results.input }}</div>
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center">
-                                      @if (test.results.startType === 'cold') {
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 uppercase tracking-wider border border-blue-200 dark:border-blue-800/50"><i class="bi bi-thermometer-snow mr-1"></i>Cold</span>
-                                      } @else {
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 uppercase tracking-wider border border-orange-200 dark:border-orange-800/50"><i class="bi bi-thermometer-sun mr-1"></i>Warm</span>
-                                      }
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-center">
-                                      <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
-                                      {{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
-                                      {{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : "---" }} <span class="text-[10px] text-gray-400 font-normal">ms</span>
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-gray-700 dark:text-gray-300">
-                                      @if (test.results.inputAudioDuration) {
-                                        {{ test.results.inputAudioDuration | number:'1.0-1' }} <span class="text-[10px] text-gray-400 font-normal">s</span>
-                                      } @else {
-                                        {{ test.results.input.length | number:'1.0-0' }} <span class="text-[10px] text-gray-400 font-normal">chars</span>
-                                      }
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">
-                                      {{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : "---" }} <span class="text-[10px] text-emerald-600/60 dark:text-emerald-400/60 font-normal">c/s</span>
-                                    </td>
-                                    <td class="px-3 py-2.5 whitespace-nowrap !text-right text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">
-                                      <i class="bi text-sm transition-transform" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
+                              <tbody class="divide-y divide-slate-50">
+                                @for (iter of test.results.testIterationResults; track $index) {
+                                  <tr class="text-xs hover:bg-slate-50 transition-colors" [class.bg-amber-50]="iter.status === TestStatus.Executing">
+                                    <td class="px-3 py-1.5 text-slate-400 font-mono">{{ $index + 1 }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }} ms</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }} ms</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "—" }} c/s</td>
+                                    <td class="px-3 py-1.5 text-center">
+                                      <button class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-[10px]" 
+                                              title="Toggle Output"
+                                              [disabled]="!iter.output"
+                                              (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
+                                        @if (!viewData[test.id].expandedOutputs?.[$index]) {
+                                          <i class="bi bi-file-text"></i> View
+                                        } @else {
+                                          <i class="bi bi-chevron-up"></i> Hide
+                                        }
+                                      </button>
                                     </td>
                                   </tr>
-                                  
-                                  @if (isTestExpanded) {
-                                    <tr class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-inner">
-                                      <td colspan="8" class="p-0">
-                                        <div class="px-6 py-4 border-l-4 border-blue-500" (click)="$event.stopPropagation()">
-                                          <div class="mb-4">
-                                            <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                              <span class="flex items-center gap-1.5"><i class="bi bi-input-cursor text-gray-400"></i> Input Payload</span>
-                                              <span class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500 dark:text-gray-400 font-mono">
-                                                @if (test.results.inputAudioDuration) {
-                                                  {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
-                                                } @else {
-                                                  {{ test.results.input.length | number:'1.0-0' }} chars
-                                                }
-                                              </span>
-                                            </h4>
-                                            <div class="flex flex-col sm:flex-row gap-4">
-                                              <div class="flex-1 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 text-xs text-gray-700 dark:text-gray-300 font-mono overflow-y-auto max-h-32 shadow-sm leading-relaxed">
-                                                {{ test.results.input }}
-                                              </div>
-                                              @if (test.results.inputImageDataUrl) {
-                                                <div class="shrink-0 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
-                                                  <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
-                                                </div>
-                                              }
-                                              @if (test.results.inputAudioUrl) {
-                                                <div class="shrink-0 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-3 shadow-sm flex items-center justify-center">
-                                                  <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
-                                                </div>
-                                              }
-                                            </div>
-                                          </div>
-                                          
-                                          @if (isReportReady) {
-                                            <div class="mb-6 bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-4 shadow-sm">
-                                              <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center justify-between">
-                                                <span class="flex items-center gap-1.5"><i class="bi bi-graph-up text-blue-500"></i> Execution Time Plot</span>
-                                                <div class="flex items-center gap-4 text-[9px] text-gray-400 font-normal">
-                                                  <span class="flex items-center gap-1"><span class="w-3 border-t-2 border-blue-400 border-dashed"></span> TTFT</span>
-                                                  <span class="flex items-center gap-1"><span class="w-3 border-t-2 border-purple-400 border-solid"></span> Total Response</span>
-                                                </div>
-                                              </h4>
-                                              <div class="relative w-full h-[200px]">
-                                                <canvas [id]="'cortex-test-chart-' + test.id"></canvas>
-                                              </div>
-                                            </div>
-                                          }
-
-                                          <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                            <i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})
-                                          </h4>
-                                          <div class="overflow-hidden rounded border border-gray-200 dark:border-gray-700 shadow-sm bg-[#ffffff] dark:bg-gray-900">
-                                            <table class="min-w-full divide-y divide-gray-200 text-xs !text-center">
-                                              <thead class="bg-gray-100 dark:bg-gray-800">
-                                                <tr>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 w-8 border-r border-gray-200 dark:border-gray-700">#</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400">Status</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">TTFT</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Total Time</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Speed</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 !text-right">Output Chars</th>
-                                                  <th scope="col" class="px-2 py-1.5 font-bold text-gray-600 dark:text-gray-400 w-16">Output</th>
-                                                </tr>
-                                              </thead>
-                                              <tbody class="divide-y divide-gray-100">
-                                                @for (iter of test.results.testIterationResults; track $index) {
-                                                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer" [class.bg-yellow-50]="iter.status === TestStatus.Executing" [class.dark:bg-yellow-900/30]="iter.status === TestStatus.Executing" (click)="iter.output ? toggleOutput(test.id, $index) : null">
-                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center text-gray-500 dark:text-gray-400 font-bold bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">{{ $index + 1 }}</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center">
-                                                      <axon-test-status-badge [status]="iter.status"></axon-test-status-badge>
-                                                    </td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "---" }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "---" }} ms</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "---" }} c/s</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap text-gray-700 dark:text-gray-300 font-mono !text-right font-medium">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
-                                                    <td class="px-2 py-1.5 whitespace-nowrap !text-center">
-                                                      <button class="inline-flex items-center justify-center px-2 py-1 rounded text-blue-600 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-700" 
-                                                              title="Toggle Output"
-                                                              [disabled]="!iter.output"
-                                                              (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
-                                                        @if (!viewData[test.id].expandedOutputs?.[$index]) {
-                                                          <i class="bi bi-file-text mr-1"></i> View
-                                                        } @else {
-                                                          <i class="bi bi-chevron-up mr-1"></i> Hide
-                                                        }
-                                                      </button>
-                                                    </td>
-                                                  </tr>
-                                                  @if (viewData[test.id].expandedOutputs?.[$index]) {
-                                                    <tr class="bg-gray-900 dark:bg-black border-b border-gray-200 dark:border-gray-700">
-                                                      <td colspan="7" class="p-4 !text-left">
-                                                        <div class="text-[10px] font-mono text-gray-300 dark:text-gray-400 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
-                                                          {{ unescapeOutput(iter.output ?? '') }}
-                                                        </div>
-                                                      </td>
-                                                    </tr>
-                                                  }
-                                                }
-                                              </tbody>
-                                            </table>
-                                          </div>
+                                  @if (viewData[test.id].expandedOutputs?.[$index]) {
+                                    <tr class="bg-slate-900 border-b border-slate-200">
+                                      <td colspan="5" class="p-4 !text-left">
+                                        <div class="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
+                                          {{ unescapeOutput(iter.output ?? '') }}
                                         </div>
                                       </td>
                                     </tr>
@@ -543,108 +867,169 @@
                             </table>
                           </div>
                         </div>
-                      </td>
-                    </tr>
-                  }
-                }
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
-    @if (!isImportedReport) {
-      <div class="mt-8 flex flex-col items-center justify-center">
-        <div class="mb-4 text-sm font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-zinc-800 px-4 py-1.5 rounded-full border border-slate-200 dark:border-zinc-700 shadow-sm flex items-center gap-2">
-          <i class="bi bi-ui-checks text-indigo-500"></i>
-          <span>{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+                </div>
+              }
+            </div>
+          }
+          </div> <!-- End Indented Grouping Container -->
         </div>
+      }
+    }
+
+  </main>
+
+  @if (!isImportedReport) {
+    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 py-4 px-6 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <div class="max-w-xl mx-auto flex flex-col items-center gap-3">
+        <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border"><i class="bi bi-ui-checks"></i> {{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
         
-        <div class="flex items-center gap-4">
-          <button type="button" class="rounded-lg relative inline-flex items-center justify-center gap-2 px-10 py-5 text-lg font-bold text-white transition-all duration-300 bg-indigo-600 border border-transparent shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:cursor-not-wait disabled:hover:translate-y-0 disabled:hover:shadow-lg w-64"
-                  (click)="start()"
-                  [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-            @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
-              <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-              <span>Running...</span>
-            } @else {
-              <i class="bi bi-play-fill text-xl"></i>
-              <span>Run Cortex Test</span>
-            }
-          </button>
-        </div>
+        <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
+                (click)="start()"
+                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span>Running...</span>
+          } @else {
+            <i class="bi bi-play-fill text-lg"></i>
+            <span>Run Cortex Test</span>
+          }
+        </button>
         
         @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
           @let overallProgress = getOverallProgress();
-          <div class="mt-4 w-full max-w-md flex items-center justify-center gap-3">
-            <div class="text-sm font-bold text-slate-600 dark:text-slate-400">{{ overallProgress.percentage }}% Complete</div>
-            <div class="flex-1 bg-slate-200 dark:bg-zinc-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-              <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
+          <div class="w-full max-w-sm flex items-center gap-3">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24 text-right">{{ overallProgress.percentage }}% Complete</span>
+            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
             </div>
           </div>
         }
       </div>
-    }
-    
-</div>
+    </div>
+  }
 
-@if (selectedImageUrl) {
-  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4" (click)="closeImage()">
-    <button class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors focus:outline-none" (click)="closeImage()">
-      <i class="bi bi-x-lg text-4xl"></i>
-    </button>
-    <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
-  </div>
-}
+  @if (selectedImageUrl) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm p-4" (click)="closeImage()">
+      <button class="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors focus:outline-none" (click)="closeImage()">
+        <i class="bi bi-x-lg text-4xl"></i>
+      </button>
+      <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
+    </div>
+  }
 
-@if (showShareModal) {
-  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
-    <div class="bg-[#ffffff] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-      <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 m-0 flex items-center gap-2">
-          <i class="bi bi-share text-blue-600"></i> Share Report
-        </h3>
-        <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors focus:outline-none" (click)="closeShareModal()">
-          <i class="bi bi-x-lg text-xl"></i>
-        </button>
-      </div>
-      
-      <div class="p-6">
-        @if (isGeneratingUrl) {
-          <div class="flex flex-col items-center justify-center py-8">
-            <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="text-gray-600 dark:text-gray-400 font-medium">Compressing and generating URL...</p>
-          </div>
-        } @else if (generatedShareUrl) {
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Your report has been compressed and attached to the URL below. Anyone with this link can view the exact state of this benchmark.
-          </p>
-          
-          <div class="flex gap-2">
-            <input type="text" readonly [value]="generatedShareUrl" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-blue-500 focus:border-blue-500 font-mono" (click)="$any($event.target).select()">
-            <button class="btn shrink-0 flex items-center justify-center gap-2" [ngClass]="isUrlCopied ? 'btn-success' : 'btn-primary'" (click)="copyShareUrl()">
-              @if (isUrlCopied) {
-                <i class="bi bi-check2"></i> Copied!
-              } @else {
-                <i class="bi bi-copy"></i> Copy
-              }
-            </button>
-          </div>
-          
-          <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 text-xs rounded-lg border border-yellow-200 dark:border-yellow-800/50 flex gap-3">
-            <i class="bi bi-exclamation-triangle-fill text-lg shrink-0"></i>
-            <span>Because this relies on URL length, very large reports (e.g. ones with large base64 image outputs) might exceed browser URL limits and fail to load for some users.</span>
-          </div>
-        }
-      </div>
-      
-      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
-        <button class="btn btn-outline-secondary" (click)="closeShareModal()">Close</button>
+  @if (showShareModal) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2">
+            <i class="bi bi-share text-indigo-600"></i> Share Report
+          </h3>
+          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none" (click)="closeShareModal()">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          @if (isGeneratingUrl) {
+            <div class="flex flex-col items-center justify-center py-8">
+              <svg class="animate-spin h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="text-slate-600 font-medium">Compressing and generating URL...</p>
+            </div>
+          } @else if (generatedShareUrl) {
+            <p class="text-sm text-slate-600 mb-4">
+              Your report has been compressed and attached to the URL below. Anyone with this link can view the exact state of this benchmark.
+            </p>
+            
+            <div class="flex gap-2">
+              <input type="text" readonly [value]="generatedShareUrl" class="block w-full rounded-lg border-slate-300 bg-slate-50 text-slate-900 text-sm focus:ring-indigo-500 focus:border-indigo-500 font-mono" (click)="$any($event.target).select()">
+              <button class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white rounded-lg transition-colors shrink-0" [ngClass]="isUrlCopied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'" (click)="copyShareUrl()">
+                @if (isUrlCopied) {
+                  <i class="bi bi-check2"></i> Copied!
+                } @else {
+                  <i class="bi bi-copy"></i> Copy
+                }
+              </button>
+            </div>
+            
+            <div class="mt-4 p-3 bg-amber-50 text-amber-800 text-xs rounded-lg border border-amber-200 flex gap-3">
+              <i class="bi bi-exclamation-triangle-fill text-lg shrink-0"></i>
+              <span>Because this relies on URL length, very large reports (e.g. ones with large base64 image outputs) might exceed browser URL limits and fail to load for some users.</span>
+            </div>
+          }
+        </div>
+        
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+          <button class="px-4 py-2 border border-slate-300 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors" (click)="closeShareModal()">Close</button>
+        </div>
       </div>
     </div>
-  </div>
-}
+  }
+
+  @if (showExtensionModal) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2">
+            <i class="bi bi-puzzle text-blue-600"></i> Install WebAI Extension
+          </h3>
+          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none" (click)="closeExtensionModal()">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <p class="text-sm text-slate-600 mb-4">
+            The Chrome WebAI Extension is required to capture important hardware information (CPU model, memory, architecture) which makes your benchmark reports significantly more valuable and comparable.
+          </p>
+          <div class="flex flex-col gap-3 mt-6">
+            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm w-full">
+              <i class="bi bi-browser-chrome"></i> Install from Chrome Web Store
+            </a>
+            <button class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors shadow-sm w-full" (click)="confirmDownloadResults()">
+              <i class="bi bi-download"></i> Download Report Anyway
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showAboutModal) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2">
+            <i class="bi bi-info-circle text-blue-600"></i> About the Benchmark
+          </h3>
+          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none" (click)="closeAboutModal()">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <p class="text-sm text-slate-600 leading-relaxed mb-0">
+            The Cortex Test measures the raw, unconstrained speed of the AI APIs. It evaluates the APIs fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.
+          </p>
+          @if (isImportedReport && importedTimestamp) {
+            <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Report Details</div>
+              <div class="text-sm text-slate-800 font-medium"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
+              <div class="text-xs text-slate-500 font-mono mt-1.5 truncate" [title]="importedUserAgent">{{ importedUserAgent }}</div>
+            </div>
+          }
+        </div>
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+          <button class="px-4 py-2 border border-slate-300 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors" (click)="closeAboutModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

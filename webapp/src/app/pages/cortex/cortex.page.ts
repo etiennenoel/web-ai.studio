@@ -10,7 +10,6 @@ import {MathematicalCalculations} from './axon/util/mathematical-calculations';
 import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
-import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'page-cortex',
@@ -28,8 +27,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   isExtensionInstalled: boolean = true; // By default we don't show it.
   
   hardwareInfo: any = null;
-  comparisonChart: Chart | null = null;
-  testCharts: { [id: string]: Chart } = {};
 
   isImportedReport = false;
   importedTimestamp: string | null = null;
@@ -38,6 +35,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   isGeneratingUrl = false;
   generatedShareUrl: string | null = null;
   showShareModal = false;
+  showExtensionModal = false;
+  showAboutModal = false;
   isUrlCopied = false;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
@@ -121,9 +120,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       this.axonTestSuiteExecutor.preTestsStatus = TestStatus.Success;
       this.axonTestSuiteExecutor.results.status = TestStatus.Success;
       
-      setTimeout(() => {
-        this.renderCharts();
-      }, 100);
     } else {
       alert("Invalid report format");
     }
@@ -261,16 +257,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    if (this.comparisonChart) {
-      this.comparisonChart.destroy();
-    }
-    for (const key in this.testCharts) {
-      if (this.testCharts[key]) {
-        this.testCharts[key].destroy();
-      }
-    }
-  }
+  ngOnDestroy() {}
 
   ngAfterViewInit(): void {
     if(isPlatformServer(this.platformId)) {
@@ -278,6 +265,175 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+    if (this.isExtensionInstalled && !this.hardwareInfo) {
+      this.loadInitialHardwareInfo();
+    }
+  }
+
+  async loadInitialHardwareInfo() {
+      try {
+        this.hardwareInfo = await (window as any).webai.getHardwareInformation();
+      } catch (e) {
+        console.error("Failed to get hardware info", e);
+      }
+  }
+
+  getComputeUnit(): string {
+    if (this.hardwareInfo?.cpu?.modelName) {
+      const cores = this.hardwareInfo.cpu.numOfProcessors;
+      return cores ? `${this.hardwareInfo.cpu.modelName} (${cores}-Core)` : this.hardwareInfo.cpu.modelName;
+    }
+    return 'Extension Required';
+  }
+
+  getNpuInfo(): string {
+    const cpu = this.getComputeUnit();
+    if (cpu.includes('Apple M')) {
+      return 'Apple Neural Engine';
+    }
+    if (cpu.includes('Snapdragon')) {
+      return 'Qualcomm Hexagon';
+    }
+    if (cpu.includes('Intel')) {
+      return 'Intel NPU (if available)';
+    }
+    if (cpu.includes('AMD')) {
+      return 'AMD Ryzen AI (if available)';
+    }
+    return 'Unknown or None';
+  }
+
+  getMemoryInfo(): string {
+    if (this.hardwareInfo?.memory?.capacity) {
+      const gb = Math.round(this.hardwareInfo.memory.capacity / (1024 * 1024 * 1024));
+      return `${gb} GB RAM`;
+    }
+    return 'Extension Required';
+  }
+
+  getOsProfile(): string {
+    if (typeof navigator !== 'undefined') {
+       const uaData = (navigator as any).userAgentData;
+       if (uaData && uaData.platform) {
+         return uaData.platform;
+       }
+       
+       const ua = navigator.userAgent;
+       if (ua.includes('Mac OS X')) {
+          const match = ua.match(/Mac OS X (\d+[_.]\d+[_.]?\d*)/);
+          return match ? `macOS ${match[1].replace(/_/g, '.')}` : 'macOS';
+       } else if (ua.includes('Windows NT 10.0')) {
+          return 'Windows 10/11';
+       } else if (ua.includes('Linux')) {
+          return 'Linux';
+       } else if (ua.includes('Android')) {
+          return 'Android';
+       } else if (ua.includes('iPhone') || ua.includes('iPad')) {
+          return 'iOS / iPadOS';
+       }
+    }
+    return 'Unknown OS';
+  }
+
+  getBrowserInfo(): string {
+    if (typeof navigator !== 'undefined') {
+       const uaData = (navigator as any).userAgentData;
+       if (uaData && uaData.brands) {
+         const brand = uaData.brands.find((b: any) => !b.brand.includes('Not') && !b.brand.includes('Chromium'));
+         if (brand) {
+           return `${brand.brand} ${brand.version}`;
+         }
+       }
+       const ua = navigator.userAgent;
+       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+(\.\d+)?)/);
+       if (match) {
+         let name = match[1];
+         if (name === 'Edg') name = 'Edge';
+         return `${name} ${match[2]}`;
+       }
+    }
+    return 'Unknown Browser';
+  }
+
+  get isHardwareOptimal(): boolean {
+    const cpu = this.getComputeUnit();
+    const mem = this.getMemoryInfo();
+    return cpu.includes('Apple M') || cpu.includes('Snapdragon') || mem.includes('32 GB') || mem.includes('64 GB');
+  }
+
+  getMax(a: number | null | undefined, b: number | null | undefined): number {
+    return Math.max(a || 0, b || 0);
+  }
+
+  getPercentage(val: number | null | undefined, max: number): number {
+    if (!val || max === 0) return 0;
+    return Math.max(2, (val / max) * 100);
+  }
+
+  isWinner(type: 'cold'|'warm', coldVal: number | null | undefined, warmVal: number | null | undefined, metric: 'ttft'|'total'|'speed'): boolean {
+    const c = coldVal || 0;
+    const w = warmVal || 0;
+    if (c === 0 && w === 0) return false;
+    
+    if (metric === 'speed') {
+      if (type === 'cold') return c >= w && c > 0;
+      return w > c && w > 0;
+    } else {
+      // lower is better
+      if (type === 'cold') return (c <= w && c > 0) || (w === 0 && c > 0);
+      return (w < c && w > 0) || (c === 0 && w > 0);
+    }
+  }
+
+  getSelectedTestsCountForApi(api: BuiltInAiApi): number {
+    const tests = this.getTests(api);
+    return tests.filter(t => this.selectedTestIds.has(t.id)).length;
+  }
+
+  getCategoryStatus(api: BuiltInAiApi): TestStatus {
+    const tests = this.getTests(api);
+    if (tests.length === 0) return TestStatus.Idle;
+
+    const selectedTests = tests.filter(t => this.selectedTestIds.has(t.id));
+    if (selectedTests.length === 0) return TestStatus.Idle;
+
+    if (selectedTests.some(t => t.results.status === TestStatus.Error || t.results.status === TestStatus.Fail)) {
+      return TestStatus.Fail;
+    }
+    if (selectedTests.some(t => t.results.status === TestStatus.Executing)) {
+      return TestStatus.Executing;
+    }
+    if (selectedTests.every(t => t.results.status === TestStatus.Success || t.results.status === TestStatus.Skipped)) {
+      if (selectedTests.some(t => t.results.status === TestStatus.Success)) {
+        return TestStatus.Success;
+      }
+    }
+    return TestStatus.Idle;
+  }
+
+  triggerDownloadResults() {
+    if (!this.isExtensionInstalled) {
+      this.showExtensionModal = true;
+    } else {
+      this.downloadResults();
+    }
+  }
+
+  closeExtensionModal() {
+    this.showExtensionModal = false;
+  }
+
+  openAboutModal() {
+    this.showAboutModal = true;
+  }
+
+  closeAboutModal() {
+    this.showAboutModal = false;
+  }
+
+  confirmDownloadResults() {
+    this.showExtensionModal = false;
+    this.downloadResults();
   }
 
   async downloadResults() {
@@ -395,152 +551,19 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     
-    setTimeout(() => {
-      this.renderCharts();
-    }, 100);
   }
   
   getTestById(id: string): AxonTestInterface | undefined {
     return this.axonTestSuiteExecutor.testIdMap[id as AxonTestId];
   }
   
-  renderCharts() {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const textColor = isDark ? '#9aa0a6' : '#4b5563';
-    const gridColor = isDark ? '#3c4043' : '#e5e7eb';
-    
-    // Comparison Chart
-    const comparisonCanvas = document.getElementById('cortex-comparison-chart') as HTMLCanvasElement;
-    if (comparisonCanvas) {
-      if (this.comparisonChart) this.comparisonChart.destroy();
-      
-      const labels: string[] = [];
-      const ttftData: number[] = [];
-      const totalData: number[] = [];
-      
-      for (const testId of this.selectedTestIds) {
-        const test = this.getTestById(testId);
-        if (test && test.results.testIterationResults.length > 0) {
-          labels.push(test.id.substring(0, 15) + '...');
-          ttftData.push(test.results.averageTimeToFirstToken || 0);
-          totalData.push(test.results.averageTotalResponseTime || 0);
-        }
-      }
-      
-      this.comparisonChart = new Chart(comparisonCanvas, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Avg TTFT (ms)',
-              data: ttftData,
-              backgroundColor: '#8ab4f8',
-              borderColor: '#8ab4f8',
-              borderWidth: 1
-            },
-            {
-              label: 'Avg Total Response (ms)',
-              data: totalData,
-              backgroundColor: '#c58af9',
-              borderColor: '#c58af9',
-              borderWidth: 1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          color: textColor,
-          scales: {
-            x: {
-              grid: { color: gridColor },
-              ticks: { color: textColor, maxRotation: 45, minRotation: 45 }
-            },
-            y: {
-              grid: { color: gridColor },
-              ticks: { color: textColor }
-            }
-          },
-          plugins: {
-            legend: {
-              labels: { color: textColor }
-            }
-          }
-        }
-      });
-    }
-  }
-
-  renderTestChart(testId: string) {
-    const test = this.getTestById(testId);
-    if (!test || test.results.testIterationResults.length === 0) return;
-    
-    const canvas = document.getElementById('cortex-test-chart-' + test.id) as HTMLCanvasElement;
-    if (!canvas) return;
-    
-    if (this.testCharts[test.id]) this.testCharts[test.id].destroy();
-    
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const textColor = isDark ? '#9aa0a6' : '#4b5563';
-    const gridColor = isDark ? '#3c4043' : '#e5e7eb';
-    
-    const labels = test.results.testIterationResults.map((_, i) => `Run ${i + 1}`);
-    const ttft = test.results.testIterationResults.map(r => r.timeToFirstToken || 0);
-    const total = test.results.testIterationResults.map(r => r.totalResponseTime || 0);
-    
-    this.testCharts[test.id] = new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'TTFT (ms)',
-            data: ttft,
-            borderColor: '#8ab4f8',
-            backgroundColor: '#8ab4f8',
-            borderDash: [5, 5],
-            tension: 0.2
-          },
-          {
-            label: 'Total Response (ms)',
-            data: total,
-            borderColor: '#c58af9',
-            backgroundColor: '#c58af9',
-            tension: 0.2
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        color: textColor,
-        scales: {
-          x: {
-            grid: { color: gridColor },
-            ticks: { color: textColor }
-          },
-          y: {
-            grid: { color: gridColor },
-            ticks: { color: textColor },
-            beginAtZero: true
-          }
-        },
-        plugins: {
-          legend: {
-            labels: { color: textColor }
-          }
-        }
-      }
-    });
-  }
-
   forceSetup(testId: AxonTestId): Promise<void> {
     return this.axonTestSuiteExecutor.forceSetup(testId);
   }
 
   getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
-    const items = this.axonTestSuiteExecutor.results.testsResults.filter(value => {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const items = results.filter(value => {
       return value.api === builtInAIApi && value.startType === startType;
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
@@ -554,6 +577,37 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
         medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
     };
+  }
+
+  getGlobalSummaryResults(startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const items = results.filter(value => {
+      return value.startType === startType;
+    }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
+
+    if (items.length === 0) return undefined;
+
+    return {
+        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
+        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
+        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
+        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
+        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
+        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+    };
+  }
+
+  getGlobalPassedAndFailed(): { passed: number, failed: number } {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const passed = results.filter(r => r.status === TestStatus.Success).length;
+    const failed = results.filter(r => r.status === TestStatus.Fail || r.status === TestStatus.Error).length;
+    return { passed, failed };
+  }
+
+  getTestedApiCategoriesCount(): number {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const testedApis = new Set(results.filter(r => r.status !== TestStatus.Idle).map(r => r.api));
+    return testedApis.size;
   }
 
   getTests(api: BuiltInAiApi) {
@@ -729,12 +783,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   toggleTest(testId: AxonTestId) {
     const test = this.axonTestSuiteExecutor.testIdMap[testId];
     this.viewData[testId].iterationsCollapsed = !this.isTestCollapsed(test);
-    
-    if (!this.viewData[testId].iterationsCollapsed) {
-      setTimeout(() => {
-        this.renderTestChart(testId);
-      }, 50);
-    }
   }
 
   unescapeOutput(output: string): string {

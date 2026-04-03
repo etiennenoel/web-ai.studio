@@ -10,5 +10,9 @@ import {TestStatus} from '../../../../../enums/test-status.enum';
 export class AxonTestStatusBadgeComponent {
   @Input()
   status: TestStatus = TestStatus.Idle;
+
+  @Input()
+  selected?: boolean;
+
   protected readonly TestStatus = TestStatus;
 }
