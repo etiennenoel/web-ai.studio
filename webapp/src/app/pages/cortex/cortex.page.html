@@ -333,9 +333,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           @let globalCold = getGlobalSummaryResults('cold');
           @let globalWarm = getGlobalSummaryResults('warm');
-          @let globalBaseline = comparisonService.getGlobalSummaryResults(comparisonService.baselineData);
-          @let globalCloudFlash = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashData);
-          @let globalCloudFlashLite = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashLiteData);
+          @let globalBaseline = comparisonService.getGlobalSummaryResults(comparisonService.baselineData, selectedTestIds);
+          @let globalCloudFlash = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashData, selectedTestIds);
+          @let globalCloudFlashLite = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashLiteData, selectedTestIds);
 
           @let ttftColdLocal = globalCold?.averageTimeToFirstToken || 0;
           @let ttftWarmLocal = globalWarm?.averageTimeToFirstToken || 0;
@@ -404,7 +404,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')" [class.text-slate-500]="!isWinner('baseline', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')">
-                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} 
+                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -425,7 +425,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner('cloudFlashLite', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')" [class.text-slate-500]="!isWinner('cloudFlashLite', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlashLite', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -441,7 +441,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner('cloudFlash', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')" [class.text-slate-500]="!isWinner('cloudFlash', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlash', ttftColdLocal, ttftWarmLocal, ttftBaseline, ttftCloudFlash, ttftCloudFlashLite, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -502,7 +502,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')" [class.text-slate-500]="!isWinner('baseline', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')">
-                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} 
+                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -523,7 +523,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner('cloudFlashLite', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')" [class.text-slate-500]="!isWinner('cloudFlashLite', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlashLite', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -539,7 +539,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner('cloudFlash', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')" [class.text-slate-500]="!isWinner('cloudFlash', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlash', totalColdLocal, totalWarmLocal, totalBaseline, totalCloudFlash, totalCloudFlashLite, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -600,7 +600,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')" [class.text-slate-500]="!isWinner('baseline', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')">
-                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} 
+                     Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -621,7 +621,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner('cloudFlashLite', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')" [class.text-slate-500]="!isWinner('cloudFlashLite', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlashLite', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -637,7 +637,7 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner('cloudFlash', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')" [class.text-slate-500]="!isWinner('cloudFlash', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
+                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span> 
                      @if (isWinner('cloudFlash', speedColdLocal, speedWarmLocal, speedBaseline, speedCloudFlash, speedCloudFlashLite, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
@@ -710,9 +710,9 @@
               <!-- Avg TTFT Card -->
               @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
               @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
-              @let baselineTtft = comparisonService.getSummaryResults(comparisonService.baselineData, element.id)?.averageTimeToFirstToken;
-              @let cloudFlashTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id)?.averageTimeToFirstToken;
-              @let cloudFlashLiteTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id)?.averageTimeToFirstToken;
+              @let baselineTtft = comparisonService.getSummaryResults(comparisonService.baselineData, element.id, selectedTestIds)?.averageTimeToFirstToken;
+              @let cloudFlashTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTimeToFirstToken;
+              @let cloudFlashLiteTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTimeToFirstToken;
               @let maxTtft = getMax(coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -756,7 +756,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')" [class.text-slate-500]="!isWinner('baseline', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')">
-                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }}
+                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -777,7 +777,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner('cloudFlashLite', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')" [class.text-slate-500]="!isWinner('cloudFlashLite', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlashLite', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
@@ -793,7 +793,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner('cloudFlash', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')" [class.text-slate-500]="!isWinner('cloudFlash', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlash', coldTtft, warmTtft, baselineTtft, cloudFlashTtft, cloudFlashLiteTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
@@ -811,9 +811,9 @@
               <!-- Avg Execution Time Card -->
               @let coldTotal = coldSummaryResults?.averageTotalResponseTime;
               @let warmTotal = warmSummaryResults?.averageTotalResponseTime;
-              @let baselineTotal = comparisonService.getSummaryResults(comparisonService.baselineData, element.id)?.averageTotalResponseTime;
-              @let cloudFlashTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id)?.averageTotalResponseTime;
-              @let cloudFlashLiteTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id)?.averageTotalResponseTime;
+              @let baselineTotal = comparisonService.getSummaryResults(comparisonService.baselineData, element.id, selectedTestIds)?.averageTotalResponseTime;
+              @let cloudFlashTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTotalResponseTime;
+              @let cloudFlashLiteTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTotalResponseTime;
               @let maxTotal = getMax(coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -857,7 +857,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')" [class.text-slate-500]="!isWinner('baseline', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')">
-                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }}
+                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -878,7 +878,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner('cloudFlashLite', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')" [class.text-slate-500]="!isWinner('cloudFlashLite', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlashLite', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
@@ -894,7 +894,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner('cloudFlash', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')" [class.text-slate-500]="!isWinner('cloudFlash', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlash', coldTotal, warmTotal, baselineTotal, cloudFlashTotal, cloudFlashLiteTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
@@ -912,9 +912,9 @@
               <!-- Avg Generation Speed Card -->
               @let coldSpeed = coldSummaryResults?.averageTokenPerSecond;
               @let warmSpeed = warmSummaryResults?.averageTokenPerSecond;
-              @let baselineSpeed = comparisonService.getSummaryResults(comparisonService.baselineData, element.id)?.averageTokenPerSecond;
-              @let cloudFlashSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id)?.averageTokenPerSecond;
-              @let cloudFlashLiteSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id)?.averageTokenPerSecond;
+              @let baselineSpeed = comparisonService.getSummaryResults(comparisonService.baselineData, element.id, selectedTestIds)?.averageTokenPerSecond;
+              @let cloudFlashSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTokenPerSecond;
+              @let cloudFlashLiteSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTokenPerSecond;
               @let maxSpeed = getMax(coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -958,7 +958,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner('baseline', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')" [class.text-slate-500]="!isWinner('baseline', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')">
-                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }}
+                         Baseline {{ comparisonService.baselineModelName ? '- ' + comparisonService.baselineModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (!isExtensionInstalled) {
                            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                              <i class="bi bi-browser-chrome"></i> Install Extension
@@ -979,7 +979,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner('cloudFlashLite', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')" [class.text-slate-500]="!isWinner('cloudFlashLite', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlashLite', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
@@ -995,7 +995,7 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner('cloudFlash', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')" [class.text-slate-500]="!isWinner('cloudFlash', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
+                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ml-1">Dummy Data</span>
                          @if (isWinner('cloudFlash', coldSpeed, warmSpeed, baselineSpeed, cloudFlashSpeed, cloudFlashLiteSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">

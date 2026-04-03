@@ -144,11 +144,12 @@ export class ComparisonDataService {
     };
   }
 
-  getGlobalSummaryResults(reportData: any): AxonSummaryResultsInterface | undefined {
+  getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {
     if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
 
     const results = reportData.results.testsResults;
-    const items = results.map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
+    const items = results.filter((value: any) => selectedTestIds.has(value.id))
+      .map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;
 
@@ -156,10 +157,6 @@ export class ComparisonDataService {
       averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.tokensPerSecond ?? 0)),
       averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map((item: any) => item.timeToFirstToken ?? 0)),
       averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map((item: any) => item.totalResponseTime ?? 0)),
-    };
-  }
-}
-seTime ?? 0)),
     };
   }
 }
