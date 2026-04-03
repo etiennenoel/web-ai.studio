@@ -41,7 +41,176 @@
 
   <main class="max-w-7xl mx-auto px-6 sm:px-8 py-8 flex flex-col gap-6">
 
-    <!-- Local System Environment Card -->
+<!-- Setup Accordion -->
+    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors"
+           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
+           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
+        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
+          <div class="flex items-center gap-4">
+            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+              <span class="text-xs font-bold text-slate-500">1</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 mb-0">Setup Details & Availability</h3>
+            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2">
+                <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Checking...
+              </span>
+            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2">
+                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
+              </span>
+            }
+          </div>
+          <i class="bi text-slate-400 text-lg" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
+        </div>
+        
+        <div class="px-6 py-4 bg-white border-t border-slate-100" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
+              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm">
+                <div class="font-bold text-sm text-slate-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
+                <div class="shrink-0">
+                  @switch (result.apiAvailability) {
+                    @case ("unknown") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
+                        <svg class="animate-spin h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
+                      </span>
+                    }
+                    @case ("available") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                        <i class="bi bi-check-circle-fill"></i> Ready
+                      </span>
+                    }
+                    @case ("downloading") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse">
+                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
+                      </span>
+                    }
+                    @case ("downloadable") {
+                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
+                        <i class="bi bi-download"></i> Download
+                      </button>
+                    }
+                    @case ("unavailable") {
+                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+                        <i class="bi bi-x-circle-fill"></i> Unavailable
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Cortex Report & Chart -->
+
+<!-- Suite Execution Planner -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-10 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-indigo-600 shadow-sm">
+            <i class="bi bi-check2-square text-lg"></i>
+          </div>
+          <h2 class="text-lg font-bold text-slate-800 tracking-tight mb-0">Suite Execution Planner</h2>
+          <span class="bg-indigo-100 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border">{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Selected</span>
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer group mb-0">
+          <input type="checkbox"
+                 class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                 [checked]="isAllSelected()"
+                 [indeterminate]="isPartiallySelected()"
+                 [disabled]="isTestingRunning"
+                 (change)="toggleAllSelection($event)">
+          <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All API Suites</span>
+        </label>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (element of builtInAiApis; track $index) {
+          @let api = getBuiltInAiAPIFromItemInterface(element);
+          @let tests = getTests(api);
+          @if (tests.length > 0) {
+            @let selectedCount = getSelectedTestsCountForApi(api);
+            <label class="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-indigo-300 transition-colors cursor-pointer" [class.border-dashed]="isCategoryPartiallySelected(api)" [class.ring-1]="selectedCount > 0" [class.ring-indigo-500]="selectedCount > 0" [class.border-indigo-500]="selectedCount > 0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">
+                  <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
+                </div>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-0">
+                    <h3 class="text-sm font-bold text-slate-800 tracking-tight">{{ element.id }}</h3>
+                    <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
+                  </div>
+                  <span class="text-xs text-slate-500 font-medium">{{ tests.length }} Total Tests Available</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-bold text-indigo-600">{{ selectedCount }} / {{ tests.length }}</span>
+                <input type="checkbox"
+                       class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                       [checked]="isCategorySelected(api)"
+                       [indeterminate]="isCategoryPartiallySelected(api)"
+                       [disabled]="isTestingRunning"
+                       (change)="toggleCategorySelection(api, $event)">
+              </div>
+            </label>
+          }
+        }
+      </div>
+
+      <div class="mt-8 flex justify-center border-t border-slate-200 pt-6">
+        <button type="button" class="w-full max-w-xs py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
+                (click)="start()"
+                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
+          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span>Running...</span>
+          } @else {
+            <i class="bi bi-play-fill text-lg"></i>
+            <span>Run Cortex Test</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- API Categories -->
+
+<!-- Cortex Report & Chart -->
+    @if (isReportReady) {
+      <section class="mt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+              <i class="bi bi-bar-chart-fill text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0">Cortex Report</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm" (click)="saveReportToUrl()">
+              <i class="bi bi-share text-indigo-600"></i> Share via URL
+            </button>
+            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white border border-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200" (click)="triggerDownloadResults()">
+              <i class="bi bi-download"></i> Download Report
+            </button>
+          </div>
+        </div>
+
+        @if (hardwareInfo) {
+        }
+
+      </section>
+    }
+
+    <!-- Legend / Context -->
+
+<!-- Local System Environment Card -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-100 bg-white flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -126,506 +295,398 @@
     </div>
 
     <!-- Setup Accordion -->
-    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors"
-           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
-          <div class="flex items-center gap-4">
-            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-              <span class="text-xs font-bold text-slate-500">1</span>
+
+    <!-- API Categories -->
+    @for (element of builtInAiApis; track $index) {
+      @let api = getBuiltInAiAPIFromItemInterface(element);
+      @let tests = getTests(api);
+      @if (tests.length > 0) {
+        @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
+        @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
+        @let progress = getApiProgress(api);
+        @let isCollapsed = isApiCollapsed(api, progress);
+
+        <div class="mb-14">
+          <!-- Category Header -->
+          <div class="flex items-center justify-between gap-3 mb-6 px-1">
+            <div class="flex items-center gap-3">
+              <i class="bi text-2xl text-slate-800" [ngClass]="getIconForApi(api)"></i>
+              <h2 class="text-2xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-2">
+                {{ element.id }}
+                <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
+              </h2>
             </div>
-            <h3 class="text-sm font-bold text-slate-800 mb-0">Setup Details & Availability</h3>
-            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2">
-                <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Checking...
-              </span>
-            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2">
-                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
-              </span>
-            }
+            <label class="flex items-center gap-2 cursor-pointer group mb-0">
+              <input type="checkbox"
+                     class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                     [checked]="isCategorySelected(api)"
+                     [indeterminate]="isCategoryPartiallySelected(api)"
+                     [disabled]="isTestingRunning"
+                     (change)="toggleCategorySelection(api, $event)">
+              <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Select All {{ tests.length }} Tests</span>
+            </label>
           </div>
-          <i class="bi text-slate-400 text-lg" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
-        </div>
-        
-        <div class="px-6 py-4 bg-white border-t border-slate-100" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
-              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm">
-                <div class="font-bold text-sm text-slate-700 truncate pr-4" [title]="result.id">{{ result.id }}</div>
-                <div class="shrink-0">
-                  @switch (result.apiAvailability) {
-                    @case ("unknown") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
-                        <svg class="animate-spin h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
-                      </span>
-                    }
-                    @case ("available") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
-                        <i class="bi bi-check-circle-fill"></i> Ready
-                      </span>
-                    }
-                    @case ("downloading") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse">
-                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
-                      </span>
-                    }
-                    @case ("downloadable") {
-                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
-                        <i class="bi bi-download"></i> Download
-                      </button>
-                    }
-                    @case ("unavailable") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
-                        <i class="bi bi-x-circle-fill"></i> Unavailable
-                      </span>
-                    }
-                  }
+
+          <!-- Aggregate Overview Container -->
+          @let catStatus = getCategoryStatus(api);
+          @let catSelected = isCategorySelected(api) || isCategoryPartiallySelected(api);
+          <div class="bg-slate-50/80 rounded-2xl border p-5 sm:p-6 mb-2 shadow-sm transition-colors"
+               [class.border-dashed]="isCategoryPartiallySelected(api)"
+               [class.border-red-300]="catStatus === TestStatus.Fail || catStatus === TestStatus.Error"
+               [class.border-blue-300]="catStatus === TestStatus.Executing"
+               [class.border-indigo-300]="catStatus === TestStatus.Idle && catSelected"
+               [class.border-slate-200]="catStatus === TestStatus.Idle && !catSelected"
+               [class.border-green-300]="catStatus === TestStatus.Success">
+            <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Aggregate Performance (Average)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Avg TTFT Card -->
+              @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
+              @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
+              @let maxTtft = getMax(coldTtft, warmTtft);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-stopwatch text-slate-600"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Time To First Token</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.text-slate-500]="!isWinner('cold', coldTtft, warmTtft, 'ttft')">
+                         Cold @if (isWinner('cold', coldTtft, warmTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.text-slate-700]="!isWinner('cold', coldTtft, warmTtft, 'ttft')">{{ coldTtft ? (coldTtft | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldTtft, warmTtft, 'ttft')" [class.bg-slate-300]="!isWinner('cold', coldTtft, warmTtft, 'ttft')" [style.width]="getPercentage(coldTtft, maxTtft) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.text-slate-500]="!isWinner('warm', coldTtft, warmTtft, 'ttft')">
+                         Warm @if (isWinner('warm', coldTtft, warmTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.text-slate-700]="!isWinner('warm', coldTtft, warmTtft, 'ttft')">{{ warmTtft ? (warmTtft | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldTtft, warmTtft, 'ttft')" [class.bg-slate-300]="!isWinner('warm', coldTtft, warmTtft, 'ttft')" [style.width]="getPercentage(warmTtft, maxTtft) + '%'"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
 
-    <!-- Cortex Report & Chart -->
-    @if (isReportReady) {
-      <section class="mt-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
-              <i class="bi bi-bar-chart-fill text-lg"></i>
+              <!-- Avg Execution Time Card -->
+              @let coldTotal = coldSummaryResults?.averageTotalResponseTime;
+              @let warmTotal = warmSummaryResults?.averageTotalResponseTime;
+              @let maxTotal = getMax(coldTotal, warmTotal);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-activity text-slate-600"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Execution Time</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.text-slate-500]="!isWinner('cold', coldTotal, warmTotal, 'total')">
+                         Cold @if (isWinner('cold', coldTotal, warmTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.text-slate-700]="!isWinner('cold', coldTotal, warmTotal, 'total')">{{ coldTotal ? (coldTotal | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldTotal, warmTotal, 'total')" [class.bg-slate-300]="!isWinner('cold', coldTotal, warmTotal, 'total')" [style.width]="getPercentage(coldTotal, maxTotal) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.text-slate-500]="!isWinner('warm', coldTotal, warmTotal, 'total')">
+                         Warm @if (isWinner('warm', coldTotal, warmTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.text-slate-700]="!isWinner('warm', coldTotal, warmTotal, 'total')">{{ warmTotal ? (warmTotal | number:'1.0-0') : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldTotal, warmTotal, 'total')" [class.bg-slate-300]="!isWinner('warm', coldTotal, warmTotal, 'total')" [style.width]="getPercentage(warmTotal, maxTotal) + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avg Generation Speed Card -->
+              @let coldSpeed = coldSummaryResults?.averageTokenPerSecond;
+              @let warmSpeed = warmSummaryResults?.averageTokenPerSecond;
+              @let maxSpeed = getMax(coldSpeed, warmSpeed);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <i class="bi bi-speedometer text-slate-600"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0">Avg Generation Speed</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.text-slate-500]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')">
+                         Cold @if (isWinner('cold', coldSpeed, warmSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.text-slate-700]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')">{{ coldSpeed ? (coldSpeed >= 1000 ? ((coldSpeed/1000) | number:'1.1-1') + 'k' : (coldSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner('cold', coldSpeed, warmSpeed, 'speed')" [class.bg-slate-300]="!isWinner('cold', coldSpeed, warmSpeed, 'speed')" [style.width]="getPercentage(coldSpeed, maxSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.text-slate-500]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')">
+                         Warm @if (isWinner('warm', coldSpeed, warmSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.text-slate-700]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')">{{ warmSpeed ? (warmSpeed >= 1000 ? ((warmSpeed/1000) | number:'1.1-1') + 'k' : (warmSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner('warm', coldSpeed, warmSpeed, 'speed')" [class.bg-slate-300]="!isWinner('warm', coldSpeed, warmSpeed, 'speed')" [style.width]="getPercentage(warmSpeed, maxSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0">Cortex Report</h2>
           </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm" (click)="saveReportToUrl()">
-              <i class="bi bi-share text-indigo-600"></i> Share via URL
-            </button>
-            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white border border-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200" (click)="triggerDownloadResults()">
-              <i class="bi bi-download"></i> Download Report
-            </button>
-          </div>
-        </div>
 
-        @if (hardwareInfo) {
-        }
-
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-hidden">
-          <h3 class="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-8">
-            <i class="bi bi-bar-chart-fill text-slate-400"></i>
-            Tests Comparison (TTFT & Total Response Time)
-          </h3>
-          <div class="relative w-full h-[400px]">
-            <canvas id="cortex-comparison-chart"></canvas>
+          <!-- Collapsible Divider for Tests -->
+          <div class="flex items-center gap-4 py-4">
+            <div class="flex-1 h-px bg-slate-200/80"></div>
+            <button (click)="toggleApi(api, progress)" class="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 shadow-sm rounded-full text-xs font-bold text-slate-600 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all active:scale-95">
+              @if (isCollapsed) {
+                <i class="bi bi-chevron-down"></i> View {{ tests.length }} Detailed Tests
+              } @else {
+                <i class="bi bi-chevron-up"></i> Hide Detailed Tests
+              }
+            </button>
+            <div class="flex-1 h-px bg-slate-200/80"></div>
           </div>
+
+          <!-- Detailed Tests List -->
+          @if (!isCollapsed) {
+            <div class="mt-4 flex flex-col gap-2">
+              @for (test of tests; track $index) {
+                @let isTestExpanded = !isTestCollapsed(test);
+                <!-- Test Block -->
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-6 transition-all duration-300"
+                     [class.border-red-300]="test.results.status === TestStatus.Fail || test.results.status === TestStatus.Error"
+                     [class.border-blue-300]="test.results.status === TestStatus.Executing"
+                     [class.border-indigo-300]="test.results.status === TestStatus.Idle && selectedTestIds.has(test.id)"
+                     [class.border-slate-200]="test.results.status === TestStatus.Idle && !selectedTestIds.has(test.id)"
+                     [class.border-green-300]="test.results.status === TestStatus.Success">
+                  <!-- Test Header -->
+                  <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-100 transition-colors" (click)="toggleTestSelection(test.id, $event)">
+                    <div class="flex items-start gap-3">
+                      <div class="mt-0.5">
+                        <input type="checkbox"
+                               class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                               [checked]="selectedTestIds.has(test.id)"
+                               [disabled]="isTestingRunning"
+                               (click)="$event.stopPropagation()"
+                               (change)="toggleTestSelection(test.id, $event)">
+                      </div>
+                      <div>
+                        <h3 class="text-sm font-bold text-slate-800 tracking-tight">{{ test.id }}</h3>
+                        <div class="flex flex-wrap gap-2 mt-1.5 items-center">
+                          <axon-test-status-badge [status]="test.results.status" [selected]="selectedTestIds.has(test.id)"></axon-test-status-badge>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                            @if (test.results.inputAudioDuration) {
+                              {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
+                            } @else {
+                              {{ test.results.input.length | number:'1.0-0' }} chars
+                            }
+                          </span>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                            @if (test.results.inputImageDataUrl) { Image }
+                            @else if (test.results.inputAudioUrl) { Audio }
+                            @else { Text }
+                          </span>
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" [ngClass]="test.results.startType === 'cold' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-orange-50 text-orange-700 border border-orange-200'">
+                            <i class="bi" [ngClass]="test.results.startType === 'cold' ? 'bi-thermometer-snow' : 'bi-thermometer-sun'"></i> {{ test.results.startType }} Start
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Test Metric Overview (Always Visible) -->
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead>
+                        <tr class="bg-white border-b border-slate-200">
+                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance Metric</th>
+                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold uppercase tracking-widest border-l border-slate-100" [ngClass]="test.results.startType === 'cold' ? 'text-blue-600 bg-blue-50/30' : 'text-orange-600 bg-orange-50/30'">Local Result</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Time To First Token -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-stopwatch text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Time To First Token</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Total Execution Time -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-activity text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Total Execution Time</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Generation Speed -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                          <td class="p-4 border-b border-slate-100 align-middle">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <i class="bi bi-speedometer text-slate-400"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Generation Speed</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700">{{ test.results.averageTokensPerSecond != null ? (test.results.averageTokensPerSecond | number:'1.0-0') : '—' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400">c/s</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Deep Dive Expander -->
+                  <button (click)="toggleTest(test.id)" class="w-full py-2.5 bg-slate-50 border-t border-slate-200 text-[11px] font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                    @if (isTestExpanded) {
+                      <i class="bi bi-chevron-up"></i> Hide Deep Dive Details
+                    } @else {
+                      <i class="bi bi-chevron-down"></i> View Test Deep Dive
+                    }
+                  </button>
+
+                  <!-- Expanded Details Area -->
+                  @if (isTestExpanded) {
+                    <div class="border-t border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                      
+                      <!-- Left Col: Payload -->
+                      <div class="flex-1 p-5 lg:w-1/2">
+                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                          <i class="bi bi-terminal"></i> Input Payload
+                        </h4>
+                        <div class="bg-slate-900 rounded-lg p-4 shadow-inner border border-slate-800 flex flex-col gap-3">
+                          <pre class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto custom-scrollbar">{{ test.results.input }}</pre>
+                          @if (test.results.inputImageDataUrl) {
+                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all self-start" (click)="openImage(test.results.inputImageDataUrl, $event)">
+                              <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                            </div>
+                          }
+                          @if (test.results.inputAudioUrl) {
+                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-3 shadow-sm flex items-center justify-center self-start">
+                              <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Right Col: Iterations & Chart -->
+                      <div class="flex-1 p-5 lg:w-1/2 flex flex-col gap-6">
+
+                        <!-- Micro Iterations Log -->
+                        <div>
+                          <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                            <i class="bi bi-list"></i> Local Iteration Log
+                          </h4>
+                          <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+                            <table class="w-full text-left">
+                              <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                  <th class="px-3 py-2 w-10">#</th>
+                                  <th class="px-3 py-2 text-right">TTFT</th>
+                                  <th class="px-3 py-2 text-right">Total</th>
+                                  <th class="px-3 py-2 text-right">Speed</th>
+                                  <th class="px-3 py-2 text-center">Output</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-50">
+                                @for (iter of test.results.testIterationResults; track $index) {
+                                  <tr class="text-xs hover:bg-slate-50 transition-colors" [class.bg-amber-50]="iter.status === TestStatus.Executing">
+                                    <td class="px-3 py-1.5 text-slate-400 font-mono">{{ $index + 1 }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }} ms</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }} ms</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "—" }} c/s</td>
+                                    <td class="px-3 py-1.5 text-center">
+                                      <button class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-[10px]" 
+                                              title="Toggle Output"
+                                              [disabled]="!iter.output"
+                                              (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
+                                        @if (!viewData[test.id].expandedOutputs?.[$index]) {
+                                          <i class="bi bi-file-text"></i> View
+                                        } @else {
+                                          <i class="bi bi-chevron-up"></i> Hide
+                                        }
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  @if (viewData[test.id].expandedOutputs?.[$index]) {
+                                    <tr class="bg-slate-900 border-b border-slate-200">
+                                      <td colspan="5" class="p-4 !text-left">
+                                        <div class="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
+                                          {{ unescapeOutput(iter.output ?? '') }}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  }
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
-      </section>
+      }
     }
 
-    <!-- Performance Overview Table -->
-    <section class="mt-4">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
-           <i class="bi bi-activity text-lg"></i>
-        </div>
-        <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0">Performance Overview</h2>
-      </div>
-
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[1000px]">
-          <thead>
-            <tr>
-              <th class="px-4 py-3 border-b border-slate-200 bg-slate-50 text-xs font-bold text-slate-600 uppercase tracking-wider w-64 align-bottom">
-                <div class="flex items-center gap-3">
-                  <div class="shrink-0" (click)="$event.stopPropagation()">
-                    <input type="checkbox" 
-                           class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 shadow-sm"
-                           [class.cursor-pointer]="!isTestingRunning"
-                           [class.cursor-not-allowed]="isTestingRunning"
-                           [class.opacity-50]="isTestingRunning"
-                           [checked]="isAllSelected()"
-                           [indeterminate]="isPartiallySelected()"
-                           [disabled]="isTestingRunning"
-                           (change)="toggleAllSelection($event)"
-                           title="Select/Deselect All">
-                  </div>
-                  API Category / Test Name
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">AVG TTFT (MS)</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MED TTFT (MS)</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">AVG TOTAL (MS)</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MED TOTAL (MS)</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">AVG CHAR/S</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-              <th class="px-3 py-3 text-center border-b border-slate-200 bg-slate-50">
-                <div class="flex flex-col items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MED CHAR/S</span>
-                  <div class="flex w-full divide-x divide-slate-200 border-t border-slate-200 mt-2 pt-2">
-                    <div class="flex-1 flex items-center justify-center gap-1 text-blue-600"><i class="bi bi-thermometer-snow text-xs"></i> <span class="text-[10px] font-bold">COLD</span></div>
-                    <div class="flex-1 flex items-center justify-center gap-1 text-orange-500"><i class="bi bi-thermometer-sun text-xs"></i> <span class="text-[10px] font-bold">WARM</span></div>
-                  </div>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (element of builtInAiApis; track $index) {
-              @let api = getBuiltInAiAPIFromItemInterface(element);
-              @let tests = getTests(api);
-              @if (tests.length > 0) {
-                @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
-                @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
-                @let progress = getApiProgress(api);
-                @let isCollapsed = isApiCollapsed(api, progress);
-
-                <tr class="group hover:bg-slate-50/50 transition-colors cursor-pointer" [class.bg-indigo-50]="!isCollapsed" [class.bg-opacity-20]="!isCollapsed" (click)="toggleApi(api, progress)">
-                  <td class="px-4 py-3 border-b border-slate-100 whitespace-nowrap">
-                    <div class="flex items-center gap-3">
-                      <div class="shrink-0" (click)="$event.stopPropagation()">
-                        <input type="checkbox" 
-                               class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500"
-                               [class.cursor-pointer]="!isTestingRunning"
-                               [class.cursor-not-allowed]="isTestingRunning"
-                               [class.opacity-50]="isTestingRunning"
-                               [checked]="isCategorySelected(api)"
-                               [indeterminate]="isCategoryPartiallySelected(api)"
-                               [disabled]="isTestingRunning"
-                               (change)="toggleCategorySelection(api, $event)">
-                      </div>
-                      <button class="text-slate-400 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50">
-                        <i class="bi" [class.bi-chevron-down]="!isCollapsed" [class.bi-chevron-right]="isCollapsed"></i>
-                      </button>
-                      <div class="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center shadow-sm text-slate-600">
-                        <i class="bi text-base" [ngClass]="getIconForApi(api)"></i>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-semibold text-slate-800">{{ element.id }}</span>
-                        <div class="flex items-center gap-2 mt-0.5">
-                          <span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{{ progress.total }} Tests</span>
-                          @if (progress.passed > 0) {
-                            <span class="bg-emerald-50 text-emerald-700 border-emerald-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border">
-                              <i class="bi bi-check-circle-fill text-[10px]"></i> {{ progress.passed }}
-                            </span>
-                          }
-                          @if (progress.executing > 0) {
-                            <span class="bg-amber-50 text-amber-700 border-amber-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border">
-                               <svg class="animate-spin h-3 w-3 text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {{ progress.executing }}
-                            </span>
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-blue-50/10">
-                        @if (coldSummaryResults?.averageTimeToFirstToken != null) {
-                          <span>{{ coldSummaryResults!.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-orange-50/10">
-                        @if (warmSummaryResults?.averageTimeToFirstToken != null) {
-                          <span>{{ warmSummaryResults!.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-blue-50/10">
-                        @if (coldSummaryResults?.medianTimeToFirstToken != null) {
-                          <span>{{ coldSummaryResults!.medianTimeToFirstToken | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-orange-50/10">
-                        @if (warmSummaryResults?.medianTimeToFirstToken != null) {
-                          <span>{{ warmSummaryResults!.medianTimeToFirstToken | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-blue-50/10">
-                        @if (coldSummaryResults?.averageTotalResponseTime != null) {
-                          <span>{{ coldSummaryResults!.averageTotalResponseTime | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-orange-50/10">
-                        @if (warmSummaryResults?.averageTotalResponseTime != null) {
-                          <span>{{ warmSummaryResults!.averageTotalResponseTime | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-blue-50/10">
-                        @if (coldSummaryResults?.medianTotalResponseTime != null) {
-                          <span>{{ coldSummaryResults!.medianTotalResponseTime | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-slate-700 bg-orange-50/10">
-                        @if (warmSummaryResults?.medianTotalResponseTime != null) {
-                          <span>{{ warmSummaryResults!.medianTotalResponseTime | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">ms</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-emerald-600 bg-blue-50/10">
-                        @if (coldSummaryResults?.averageTokenPerSecond != null) {
-                          <span>{{ coldSummaryResults!.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">c/s</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-emerald-600 bg-orange-50/10">
-                        @if (warmSummaryResults?.averageTokenPerSecond != null) {
-                          <span>{{ warmSummaryResults!.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">c/s</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-
-                  <td class="px-0 py-0 border-b border-slate-100 group-hover:bg-slate-50/50 transition-colors align-middle">
-                    <div class="flex w-full h-full divide-x divide-slate-100 items-stretch min-h-[48px]">
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-emerald-600 bg-blue-50/10">
-                        @if (coldSummaryResults?.medianTokenPerSecond != null) {
-                          <span>{{ coldSummaryResults!.medianTokenPerSecond | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">c/s</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                      <div class="flex-1 flex items-center justify-center text-xs font-medium text-emerald-600 bg-orange-50/10">
-                        @if (warmSummaryResults?.medianTokenPerSecond != null) {
-                          <span>{{ warmSummaryResults!.medianTokenPerSecond | number:'1.0-0' }} <span class="text-[10px] text-slate-400 font-normal">c/s</span></span>
-                        } @else { <span class="text-slate-300">—</span> }
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-                @if (!isCollapsed) {
-                  <tr>
-                    <td colspan="7" class="p-0 border-b-2 border-indigo-100 bg-slate-50/80">
-                      <div class="pl-14 pr-6 py-6 border-l-[3px] border-indigo-500 ml-4">
-                        <div class="flex items-center gap-2 mb-4">
-                          <i class="bi text-slate-400" [ngClass]="getIconForApi(api)"></i>
-                          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-0">Tests in {{ element.id }}</h4>
-                        </div>
-
-                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                          <div class="grid grid-cols-12 gap-4 px-5 py-3 border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-500 uppercase tracking-wider items-center">
-                            <div class="col-span-5 pl-8">Test ID</div>
-                            <div class="col-span-1 text-center">Type</div>
-                            <div class="col-span-2 text-center">Status</div>
-                            <div class="col-span-2 text-right">Avg TTFT</div>
-                            <div class="col-span-2 text-right">Avg Total</div>
-                          </div>
-
-                          @for (test of tests; track $index) {
-                            @let isTestExpanded = !isTestCollapsed(test);
-                            <div class="grid grid-cols-12 gap-4 px-5 py-4 border-b border-slate-100 items-center transition-colors cursor-pointer relative group"
-                                 [class.bg-amber-50]="test.results.status === TestStatus.Executing"
-                                 [class.opacity-60]="!selectedTestIds.has(test.id)"
-                                 [class.bg-white]="selectedTestIds.has(test.id)"
-                                 [class.hover:bg-slate-50]="selectedTestIds.has(test.id)"
-                                 (click)="toggleTest(test.id)">
-                              
-                              <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 transition-opacity" [class.group-hover:opacity-100]="selectedTestIds.has(test.id)"></div>
-                              
-                              <div class="col-span-5 flex items-center gap-3">
-                                <div class="shrink-0" (click)="$event.stopPropagation()">
-                                  <input type="checkbox" 
-                                         class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
-                                         [class.cursor-pointer]="!isTestingRunning"
-                                         [class.cursor-not-allowed]="isTestingRunning"
-                                         [checked]="selectedTestIds.has(test.id)"
-                                         [disabled]="isTestingRunning"
-                                         (change)="toggleTestSelection(test.id, $event)">
-                                </div>
-                                <div class="flex flex-col overflow-hidden">
-                                  <span class="text-sm font-semibold text-slate-800 truncate" [title]="test.id">{{ test.id }}</span>
-                                  <span class="text-[11px] text-slate-500 font-medium truncate max-w-sm" [title]="test.results.input">{{ test.results.input }}</span>
-                                </div>
-                              </div>
-                              
-                              <div class="col-span-1 flex justify-center">
-                                @if (test.results.startType === 'cold') {
-                                  <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border"><i class="bi bi-thermometer-snow"></i>Cold</span>
-                                } @else {
-                                  <span class="bg-transparent text-slate-600 border-slate-300 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border"><i class="bi bi-thermometer-sun"></i>Warm</span>
-                                }
-                              </div>
-                              
-                              <div class="col-span-2 flex justify-center">
-                                <axon-test-status-badge [status]="test.results.status"></axon-test-status-badge>
-                              </div>
-                              
-                              <div class="col-span-2 text-right text-sm font-medium text-slate-700">
-                                {{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : "—" }} <span class="text-[10px] text-slate-400 font-normal">ms</span>
-                              </div>
-                              
-                              <div class="col-span-2 text-right text-sm font-medium text-slate-700 pr-4">
-                                {{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : "—" }} <span class="text-[10px] text-slate-400 font-normal">ms</span>
-                                <i class="bi text-slate-400 ml-2 absolute right-4 top-1/2 -translate-y-1/2" [class.bi-chevron-up]="isTestExpanded" [class.bi-chevron-down]="!isTestExpanded"></i>
-                              </div>
-                            </div>
-
-                            @if (isTestExpanded) {
-                              <div class="bg-slate-50/50 p-6 border-b border-slate-200">
-                                <div class="mb-6">
-                                  <h5 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                    <i class="bi bi-terminal"></i> Input Payload
-                                    <span class="bg-slate-200 px-2 py-0.5 rounded text-slate-600 font-mono lowercase">
-                                      @if (test.results.inputAudioDuration) {
-                                        {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
-                                      } @else {
-                                        {{ test.results.input.length | number:'1.0-0' }} chars
-                                      }
-                                    </span>
-                                  </h5>
-                                  <div class="flex flex-col sm:flex-row gap-4">
-                                    <div class="flex-1 bg-slate-800 text-slate-300 rounded-lg p-4 font-mono text-xs leading-relaxed overflow-x-auto border border-slate-700 shadow-inner max-h-32 custom-scrollbar">
-                                      {{ test.results.input }}
-                                    </div>
-                                    @if (test.results.inputImageDataUrl) {
-                                      <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all" (click)="openImage(test.results.inputImageDataUrl, $event)">
-                                        <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
-                                      </div>
-                                    }
-                                    @if (test.results.inputAudioUrl) {
-                                      <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-3 shadow-sm flex items-center justify-center">
-                                        <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
-                                      </div>
-                                    }
-                                  </div>
-                                </div>
-
-                                @if (isReportReady) {
-                                  <div class="mb-6">
-                                    <h5 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="bi bi-activity"></i> Execution Time Plot</h5>
-                                    <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm relative h-[200px]">
-                                      <canvas [id]="'cortex-test-chart-' + test.id"></canvas>
-                                    </div>
-                                  </div>
-                                }
-
-                                <div>
-                                  <h5 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2"><i class="bi bi-arrow-clockwise"></i> Iterations ({{ test.results.numberOfIterations }})</h5>
-                                  <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
-                                    <table class="w-full text-left">
-                                      <thead class="bg-slate-50 border-b border-slate-100">
-                                        <tr class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                          <th class="px-4 py-2 w-16">#</th>
-                                          <th class="px-4 py-2 text-center">Status</th>
-                                          <th class="px-4 py-2 text-right">TTFT</th>
-                                          <th class="px-4 py-2 text-right">Total Time</th>
-                                          <th class="px-4 py-2 text-right">Speed</th>
-                                          <th class="px-4 py-2 text-right">Output Chars</th>
-                                          <th class="px-4 py-2 text-center">Output</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody class="divide-y divide-slate-100">
-                                        @for (iter of test.results.testIterationResults; track $index) {
-                                          <tr class="text-sm hover:bg-slate-50 transition-colors" [class.bg-amber-50]="iter.status === TestStatus.Executing">
-                                            <td class="px-4 py-2.5 text-slate-400 font-mono text-xs">{{ $index + 1 }}</td>
-                                            <td class="px-4 py-2.5 text-center"><axon-test-status-badge [status]="iter.status"></axon-test-status-badge></td>
-                                            <td class="px-4 py-2.5 text-right font-medium text-slate-700">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }} <span class="text-[10px] text-slate-400">ms</span></td>
-                                            <td class="px-4 py-2.5 text-right font-medium text-slate-700">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }} <span class="text-[10px] text-slate-400">ms</span></td>
-                                            <td class="px-4 py-2.5 text-right font-medium text-slate-700">{{ iter.tokensPerSecond != null ? (iter.tokensPerSecond | number:'1.0-0') : "—" }} <span class="text-[10px] text-slate-400">c/s</span></td>
-                                            <td class="px-4 py-2.5 text-right font-medium text-slate-700">{{ iter.output?.length ?? 0 | number:'1.0-0' }}</td>
-                                            <td class="px-4 py-2.5 text-center">
-                                              <button class="inline-flex items-center justify-center px-2 py-1 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-xs" 
-                                                      title="Toggle Output"
-                                                      [disabled]="!iter.output"
-                                                      (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
-                                                @if (!viewData[test.id].expandedOutputs?.[$index]) {
-                                                  <i class="bi bi-file-text mr-1"></i> View
-                                                } @else {
-                                                  <i class="bi bi-chevron-up mr-1"></i> Hide
-                                                }
-                                              </button>
-                                            </td>
-                                          </tr>
-                                          @if (viewData[test.id].expandedOutputs?.[$index]) {
-                                            <tr class="bg-slate-900 border-b border-slate-200">
-                                              <td colspan="7" class="p-4 !text-left">
-                                                <div class="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed">
-                                                  {{ unescapeOutput(iter.output ?? '') }}
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          }
-                                        }
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-
-                              </div>
-                            }
-                          }
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              }
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
   </main>
 
   @if (!isImportedReport) {

@@ -1,4 +1,4 @@
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap"
       [class.bg-red-50]="status === TestStatus.Fail || status === TestStatus.Error"
       [class.text-red-700]="status === TestStatus.Fail || status === TestStatus.Error"
       [class.border-red-200]="status === TestStatus.Fail || status === TestStatus.Error"
@@ -6,10 +6,18 @@
       [class.bg-blue-50]="status === TestStatus.Executing"
       [class.text-blue-700]="status === TestStatus.Executing"
       [class.border-blue-200]="status === TestStatus.Executing"
+
+      [class.bg-indigo-50]="status === TestStatus.Idle && selected === true"
+      [class.text-indigo-700]="status === TestStatus.Idle && selected === true"
+      [class.border-indigo-200]="status === TestStatus.Idle && selected === true"
+
+      [class.bg-gray-50]="status === TestStatus.Idle && selected === false"
+      [class.text-gray-400]="status === TestStatus.Idle && selected === false"
+      [class.border-gray-200]="status === TestStatus.Idle && selected === false"
       
-      [class.bg-gray-100]="status === TestStatus.Idle || status === TestStatus.Skipped"
-      [class.text-gray-600]="status === TestStatus.Idle || status === TestStatus.Skipped"
-      [class.border-gray-200]="status === TestStatus.Idle || status === TestStatus.Skipped"
+      [class.bg-gray-100]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
+      [class.text-gray-600]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
+      [class.border-gray-200]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
       
       [class.bg-green-50]="status === TestStatus.Success"
       [class.text-green-700]="status === TestStatus.Success"
@@ -25,7 +33,13 @@
     </svg>
   }
   @if(status === TestStatus.Idle) {
-    <i class="bi bi-clock"></i>
+    @if(selected === true) {
+      <i class="bi bi-check2-circle"></i>
+    } @else if(selected === false) {
+      <i class="bi bi-circle"></i>
+    } @else {
+      <i class="bi bi-clock"></i>
+    }
   }
   @if(status === TestStatus.Skipped) {
     <i class="bi bi-dash-circle"></i>
@@ -34,5 +48,13 @@
     <i class="bi bi-check-circle-fill"></i>
   }
 
-  <span>{{ status }}</span>
+  <span>
+    @if(status === TestStatus.Idle && selected === true) {
+      Selected
+    } @else if(status === TestStatus.Idle && selected === false) {
+      Not Selected
+    } @else {
+      {{ status }}
+    }
+  </span>
 </span>
