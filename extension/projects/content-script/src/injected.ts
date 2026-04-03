@@ -312,6 +312,113 @@ function wrapAPI(apiName: string) {
         emitStage(callId, callId, 'create', 'create', { options: sanitizedOptions });
 
         try {
+          const routingResponse = await new Promise<any>((resolve) => {
+            const msgId = crypto.randomUUID();
+            const listener = (event: any) => {
+              if (event.source !== window) return;
+              if (event.data && event.data.type === 'WEBAI_ROUTING_RESPONSE' && event.data.messageId === msgId) {
+                window.removeEventListener('message', listener);
+                resolve(event.data.data);
+              }
+            };
+            window.addEventListener('message', listener);
+            window.postMessage({ type: 'WEBAI_ROUTING_REQUEST', messageId: msgId }, '*');
+          });
+
+          if (routingResponse.modelRouting !== 'chrome') {
+            emitStage(callId, callId, 'create', 'completed');
+            
+            const mockInstance: any = {
+              clone: async function() { return this; },
+              destroy: function() {}
+            };
+
+            const explicitlyWrapped = [
+              'prompt', 'promptStreaming', 'append',
+              'summarize', 'summarizeStreaming',
+              'translate', 'translateStreaming',
+              'detect', 'write', 'writeStreaming',
+              'rewrite', 'rewriteStreaming',
+              'proofread', 'proofreadStreaming'
+            ];
+
+            for (const methodName of explicitlyWrapped) {
+              if (methodName.endsWith('Streaming')) {
+                mockInstance[methodName] = function(...args: any[]) {
+                  const methodCallId = crypto.randomUUID();
+                  const sanitizedArgsPromise = sanitizeForPostMessage(args);
+                  
+                  sanitizedArgsPromise.then(sanitizedArgs => {
+                    emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
+                  });
+
+                  let accumulatedResponse = '';
+                  return new ReadableStream({
+                    async start(controller) {
+                      try {
+                        const sanitizedArgs = await sanitizedArgsPromise;
+                        const response = await new Promise<any>((resolve, reject) => {
+                            const msgId = crypto.randomUUID();
+                            const listener = (event: any) => {
+                              if (event.source !== window) return;
+                              if (event.data && event.data.type === 'WEBAI_GEMINI_RESPONSE' && event.data.messageId === msgId) {
+                                window.removeEventListener('message', listener);
+                                if (event.data.error) reject(new Error(event.data.error));
+                                else resolve(event.data.data);
+                              }
+                            };
+                            window.addEventListener('message', listener);
+                            window.postMessage({ type: 'WEBAI_GEMINI_REQUEST', messageId: msgId, payload: { api: apiName, method: methodName, args: sanitizedArgs } }, '*');
+                        });
+                        emitStage(methodCallId, callId, methodName, 'first_token');
+                        accumulatedResponse = response;
+                        controller.enqueue(response);
+                        emitStage(methodCallId, callId, methodName, 'completed', { response: accumulatedResponse });
+                        controller.close();
+                      } catch(err: any) {
+                        emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
+                        controller.error(err);
+                      }
+                    }
+                  });
+                };
+              } else {
+                mockInstance[methodName] = async function(...args: any[]) {
+                  const methodCallId = crypto.randomUUID();
+                  
+                  const sanitizedArgs = await sanitizeForPostMessage(args);
+                  emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
+
+                  try {
+                    const response = await new Promise<any>((resolve, reject) => {
+                        const msgId = crypto.randomUUID();
+                        const listener = (event: any) => {
+                          if (event.source !== window) return;
+                          if (event.data && event.data.type === 'WEBAI_GEMINI_RESPONSE' && event.data.messageId === msgId) {
+                            window.removeEventListener('message', listener);
+                            if (event.data.error) reject(new Error(event.data.error));
+                            else resolve(event.data.data);
+                          }
+                        };
+                        window.addEventListener('message', listener);
+                        window.postMessage({ type: 'WEBAI_GEMINI_REQUEST', messageId: msgId, payload: { api: apiName, method: methodName, args: sanitizedArgs } }, '*');
+                    });
+                    
+                    sanitizeForPostMessage(response).then(sanitizedRes => {
+                      emitStage(methodCallId, callId, methodName, 'completed', { response: sanitizedRes });
+                    });
+                    
+                    return response;
+                  } catch (err: any) {
+                    emitStage(methodCallId, callId, methodName, 'error', { errorMessage: err?.message || String(err) });
+                    throw err;
+                  }
+                };
+              }
+            }
+            return mockInstance;
+          }
+
           const originalInstance = await originalCreate.call(this, options);
           emitStage(callId, callId, 'create', 'completed');
 

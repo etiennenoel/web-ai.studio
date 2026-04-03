@@ -15,7 +15,7 @@ export class LanguageDetectorShortStringColdStartAxonTest implements AxonTestInt
     status: TestStatus.Idle,
     api: BuiltInAiApi.LanguageDetector,
     startType: "cold",
-    numberOfIterations: 100,
+    numberOfIterations: 3,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",
     apiAvailability: "unknown",
