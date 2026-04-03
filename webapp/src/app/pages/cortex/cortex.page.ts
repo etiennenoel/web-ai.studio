@@ -38,6 +38,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   isGeneratingUrl = false;
   generatedShareUrl: string | null = null;
   showShareModal = false;
+  showExtensionModal = false;
+  showAboutModal = false;
   isUrlCopied = false;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
@@ -278,6 +280,125 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+    if (this.isExtensionInstalled && !this.hardwareInfo) {
+      this.loadInitialHardwareInfo();
+    }
+  }
+
+  async loadInitialHardwareInfo() {
+      try {
+        this.hardwareInfo = await (window as any).webai.getHardwareInformation();
+      } catch (e) {
+        console.error("Failed to get hardware info", e);
+      }
+  }
+
+  getComputeUnit(): string {
+    if (this.hardwareInfo?.cpu?.modelName) {
+      const cores = this.hardwareInfo.cpu.numOfProcessors;
+      return cores ? `${this.hardwareInfo.cpu.modelName} (${cores}-Core)` : this.hardwareInfo.cpu.modelName;
+    }
+    return 'Extension Required';
+  }
+
+  getNpuInfo(): string {
+    const cpu = this.getComputeUnit();
+    if (cpu.includes('Apple M')) {
+      return 'Apple Neural Engine';
+    }
+    if (cpu.includes('Snapdragon')) {
+      return 'Qualcomm Hexagon';
+    }
+    if (cpu.includes('Intel')) {
+      return 'Intel NPU (if available)';
+    }
+    if (cpu.includes('AMD')) {
+      return 'AMD Ryzen AI (if available)';
+    }
+    return 'Unknown or None';
+  }
+
+  getMemoryInfo(): string {
+    if (this.hardwareInfo?.memory?.capacity) {
+      const gb = Math.round(this.hardwareInfo.memory.capacity / (1024 * 1024 * 1024));
+      return `${gb} GB RAM`;
+    }
+    return 'Extension Required';
+  }
+
+  getOsProfile(): string {
+    if (typeof navigator !== 'undefined') {
+       const uaData = (navigator as any).userAgentData;
+       if (uaData && uaData.platform) {
+         return uaData.platform;
+       }
+       
+       const ua = navigator.userAgent;
+       if (ua.includes('Mac OS X')) {
+          const match = ua.match(/Mac OS X (\d+[_.]\d+[_.]?\d*)/);
+          return match ? `macOS ${match[1].replace(/_/g, '.')}` : 'macOS';
+       } else if (ua.includes('Windows NT 10.0')) {
+          return 'Windows 10/11';
+       } else if (ua.includes('Linux')) {
+          return 'Linux';
+       } else if (ua.includes('Android')) {
+          return 'Android';
+       } else if (ua.includes('iPhone') || ua.includes('iPad')) {
+          return 'iOS / iPadOS';
+       }
+    }
+    return 'Unknown OS';
+  }
+
+  getBrowserInfo(): string {
+    if (typeof navigator !== 'undefined') {
+       const uaData = (navigator as any).userAgentData;
+       if (uaData && uaData.brands) {
+         const brand = uaData.brands.find((b: any) => !b.brand.includes('Not') && !b.brand.includes('Chromium'));
+         if (brand) {
+           return `${brand.brand} ${brand.version}`;
+         }
+       }
+       const ua = navigator.userAgent;
+       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+(\.\d+)?)/);
+       if (match) {
+         let name = match[1];
+         if (name === 'Edg') name = 'Edge';
+         return `${name} ${match[2]}`;
+       }
+    }
+    return 'Unknown Browser';
+  }
+
+  get isHardwareOptimal(): boolean {
+    const cpu = this.getComputeUnit();
+    const mem = this.getMemoryInfo();
+    return cpu.includes('Apple M') || cpu.includes('Snapdragon') || mem.includes('32 GB') || mem.includes('64 GB');
+  }
+
+  triggerDownloadResults() {
+    if (!this.isExtensionInstalled) {
+      this.showExtensionModal = true;
+    } else {
+      this.downloadResults();
+    }
+  }
+
+  closeExtensionModal() {
+    this.showExtensionModal = false;
+  }
+
+  openAboutModal() {
+    this.showAboutModal = true;
+  }
+
+  closeAboutModal() {
+    this.showAboutModal = false;
+  }
+
+  confirmDownloadResults() {
+    this.showExtensionModal = false;
+    this.downloadResults();
   }
 
   async downloadResults() {
