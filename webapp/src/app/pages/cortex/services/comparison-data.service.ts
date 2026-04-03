@@ -22,8 +22,8 @@ export class ComparisonDataService {
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     // Load a default cloud model comparison
     if (isPlatformBrowser(this.platformId)) {
-      this.loadCloudFlashData('vertex_gemini_3.1_flash', 'Vertex Gemini 3.1 Flash');
-      this.loadCloudFlashLiteData('vertex_gemini_3.1_flash_lite', 'Vertex Gemini 3.1 Flash Lite');
+      this.loadCloudFlashData('2026-04-03_gemini_3.1_flash', 'Gemini 3.1 Flash');
+      this.loadCloudFlashLiteData('2026-04-03_gemini_3.1_flash_lite', 'Gemini 3.1 Flash Lite');
     }
   }
 

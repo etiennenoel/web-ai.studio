@@ -140,30 +140,62 @@ window.addEventListener('message', async (event) => {
           return;
         }
         
-        let promptText = '';
         const rawArg = payload.args && payload.args.length > 0 ? payload.args[0] : '';
-        let extractedText = '';
-        
+        let contents: any[] = [];
+
         if (typeof rawArg === 'string') {
-          extractedText = rawArg;
+          contents.push({ role: 'user', parts: [{ text: rawArg }] });
         } else if (Array.isArray(rawArg)) {
-          extractedText = rawArg.map(p => p.content || JSON.stringify(p)).join('\\n');
+          for (const msg of rawArg) {
+            const role = msg.role === 'assistant' ? 'model' : 'user';
+            let parts: any[] = [];
+            if (typeof msg.content === 'string') {
+              parts.push({ text: msg.content });
+            } else if (Array.isArray(msg.content)) {
+              for (const item of msg.content) {
+                if (item.type === 'text') {
+                  parts.push({ text: item.value || '' });
+                } else if ((item.type === 'image' || item.type === 'audio') && item.value && item.value.dataUrl) {
+                  const dataUrl = item.value.dataUrl;
+                  const splitDataUrl = dataUrl.split(',');
+                  if (splitDataUrl.length === 2) {
+                    const mimeMatch = splitDataUrl[0].match(/:(.*?);/);
+                    const mimeType = mimeMatch ? mimeMatch[1] : item.value.type;
+                    parts.push({
+                      inlineData: {
+                        mimeType: mimeType,
+                        data: splitDataUrl[1]
+                      }
+                    });
+                  }
+                } else {
+                  parts.push({ text: JSON.stringify(item) });
+                }
+              }
+            } else {
+              parts.push({ text: JSON.stringify(msg.content) });
+            }
+            contents.push({ role, parts });
+          }
         } else if (typeof rawArg === 'object') {
-          extractedText = JSON.stringify(rawArg);
+          contents.push({ role: 'user', parts: [{ text: JSON.stringify(rawArg) }] });
         }
 
-        if (payload.api === 'LanguageModel') {
-           promptText = extractedText;
-        } else if (payload.api === 'Summarizer') {
-           promptText = `Summarize the following text:\n\n${extractedText}`;
-        } else if (payload.api === 'Writer') {
-           promptText = `Write about the following topic:\n\n${extractedText}`;
-        } else if (payload.api === 'Rewriter') {
-           promptText = `Rewrite the following text:\n\n${extractedText}`;
-        } else if (payload.api === 'Translator') {
-           promptText = `Translate the following text:\n\n${extractedText}`;
+        let fallbackText = '';
+        if (typeof rawArg === 'string') {
+          fallbackText = rawArg;
         } else {
-           promptText = extractedText;
+          fallbackText = JSON.stringify(rawArg);
+        }
+
+        if (payload.api === 'Summarizer') {
+           contents = [{ role: 'user', parts: [{ text: `Summarize the following text:\n\n${fallbackText}` }] }];
+        } else if (payload.api === 'Writer') {
+           contents = [{ role: 'user', parts: [{ text: `Write about the following topic:\n\n${fallbackText}` }] }];
+        } else if (payload.api === 'Rewriter') {
+           contents = [{ role: 'user', parts: [{ text: `Rewrite the following text:\n\n${fallbackText}` }] }];
+        } else if (payload.api === 'Translator') {
+           contents = [{ role: 'user', parts: [{ text: `Translate the following text:\n\n${fallbackText}` }] }];
         }
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${routing}:generateContent?key=${apiKey}`;
@@ -172,10 +204,9 @@ window.addEventListener('message', async (event) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }]
+            contents: contents
           })
-        }).then(async res => {
-          if (!res.ok) {
+        }).then(async res => {          if (!res.ok) {
             const errBody = await res.text();
             throw new Error(`Gemini API Error: ${res.status} ${errBody}`);
           }

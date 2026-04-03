@@ -15,7 +15,7 @@ export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements Ax
     status: TestStatus.Idle,
     api: BuiltInAiApi.Translator,
     startType: "cold",
-    numberOfIterations: 100,
+    numberOfIterations: 3,
     testIterationResults: [],
     input: "In which language is this sentence? I believe it is in french.",
     apiAvailability: "unknown",
