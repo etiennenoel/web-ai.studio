@@ -383,12 +383,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getMaxArray(values: number[]): number { return values.length > 0 ? Math.max(...values) : 0; }
   
-  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null, cloudFlashVal?: number|null, cloudFlashLiteVal?: number|null): number[] {
-    return [coldVal||0, warmVal||0, cloudFlashVal||0, cloudFlashLiteVal||0, ...this.getAllBaselineGlobalValues(metric)];
+  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null): number[] {
+    return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
   }
 
-  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null, cloudFlashVal?: number|null, cloudFlashLiteVal?: number|null): number[] {
-    return [coldVal||0, warmVal||0, cloudFlashVal||0, cloudFlashLiteVal||0, ...this.getAllBaselineValues(testId, metric)];
+  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null): number[] {
+    return [coldVal||0, warmVal||0, ...this.getAllBaselineValues(testId, metric)];
   }
 
   getMax(...values: (number | null | undefined)[]): number {

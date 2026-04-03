@@ -13,17 +13,13 @@ export class ComparisonDataService {
   baselines: { id: string, name: string, data: any }[] = [];
   availableBaselinesIndex: {filename: string, name: string}[] = [];
 
-  cloudFlashData: any = null;
-  cloudFlashModelName: string | null = null;
-
-  cloudFlashLiteData: any = null;
-  cloudFlashLiteModelName: string | null = null;
+  
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     // Load a default cloud model comparison
     if (isPlatformBrowser(this.platformId)) {
-      this.loadCloudFlashData('2026-04-03_gemini_3.1_flash', 'Gemini 3.1 Flash');
-      this.loadCloudFlashLiteData('2026-04-03_gemini_3.1_flash_lite', 'Gemini 3.1 Flash Lite');
+      this.addBaseline('2026-04-03_gemini_3.1_flash', 'Cloud Gemini 3.1 Flash');
+      this.addBaseline('2026-04-03_gemini_3.1_flash_lite', 'Cloud Gemini 3.1 Flash Lite');
       this.loadAvailableBaselinesIndex();
     }
   }
@@ -127,34 +123,6 @@ export class ComparisonDataService {
               this.tryLoadNextBaseline(candidates, index + 1);
           }
       });
-  }
-
-  loadCloudFlashData(filename: string, modelName: string) {
-    if (!isPlatformBrowser(this.platformId)) return;
-    this.cloudFlashModelName = modelName;
-    this.http.get(`/data/cloud/${filename}.json`).subscribe({
-      next: (data) => {
-        this.cloudFlashData = data;
-      },
-      error: (err) => {
-        console.warn(`Cloud data for ${filename} not found.`);
-        this.cloudFlashData = null;
-      }
-    });
-  }
-
-  loadCloudFlashLiteData(filename: string, modelName: string) {
-    if (!isPlatformBrowser(this.platformId)) return;
-    this.cloudFlashLiteModelName = modelName;
-    this.http.get(`/data/cloud/${filename}.json`).subscribe({
-      next: (data) => {
-        this.cloudFlashLiteData = data;
-      },
-      error: (err) => {
-        console.warn(`Cloud data for ${filename} not found.`);
-        this.cloudFlashLiteData = null;
-      }
-    });
   }
 
   getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {

@@ -365,28 +365,20 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           @let globalCold = getGlobalSummaryResults('cold');
           @let globalWarm = getGlobalSummaryResults('warm');
-          @let globalCloudFlash = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashData, selectedTestIds);
-          @let globalCloudFlashLite = comparisonService.getGlobalSummaryResults(comparisonService.cloudFlashLiteData, selectedTestIds);
 
           @let ttftColdLocal = globalCold?.averageTimeToFirstToken || 0;
           @let ttftWarmLocal = globalWarm?.averageTimeToFirstToken || 0;
-          @let ttftCloudFlash = globalCloudFlash?.averageTimeToFirstToken || 0;
-          @let ttftCloudFlashLite = globalCloudFlashLite?.averageTimeToFirstToken || 0;
-          @let allTtft = getGlobalAllValues('ttft', ttftColdLocal, ttftWarmLocal, ttftCloudFlash, ttftCloudFlashLite);
+          @let allTtft = getGlobalAllValues('ttft', ttftColdLocal, ttftWarmLocal);
           @let ttftMax = getMaxArray(allTtft);
 
           @let totalColdLocal = globalCold?.averageTotalResponseTime || 0;
           @let totalWarmLocal = globalWarm?.averageTotalResponseTime || 0;
-          @let totalCloudFlash = globalCloudFlash?.averageTotalResponseTime || 0;
-          @let totalCloudFlashLite = globalCloudFlashLite?.averageTotalResponseTime || 0;
-          @let allTotal = getGlobalAllValues('total', totalColdLocal, totalWarmLocal, totalCloudFlash, totalCloudFlashLite);
+          @let allTotal = getGlobalAllValues('total', totalColdLocal, totalWarmLocal);
           @let totalMax = getMaxArray(allTotal);
 
           @let speedColdLocal = globalCold?.averageTokenPerSecond || 0;
           @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
-          @let speedCloudFlash = globalCloudFlash?.averageTokenPerSecond || 0;
-          @let speedCloudFlashLite = globalCloudFlashLite?.averageTokenPerSecond || 0;
-          @let allSpeed = getGlobalAllValues('speed', speedColdLocal, speedWarmLocal, speedCloudFlash, speedCloudFlashLite);
+          @let allSpeed = getGlobalAllValues('speed', speedColdLocal, speedWarmLocal);
           @let speedMax = getMaxArray(allSpeed);
           
           <!-- Global Avg TTFT Card -->
@@ -403,8 +395,8 @@
               <div class="flex flex-col gap-1.5 ">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
-                     Cold 
-                     @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
@@ -419,8 +411,8 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
-                     Warm 
-                     @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ ttftWarmLocal ? (ttftWarmLocal | number:'1.0-0') : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
@@ -437,7 +429,7 @@
                 <div class="flex flex-col gap-1.5 mt-2">
                   <div class="flex items-center justify-between">
                      <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(ttftBaseline, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftBaseline, allTtft, 'ttft')">
-                       Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                       {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -455,38 +447,6 @@
                   </div>
                 </div>
               }
-              <!-- Cloud Flash Lite -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
-                     @if (isWinner(ttftCloudFlashLite, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-cyan-700]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')">{{ ttftCloudFlashLite ? (ttftCloudFlashLite | number:'1.0-0') : (['cold', 'warm'].includes('cloudFlashLite') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [style.width]="getPercentage(ttftCloudFlashLite, ttftMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Cloud Flash -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlash, allTtft, 'ttft')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
-                     @if (isWinner(ttftCloudFlash, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-sky-700]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftCloudFlash, allTtft, 'ttft')">{{ ttftCloudFlash ? (ttftCloudFlash | number:'1.0-0') : (['cold', 'warm'].includes('cloudFlash') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftCloudFlash, allTtft, 'ttft')" [style.width]="getPercentage(ttftCloudFlash, ttftMax) + '%'"></div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -504,8 +464,8 @@
               <div class="flex flex-col gap-1.5 ">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
-                     Cold 
-                     @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
@@ -520,8 +480,8 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
-                     Warm 
-                     @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ totalWarmLocal ? (totalWarmLocal | number:'1.0-0') : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
@@ -538,7 +498,7 @@
                 <div class="flex flex-col gap-1.5 mt-2">
                   <div class="flex items-center justify-between">
                      <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(totalBaseline, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalBaseline, allTotal, 'total')">
-                       Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                       {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -556,38 +516,6 @@
                   </div>
                 </div>
               }
-              <!-- Cloud Flash Lite -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlashLite, allTotal, 'total')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
-                     @if (isWinner(totalCloudFlashLite, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-cyan-700]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalCloudFlashLite, allTotal, 'total')">{{ totalCloudFlashLite ? (totalCloudFlashLite | number:'1.0-0') : (['cold', 'warm'].includes('cloudFlashLite') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalCloudFlashLite, allTotal, 'total')" [style.width]="getPercentage(totalCloudFlashLite, totalMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Cloud Flash -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner(totalCloudFlash, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlash, allTotal, 'total')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
-                     @if (isWinner(totalCloudFlash, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-sky-700]="isWinner(totalCloudFlash, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalCloudFlash, allTotal, 'total')">{{ totalCloudFlash ? (totalCloudFlash | number:'1.0-0') : (['cold', 'warm'].includes('cloudFlash') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(totalCloudFlash, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalCloudFlash, allTotal, 'total')" [style.width]="getPercentage(totalCloudFlash, totalMax) + '%'"></div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -605,8 +533,8 @@
               <div class="flex flex-col gap-1.5 ">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal, allSpeed, 'speed')">
-                     Cold 
-                     @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal, allSpeed, 'speed')">{{ speedColdLocal ? (speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
@@ -621,8 +549,8 @@
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider " [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal, allSpeed, 'speed')">
-                     Warm 
-                     @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
                      <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedWarmLocal, allSpeed, 'speed')">{{ speedWarmLocal ? (speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
@@ -639,7 +567,7 @@
                 <div class="flex flex-col gap-1.5 mt-2">
                   <div class="flex items-center justify-between">
                      <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(speedBaseline, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedBaseline, allSpeed, 'speed')">
-                       Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                       {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -657,38 +585,6 @@
                   </div>
                 </div>
               }
-              <!-- Cloud Flash Lite -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-cyan-700]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')">
-                     Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }} 
-                     @if (isWinner(speedCloudFlashLite, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-cyan-700]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')">{{ speedCloudFlashLite ? (speedCloudFlashLite >= 1000 ? ((speedCloudFlashLite/1000) | number:'1.1-1') + 'k' : (speedCloudFlashLite | number:'1.0-0')) : (['cold', 'warm'].includes('cloudFlashLite') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')" [style.width]="getPercentage(speedCloudFlashLite, speedMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Cloud Flash -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-sky-700]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlash, allSpeed, 'speed')">
-                     Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }} 
-                     @if (isWinner(speedCloudFlash, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-sky-700]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedCloudFlash, allSpeed, 'speed')">{{ speedCloudFlash ? (speedCloudFlash >= 1000 ? ((speedCloudFlash/1000) | number:'1.1-1') + 'k' : (speedCloudFlash | number:'1.0-0')) : (['cold', 'warm'].includes('cloudFlash') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedCloudFlash, allSpeed, 'speed')" [style.width]="getPercentage(speedCloudFlash, speedMax) + '%'"></div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -750,9 +646,7 @@
               <!-- Avg TTFT Card -->
               @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
               @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
-              @let cloudFlashTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTimeToFirstToken;
-              @let cloudFlashLiteTtft = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTimeToFirstToken;
-              @let allTtft = getTestAllValues(element.id, 'ttft', coldTtft, warmTtft, cloudFlashTtft, cloudFlashLiteTtft);
+              @let allTtft = getTestAllValues(element.id, 'ttft', coldTtft, warmTtft);
                           @let maxTtft = getMaxArray(allTtft);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -766,7 +660,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
-                         Cold @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ coldTtft ? (coldTtft | number:'1.0-0') : '—' }}</span>
@@ -781,7 +676,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
-                         Warm @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ warmTtft ? (warmTtft | number:'1.0-0') : '—' }}</span>
@@ -798,7 +694,7 @@
                     <div class="flex flex-col gap-1.5 mt-2">
                       <div class="flex items-center justify-between">
                          <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(baselineTtft, allTtft, 'ttft')">
-                           Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                           {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -816,47 +712,13 @@
                       </div>
                     </div>
                   }
-                  <!-- CLOUD FLASH LITE -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
-                         @if (isWinner(ttftCloudFlashLite, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-cyan-700]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')">{{ cloudFlashLiteTtft ? (cloudFlashLiteTtft | number:'1.0-0') : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftCloudFlashLite, allTtft, 'ttft')" [style.width]="getPercentage(cloudFlashLiteTtft, maxTtft) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- CLOUD FLASH -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlash, allTtft, 'ttft')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
-                         @if (isWinner(ttftCloudFlash, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-sky-700]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftCloudFlash, allTtft, 'ttft')">{{ cloudFlashTtft ? (cloudFlashTtft | number:'1.0-0') : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(ttftCloudFlash, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftCloudFlash, allTtft, 'ttft')" [style.width]="getPercentage(cloudFlashTtft, maxTtft) + '%'"></div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
               <!-- Avg Execution Time Card -->
               @let coldTotal = coldSummaryResults?.averageTotalResponseTime;
               @let warmTotal = warmSummaryResults?.averageTotalResponseTime;
-              @let cloudFlashTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTotalResponseTime;
-              @let cloudFlashLiteTotal = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTotalResponseTime;
-              @let allTotal = getTestAllValues(element.id, 'total', coldTotal, warmTotal, cloudFlashTotal, cloudFlashLiteTotal);
+              @let allTotal = getTestAllValues(element.id, 'total', coldTotal, warmTotal);
                           @let maxTotal = getMaxArray(allTotal);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -870,7 +732,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
-                         Cold @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalColdLocal, allTotal, 'total')">{{ coldTotal ? (coldTotal | number:'1.0-0') : '—' }}</span>
@@ -885,7 +748,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
-                         Warm @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ warmTotal ? (warmTotal | number:'1.0-0') : '—' }}</span>
@@ -902,7 +766,7 @@
                     <div class="flex flex-col gap-1.5 mt-2">
                       <div class="flex items-center justify-between">
                          <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-500]="!isWinner(baselineTotal, allTotal, 'total')">
-                           Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                           {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -920,47 +784,13 @@
                       </div>
                     </div>
                   }
-                  <!-- CLOUD FLASH LITE -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlashLite, allTotal, 'total')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
-                         @if (isWinner(totalCloudFlashLite, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-cyan-700]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlashLite, allTotal, 'total')">{{ cloudFlashLiteTotal ? (cloudFlashLiteTotal | number:'1.0-0') : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(totalCloudFlashLite, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalCloudFlashLite, allTotal, 'total')" [style.width]="getPercentage(cloudFlashLiteTotal, maxTotal) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- CLOUD FLASH -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner(totalCloudFlash, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlash, allTotal, 'total')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
-                         @if (isWinner(totalCloudFlash, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-sky-700]="isWinner(totalCloudFlash, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalCloudFlash, allTotal, 'total')">{{ cloudFlashTotal ? (cloudFlashTotal | number:'1.0-0') : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(totalCloudFlash, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalCloudFlash, allTotal, 'total')" [style.width]="getPercentage(cloudFlashTotal, maxTotal) + '%'"></div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
               <!-- Avg Generation Speed Card -->
               @let coldSpeed = coldSummaryResults?.averageTokenPerSecond;
               @let warmSpeed = warmSummaryResults?.averageTokenPerSecond;
-              @let cloudFlashSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashData, element.id, selectedTestIds)?.averageTokenPerSecond;
-              @let cloudFlashLiteSpeed = comparisonService.getSummaryResults(comparisonService.cloudFlashLiteData, element.id, selectedTestIds)?.averageTokenPerSecond;
-              @let allSpeed = getTestAllValues(element.id, 'speed', coldSpeed, warmSpeed, cloudFlashSpeed, cloudFlashLiteSpeed);
+              @let allSpeed = getTestAllValues(element.id, 'speed', coldSpeed, warmSpeed);
                           @let maxSpeed = getMaxArray(allSpeed);
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
@@ -974,7 +804,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal, allSpeed, 'speed')">
-                         Cold @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedColdLocal, allSpeed, 'speed')">{{ coldSpeed ? (coldSpeed >= 1000 ? ((coldSpeed/1000) | number:'1.1-1') + 'k' : (coldSpeed | number:'1.0-0')) : '—' }}</span>
@@ -989,7 +820,8 @@
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal, allSpeed, 'speed')">
-                         Warm @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
                          <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedWarmLocal, allSpeed, 'speed')">{{ warmSpeed ? (warmSpeed >= 1000 ? ((warmSpeed/1000) | number:'1.1-1') + 'k' : (warmSpeed | number:'1.0-0')) : '—' }}</span>
@@ -1006,7 +838,7 @@
                     <div class="flex flex-col gap-1.5 mt-2">
                       <div class="flex items-center justify-between">
                          <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-2" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(baselineSpeed, allSpeed, 'speed')">
-                           Baseline {{ baseline.name ? '- ' + baseline.name : '' }} 
+                           {{ baseline.name }} 
                            @if (!isExtensionInstalled) {
                              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm">
                                <i class="bi bi-browser-chrome"></i> Install Extension
@@ -1024,38 +856,6 @@
                       </div>
                     </div>
                   }
-                  <!-- CLOUD FLASH LITE -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-cyan-700]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')">
-                         Cloud {{ comparisonService.cloudFlashLiteModelName ? '- ' + comparisonService.cloudFlashLiteModelName : '' }}
-                         @if (isWinner(speedCloudFlashLite, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-cyan-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-cyan-700]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')">{{ cloudFlashLiteSpeed ? (cloudFlashLiteSpeed >= 1000 ? ((cloudFlashLiteSpeed/1000) | number:'1.1-1') + 'k' : (cloudFlashLiteSpeed | number:'1.0-0')) : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-cyan-500]="isWinner(speedCloudFlashLite, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedCloudFlashLite, allSpeed, 'speed')" [style.width]="getPercentage(cloudFlashLiteSpeed, maxSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- CLOUD FLASH -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-sky-700]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlash, allSpeed, 'speed')">
-                         Cloud {{ comparisonService.cloudFlashModelName ? '- ' + comparisonService.cloudFlashModelName : '' }}
-                         @if (isWinner(speedCloudFlash, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-sky-700"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-sky-700]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedCloudFlash, allSpeed, 'speed')">{{ cloudFlashSpeed ? (cloudFlashSpeed >= 1000 ? ((cloudFlashSpeed/1000) | number:'1.1-1') + 'k' : (cloudFlashSpeed | number:'1.0-0')) : 'N/A' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400">c/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-sky-500]="isWinner(speedCloudFlash, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedCloudFlash, allSpeed, 'speed')" [style.width]="getPercentage(cloudFlashSpeed, maxSpeed) + '%'"></div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
