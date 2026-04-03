@@ -1,0 +1,306 @@
+{
+  "results": {
+    "status": "Success",
+    "testsResults": [
+      {
+        "api": "Language Detector",
+        "id": "Identify language of a common, short phrase. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 200,
+            "totalResponseTime": 250,
+            "tokensPerSecond": 10000
+          }
+        ]
+      },
+      {
+        "api": "Language Detector",
+        "id": "Identify language of a common, short phrase. Warm Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 180,
+            "totalResponseTime": 200,
+            "tokensPerSecond": 11000
+          }
+        ]
+      },
+      {
+        "api": "Translator",
+        "id": "Translate short phrase from english to french. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 280,
+            "totalResponseTime": 600,
+            "tokensPerSecond": 950
+          }
+        ]
+      },
+      {
+        "api": "Translator",
+        "id": "Translate short phrase from english to french. Warm Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 250,
+            "totalResponseTime": 500,
+            "tokensPerSecond": 1000
+          }
+        ]
+      },
+      {
+        "api": "Summarizer",
+        "id": "Summarize a long news article. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 400,
+            "totalResponseTime": 1500,
+            "tokensPerSecond": 1100
+          }
+        ]
+      },
+      {
+        "api": "Summarizer",
+        "id": "Summarize a long news article. Warm Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 350,
+            "totalResponseTime": 1300,
+            "tokensPerSecond": 1150
+          }
+        ]
+      },
+      {
+        "api": "Prompt",
+        "id": "Prompt (Text). Analyze the scenario and provide a response. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 320,
+            "totalResponseTime": 1100,
+            "tokensPerSecond": 1200
+          }
+        ]
+      },
+      {
+        "api": "Prompt",
+        "id": "Prompt (Text). Answer Ethical Dilemma, then creative task. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 330,
+            "totalResponseTime": 1150,
+            "tokensPerSecond": 1180
+          }
+        ]
+      },
+      {
+        "api": "Prompt",
+        "id": "Prompt (Text). Technical challenge, write code. Cold Start.",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 350,
+            "totalResponseTime": 1200,
+            "tokensPerSecond": 1150
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Letter 1 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 600,
+            "totalResponseTime": 1800,
+            "tokensPerSecond": 800
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Letter 2 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 610,
+            "totalResponseTime": 1850,
+            "tokensPerSecond": 790
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Letter 3 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 620,
+            "totalResponseTime": 1900,
+            "tokensPerSecond": 780
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Name 1 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 550,
+            "totalResponseTime": 1100,
+            "tokensPerSecond": 850
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Name 2 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 560,
+            "totalResponseTime": 1120,
+            "tokensPerSecond": 840
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Handwritten Name 3 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 570,
+            "totalResponseTime": 1150,
+            "tokensPerSecond": 830
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image OCR Computer Font (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 500,
+            "totalResponseTime": 1000,
+            "tokensPerSecond": 900
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image Describe (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 650,
+            "totalResponseTime": 2100,
+            "tokensPerSecond": 750
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image Explain Meme (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 700,
+            "totalResponseTime": 2300,
+            "tokensPerSecond": 720
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Image)",
+        "id": "Prompt Image Explain Emotion (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 680,
+            "totalResponseTime": 2200,
+            "tokensPerSecond": 730
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Audio)",
+        "id": "Prompt Audio Transcription 119 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 900,
+            "totalResponseTime": 2500,
+            "tokensPerSecond": 600
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Audio)",
+        "id": "Prompt Audio Transcription 4167 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 950,
+            "totalResponseTime": 2700,
+            "tokensPerSecond": 580
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Audio)",
+        "id": "Prompt Audio Transcription 46 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 920,
+            "totalResponseTime": 2600,
+            "tokensPerSecond": 590
+          }
+        ]
+      },
+      {
+        "api": "Prompt (with Audio)",
+        "id": "Prompt Audio Transcription 5670 (Cold)",
+        "status": "Success",
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "timeToFirstToken": 1050,
+            "totalResponseTime": 3000,
+            "tokensPerSecond": 550
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -10,6 +10,7 @@ import {MathematicalCalculations} from './axon/util/mathematical-calculations';
 import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
+import {ComparisonDataService} from './services/comparison-data.service';
 
 @Component({
   selector: 'page-cortex',
@@ -68,6 +69,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     public readonly axonTestSuiteExecutor: AxonTestSuiteExecutor,
+    public readonly comparisonService: ComparisonDataService,
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private readonly platformId: Object,
@@ -104,6 +106,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if (data && data.results) {
       this.axonTestSuiteExecutor.results = data.results;
       this.hardwareInfo = data.hardware;
+      this.comparisonService.loadBaselineData(this.hardwareInfo);
       this.importedTimestamp = data.timestamp;
       this.importedUserAgent = data.userAgent;
       
@@ -239,9 +242,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if(isPlatformServer(this.platformId)) {
       return;
     }
-    
-    this.route.queryParamMap.subscribe(params => {
-      const reportParam = params.get('report');
+
+    this.comparisonService.loadBaselineData(this.hardwareInfo);
+
+    this.route.queryParamMap.subscribe(params => {      const reportParam = params.get('report');
       if (reportParam) {
         // If we have a report, prioritize loading it and don't overwrite with default test selections
         this.loadReportFromUrl(reportParam);
@@ -264,15 +268,30 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
-    if (this.isExtensionInstalled && !this.hardwareInfo) {
-      this.loadInitialHardwareInfo();
+    const checkExtension = () => {
+      this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
+      if (this.isExtensionInstalled && !this.hardwareInfo) {
+        this.loadInitialHardwareInfo();
+      }
+    };
+
+    checkExtension();
+    if (!this.isExtensionInstalled) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        checkExtension();
+        if (this.isExtensionInstalled || attempts > 20) {
+          clearInterval(interval);
+        }
+      }, 50);
     }
   }
 
   async loadInitialHardwareInfo() {
       try {
         this.hardwareInfo = await (window as any).webai.getHardwareInformation();
+        this.comparisonService.loadBaselineData(this.hardwareInfo);
       } catch (e) {
         console.error("Failed to get hardware info", e);
       }
@@ -361,8 +380,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return cpu.includes('Apple M') || cpu.includes('Snapdragon') || mem.includes('32 GB') || mem.includes('64 GB');
   }
 
-  getMax(a: number | null | undefined, b: number | null | undefined): number {
-    return Math.max(a || 0, b || 0);
+  getMax(cold?: number | null, warm?: number | null, baseline?: number | null, cloudFlash?: number | null, cloudFlashLite?: number | null): number {
+    return Math.max(cold || 0, warm || 0, baseline || 0, cloudFlash || 0, cloudFlashLite || 0);
   }
 
   getPercentage(val: number | null | undefined, max: number): number {
@@ -370,21 +389,27 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(2, (val / max) * 100);
   }
 
-  isWinner(type: 'cold'|'warm', coldVal: number | null | undefined, warmVal: number | null | undefined, metric: 'ttft'|'total'|'speed'): boolean {
-    const c = coldVal || 0;
-    const w = warmVal || 0;
-    if (c === 0 && w === 0) return false;
-    
-    if (metric === 'speed') {
-      if (type === 'cold') return c >= w && c > 0;
-      return w > c && w > 0;
-    } else {
-      // lower is better
-      if (type === 'cold') return (c <= w && c > 0) || (w === 0 && c > 0);
-      return (w < c && w > 0) || (c === 0 && w > 0);
-    }
-  }
+  isWinner(type: 'cold'|'warm'|'baseline'|'cloudFlash'|'cloudFlashLite', coldVal?: number | null, warmVal?: number | null, baselineVal?: number | null, cloudFlashVal?: number | null, cloudFlashLiteVal?: number | null, metric?: 'ttft'|'total'|'speed'): boolean {
+    const values = {
+      cold: coldVal || 0,
+      warm: warmVal || 0,
+      baseline: baselineVal || 0,
+      cloudFlash: cloudFlashVal || 0,
+      cloudFlashLite: cloudFlashLiteVal || 0
+    };
 
+    const activeValues = Object.values(values).filter(v => v > 0);
+    if (activeValues.length === 0) return false;
+
+    let bestValue;
+    if (metric === 'speed') {
+      bestValue = Math.max(...activeValues);
+    } else {
+      bestValue = Math.min(...activeValues);
+    }
+
+    return values[type] === bestValue && values[type] > 0;
+  }
   getSelectedTestsCountForApi(api: BuiltInAiApi): number {
     const tests = this.getTests(api);
     return tests.filter(t => this.selectedTestIds.has(t.id)).length;
@@ -564,7 +589,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
     const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
     const items = results.filter(value => {
-      return value.api === builtInAIApi && value.startType === startType;
+      return value.api === builtInAIApi && value.startType === startType && this.selectedTestIds.has(value.id);
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;
