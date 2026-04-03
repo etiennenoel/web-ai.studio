@@ -10,8 +10,8 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class ComparisonDataService {
 
-  baselineData: any = null;
-  baselineModelName: string | null = null;
+  baselines: { id: string, name: string, data: any }[] = [];
+  availableBaselinesIndex: {filename: string, name: string}[] = [];
 
   cloudFlashData: any = null;
   cloudFlashModelName: string | null = null;
@@ -24,7 +24,37 @@ export class ComparisonDataService {
     if (isPlatformBrowser(this.platformId)) {
       this.loadCloudFlashData('2026-04-03_gemini_3.1_flash', 'Gemini 3.1 Flash');
       this.loadCloudFlashLiteData('2026-04-03_gemini_3.1_flash_lite', 'Gemini 3.1 Flash Lite');
+      this.loadAvailableBaselinesIndex();
     }
+  }
+
+  loadAvailableBaselinesIndex() {
+    this.http.get<{filename: string, name: string}[]>('/data/baselines/index.json').subscribe({
+        next: (data) => {
+            this.availableBaselinesIndex = data;
+        },
+        error: (err) => {
+            console.warn('Failed to load baselines index');
+        }
+    });
+  }
+
+  addBaseline(filename: string, name: string) {
+      if (!isPlatformBrowser(this.platformId)) return;
+      if (this.baselines.some(b => b.id === filename)) return; // Already added
+
+      this.http.get(`/data/baselines/${filename}.json`).subscribe({
+          next: (data) => {
+              this.baselines.push({ id: filename, name: name, data: data });
+          },
+          error: (err) => {
+              console.error(`Failed to load baseline ${filename}`);
+          }
+      });
+  }
+
+  removeBaseline(id: string) {
+      this.baselines = this.baselines.filter(b => b.id !== id);
   }
 
   loadBaselineData(hardwareInfo: any) {
@@ -80,8 +110,7 @@ export class ComparisonDataService {
 
   private tryLoadNextBaseline(candidates: {filename: string, modelName: string}[], index: number) {
       if (index >= candidates.length) {
-          this.baselineData = null;
-          this.baselineModelName = null;
+          
           return;
       }
 
@@ -89,8 +118,9 @@ export class ComparisonDataService {
       
       this.http.get(`/data/baselines/${candidate.filename}.json`).subscribe({
           next: (data) => {
-              this.baselineData = data;
-              this.baselineModelName = candidate.modelName;
+              if (!this.baselines.some(b => b.id === candidate.filename)) {
+                  this.baselines.push({ id: candidate.filename, name: candidate.modelName, data: data });
+              }
           },
           error: (err) => {
               // Not found, try next

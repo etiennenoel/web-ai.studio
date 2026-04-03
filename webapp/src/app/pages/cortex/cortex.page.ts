@@ -38,6 +38,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   showShareModal = false;
   showExtensionModal = false;
   showAboutModal = false;
+  showBaselineDropdown = false;
   isUrlCopied = false;
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
@@ -380,8 +381,18 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return cpu.includes('Apple M') || cpu.includes('Snapdragon') || mem.includes('32 GB') || mem.includes('64 GB');
   }
 
-  getMax(cold?: number | null, warm?: number | null, baseline?: number | null, cloudFlash?: number | null, cloudFlashLite?: number | null): number {
-    return Math.max(cold || 0, warm || 0, baseline || 0, cloudFlash || 0, cloudFlashLite || 0);
+  getMaxArray(values: number[]): number { return values.length > 0 ? Math.max(...values) : 0; }
+  
+  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null, cloudFlashVal?: number|null, cloudFlashLiteVal?: number|null): number[] {
+    return [coldVal||0, warmVal||0, cloudFlashVal||0, cloudFlashLiteVal||0, ...this.getAllBaselineGlobalValues(metric)];
+  }
+
+  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null, cloudFlashVal?: number|null, cloudFlashLiteVal?: number|null): number[] {
+    return [coldVal||0, warmVal||0, cloudFlashVal||0, cloudFlashLiteVal||0, ...this.getAllBaselineValues(testId, metric)];
+  }
+
+  getMax(...values: (number | null | undefined)[]): number {
+    return Math.max(...values.map(v => v || 0));
   }
 
   getPercentage(val: number | null | undefined, max: number): number {
@@ -389,16 +400,33 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(2, (val / max) * 100);
   }
 
-  isWinner(type: 'cold'|'warm'|'baseline'|'cloudFlash'|'cloudFlashLite', coldVal?: number | null, warmVal?: number | null, baselineVal?: number | null, cloudFlashVal?: number | null, cloudFlashLiteVal?: number | null, metric?: 'ttft'|'total'|'speed'): boolean {
-    const values = {
-      cold: coldVal || 0,
-      warm: warmVal || 0,
-      baseline: baselineVal || 0,
-      cloudFlash: cloudFlashVal || 0,
-      cloudFlashLite: cloudFlashLiteVal || 0
-    };
+  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed'): number[] {
+    return this.comparisonService.baselines.map(b => {
+      const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds);
+      if (!res) return 0;
+      if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
+      if (metric === 'total') return res.averageTotalResponseTime || 0;
+      if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      return 0;
+    });
+  }
 
-    const activeValues = Object.values(values).filter(v => v > 0);
+  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed'): number[] {
+    return this.comparisonService.baselines.map(b => {
+      const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds);
+      if (!res) return 0;
+      if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
+      if (metric === 'total') return res.averageTotalResponseTime || 0;
+      if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      return 0;
+    });
+  }
+
+  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'): boolean {
+    const val = currentVal || 0;
+    if (val <= 0) return false;
+
+    const activeValues = allValues.map(v => v || 0).filter(v => v > 0);
     if (activeValues.length === 0) return false;
 
     let bestValue;
@@ -408,8 +436,9 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       bestValue = Math.min(...activeValues);
     }
 
-    return values[type] === bestValue && values[type] > 0;
+    return val === bestValue;
   }
+
   getSelectedTestsCountForApi(api: BuiltInAiApi): number {
     const tests = this.getTests(api);
     return tests.filter(t => this.selectedTestIds.has(t.id)).length;
@@ -442,6 +471,19 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.downloadResults();
     }
+  }
+
+  toggleBaseline(filename: string, name: string, event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (isChecked) {
+      this.comparisonService.addBaseline(filename, name);
+    } else {
+      this.comparisonService.removeBaseline(filename);
+    }
+  }
+
+  isBaselineSelected(filename: string): boolean {
+    return this.comparisonService.baselines.some(b => b.id === filename);
   }
 
   closeExtensionModal() {
