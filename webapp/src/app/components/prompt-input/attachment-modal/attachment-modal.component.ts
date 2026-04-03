@@ -1,5 +1,5 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input, OnChanges, SimpleChanges, Inject} from '@angular/core';
+import {DialogRef, DIALOG_DATA} from '@angular/cdk/dialog';
 import {Attachment} from '../../../core/interfaces/attachment.interface';
 import {AttachmentTypeEnum} from '../../../core/enums/attachment-type.enum';
 import {FramingAlgorithm} from '../../../core/enums/framing-algorithm.enum';
@@ -28,12 +28,19 @@ export class AttachmentModalComponent implements OnChanges {
   protected readonly FramingAlgorithm = FramingAlgorithm;
 
   constructor(
-    public activeModal: NgbActiveModal,
+    public dialogRef: DialogRef<AttachmentModalComponent>,
+    @Inject(DIALOG_DATA) public data: { attachment: Attachment, isAttachmentReadyForPrompt: boolean, imageResolution: { width: number, height: number } },
     private readonly imageProcessingService: ImageProcessingService,
     private readonly pdfProcessingService: PdfProcessingService,
     private sanitizer: DomSanitizer,
     private readonly eventStore: EventStore,
   ) {
+    if(data) {
+      this.attachment = data.attachment;
+      this.isAttachmentReadyForPrompt = data.isAttachmentReadyForPrompt;
+      this.imageResolution = data.imageResolution;
+      this.setImageSafeUrl();
+    }
   }
 
   async setImageSafeUrl() {

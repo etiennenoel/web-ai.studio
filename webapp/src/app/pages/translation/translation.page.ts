@@ -4,7 +4,7 @@ import {LOCALES} from '../../constants/locales.constant';
 import {LOCALES_MAP} from '../../constants/locales-map.constant';
 import {isPlatformServer} from '@angular/common';
 import {FormControl} from '@angular/forms';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Dialog} from '@angular/cdk/dialog';
 import {TranslationCodeModal} from '../../components/translation-code-modal/translation-code-modal';
 
 @Component({
@@ -48,10 +48,12 @@ export class TranslationPage {
 
   sourceSearchTerm = '';
   destinationSearchTerm = '';
+  isSourceDropdownOpen = false;
+  isDestinationDropdownOpen = false;
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
-    private readonly ngbModal: NgbModal,
+    private readonly dialog: Dialog,
   ){
   }
 
@@ -60,13 +62,15 @@ export class TranslationPage {
   }
 
   openCodeModal() {
-    const codeModalComponent = this.ngbModal.open(TranslationCodeModal, {
-      size: "xl",
+    this.dialog.open(TranslationCodeModal, {
+      panelClass: ['w-[90vw]', 'max-w-6xl', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+      data: {
+        sourceLanguage: this.sourceLocale,
+        targetLanguage: this.destinationLocale
+      }
     });
-    const instance = codeModalComponent.componentInstance as TranslationCodeModal;
-    instance.sourceLanguage = this.sourceLocale;
-    instance.targetLanguage = this.destinationLocale;
-    instance.updateCode();
   }
 
   getFilteredLocales(term: string): LocaleInterface[] {

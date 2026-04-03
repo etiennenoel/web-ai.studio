@@ -5,7 +5,7 @@
 
       <div class="flex items-center gap-2 sm:gap-3">
         <button class="flex items-center gap-2 px-3 py-2 !rounded-xl text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors focus:outline-none border-none" 
-                (click)="openCodeModal()" ngbTooltip="Get the JS code to integrate this on your site!" placement="bottom">
+                (click)="openCodeModal()" title="Get the JS code to integrate this on your site!">
           <i class="bi bi-code-square"></i> <span class="hidden sm:inline">Get code</span>
         </button>
       </div>
@@ -41,12 +41,12 @@
             </button>
             }
             
-            <div class="dropdown">
+            <div class="relative">
               <button class="px-3 py-2 !rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent flex items-center justify-center h-full after:!hidden" 
-                      data-bs-toggle="dropdown" aria-expanded="false" (click)="sourceSearchTerm = ''">
+                      (click)="isSourceDropdownOpen = !isSourceDropdownOpen; sourceSearchTerm = ''">
                 <i class="bi bi-chevron-down"></i>
               </button>
-              <ul class="dropdown-menu bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
+              <ul *ngIf="isSourceDropdownOpen" class="absolute top-full left-0 mt-1 z-50 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
                 <li class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                   <div class="relative">
                     <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -59,8 +59,8 @@
                 <div class="max-h-64 overflow-y-auto mt-1">
                   @for (locale of getFilteredLocales(sourceSearchTerm); track locale.code) {
                   <li>
-                    <button class="dropdown-item px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
-                            type="button" (click)="onSourceLanguageSelect(locale)">
+                    <button class="w-full text-left px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
+                            type="button" (click)="onSourceLanguageSelect(locale); isSourceDropdownOpen = false">
                       {{ locale.language }}
                     </button>
                   </li>
@@ -103,12 +103,12 @@
             </button>
             }
             
-            <div class="dropdown">
+            <div class="relative">
               <button class="px-3 py-2 !rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent flex items-center justify-center h-full after:!hidden" 
-                      data-bs-toggle="dropdown" aria-expanded="false" (click)="destinationSearchTerm = ''">
+                      (click)="isDestinationDropdownOpen = !isDestinationDropdownOpen; destinationSearchTerm = ''">
                 <i class="bi bi-chevron-down"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
+              <ul *ngIf="isDestinationDropdownOpen" class="absolute top-full right-0 lg:left-0 mt-1 z-50 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl p-2 !min-w-[240px]">
                 <li class="px-2 pb-2 mb-1 border-b border-slate-100 dark:border-zinc-700">
                   <div class="relative">
                     <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -121,8 +121,8 @@
                 <div class="max-h-64 overflow-y-auto mt-1">
                   @for (locale of getFilteredLocales(destinationSearchTerm); track locale.code) {
                   <li>
-                    <button class="dropdown-item px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
-                            type="button" (click)="onDestinationLanguageSelect(locale)">
+                    <button class="w-full text-left px-3 py-2 !rounded-md text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors" 
+                            type="button" (click)="onDestinationLanguageSelect(locale); isDestinationDropdownOpen = false">
                       {{ locale.language }}
                     </button>
                   </li>

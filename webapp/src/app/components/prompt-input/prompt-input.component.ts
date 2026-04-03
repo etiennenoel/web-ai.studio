@@ -15,7 +15,7 @@ import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {AttachmentTypeEnum} from '../../core/enums/attachment-type.enum';
 import {Attachment} from '../../core/interfaces/attachment.interface';
 import {FramingAlgorithm} from '../../core/enums/framing-algorithm.enum';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Dialog} from '@angular/cdk/dialog';
 import {AttachmentModalComponent} from './attachment-modal/attachment-modal.component';
 import {CameraModalComponent} from './camera-modal/camera-modal.component';
 import {AudioRecordingModalComponent} from './audio-recording-modal/audio-recording-modal.component';
@@ -35,6 +35,7 @@ export class PromptInputComponent implements OnInit {
   attachments: Attachment[] = [];
   isDragging = false;
   attachmentWarnings = false;
+  isAttachmentDropdownOpen = false;
   
   options: PromptRunOptions = new PromptRunOptions();
 
@@ -66,7 +67,7 @@ export class PromptInputComponent implements OnInit {
 
   constructor(private sanitizer: DomSanitizer,
               @Inject(PLATFORM_ID) private readonly platformId: Object,
-              private modalService: NgbModal) {
+              private modalService: Dialog) {
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -212,21 +213,32 @@ export class PromptInputComponent implements OnInit {
   }
 
   openCamera() {
-    const modalRef = this.modalService.open(CameraModalComponent, { size: 'lg', centered: true });
-    modalRef.result.then((file: File) => {
-      if (file) {
-        this.addAttachment(file);
+    const modalRef = this.modalService.open(CameraModalComponent, {
+      panelClass: ['w-[90vw]', 'max-w-3xl', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+    });
+
+    modalRef.closed.subscribe((result: any) => {
+      if (result) {
+        this.addAttachment(result);
       }
-    }).catch(() => {}); // handle dismiss
+    });
   }
   
   recordAudio() {
-    const modalRef = this.modalService.open(AudioRecordingModalComponent, { size: 'md', centered: true });
-    modalRef.result.then((file: File) => {
-      if (file) {
-        this.addAttachment(file);
+    const modalRef = this.modalService.open(AudioRecordingModalComponent, {
+      panelClass: ['w-[90vw]', 'max-w-md', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+      disableClose: true,
+    });
+
+    modalRef.closed.subscribe((result: any) => {
+      if (result) {
+        this.addAttachment(result);
       }
-    }).catch(() => {}); // handle dismiss
+    });
   }
   
   async takeScreenshot() {
@@ -332,9 +344,15 @@ export class PromptInputComponent implements OnInit {
   }
 
   openAttachmentModal(attachment: Attachment) {
-    const modalRef = this.modalService.open(AttachmentModalComponent, { size: 'xl' });
-    modalRef.componentInstance.attachment = attachment;
-    modalRef.componentInstance.isAttachmentReadyForPrompt = this.attachmentReadyForPromptMap.get(attachment.id);
-    modalRef.componentInstance.imageResolution = { width: attachment.width, height: attachment.height };
+    this.modalService.open(AttachmentModalComponent, {
+      panelClass: ['w-[90vw]', 'max-w-6xl', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+      data: {
+        attachment: attachment,
+        isAttachmentReadyForPrompt: this.attachmentReadyForPromptMap.get(attachment.id),
+        imageResolution: { width: attachment.width, height: attachment.height }
+      }
+    });
   }
 }

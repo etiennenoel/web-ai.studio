@@ -79,33 +79,33 @@
       <div class="flex items-center gap-1.5 flex-shrink-0 pb-1 pr-1">
         
         <!-- Attachment Dropdown -->
-        <div class="dropdown dropup">
+        <div class="relative">
           <button type="button" class="p-2.5 !rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-zinc-700/50 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent" 
-            data-bs-toggle="dropdown" aria-expanded="false"
+            (click)="isAttachmentDropdownOpen = !isAttachmentDropdownOpen"
             [disabled]="state === PromptInputStateEnum.Inferencing"
             title="Attach files">
             <i class="bi bi-paperclip text-xl"></i>
           </button>
           
-          <ul class="dropdown-menu bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl !p-2 !min-w-[200px] mb-2">
+          <ul *ngIf="isAttachmentDropdownOpen" class="absolute bottom-full right-0 mb-2 bg-[#ffffff] dark:bg-zinc-800 !border !border-slate-200 dark:!border-zinc-700 !shadow-xl !rounded-xl !p-2 !min-w-[200px] z-50">
             <li>
-              <button class="dropdown-item flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="openFileUpload()"
+              <button class="w-full text-left flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="openFileUpload(); isAttachmentDropdownOpen = false"
                 [disabled]="!capabilities.image && !capabilities.audio">
                 <i class="bi bi-upload mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Select File
               </button>
             </li>
             <li>
-              <button class="dropdown-item flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="openCamera()" [disabled]="!capabilities.image">
+              <button class="w-full text-left flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="openCamera(); isAttachmentDropdownOpen = false" [disabled]="!capabilities.image">
                 <i class="bi bi-camera mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Camera
               </button>
             </li>
             <li>
-              <button class="dropdown-item flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="recordAudio()" [disabled]="!capabilities.audio">
+              <button class="w-full text-left flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="recordAudio(); isAttachmentDropdownOpen = false" [disabled]="!capabilities.audio">
                 <i class="bi bi-mic mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Record Audio
               </button>
             </li>
             <li>
-              <button class="dropdown-item flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="takeScreenshot()" [disabled]="!capabilities.image">
+              <button class="w-full text-left flex items-center px-3 py-2.5 !rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-700 transition-colors focus:outline-none disabled:opacity-40" (click)="takeScreenshot(); isAttachmentDropdownOpen = false" [disabled]="!capabilities.image">
                 <i class="bi bi-display mr-3 text-slate-400 dark:text-slate-500 text-base"></i> Screenshot
               </button>
             </li>
@@ -122,7 +122,7 @@
             'bg-slate-800 hover:bg-slate-900 text-white dark:bg-red-600 dark:hover:bg-red-500 dark:text-white': buttonState === 'Stop',
             'bg-amber-500 hover:bg-amber-600 text-white animate-pulse': buttonState === 'Interject'
           }" 
-          [ngbTooltip]="runBtnTooltip" placement="top" [tooltipClass]="attachmentWarnings ? 'bg-warning' : ''">
+          [title]="runBtnTooltip">
 
           <i class="bi transition-transform flex items-center justify-center leading-none" [ngClass]="{
             'bi-arrow-up-short text-[28px]': buttonState === 'Idle',

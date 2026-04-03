@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit, PLATFORM_ID} from '@angular/core';
 import {isPlatformServer} from '@angular/common';
-import {NgbOffcanvas} from '@ng-bootstrap/ng-bootstrap';
+import {Dialog} from '@angular/cdk/dialog';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 
 @Component({
@@ -13,7 +13,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    protected readonly ngbOffcanvas: NgbOffcanvas
+    protected readonly dialog: Dialog
   ) {
   }
 
@@ -22,7 +22,11 @@ export class HeaderComponent implements OnInit {
   }
 
   openSidebar() {
-    this.ngbOffcanvas.open(SidebarComponent, { panelClass: 'w-auto' })
+    this.dialog.open(SidebarComponent, { 
+      panelClass: ['w-64', 'h-full', 'fixed', 'left-0', 'top-0', 'bg-white', 'shadow-2xl', 'dark:bg-[#121212]'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50'
+    });
   }
 
 }

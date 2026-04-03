@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-camera-modal',
@@ -13,7 +13,7 @@ export class CameraModalComponent implements AfterViewInit, OnDestroy {
   stream: MediaStream | null = null;
   error: string | null = null;
 
-  constructor(public activeModal: NgbActiveModal) {}
+  constructor(public dialogRef: DialogRef<any>) {}
 
   async ngAfterViewInit() {
     try {
@@ -35,7 +35,7 @@ export class CameraModalComponent implements AfterViewInit, OnDestroy {
       canvas.toBlob((blob) => {
         if (blob) {
           const file = new File([blob], 'camera-capture.png', { type: 'image/png' });
-          this.activeModal.close(file);
+          this.dialogRef.close(file);
         }
       }, 'image/png');
     }

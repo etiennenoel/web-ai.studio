@@ -1,10 +1,12 @@
-<div class="modal-header border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] !rounded-t-[calc(var(--bs-modal-border-radius)-1px)]">
-  <h4 class="modal-title flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
-    <i class="bi bi-code-square text-indigo-500"></i> Get Translation Code
+<div class="flex items-center justify-between p-5 border-b border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] !rounded-t-xl">
+  <h4 class="modal-title flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">
+    <i class="bi bi-code-square text-indigo-500"></i> Get Code
   </h4>
-  <button type="button" class="btn-close dark:invert focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+  <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none bg-transparent border-none" aria-label="Close" (click)="dialogRef.close()">
+    <i class="bi bi-x-lg"></i>
+  </button>
 </div>
-<div class="modal-body flex flex-col gap-4 p-5 bg-slate-50 dark:bg-[#121212] !rounded-b-[calc(var(--bs-modal-border-radius)-1px)]">
+<div class="modal-body flex flex-col gap-4 p-5 bg-slate-50 dark:bg-[#121212] !rounded-b-xl">
   <div class="w-full flex justify-between items-center">
     <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Language</label>
     <select class="form-select w-48 bg-[#ffffff] dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm cursor-pointer" aria-label="Language Select" [formControl]="languageFormControl">

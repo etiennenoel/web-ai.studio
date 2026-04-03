@@ -4,7 +4,7 @@ import {WritingAssistanceService} from '../../core/services/writing-assistance.s
 import {WritingAssistanceApiEnum} from '../../core/enums/writing-assistance-api.enum';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {WritingAssistanceOptions} from '../../core/models/writing-assistance-options.model';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Dialog} from '@angular/cdk/dialog';
 import {WritingAssistanceCodeModal} from '../../components/writing-assistance-code-modal/writing-assistance-code-modal';
 import {WritingAssistanceInputComponent} from '../../components/writing-assistance-input/writing-assistance-input.component';
 
@@ -28,7 +28,7 @@ export class WritingAssistancePage implements OnInit {
   constructor(
     private readonly writingAssistanceService: WritingAssistanceService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private readonly ngbModal: NgbModal,
+    private readonly dialog: Dialog,
   ) {
     this.checkAvailability(this.api);
   }
@@ -37,15 +37,15 @@ export class WritingAssistancePage implements OnInit {
   }
 
   openCodeModal() {
-    const codeModalComponent = this.ngbModal.open(WritingAssistanceCodeModal, {
-      size: "xl",
+    this.dialog.open(WritingAssistanceCodeModal, {
+      panelClass: ['w-[90vw]', 'max-w-6xl', 'mx-auto', 'bg-transparent', 'shadow-none'],
+      hasBackdrop: true,
+      backdropClass: 'bg-black/50',
+      data: {
+        api: this.api,
+        options: this.inputComponent ? this.inputComponent.options : null
+      }
     });
-    const instance = codeModalComponent.componentInstance as WritingAssistanceCodeModal;
-    instance.api = this.api;
-    if (this.inputComponent) {
-      instance.options = this.inputComponent.options;
-    }
-    instance.updateCode();
   }
 
   async checkAvailability(api: WritingAssistanceApiEnum) {

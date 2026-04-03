@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { WritingAssistanceInputComponent } from './writing-assistance-input.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Dialog } from '@angular/cdk/dialog';
 import { FormsModule } from '@angular/forms';
 import { PromptInputStateEnum } from '../../core/enums/prompt-input-state.enum';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -8,16 +8,16 @@ import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 describe('WritingAssistanceInputComponent', () => {
   let component: WritingAssistanceInputComponent;
   let fixture: ComponentFixture<WritingAssistanceInputComponent>;
-  let mockModalService: jasmine.SpyObj<NgbModal>;
+  let mockModalService: jasmine.SpyObj<Dialog>;
 
   beforeEach(async () => {
-    mockModalService = jasmine.createSpyObj('NgbModal', ['open']);
+    mockModalService = jasmine.createSpyObj('Dialog', ['open']);
 
     await TestBed.configureTestingModule({
       declarations: [ WritingAssistanceInputComponent ],
       imports: [ FormsModule ],
       providers: [
-        { provide: NgbModal, useValue: mockModalService }
+        { provide: Dialog, useValue: mockModalService }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
     })

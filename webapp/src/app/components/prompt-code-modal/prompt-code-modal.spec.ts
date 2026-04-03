@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { PromptCodeModal } from './prompt-code-modal';
@@ -11,7 +11,7 @@ describe('PromptCodeModal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [PromptCodeModal],
-      providers: [NgbActiveModal],
+      providers: [{provide: DialogRef, useValue: {}}, {provide: DIALOG_DATA, useValue: {}}],
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
