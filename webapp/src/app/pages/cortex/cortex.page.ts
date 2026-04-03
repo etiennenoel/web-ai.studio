@@ -562,7 +562,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
-    const items = this.axonTestSuiteExecutor.results.testsResults.filter(value => {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const items = results.filter(value => {
       return value.api === builtInAIApi && value.startType === startType;
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
@@ -579,7 +580,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getGlobalSummaryResults(startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
-    const items = this.axonTestSuiteExecutor.results.testsResults.filter(value => {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const items = results.filter(value => {
       return value.startType === startType;
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
@@ -596,14 +598,15 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getGlobalPassedAndFailed(): { passed: number, failed: number } {
-    const results = this.axonTestSuiteExecutor.results.testsResults;
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
     const passed = results.filter(r => r.status === TestStatus.Success).length;
     const failed = results.filter(r => r.status === TestStatus.Fail || r.status === TestStatus.Error).length;
     return { passed, failed };
   }
 
   getTestedApiCategoriesCount(): number {
-    const testedApis = new Set(this.axonTestSuiteExecutor.results.testsResults.filter(r => r.status !== TestStatus.Idle).map(r => r.api));
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    const testedApis = new Set(results.filter(r => r.status !== TestStatus.Idle).map(r => r.api));
     return testedApis.size;
   }
 
