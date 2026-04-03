@@ -128,7 +128,7 @@ export class ComparisonDataService {
   }
 
   getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData || !reportData.results || !reportData.results.testsResults || !selectedTestIds) return undefined;
 
     const results = reportData.results.testsResults;
     const items = results.filter((value: any) => {
@@ -145,7 +145,7 @@ export class ComparisonDataService {
   }
 
   getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData || !reportData.results || !reportData.results.testsResults || !selectedTestIds) return undefined;
 
     const results = reportData.results.testsResults;
     const items = results.filter((value: any) => selectedTestIds.has(value.id))
