@@ -578,6 +578,35 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
+  getGlobalSummaryResults(startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
+    const items = this.axonTestSuiteExecutor.results.testsResults.filter(value => {
+      return value.startType === startType;
+    }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
+
+    if (items.length === 0) return undefined;
+
+    return {
+        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
+        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
+        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
+        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
+        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
+        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+    };
+  }
+
+  getGlobalPassedAndFailed(): { passed: number, failed: number } {
+    const results = this.axonTestSuiteExecutor.results.testsResults;
+    const passed = results.filter(r => r.status === TestStatus.Success).length;
+    const failed = results.filter(r => r.status === TestStatus.Fail || r.status === TestStatus.Error).length;
+    return { passed, failed };
+  }
+
+  getTestedApiCategoriesCount(): number {
+    const testedApis = new Set(this.axonTestSuiteExecutor.results.testsResults.filter(r => r.status !== TestStatus.Idle).map(r => r.api));
+    return testedApis.size;
+  }
+
   getTests(api: BuiltInAiApi) {
     return this.axonTestSuiteExecutor.testsSuite.filter(testId => {
       return this.axonTestSuiteExecutor.testIdMap[testId].results.api === api;

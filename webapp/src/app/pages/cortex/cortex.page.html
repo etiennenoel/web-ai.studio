@@ -294,6 +294,188 @@
       </div>
     </div>
 
+    <!-- Global Suite Performance Card -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-6 mb-2">
+      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl border border-indigo-100 flex items-center justify-center shrink-0" style="background-color: #F8F9FC;">
+            <i class="bi bi-globe2 text-lg text-indigo-600"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3">
+              Global Suite Performance
+            </h2>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+              Aggregate across all {{ getTestedApiCategoriesCount() }} API categories
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          @let passFail = getGlobalPassedAndFailed();
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="bi bi-check-circle text-lg"></i>
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Passed</span>
+              <span class="text-sm font-bold leading-none mt-1">{{ passFail.passed }}</span>
+            </div>
+          </div>
+          <div class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="bi bi-exclamation-circle text-lg"></i>
+            <div class="flex flex-col">
+              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Failed</span>
+              <span class="text-sm font-bold leading-none mt-1">{{ passFail.failed }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 bg-slate-50/50">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          @let globalCold = getGlobalSummaryResults('cold');
+          @let globalWarm = getGlobalSummaryResults('warm');
+          @let ttftColdLocal = globalCold?.averageTimeToFirstToken || 0;
+          @let ttftWarmLocal = globalWarm?.averageTimeToFirstToken || 0;
+          @let totalColdLocal = globalCold?.averageTotalResponseTime || 0;
+          @let totalWarmLocal = globalWarm?.averageTotalResponseTime || 0;
+          @let speedColdLocal = globalCold?.averageTokenPerSecond || 0;
+          @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
+          
+          <!-- Global Avg TTFT Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-stopwatch text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg TTFT</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ ttftColdLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+              
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ ttftWarmLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Avg Total Time Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-activity text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg Total Time</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ totalColdLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ totalWarmLocal | number:'1.0-0' }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">ms</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Avg Generation Speed Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <i class="bi bi-speedometer text-slate-600"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0">Global Avg Speed</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+              <!-- Local Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                     Cold
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-blue-500" style="width: 100%"></div>
+                </div>
+              </div>
+
+              <!-- Local Warm -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">
+                     Warm
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold text-slate-800">{{ speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400">chars/sec</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                   <div class="h-full rounded-full bg-orange-500" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- Setup Accordion -->
 
     <!-- API Categories -->
