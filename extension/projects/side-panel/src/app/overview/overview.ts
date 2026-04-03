@@ -42,6 +42,10 @@ export class OverviewComponent implements OnInit {
   modelVariant = '-';
   modelStatusClass = 'bg-gray-300 dark:bg-gray-500';
 
+  // Model Routing
+  modelRouting: string = 'chrome';
+  geminiApiKey: string = '';
+
   // API Grid
   apiCapabilities: ApiAvailability[] = [];
   activeDownloads = new Map<string, { controller: AbortController, progress: number }>();
@@ -65,6 +69,7 @@ export class OverviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadSettings();
     this.refreshAll();
     
     this.modelManager.modelDownloadedEvent.subscribe(() => {
@@ -80,6 +85,37 @@ export class OverviewComponent implements OnInit {
             setTimeout(() => this.fetchActiveSessions(), 100);
           });
         }
+      });
+    }
+  }
+
+  loadSettings() {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: 'get_setting', key: 'model_routing', defaultValue: 'chrome' }, (response: any) => {
+        this.ngZone.run(() => {
+          if (!chrome.runtime.lastError) {
+            this.modelRouting = response?.value || 'chrome';
+          }
+          
+          chrome.runtime.sendMessage({ action: 'get_setting', key: 'gemini_api_key', defaultValue: '' }, (keyResponse: any) => {
+            this.ngZone.run(() => {
+              if (!chrome.runtime.lastError) {
+                this.geminiApiKey = keyResponse?.value || '';
+              }
+              this.cdr.detectChanges();
+            });
+          });
+        });
+      });
+    }
+  }
+
+  saveModelRouting() {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: 'set_setting', key: 'model_routing', value: this.modelRouting }, () => {
+        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        });
       });
     }
   }

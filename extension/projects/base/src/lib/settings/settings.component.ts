@@ -37,6 +37,21 @@ declare const chrome: any;
               </div>
             </div>
           </label>
+
+          <div class="flex flex-col gap-2 p-4 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
+            <label class="font-medium text-gray-800 dark:text-gray-200">Gemini API Key</label>
+            <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
+              Used when routing requests to Gemini models instead of the built-in Chrome AI.
+            </div>
+            <input 
+              type="password" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-[#5f6368] rounded-lg bg-white dark:bg-[#202124] text-gray-900 dark:text-[#e8eaed] focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="AIzaSy..."
+              [(ngModel)]="geminiApiKey"
+              (change)="saveSettings()"
+              [disabled]="loading"
+            >
+          </div>
         </div>
 
         <div *ngIf="savedMessage" class="mt-4 flex items-center text-sm text-green-700 dark:text-green-400 font-medium transition-opacity bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-800/50 p-3 rounded-lg w-fit">
@@ -51,6 +66,7 @@ export class SettingsComponent implements OnInit {
   @Input() showHeader: boolean = true;
   
   wrapApiEnabled: boolean = true;
+  geminiApiKey: string = '';
   loading: boolean = true;
   savedMessage: boolean = false;
 
@@ -65,13 +81,19 @@ export class SettingsComponent implements OnInit {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ action: 'get_setting', key: 'wrap_api', defaultValue: true }, (response: any) => {
         this.ngZone.run(() => {
-          if (chrome.runtime.lastError) {
-            console.error('Error loading settings:', chrome.runtime.lastError);
-          } else {
+          if (!chrome.runtime.lastError) {
             this.wrapApiEnabled = response?.value !== false;
           }
-          this.loading = false;
-          this.cdr.detectChanges();
+          
+          chrome.runtime.sendMessage({ action: 'get_setting', key: 'gemini_api_key', defaultValue: '' }, (keyResponse: any) => {
+            this.ngZone.run(() => {
+              if (!chrome.runtime.lastError) {
+                this.geminiApiKey = keyResponse?.value || '';
+              }
+              this.loading = false;
+              this.cdr.detectChanges();
+            });
+          });
         });
       });
     } else {
@@ -84,13 +106,21 @@ export class SettingsComponent implements OnInit {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ action: 'set_setting', key: 'wrap_api', value: this.wrapApiEnabled }, (response: any) => {
         this.ngZone.run(() => {
-          this.loading = false;
           if (chrome.runtime.lastError) {
-            console.error('Error saving settings:', chrome.runtime.lastError);
-          } else {
-            this.showSavedMessage();
+            console.error('Error saving wrap_api setting:', chrome.runtime.lastError);
           }
-          this.cdr.detectChanges();
+          
+          chrome.runtime.sendMessage({ action: 'set_setting', key: 'gemini_api_key', value: this.geminiApiKey }, (keyResponse: any) => {
+            this.ngZone.run(() => {
+              this.loading = false;
+              if (chrome.runtime.lastError) {
+                console.error('Error saving gemini_api_key setting:', chrome.runtime.lastError);
+              } else {
+                this.showSavedMessage();
+              }
+              this.cdr.detectChanges();
+            });
+          });
         });
       });
     } else {

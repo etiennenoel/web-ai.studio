@@ -121,6 +121,72 @@ window.addEventListener('message', async (event) => {
         data: data 
       }, '*');
     });
+  } else if (event.data && event.data.type === 'WEBAI_ROUTING_REQUEST') {
+    const messageId = event.data.messageId;
+    chrome.runtime.sendMessage({ action: 'get_setting', key: 'model_routing', defaultValue: 'chrome' }, (response: any) => {
+      const routing = response?.value || 'chrome';
+      window.postMessage({ type: 'WEBAI_ROUTING_RESPONSE', messageId: messageId, data: { modelRouting: routing } }, '*');
+    });
+  } else if (event.data && event.data.type === 'WEBAI_GEMINI_REQUEST') {
+    const messageId = event.data.messageId;
+    const payload = event.data.payload;
+    
+    chrome.runtime.sendMessage({ action: 'get_setting', key: 'model_routing', defaultValue: 'chrome' }, (routingResp: any) => {
+      const routing = routingResp?.value || 'chrome';
+      chrome.runtime.sendMessage({ action: 'get_setting', key: 'gemini_api_key', defaultValue: '' }, (keyResp: any) => {
+        const apiKey = keyResp?.value || '';
+        if (!apiKey) {
+          window.postMessage({ type: 'WEBAI_GEMINI_RESPONSE', messageId, error: 'Gemini API Key is missing. Please set it in WebAI Extension settings.' }, '*');
+          return;
+        }
+        
+        let promptText = '';
+        const rawArg = payload.args && payload.args.length > 0 ? payload.args[0] : '';
+        let extractedText = '';
+        
+        if (typeof rawArg === 'string') {
+          extractedText = rawArg;
+        } else if (Array.isArray(rawArg)) {
+          extractedText = rawArg.map(p => p.content || JSON.stringify(p)).join('\\n');
+        } else if (typeof rawArg === 'object') {
+          extractedText = JSON.stringify(rawArg);
+        }
+
+        if (payload.api === 'LanguageModel') {
+           promptText = extractedText;
+        } else if (payload.api === 'Summarizer') {
+           promptText = `Summarize the following text:\n\n${extractedText}`;
+        } else if (payload.api === 'Writer') {
+           promptText = `Write about the following topic:\n\n${extractedText}`;
+        } else if (payload.api === 'Rewriter') {
+           promptText = `Rewrite the following text:\n\n${extractedText}`;
+        } else if (payload.api === 'Translator') {
+           promptText = `Translate the following text:\n\n${extractedText}`;
+        } else {
+           promptText = extractedText;
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${routing}:generateContent?key=${apiKey}`;
+
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }]
+          })
+        }).then(async res => {
+          if (!res.ok) {
+            const errBody = await res.text();
+            throw new Error(`Gemini API Error: ${res.status} ${errBody}`);
+          }
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          window.postMessage({ type: 'WEBAI_GEMINI_RESPONSE', messageId, data: text }, '*');
+        }).catch(err => {
+           window.postMessage({ type: 'WEBAI_GEMINI_RESPONSE', messageId, error: err.message }, '*');
+        });
+      });
+    });
   } else if (event.data && event.data.type === 'WEBAI_API_CALL') {
     // Forward the API call log to the background script
     chrome.runtime.sendMessage({
