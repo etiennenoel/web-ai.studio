@@ -59,9 +59,13 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   rawItems: any[] = [];
   sessionGroups: SessionGroup[] = [];
-  timeFilteredGroups: SessionGroup[] = [];
+  filteredGroups: SessionGroup[] = [];
+  apiGroupsCache: Record<string, SessionGroup[]> = {};
+  paginatedApiGroups: Record<string, SessionGroup[]> = {};
+  apiPages: Record<string, number> = {};
+  pageSize = 10;
   
-  timeFilter: '5m' | '1h' | '24h' | 'all' = 'all';
+  countFilter: '50' | '100' | '250' | '500' | 'all' = 'all';
   availableApis: string[] = ['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
   selectedApis: Set<string> = new Set<string>(['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader']);
   
@@ -93,7 +97,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    if (this.timeFilteredGroups.length > 0) {
+    if (this.filteredGroups.length > 0) {
       this.updateChart();
     }
   }
@@ -101,6 +105,35 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.chart) {
       this.chart.destroy();
+    }
+  }
+
+  formatForDisplay(obj: any): string {
+    if (obj === undefined) return '';
+    try {
+      return JSON.stringify(
+        obj,
+        (key, value) => {
+          if (key === 'dataUrl' && typeof value === 'string' && value.length > 100) {
+            return `<Base64 Data: ${Math.round(value.length / 1024)}KB>`;
+          }
+          if (Array.isArray(value) && value.length > 100) {
+            const truncated = value.slice(0, 10);
+            truncated.push(`... and ${value.length - 10} more items`);
+            return truncated;
+          }
+          if (typeof value === 'string' && value.length > 50000) {
+            return (
+              value.substring(0, 1000) +
+              `\n... [String truncated: ${Math.round(value.length / 1024)}KB total]`
+            );
+          }
+          return value;
+        },
+        2,
+      );
+    } catch (e) {
+      return String(obj);
     }
   }
 
@@ -128,6 +161,14 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
             this.error = response.error;
           } else {
             this.rawItems = response.data || [];
+            for (const item of this.rawItems) {
+              item.displayOptions = item.options ? this.formatForDisplay(item.options) : '{}';
+              item.displayArgs = item.args && item.args.length > 0 ? this.formatForDisplay(item.args) : '[]';
+              item.displayResponse = item.response !== undefined ? this.formatForDisplay(item.response) : '';
+              item.computedCreateDuration = this.getCreateDuration(item);
+              item.computedDuration = this.getDuration(item);
+              item.computedTtft = this.getTtft(item);
+            }
             this.groupSessions();
           }
           this.cdr.detectChanges();
@@ -176,22 +217,39 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters() {
-    const now = Date.now();
-    let timeLimit = 0;
-    
-    switch (this.timeFilter) {
-      case '5m': timeLimit = now - 5 * 60 * 1000; break;
-      case '1h': timeLimit = now - 60 * 60 * 1000; break;
-      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
+    let countLimit = this.sessionGroups.length;
+    switch (this.countFilter) {
+      case '50': countLimit = 50; break;
+      case '100': countLimit = 100; break;
+      case '250': countLimit = 250; break;
+      case '500': countLimit = 500; break;
     }
     
-    this.timeFilteredGroups = this.sessionGroups.filter(group => {
-      return this.timeFilter === 'all' || group.timestamp >= timeLimit;
-    });
+    this.filteredGroups = this.sessionGroups.slice(Math.max(0, this.sessionGroups.length - countLimit));
 
     this.apiGroupsCache = {};
+    this.paginatedApiGroups = {};
     for (const api of this.availableApis) {
-      this.apiGroupsCache[api] = this.timeFilteredGroups.filter(g => g.api === api).reverse();
+      const allGroups = this.filteredGroups.filter(g => g.api === api).reverse();
+      for (const group of allGroups) {
+        if (group.computedStatus === undefined) {
+          group.computedStatus = this.getGroupStatus(group);
+        }
+        if (group.computedTtft === undefined) {
+          group.computedTtft = this.getGroupTtft(group);
+        }
+        if (group.computedCreateTime === undefined) {
+          group.computedCreateTime = this.getGroupCreateTime(group);
+        }
+        if (group.computedInferenceTime === undefined) {
+          group.computedInferenceTime = this.getGroupInferenceTime(group);
+        }
+      }
+      this.apiGroupsCache[api] = allGroups;
+      if (this.apiPages[api] === undefined) {
+        this.apiPages[api] = 0;
+      }
+      this.updatePaginatedGroups(api);
     }
 
     this.calculateStats();
@@ -202,24 +260,15 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 0);
   }
 
-  setTimeFilter(filter: '5m' | '1h' | '24h' | 'all') {
-    this.timeFilter = filter;
+  setCountFilter(filter: '50' | '100' | '250' | '500' | 'all') {
+    this.countFilter = filter;
     this.applyFilters();
   }
 
-  getTimeFilterCount(filter: '5m' | '1h' | '24h' | 'all'): number {
-    const now = Date.now();
-    let timeLimit = 0;
-    
-    switch (filter) {
-      case '5m': timeLimit = now - 5 * 60 * 1000; break;
-      case '1h': timeLimit = now - 60 * 60 * 1000; break;
-      case '24h': timeLimit = now - 24 * 60 * 60 * 1000; break;
-    }
-    
-    return this.sessionGroups.filter(group => {
-      return filter === 'all' || group.timestamp >= timeLimit;
-    }).length;
+  getCountFilterCount(filter: '50' | '100' | '250' | '500' | 'all'): number {
+    if (filter === 'all') return this.sessionGroups.length;
+    const limit = parseInt(filter, 10);
+    return Math.min(this.sessionGroups.length, limit);
   }
 
   toggleApiFilter(api: string, event?: Event) {
@@ -291,8 +340,57 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  updatePaginatedGroups(api: string) {
+    const all = this.apiGroupsCache[api] || [];
+    const page = this.apiPages[api] || 0;
+    this.paginatedApiGroups[api] = all.slice(page * this.pageSize, (page + 1) * this.pageSize);
+  }
+
+  changePage(api: string, delta: number, event?: Event) {
+    if (event) event.stopPropagation();
+    const current = this.apiPages[api] || 0;
+    const total = this.getGroupsCountForApi(api);
+    const maxPage = Math.ceil(total / this.pageSize) - 1;
+    let newPage = current + delta;
+    if (newPage < 0) newPage = 0;
+    if (maxPage >= 0 && newPage > maxPage) newPage = maxPage;
+    
+    if (newPage !== current) {
+      this.apiPages[api] = newPage;
+      this.updatePaginatedGroups(api);
+    }
+  }
+
+  getPageStart(api: string): number {
+    const page = this.apiPages[api] || 0;
+    const total = this.getGroupsCountForApi(api);
+    return total === 0 ? 0 : page * this.pageSize + 1;
+  }
+
+  getPageEnd(api: string): number {
+    const page = this.apiPages[api] || 0;
+    const total = this.getGroupsCountForApi(api);
+    return Math.min((page + 1) * this.pageSize, total);
+  }
+
   getGroupsForApi(api: string): SessionGroup[] {
-    return this.timeFilteredGroups.filter(g => g.api === api).reverse();
+    return this.paginatedApiGroups[api] || [];
+  }
+
+  getGroupsCountForApi(api: string): number {
+    return (this.apiGroupsCache[api] || []).length;
+  }
+
+  trackByApi(index: number, stat: ApiPerformanceStats): string {
+    return stat.api;
+  }
+
+  trackBySessionId(index: number, group: SessionGroup): string {
+    return group.sessionId;
+  }
+
+  trackByHistoryItem(index: number, item: any): string {
+    return item.id;
   }
 
   setHoveredSession(sessionId: string | null) {
@@ -451,7 +549,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       apiData[api] = { success: 0, errors: 0, ttft: [], create: [], inference: [] };
     }
 
-    for (const group of this.timeFilteredGroups) {
+    for (const group of this.filteredGroups) {
       const d = apiData[group.api];
       if (!d) continue;
       
@@ -522,7 +620,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     const apis = Array.from(this.selectedApis);
 
     for (const api of apis) {
-      const apiGroups = this.timeFilteredGroups.filter(g => g.api === api);
+      const apiGroups = this.filteredGroups.filter(g => g.api === api);
       if (apiGroups.length === 0) continue;
 
       const createDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];

@@ -23,6 +23,9 @@ export interface HistoryItem {
   displayOptions?: string;
   displayArgs?: string;
   displayResponse?: string;
+  computedCreateDuration?: number | null;
+  computedDuration?: number | null;
+  computedTtft?: number | null;
 }
 
 export interface SessionGroup {
@@ -32,6 +35,9 @@ export interface SessionGroup {
   createItem: HistoryItem | null;
   methodItems: HistoryItem[];
   computedStatus?: 'completed' | 'error' | 'running';
+  computedTtft?: number | null;
+  computedCreateTime?: number | null;
+  computedInferenceTime?: number | null;
 }
 
 @Component({
