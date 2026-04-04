@@ -384,6 +384,30 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  exportData() {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        const originToExport = (!isException && origin) ? origin : '';
+        const itemsToExport = originToExport ? this.rawItems.filter(item => item.origin === originToExport) : this.rawItems;
+        this.downloadExportFile(itemsToExport, originToExport, 'performance');
+      });
+    } else {
+      this.downloadExportFile(this.rawItems, '', 'performance');
+    }
+  }
+
+  private downloadExportFile(items: any[], origin: string, type: string) {
+    const dataStr = JSON.stringify(items, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const originSuffix = origin ? `-${origin.replace(/[^a-z0-9]/gi, '_')}` : '';
+    const exportFileDefaultName = `webai-${type}-data${originSuffix}-${new Date().toISOString()}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }
+
 
   calculateStats() {
     const apiData: Record<string, {
