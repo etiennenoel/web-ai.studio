@@ -143,6 +143,9 @@
                         <tr>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider rounded-tl-md">Session ID</th>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">TTFT</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Creation Time</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Inference Time</th>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right rounded-tr-md">Actions</th>
                         </tr>
                       </thead>
@@ -165,6 +168,15 @@
                               <span class="text-xs text-gray-600 dark:text-gray-400">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
                             </td>
                             <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ getGroupTtft(group) !== null ? (getGroupTtft(group) | number:'1.0-0') + ' ms' : '-' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ getGroupCreateTime(group) !== null ? (getGroupCreateTime(group) | number:'1.0-0') + ' ms' : '-' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ getGroupInferenceTime(group) !== null ? (getGroupInferenceTime(group) | number:'1.0-0') + ' ms' : '-' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
                               <div class="flex items-center justify-end gap-2">
                                 <button (click)="provideFeedback(group); $event.stopPropagation()" class="text-[10px] text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-[#3c4043] hover:bg-gray-400 dark:hover:bg-[#4a4d51] px-2 py-1 rounded transition-colors flex items-center gap-1" title="Submit Feedback">
                                   <i class="fa-regular fa-comment-dots"></i> Submit Feedback
@@ -179,7 +191,7 @@
                           
                           <!-- Expanded Session Details inside Performance view -->
                           <tr *ngIf="isSessionExpanded(group.sessionId)" class="bg-gray-100 dark:bg-[#1a1b1e]">
-                            <td colspan="3" class="p-3 border-b border-gray-300 dark:border-[#3c4043]">
+                            <td colspan="6" class="p-3 border-b border-gray-300 dark:border-[#3c4043]">
                               <div class="relative pl-4 border-l-2 border-gray-300 dark:border-[#3c4043] space-y-4 ml-2 my-2">
                                 
                                 <!-- Create Step -->

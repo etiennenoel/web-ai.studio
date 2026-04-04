@@ -189,6 +189,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.timeFilter === 'all' || group.timestamp >= timeLimit;
     });
 
+    this.apiGroupsCache = {};
+    for (const api of this.availableApis) {
+      this.apiGroupsCache[api] = this.timeFilteredGroups.filter(g => g.api === api).reverse();
+    }
+
     this.calculateStats();
     setTimeout(() => {
       if (this.performanceChartRef) {
@@ -344,6 +349,29 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   getTtft(item: any): number | null {
     if (item?.timestamps?.execute && item?.timestamps?.first_token) {
       return item.timestamps.first_token - item.timestamps.execute;
+    }
+    return null;
+  }
+
+  getGroupCreateTime(group: SessionGroup): number | null {
+    if (group.createItem) {
+      return this.getCreateDuration(group.createItem);
+    }
+    return null;
+  }
+
+  getGroupTtft(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      const ttft = this.getTtft(item);
+      if (ttft !== null) return ttft;
+    }
+    return null;
+  }
+
+  getGroupInferenceTime(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      const duration = this.getDuration(item);
+      if (duration !== null) return duration;
     }
     return null;
   }
