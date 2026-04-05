@@ -10,15 +10,26 @@ import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties';
 })
 export class InlineCodeEditorComponent implements AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('editorContainer') editorContainer!: ElementRef;
+  @ViewChild('wrapper') wrapper!: ElementRef;
   
   @Input() content: string = '';
   @Input() maxLines: number = 30;
 
   private editor: any;
   private initialized = false;
+  private resizeObserver: ResizeObserver | null = null;
 
   ngAfterViewInit() {
     this.initEditor();
+
+    if (this.wrapper) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.editor) {
+          this.editor.resize();
+        }
+      });
+      this.resizeObserver.observe(this.wrapper.nativeElement);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -46,14 +57,15 @@ export class InlineCodeEditorComponent implements AfterViewInit, OnDestroy, OnCh
       wrap: true,
       highlightActiveLine: false,
       highlightGutterLine: false,
-      maxLines: this.maxLines,
-      minLines: 2
     });
 
     this.initialized = true;
   }
 
   ngOnDestroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
     if (this.editor) {
       this.editor.destroy();
     }

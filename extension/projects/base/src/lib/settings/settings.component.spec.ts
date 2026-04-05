@@ -22,7 +22,10 @@ describe('SettingsComponent', () => {
       runtime: {
         sendMessage: vi.fn().mockImplementation((req: any, cb: any) => {
           if (req.action === 'get_setting') {
-            cb({ value: true });
+            if (req.key === 'wrap_api') cb({ value: true });
+            else if (req.key === 'providers') cb({ value: req.defaultValue });
+            else if (req.key === 'activeProviderId') cb({ value: 'chrome' });
+            else cb({ value: req.defaultValue });
           } else if (req.action === 'set_setting') {
             cb({ success: true });
           }

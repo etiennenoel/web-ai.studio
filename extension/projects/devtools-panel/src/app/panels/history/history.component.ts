@@ -128,25 +128,57 @@ export class HistoryComponent implements OnInit {
         },
       );
 
-      chrome.runtime.sendMessage(
-        {
-          action: 'get_all_history',
-        },
-        (response: any) => {
-          this.ngZone.run(() => {
+      if (chrome.devtools) {
+        chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+          if (isException || !origin) {
+            this.error = 'Could not get inspected window origin.';
             this.isLoading = false;
-            if (chrome.runtime.lastError) {
-              this.error = chrome.runtime.lastError.message;
-            } else if (response && response.error) {
-              this.error = response.error;
-            } else {
-              this.rawItems = (response && response.data) || [];
-              this.groupSessions();
-            }
             this.cdr.detectChanges();
-          });
-        },
-      );
+            return;
+          }
+
+          chrome.runtime.sendMessage(
+            {
+              action: 'get_api_history',
+              payload: { origin, apiName: 'all' }
+            },
+            (response: any) => {
+              this.ngZone.run(() => {
+                this.isLoading = false;
+                if (chrome.runtime.lastError) {
+                  this.error = chrome.runtime.lastError.message;
+                } else if (response && response.error) {
+                  this.error = response.error;
+                } else {
+                  this.rawItems = (response && response.data) || [];
+                  this.groupSessions();
+                }
+                this.cdr.detectChanges();
+              });
+            }
+          );
+        });
+      } else {
+        chrome.runtime.sendMessage(
+          {
+            action: 'get_all_history',
+          },
+          (response: any) => {
+            this.ngZone.run(() => {
+              this.isLoading = false;
+              if (chrome.runtime.lastError) {
+                this.error = chrome.runtime.lastError.message;
+              } else if (response && response.error) {
+                this.error = response.error;
+              } else {
+                this.rawItems = (response && response.data) || [];
+                this.groupSessions();
+              }
+              this.cdr.detectChanges();
+            });
+          }
+        );
+      }
     } else {
       // Mock data for local testing outside extension
       this.rawItems = [
@@ -466,23 +498,50 @@ export class HistoryComponent implements OnInit {
   executeClearHistory() {
     this.showClearConfirm = false;
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage(
-        {
-          action: 'clear_all_history',
-        },
-        (response: any) => {
-          this.ngZone.run(() => {
-            if (chrome.runtime.lastError) {
-              this.error = chrome.runtime.lastError.message;
-            } else if (response && response.error) {
-              this.error = response.error;
-            } else {
-              this.loadHistory();
-            }
-            this.cdr.detectChanges();
-          });
-        },
-      );
+      if (chrome.devtools) {
+        chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+          if (!isException && origin) {
+            chrome.runtime.sendMessage(
+              {
+                action: 'clear_api_history',
+                payload: { origin }
+              },
+              (response: any) => {
+                this.ngZone.run(() => {
+                  if (chrome.runtime.lastError) {
+                    this.error = chrome.runtime.lastError.message;
+                  } else if (response && response.error) {
+                    this.error = response.error;
+                  } else {
+                    this.rawItems = [];
+                    this.groupSessions();
+                    this.cdr.detectChanges();
+                  }
+                });
+              }
+            );
+          }
+        });
+      } else {
+        chrome.runtime.sendMessage(
+          {
+            action: 'clear_all_history',
+          },
+          (response: any) => {
+            this.ngZone.run(() => {
+              if (chrome.runtime.lastError) {
+                this.error = chrome.runtime.lastError.message;
+              } else if (response && response.error) {
+                this.error = response.error;
+              } else {
+                this.rawItems = [];
+                this.groupSessions();
+                this.cdr.detectChanges();
+              }
+            });
+          }
+        );
+      }
     } else {
       this.rawItems = [];
       this.groupSessions();
@@ -626,26 +685,22 @@ export class HistoryComponent implements OnInit {
       return 'error';
     }
 
-    // If a session has no method calls yet but the create is still running, it's running.
-    if (
-      group.createItem &&
-      group.createItem.response === undefined &&
-      !group.createItem.timestamps?.completed
-    ) {
+    if (group.methodItems.length === 0) {
       group.computedStatus = 'running';
       return 'running';
     }
 
     let hasRunning = false;
     let hasError = false;
+    let hasResponse = false;
 
     for (const method of group.methodItems) {
       if (method.errorMessage) {
         hasError = true;
       }
-      // Only methods that are expected to return a response or explicitly log completion
-      // For synchronous methods like destroy, response might be undefined but timestamps.completed is set
-      if (method.response === undefined && !method.timestamps?.completed && !method.errorMessage) {
+      if (method.response !== undefined) {
+        hasResponse = true;
+      } else if (!method.timestamps?.completed) {
         hasRunning = true;
       }
     }
@@ -655,7 +710,12 @@ export class HistoryComponent implements OnInit {
       return 'error';
     }
 
-    group.computedStatus = hasRunning ? 'running' : 'completed';
+    if (hasRunning || !hasResponse) {
+      group.computedStatus = 'running';
+      return 'running';
+    }
+
+    group.computedStatus = 'completed';
     return group.computedStatus;
   }
 
