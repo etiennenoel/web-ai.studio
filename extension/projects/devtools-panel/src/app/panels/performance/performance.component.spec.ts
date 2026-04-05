@@ -43,7 +43,7 @@ describe('PerformanceComponent', () => {
 
   it('should toggle api filter', () => {
     expect(component.selectedApis.has('Prompt')).toBeFalse();
-    component.toggleApiFilter('Prompt');
+    component.toggleApi('Prompt');
     expect(component.selectedApis.has('Prompt')).toBeTrue();
   });
 });
