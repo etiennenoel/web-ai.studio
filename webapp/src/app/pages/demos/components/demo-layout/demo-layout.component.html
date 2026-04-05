@@ -9,11 +9,11 @@
       </a>
       
       <div class="flex items-center gap-4 mt-2">
-        <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl shadow-sm">
+        <div class="w-14 h-14 rounded-2xl flex-shrink-0 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl shadow-sm">
           <i class="bi {{ icon }}"></i>
         </div>
-        <div>
-          <h1 class="text-3xl font-bold text-slate-900 dark:text-white m-0">{{ title }}</h1>
+        <div class="min-w-0">
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-white m-0 break-words">{{ title }}</h1>
           <span class="inline-block mt-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-200/60 dark:bg-zinc-800 text-slate-600 dark:text-slate-400">
             {{ category }}
           </span>

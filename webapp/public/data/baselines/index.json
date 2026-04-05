@@ -1,14 +1,19 @@
 [
   {
     "filename": "apple_m4_max",
-    "name": "Apple M4 Max"
+    "name": "Apple M4 Max",
+    "os": "macOS",
+    "cpu": "Apple M4 Max",
+    "ram": 64
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash",
-    "name": "Cloud Gemini 3.1 Flash"
+    "name": "Cloud Gemini 3.1 Flash",
+    "os": "Cloud"
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash_lite",
-    "name": "Cloud Gemini 3.1 Flash Lite"
+    "name": "Cloud Gemini 3.1 Flash Lite",
+    "os": "Cloud"
   }
 ]

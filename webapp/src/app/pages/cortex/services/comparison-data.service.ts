@@ -11,12 +11,9 @@ import { isPlatformBrowser } from '@angular/common';
 export class ComparisonDataService {
 
   baselines: { id: string, name: string, data: any }[] = [];
-  availableBaselinesIndex: {filename: string, name: string}[] = [];
-
-  
+  availableBaselinesIndex: {filename: string, name: string, os?: string, cpu?: string, ram?: number}[] = [];
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
-    // Load a default cloud model comparison
     if (isPlatformBrowser(this.platformId)) {
       this.addBaseline('2026-04-03_gemini_3.1_flash', 'Cloud Gemini 3.1 Flash');
       this.addBaseline('2026-04-03_gemini_3.1_flash_lite', 'Cloud Gemini 3.1 Flash Lite');
@@ -24,10 +21,13 @@ export class ComparisonDataService {
     }
   }
 
-  loadAvailableBaselinesIndex() {
-    this.http.get<{filename: string, name: string}[]>('/data/baselines/index.json').subscribe({
+  loadAvailableBaselinesIndex(hardwareInfo?: any) {
+    this.http.get<{filename: string, name: string, os?: string, cpu?: string, ram?: number}[]>('/data/baselines/index.json').subscribe({
         next: (data) => {
             this.availableBaselinesIndex = data;
+            if (hardwareInfo) {
+              this.matchAndLoadBaseline(hardwareInfo);
+            }
         },
         error: (err) => {
             console.warn('Failed to load baselines index');
@@ -56,73 +56,53 @@ export class ComparisonDataService {
   loadBaselineData(hardwareInfo: any) {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    let candidates: {filename: string, modelName: string}[] = [];
-
-    const defaultFilename = 'apple_m4_max';
-    const defaultModelName = 'Apple M4 Max';
-
-    if (hardwareInfo?.cpu?.modelName) {
-        const rawModelName = hardwareInfo.cpu.modelName;
-        const baseFilename = rawModelName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
-        
-        let targetGb = 0;
-        if (hardwareInfo?.memory?.capacity) {
-            targetGb = Math.round(hardwareInfo.memory.capacity / (1024 * 1024 * 1024));
-        }
-
-        if (targetGb > 0) {
-            // 1. Exact match
-            candidates.push({filename: `${baseFilename}_${targetGb}gb`, modelName: `${rawModelName} ${targetGb}GB`});
-
-            // 2. Closest standard RAM sizes
-            const commonRamSizes = [8, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 128];
-            const sortedSizes = [...commonRamSizes]
-                .filter(size => size !== targetGb)
-                .sort((a, b) => Math.abs(a - targetGb) - Math.abs(b - targetGb));
-            
-            // Try top 4 closest
-            for (let i = 0; i < 4; i++) {
-                candidates.push({filename: `${baseFilename}_${sortedSizes[i]}gb`, modelName: `${rawModelName} ${sortedSizes[i]}GB`});
-            }
-        }
-        
-        // 3. Base model with no RAM specified
-        candidates.push({filename: baseFilename, modelName: rawModelName});
+    if (this.availableBaselinesIndex.length === 0) {
+      this.loadAvailableBaselinesIndex(hardwareInfo);
+    } else {
+      this.matchAndLoadBaseline(hardwareInfo);
     }
-    
-    // 4. Ultimate fallback
-    candidates.push({filename: defaultFilename, modelName: defaultModelName});
-
-    // Deduplicate candidates
-    const seen = new Set<string>();
-    candidates = candidates.filter(c => {
-        if (seen.has(c.filename)) return false;
-        seen.add(c.filename);
-        return true;
-    });
-
-    this.tryLoadNextBaseline(candidates, 0);
   }
 
-  private tryLoadNextBaseline(candidates: {filename: string, modelName: string}[], index: number) {
-      if (index >= candidates.length) {
-          
-          return;
+  private matchAndLoadBaseline(hardwareInfo: any) {
+    if (!hardwareInfo?.cpu?.modelName) {
+      this.addBaseline('apple_m4_max', 'Apple M4 Max'); // Fallback
+      return;
+    }
+    
+    const userCpu = hardwareInfo.cpu.modelName.toLowerCase();
+    let userRam = 0;
+    if (hardwareInfo?.memory?.capacity) {
+      userRam = Math.round(hardwareInfo.memory.capacity / (1024 * 1024 * 1024));
+    }
+
+    let bestMatch = null;
+    let bestScore = -1;
+
+    for (const baseline of this.availableBaselinesIndex) {
+      if (baseline.os === 'Cloud') continue;
+      
+      let score = 0;
+      if (baseline.cpu && userCpu.includes(baseline.cpu.toLowerCase())) {
+        score += 100;
+      }
+      
+      if (baseline.ram) {
+        // Closer RAM gives higher score (max 50 points if exact match)
+        const diff = Math.abs(baseline.ram - userRam);
+        score += Math.max(0, 50 - diff);
       }
 
-      const candidate = candidates[index];
-      
-      this.http.get(`/data/baselines/${candidate.filename}.json`).subscribe({
-          next: (data) => {
-              if (!this.baselines.some(b => b.id === candidate.filename)) {
-                  this.baselines.push({ id: candidate.filename, name: candidate.modelName, data: data });
-              }
-          },
-          error: (err) => {
-              // Not found, try next
-              this.tryLoadNextBaseline(candidates, index + 1);
-          }
-      });
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = baseline;
+      }
+    }
+
+    if (bestMatch && bestScore > 0) {
+      this.addBaseline(bestMatch.filename, bestMatch.name);
+    } else {
+      this.addBaseline('apple_m4_max', 'Apple M4 Max'); // Fallback
+    }
   }
 
   getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {

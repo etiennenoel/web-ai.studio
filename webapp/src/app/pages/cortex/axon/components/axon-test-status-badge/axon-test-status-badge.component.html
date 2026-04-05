@@ -2,26 +2,44 @@
       [class.bg-red-50]="status === TestStatus.Fail || status === TestStatus.Error"
       [class.text-red-700]="status === TestStatus.Fail || status === TestStatus.Error"
       [class.border-red-200]="status === TestStatus.Fail || status === TestStatus.Error"
+      [class.dark:bg-red-900/30]="status === TestStatus.Fail || status === TestStatus.Error"
+      [class.dark:text-red-400]="status === TestStatus.Fail || status === TestStatus.Error"
+      [class.dark:border-red-500/30]="status === TestStatus.Fail || status === TestStatus.Error"
       
       [class.bg-blue-50]="status === TestStatus.Executing"
       [class.text-blue-700]="status === TestStatus.Executing"
       [class.border-blue-200]="status === TestStatus.Executing"
+      [class.dark:bg-blue-900/30]="status === TestStatus.Executing"
+      [class.dark:text-blue-400]="status === TestStatus.Executing"
+      [class.dark:border-blue-500/30]="status === TestStatus.Executing"
 
       [class.bg-indigo-50]="status === TestStatus.Idle && selected === true"
       [class.text-indigo-700]="status === TestStatus.Idle && selected === true"
       [class.border-indigo-200]="status === TestStatus.Idle && selected === true"
+      [class.dark:bg-indigo-900/30]="status === TestStatus.Idle && selected === true"
+      [class.dark:text-indigo-400]="status === TestStatus.Idle && selected === true"
+      [class.dark:border-indigo-500/30]="status === TestStatus.Idle && selected === true"
 
       [class.bg-gray-50]="status === TestStatus.Idle && selected === false"
       [class.text-gray-400]="status === TestStatus.Idle && selected === false"
       [class.border-gray-200]="status === TestStatus.Idle && selected === false"
+      [class.dark:bg-slate-800/50]="status === TestStatus.Idle && selected === false"
+      [class.dark:text-slate-500]="status === TestStatus.Idle && selected === false"
+      [class.dark:border-slate-700/50]="status === TestStatus.Idle && selected === false"
       
       [class.bg-gray-100]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
       [class.text-gray-600]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
       [class.border-gray-200]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
+      [class.dark:bg-slate-800/80]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
+      [class.dark:text-slate-400]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
+      [class.dark:border-slate-700]="(status === TestStatus.Idle && selected === undefined) || status === TestStatus.Skipped"
       
       [class.bg-green-50]="status === TestStatus.Success"
       [class.text-green-700]="status === TestStatus.Success"
-      [class.border-green-200]="status === TestStatus.Success">
+      [class.border-green-200]="status === TestStatus.Success"
+      [class.dark:bg-green-900/30]="status === TestStatus.Success"
+      [class.dark:text-green-400]="status === TestStatus.Success"
+      [class.dark:border-green-500/30]="status === TestStatus.Success">
       
   @if(status === TestStatus.Fail || status === TestStatus.Error) {
     <i class="bi bi-x-circle-fill"></i>

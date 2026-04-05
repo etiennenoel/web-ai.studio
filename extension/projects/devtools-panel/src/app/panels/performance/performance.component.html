@@ -2,6 +2,9 @@
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold">API Performance</h1>
     <div class="flex gap-2">
+      <button (click)="exportData()" class="px-4 py-2 bg-gray-100 dark:bg-[#3c4043] border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-[#4a4d51] transition-colors text-sm font-medium flex items-center">
+        <i class="fa-solid fa-file-export mr-2"></i>Export
+      </button>
       <button (click)="loadHistory()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:text-[#202124] rounded-md transition-colors text-sm font-medium flex items-center">
         <i class="fa-solid fa-arrow-rotate-right mr-2"></i>Refresh
       </button>
@@ -9,12 +12,13 @@
   </div>
 
   <div class="flex flex-wrap gap-4 mb-6">
-    <!-- Time Filters -->
+    <!-- Count Filters -->
     <div class="flex bg-gray-50 dark:bg-[#292a2d] rounded-md border border-gray-300 dark:border-[#3c4043] overflow-hidden">
-      <button (click)="setTimeFilter('all')" [class.bg-gray-300]="timeFilter === 'all'" [class.dark:bg-[#3c4043]]="timeFilter === 'all'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">All Time ({{ getTimeFilterCount('all') }})</button>
-      <button (click)="setTimeFilter('24h')" [class.bg-gray-300]="timeFilter === '24h'" [class.dark:bg-[#3c4043]]="timeFilter === '24h'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Last 24h ({{ getTimeFilterCount('24h') }})</button>
-      <button (click)="setTimeFilter('1h')" [class.bg-gray-300]="timeFilter === '1h'" [class.dark:bg-[#3c4043]]="timeFilter === '1h'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Last Hour ({{ getTimeFilterCount('1h') }})</button>
-      <button (click)="setTimeFilter('5m')" [class.bg-gray-300]="timeFilter === '5m'" [class.dark:bg-[#3c4043]]="timeFilter === '5m'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors">Last 5m ({{ getTimeFilterCount('5m') }})</button>
+      <button (click)="setCountFilter('50')" [class.bg-gray-300]="countFilter === '50'" [class.dark:bg-[#3c4043]]="countFilter === '50'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 50 ({{ getCountFilterCount('50') }})</button>
+      <button (click)="setCountFilter('100')" [class.bg-gray-300]="countFilter === '100'" [class.dark:bg-[#3c4043]]="countFilter === '100'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 100 ({{ getCountFilterCount('100') }})</button>
+      <button (click)="setCountFilter('250')" [class.bg-gray-300]="countFilter === '250'" [class.dark:bg-[#3c4043]]="countFilter === '250'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 250 ({{ getCountFilterCount('250') }})</button>
+      <button (click)="setCountFilter('500')" [class.bg-gray-300]="countFilter === '500'" [class.dark:bg-[#3c4043]]="countFilter === '500'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 500 ({{ getCountFilterCount('500') }})</button>
+      <button (click)="setCountFilter('all')" [class.bg-gray-300]="countFilter === 'all'" [class.dark:bg-[#3c4043]]="countFilter === 'all'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors">All Time ({{ getCountFilterCount('all') }})</button>
     </div>
   </div>
 
@@ -28,12 +32,12 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && !error && timeFilteredGroups.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
+  <div *ngIf="!isLoading && !error && filteredGroups.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
     <i class="fa-solid fa-chart-line text-4xl mb-4 text-gray-600"></i>
     <p>No API performance data found for the selected filters.</p>
   </div>
 
-  <div *ngIf="!isLoading && !error && timeFilteredGroups.length > 0" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6 pr-2">
+  <div *ngIf="!isLoading && !error && filteredGroups.length > 0" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6 pr-2">
     
     <!-- Chart Section -->
     <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-lg p-4 flex flex-col">
@@ -91,7 +95,7 @@
           </thead>
           <tbody class="divide-y divide-[#3c4043]">
             
-            <ng-container *ngFor="let stat of stats">
+            <ng-container *ngFor="let stat of stats; trackBy: trackByApi">
               <tr class="transition-colors cursor-pointer" 
                   [class.bg-gray-100]="hoveredApi === stat.api" [class.dark:bg-[#303134]]="hoveredApi === stat.api" 
                   [class.hover:bg-gray-100]="true" [class.dark:hover:bg-[#303134]]="true"
@@ -133,18 +137,36 @@
               <tr *ngIf="expandedApi === stat.api" class="bg-white dark:bg-[#202124]">
                 <td colspan="19" class="p-0 border-b border-gray-300 dark:border-[#3c4043]">
                   <div class="p-4 overflow-y-auto max-h-[500px] custom-scrollbar">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 ml-2 border-b border-gray-300 dark:border-[#3c4043] pb-2">Recent Calls - {{ stat.api }}</h3>
+                    <div class="flex justify-between items-center mb-3 ml-2 border-b border-gray-300 dark:border-[#3c4043] pb-2 pr-4">
+                      <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                        Recent Calls - {{ stat.api }} 
+                      </h3>
+                      <div class="flex items-center gap-4 text-xs text-gray-500" *ngIf="getGroupsCountForApi(stat.api) > 0">
+                        <span>Showing {{ getPageStart(stat.api) }} - {{ getPageEnd(stat.api) }} of {{ getGroupsCountForApi(stat.api) }}</span>
+                        <div class="flex items-center gap-1">
+                          <button (click)="changePage(stat.api, -1, $event)" [disabled]="(apiPages[stat.api] || 0) === 0" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i>
+                          </button>
+                          <button (click)="changePage(stat.api, 1, $event)" [disabled]="getPageEnd(stat.api) >= getGroupsCountForApi(stat.api)" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                            <i class="fa-solid fa-chevron-right"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <div *ngIf="getGroupsForApi(stat.api).length === 0" class="text-gray-500 text-sm ml-2">No calls found for this API in the selected time range.</div>
                     <table *ngIf="getGroupsForApi(stat.api).length > 0" class="w-full text-left border-collapse">
                       <thead class="bg-gray-50 dark:bg-[#292a2d]">
                         <tr>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider rounded-tl-md">Session ID</th>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">TTFT</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Creation Time</th>
+                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Inference Time</th>
                           <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right rounded-tr-md">Actions</th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-[#3c4043]">
-                        <ng-container *ngFor="let group of getGroupsForApi(stat.api)">
+                        <ng-container *ngFor="let group of getGroupsForApi(stat.api); trackBy: trackBySessionId">
                           <tr class="hover:bg-gray-100 dark:hover:bg-[#303134] cursor-pointer transition-colors" 
                               [id]="'session-row-' + group.sessionId"
                               (mouseenter)="setHoveredSession(group.sessionId)"
@@ -153,13 +175,22 @@
                             <td class="p-2 align-middle border-t border-gray-300 dark:border-[#3c4043]">
                               <div class="flex items-center gap-2">
                                 <span class="text-xs text-gray-700 dark:text-gray-300 font-mono">{{ group.sessionId.substring(0, 8) }}...</span>
-                                <span *ngIf="getGroupStatus(group) === 'error'" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
-                                <span *ngIf="getGroupStatus(group) === 'running'" class="px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 text-[10px] rounded border border-yellow-300 dark:border-yellow-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> Running</span>
-                                <span *ngIf="getGroupStatus(group) === 'completed'" class="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-[10px] rounded border border-green-300 dark:border-green-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Done</span>
+                                <span *ngIf="group.computedStatus === 'error'" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
+                                <span *ngIf="group.computedStatus === 'running'" class="px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 text-[10px] rounded border border-yellow-300 dark:border-yellow-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> Running</span>
+                                <span *ngIf="group.computedStatus === 'completed'" class="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-[10px] rounded border border-green-300 dark:border-green-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Done</span>
                               </div>
                             </td>
                             <td class="p-2 align-middle border-t border-gray-300 dark:border-[#3c4043]">
                               <span class="text-xs text-gray-600 dark:text-gray-400">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedTtft !== null ? (group.computedTtft | number:'1.0-0') + ' ms' : '-' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedCreateTime !== null ? (group.computedCreateTime | number:'1.0-0') + ' ms' : '-' }}</span>
+                            </td>
+                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
+                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedInferenceTime !== null ? (group.computedInferenceTime | number:'1.0-0') + ' ms' : '-' }}</span>
                             </td>
                             <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
                               <div class="flex items-center justify-end gap-2">
@@ -176,7 +207,7 @@
                           
                           <!-- Expanded Session Details inside Performance view -->
                           <tr *ngIf="isSessionExpanded(group.sessionId)" class="bg-gray-100 dark:bg-[#1a1b1e]">
-                            <td colspan="3" class="p-3 border-b border-gray-300 dark:border-[#3c4043]">
+                            <td colspan="6" class="p-3 border-b border-gray-300 dark:border-[#3c4043]">
                               <div class="relative pl-4 border-l-2 border-gray-300 dark:border-[#3c4043] space-y-4 ml-2 my-2">
                                 
                                 <!-- Create Step -->
@@ -185,16 +216,16 @@
                                   <div class="flex items-center gap-2 mb-1">
                                     <span class="text-xs font-semibold text-black dark:text-white">create</span>
                                     <span *ngIf="createItem.timestamps?.error" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
-                                    <span *ngIf="getCreateDuration(createItem) as duration" class="text-[10px] text-gray-500"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
+                                    <span *ngIf="createItem.computedCreateDuration !== null" class="text-[10px] text-gray-500"><i class="fa-regular fa-clock"></i> {{ createItem.computedCreateDuration }}ms</span>
                                   </div>
                                   
                                   <div *ngIf="createItem.errorMessage" class="text-[10px] text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800/30 mt-1 inline-block">
                                     {{ createItem.errorMessage }}
                                   </div>
 
-                                  <div *ngIf="createItem.options && (createItem.options | json) !== '{}'" class="mt-1 bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                  <div *ngIf="getDisplayOptions(createItem) && getDisplayOptions(createItem) !== '{}'" class="mt-1 bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                     <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                    <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0">{{ createItem.options | json }}</pre>
+                                    <app-inline-code-editor [content]="getDisplayOptions(createItem) || ''" [maxLines]="15"></app-inline-code-editor>
                                   </div>
                                 </div>
                                 
@@ -211,18 +242,18 @@
                                       <span class="text-xs font-semibold text-gray-900 dark:text-[#e8eaed]">{{ item.method }}</span>
                                       <span *ngIf="item.timestamps?.error" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
                                       
-                                      <span *ngIf="getDuration(item) as duration" class="text-[10px] text-gray-500 ml-1"><i class="fa-regular fa-clock"></i> {{ duration }}ms</span>
-                                      <span *ngIf="getTtft(item) as ttft" class="text-[10px] text-gray-500 ml-1"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ ttft }}ms</span>
+                                      <span *ngIf="item.computedDuration !== null" class="text-[10px] text-gray-500 ml-1"><i class="fa-regular fa-clock"></i> {{ item.computedDuration }}ms</span>
+                                      <span *ngIf="item.computedTtft !== null" class="text-[10px] text-gray-500 ml-1"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ item.computedTtft }}ms</span>
                                     </div>
 
                                     <div class="grid grid-cols-1 gap-2 mt-1">
-                                      <div *ngIf="item.options && (item.options | json) !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                      <div *ngIf="getDisplayOptions(item) && getDisplayOptions(item) !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                        <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0">{{ item.options | json }}</pre>
+                                        <app-inline-code-editor [content]="getDisplayOptions(item) || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
-                                      <div *ngIf="item.args && item.args.length > 0" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                      <div *ngIf="getDisplayArgs(item) && getDisplayArgs(item) !== '[]'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                                        <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.args | json }}</pre>
+                                        <app-inline-code-editor [content]="getDisplayArgs(item) || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
                                     </div>
                                   </div>
@@ -242,8 +273,9 @@
                                       {{ item.errorMessage }}
                                     </div>
 
-                                    <div *ngIf="item.response !== undefined" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
-                                      <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.response | json }}</pre>
+                                    <div *ngIf="getDisplayResponse(item) !== undefined && getDisplayResponse(item) !== ''" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
+                                      <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Response</div>
+                                      <app-inline-code-editor [content]="getDisplayResponse(item) || ''" [maxLines]="30"></app-inline-code-editor>
                                     </div>
                                   </div>
                                 </ng-container>
@@ -265,3 +297,6 @@
     </div>
   </div>
 </div>
+
+>
+

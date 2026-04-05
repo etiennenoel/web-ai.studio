@@ -21,6 +21,7 @@ import { HistoryComponent } from './panels/history/history.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { ModelDownloadCard } from './components/model-download-card/model-download-card';
 import { ApiStatusComponent } from './components/api-status/api-status.component';
+import { InlineCodeEditorComponent } from './components/inline-code-editor/inline-code-editor.component';
 import {BaseModule, DiagnosisComponent} from "base";
 
 @NgModule({
@@ -42,6 +43,7 @@ import {BaseModule, DiagnosisComponent} from "base";
     RewriterComponent,
     ModelDownloadCard,
     ApiStatusComponent,
+    InlineCodeEditorComponent,
   ],
   imports: [
     BrowserModule,

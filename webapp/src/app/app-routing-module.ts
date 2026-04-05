@@ -233,6 +233,7 @@ const routes: Routes = [
       {
         path: "",
         component: ChatPage,
+        pathMatch: "full",
         data: {
           route: RouteEnum.Translation
         }

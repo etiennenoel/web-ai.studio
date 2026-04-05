@@ -38,6 +38,26 @@ declare const chrome: any;
             </div>
           </label>
 
+          <!-- Model Routing -->
+          <div class="flex flex-col gap-2 p-4 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
+            <label for="modelRouting" class="font-medium text-gray-800 dark:text-gray-200">Select the backend for API calls:</label>
+            <select 
+              id="modelRouting" 
+              [(ngModel)]="modelRouting" 
+              (change)="saveSettings()"
+              [disabled]="loading"
+              class="bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#5f6368] text-gray-900 dark:text-[#e8eaed] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"
+            >
+              <option value="chrome">Built-In AI APIs (Chrome JS APIs)</option>
+              <option value="gemini-3-flash-preview">Gemini 3.1 Flash</option>
+              <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite</option>
+            </select>
+            <div *ngIf="modelRouting !== 'chrome' && !geminiApiKey" class="mt-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 p-2 rounded-md flex items-start gap-2">
+              <i class="fas fa-exclamation-triangle mt-0.5"></i>
+              <span>You have selected a Gemini model, but no Gemini API Key is set.</span>
+            </div>
+          </div>
+
           <div class="flex flex-col gap-2 p-4 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
             <label class="font-medium text-gray-800 dark:text-gray-200">Gemini API Key</label>
             <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
@@ -66,6 +86,7 @@ export class SettingsComponent implements OnInit {
   @Input() showHeader: boolean = true;
   
   wrapApiEnabled: boolean = true;
+  modelRouting: string = 'chrome';
   geminiApiKey: string = '';
   loading: boolean = true;
   savedMessage: boolean = false;
@@ -85,13 +106,21 @@ export class SettingsComponent implements OnInit {
             this.wrapApiEnabled = response?.value !== false;
           }
           
-          chrome.runtime.sendMessage({ action: 'get_setting', key: 'gemini_api_key', defaultValue: '' }, (keyResponse: any) => {
+          chrome.runtime.sendMessage({ action: 'get_setting', key: 'model_routing', defaultValue: 'chrome' }, (modelResponse: any) => {
             this.ngZone.run(() => {
               if (!chrome.runtime.lastError) {
-                this.geminiApiKey = keyResponse?.value || '';
+                this.modelRouting = modelResponse?.value || 'chrome';
               }
-              this.loading = false;
-              this.cdr.detectChanges();
+              
+              chrome.runtime.sendMessage({ action: 'get_setting', key: 'gemini_api_key', defaultValue: '' }, (keyResponse: any) => {
+                this.ngZone.run(() => {
+                  if (!chrome.runtime.lastError) {
+                    this.geminiApiKey = keyResponse?.value || '';
+                  }
+                  this.loading = false;
+                  this.cdr.detectChanges();
+                });
+              });
             });
           });
         });
@@ -110,15 +139,23 @@ export class SettingsComponent implements OnInit {
             console.error('Error saving wrap_api setting:', chrome.runtime.lastError);
           }
           
-          chrome.runtime.sendMessage({ action: 'set_setting', key: 'gemini_api_key', value: this.geminiApiKey }, (keyResponse: any) => {
+          chrome.runtime.sendMessage({ action: 'set_setting', key: 'model_routing', value: this.modelRouting }, (modelResponse: any) => {
             this.ngZone.run(() => {
-              this.loading = false;
               if (chrome.runtime.lastError) {
-                console.error('Error saving gemini_api_key setting:', chrome.runtime.lastError);
-              } else {
-                this.showSavedMessage();
+                console.error('Error saving model_routing setting:', chrome.runtime.lastError);
               }
-              this.cdr.detectChanges();
+              
+              chrome.runtime.sendMessage({ action: 'set_setting', key: 'gemini_api_key', value: this.geminiApiKey }, (keyResponse: any) => {
+                this.ngZone.run(() => {
+                  this.loading = false;
+                  if (chrome.runtime.lastError) {
+                    console.error('Error saving gemini_api_key setting:', chrome.runtime.lastError);
+                  } else {
+                    this.showSavedMessage();
+                  }
+                  this.cdr.detectChanges();
+                });
+              });
             });
           });
         });

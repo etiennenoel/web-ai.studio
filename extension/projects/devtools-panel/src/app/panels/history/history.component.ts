@@ -23,6 +23,9 @@ export interface HistoryItem {
   displayOptions?: string;
   displayArgs?: string;
   displayResponse?: string;
+  computedCreateDuration?: number | null;
+  computedDuration?: number | null;
+  computedTtft?: number | null;
 }
 
 export interface SessionGroup {
@@ -32,6 +35,9 @@ export interface SessionGroup {
   createItem: HistoryItem | null;
   methodItems: HistoryItem[];
   computedStatus?: 'completed' | 'error' | 'running';
+  computedTtft?: number | null;
+  computedCreateTime?: number | null;
+  computedInferenceTime?: number | null;
 }
 
 @Component({
@@ -481,6 +487,30 @@ export class HistoryComponent implements OnInit {
       this.rawItems = [];
       this.groupSessions();
     }
+  }
+
+  exportData() {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        const originToExport = (!isException && origin) ? origin : '';
+        const itemsToExport = originToExport ? this.rawItems.filter(item => item.origin === originToExport) : this.rawItems;
+        this.downloadExportFile(itemsToExport, originToExport, 'history');
+      });
+    } else {
+      this.downloadExportFile(this.rawItems, '', 'history');
+    }
+  }
+
+  private downloadExportFile(items: any[], origin: string, type: string) {
+    const dataStr = JSON.stringify(items, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const originSuffix = origin ? `-${origin.replace(/[^a-z0-9]/gi, '_')}` : '';
+    const exportFileDefaultName = `webai-${type}-data${originSuffix}-${new Date().toISOString()}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
   }
 
   toggleExpand(sessionId: string, event: Event) {

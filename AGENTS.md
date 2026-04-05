@@ -12,7 +12,7 @@ This repository is a monorepo containing two main components:
 
 ### **Tech Stack**
 *   **Framework**: Angular 20+
-*   **Dependencies**: `@magieno/*` libraries, Bootstrap, Chart.js.
+*   **Dependencies**: Bootstrap, Chart.js.
 
 ### **Build & Run**
 *   **Directory**: `webapp/`
