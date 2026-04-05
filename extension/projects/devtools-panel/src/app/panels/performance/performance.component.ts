@@ -94,6 +94,16 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.loadHistory();
+
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: any) => {
+        if (request.action === 'api_call_logged' || request.action === 'log_api_call') {
+          this.ngZone.run(() => {
+            setTimeout(() => this.loadHistory(), 100);
+          });
+        }
+      });
+    }
   }
 
   ngAfterViewInit() {
@@ -135,6 +145,24 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (e) {
       return String(obj);
     }
+  }
+
+  getDisplayOptions(item: any): string {
+    if (item.displayOptions !== undefined) return item.displayOptions;
+    item.displayOptions = item.options ? this.formatForDisplay(item.options) : '{}';
+    return item.displayOptions;
+  }
+
+  getDisplayArgs(item: any): string {
+    if (item.displayArgs !== undefined) return item.displayArgs;
+    item.displayArgs = item.args && item.args.length > 0 ? this.formatForDisplay(item.args) : '[]';
+    return item.displayArgs;
+  }
+
+  getDisplayResponse(item: any): string {
+    if (item.displayResponse !== undefined) return item.displayResponse;
+    item.displayResponse = item.response !== undefined ? this.formatForDisplay(item.response) : '';
+    return item.displayResponse;
   }
 
   loadHistory() {

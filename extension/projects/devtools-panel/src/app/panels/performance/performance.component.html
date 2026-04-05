@@ -223,9 +223,9 @@
                                     {{ createItem.errorMessage }}
                                   </div>
 
-                                  <div *ngIf="createItem.options && createItem.displayOptions !== '{}'" class="mt-1 bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                  <div *ngIf="getDisplayOptions(createItem) && getDisplayOptions(createItem) !== '{}'" class="mt-1 bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                     <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                    <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0">{{ createItem.displayOptions }}</pre>
+                                    <app-inline-code-editor [content]="getDisplayOptions(createItem) || ''" [maxLines]="15"></app-inline-code-editor>
                                   </div>
                                 </div>
                                 
@@ -247,13 +247,13 @@
                                     </div>
 
                                     <div class="grid grid-cols-1 gap-2 mt-1">
-                                      <div *ngIf="item.options && item.displayOptions !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                      <div *ngIf="getDisplayOptions(item) && getDisplayOptions(item) !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                        <app-inline-code-editor [content]="item.displayOptions || ''" [maxLines]="15"></app-inline-code-editor>
+                                        <app-inline-code-editor [content]="getDisplayOptions(item) || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
-                                      <div *ngIf="item.args && item.args.length > 0" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+                                      <div *ngIf="getDisplayArgs(item) && getDisplayArgs(item) !== '[]'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                                        <app-inline-code-editor [content]="item.displayArgs || ''" [maxLines]="15"></app-inline-code-editor>
+                                        <app-inline-code-editor [content]="getDisplayArgs(item) || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
                                     </div>
                                   </div>
@@ -273,9 +273,9 @@
                                       {{ item.errorMessage }}
                                     </div>
 
-                                    <div *ngIf="item.response !== undefined" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
+                                    <div *ngIf="getDisplayResponse(item) !== undefined && getDisplayResponse(item) !== ''" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
                                       <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Response</div>
-                                      <app-inline-code-editor [content]="item.displayResponse || ''" [maxLines]="30"></app-inline-code-editor>
+                                      <app-inline-code-editor [content]="getDisplayResponse(item) || ''" [maxLines]="30"></app-inline-code-editor>
                                     </div>
                                   </div>
                                 </ng-container>
