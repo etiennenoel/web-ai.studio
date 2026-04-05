@@ -1,32 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Chart } from 'chart.js/auto';
-import { HistoryItem, SessionGroup } from '../history/history.component';
+import { SessionGroup } from '../history/history.component';
+import { formatDistanceToNow } from 'date-fns';
 
 declare const chrome: any;
-
-interface ApiPerformanceStats {
-  api: string;
-  success: number;
-  errors: number;
-  
-  avgTtft: number;
-  medianTtft: number;
-  p90Ttft: number;
-  p95Ttft: number;
-  p99Ttft: number;
-  
-  avgCreate: number;
-  medianCreate: number;
-  p90Create: number;
-  p95Create: number;
-  p99Create: number;
-  
-  avgInference: number;
-  medianInference: number;
-  p90Inference: number;
-  p95Inference: number;
-  p99Inference: number;
-}
 
 function calculatePercentile(data: number[], percentile: number) {
   if (data.length === 0) return 0;
@@ -44,8 +22,16 @@ function average(data: number[]) {
   return data.reduce((a,b) => a+b, 0) / data.length;
 }
 
-function median(data: number[]) {
-  return calculatePercentile(data, 50);
+interface ApiConfig {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  hex: string;
+  bg: string;
+  border: string;
+  activeBg: string;
+  activeText: string;
 }
 
 @Component({
@@ -60,37 +46,28 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   rawItems: any[] = [];
   sessionGroups: SessionGroup[] = [];
   filteredGroups: SessionGroup[] = [];
-  apiGroupsCache: Record<string, SessionGroup[]> = {};
-  paginatedApiGroups: Record<string, SessionGroup[]> = {};
-  apiPages: Record<string, number> = {};
-  pageSize = 10;
+  displayedGroups: SessionGroup[] = [];
+  displayLimit: number = 50;
   
-  countFilter: '50' | '100' | '250' | '500' | 'all' = 'all';
-  availableApis: string[] = ['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader'];
-  selectedApis: Set<string> = new Set<string>(['LanguageModel', 'Summarizer', 'Translator', 'LanguageDetector', 'Writer', 'Rewriter', 'Proofreader']);
+  countFilter: '50' | '100' | '250' | '500' | 'all' = '50';
   
-  hoveredApi: string | null = null;
+  apiConfigs: ApiConfig[] = [
+    { id: 'LanguageModel', name: 'Prompt API', icon: 'fa-terminal', color: 'text-blue-500 dark:text-blue-400', hex: '#3b82f6', bg: 'bg-blue-100 dark:bg-blue-400/10', border: 'border-blue-200 dark:border-blue-400/20', activeBg: 'bg-blue-600 dark:bg-blue-500', activeText: 'text-white' },
+    { id: 'Summarizer', name: 'Summarizer API', icon: 'fa-message', color: 'text-emerald-500 dark:text-emerald-400', hex: '#10b981', bg: 'bg-emerald-100 dark:bg-emerald-400/10', border: 'border-emerald-200 dark:border-emerald-400/20', activeBg: 'bg-emerald-600 dark:bg-emerald-500', activeText: 'text-white' },
+    { id: 'Translator', name: 'Translator API', icon: 'fa-language', color: 'text-amber-500 dark:text-amber-400', hex: '#f59e0b', bg: 'bg-amber-100 dark:bg-amber-400/10', border: 'border-amber-200 dark:border-amber-400/20', activeBg: 'bg-amber-500 dark:bg-amber-500', activeText: 'text-white' },
+    { id: 'LanguageDetector', name: 'Language Detector', icon: 'fa-magnifying-glass', color: 'text-violet-500 dark:text-violet-400', hex: '#8b5cf6', bg: 'bg-violet-100 dark:bg-violet-400/10', border: 'border-violet-200 dark:border-violet-400/20', activeBg: 'bg-violet-600 dark:bg-violet-500', activeText: 'text-white' },
+    { id: 'Writer', name: 'Writer API', icon: 'fa-pen-nib', color: 'text-pink-500 dark:text-pink-400', hex: '#ec4899', bg: 'bg-pink-100 dark:bg-pink-400/10', border: 'border-pink-200 dark:border-pink-400/20', activeBg: 'bg-pink-600 dark:bg-pink-500', activeText: 'text-white' },
+    { id: 'Rewriter', name: 'Rewriter API', icon: 'fa-pen-to-square', color: 'text-rose-500 dark:text-rose-400', hex: '#f43f5e', bg: 'bg-rose-100 dark:bg-rose-400/10', border: 'border-rose-200 dark:border-rose-400/20', activeBg: 'bg-rose-600 dark:bg-rose-500', activeText: 'text-white' },
+    { id: 'Proofreader', name: 'Proofreader API', icon: 'fa-spell-check', color: 'text-teal-500 dark:text-teal-400', hex: '#14b8a6', bg: 'bg-teal-100 dark:bg-teal-400/10', border: 'border-teal-200 dark:border-teal-400/20', activeBg: 'bg-teal-600 dark:bg-teal-500', activeText: 'text-white' },
+  ];
 
-  expandedApi: string | null = null;
-  hoveredSession: string | null = null;
-  expandedSessions: Set<string> = new Set<string>();
-
+  selectedApis: Set<string> = new Set<string>(this.apiConfigs.map(a => a.id));
+  selectedCall: SessionGroup | null = null;
   
   isLoading = true;
   error: string | null = null;
-  
-  stats: ApiPerformanceStats[] = [];
-  apiColors: Record<string, string> = {
-    'LanguageModel': '#8ab4f8',
-    'Summarizer': '#f28b82',
-    'Translator': '#81c995',
-    'LanguageDetector': '#fbbc04',
-    'Writer': '#c58af9',
-    'Rewriter': '#f48fb1',
-    'Proofreader': '#80cbc4'
-  };
 
-  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
+  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.loadHistory();
@@ -118,51 +95,120 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  formatForDisplay(obj: any): string {
-    if (obj === undefined) return '';
+  loadMore() {
+    this.displayLimit += 50;
+    this.displayedGroups = this.filteredGroups.slice(0, this.displayLimit);
+  }
+
+  getTotalSelectedCount(): number {
+    return this.sessionGroups.filter(g => this.selectedApis.has(g.api)).length;
+  }
+
+  getRelativeTime(timestamp: number): string {
     try {
-      return JSON.stringify(
-        obj,
-        (key, value) => {
-          if (key === 'dataUrl' && typeof value === 'string' && value.length > 100) {
-            return `<Base64 Data: ${Math.round(value.length / 1024)}KB>`;
-          }
-          if (Array.isArray(value) && value.length > 100) {
-            const truncated = value.slice(0, 10);
-            truncated.push(`... and ${value.length - 10} more items`);
-            return truncated;
-          }
-          if (typeof value === 'string' && value.length > 50000) {
-            return (
-              value.substring(0, 1000) +
-              `\n... [String truncated: ${Math.round(value.length / 1024)}KB total]`
-            );
-          }
-          return value;
-        },
-        2,
-      );
-    } catch (e) {
-      return String(obj);
+      return formatDistanceToNow(timestamp, { addSuffix: true });
+    } catch(e) {
+      return '';
     }
   }
 
-  getDisplayOptions(item: any): string {
-    if (item.displayOptions !== undefined) return item.displayOptions;
-    item.displayOptions = item.options ? this.formatForDisplay(item.options) : '{}';
-    return item.displayOptions;
+  hasText(group: SessionGroup): boolean {
+    return true;
   }
 
-  getDisplayArgs(item: any): string {
-    if (item.displayArgs !== undefined) return item.displayArgs;
-    item.displayArgs = item.args && item.args.length > 0 ? this.formatForDisplay(item.args) : '[]';
-    return item.displayArgs;
+  hasImage(group: SessionGroup): boolean {
+    return !!group.createItem?.hasImage || group.methodItems.some((item: any) => item.hasImage);
   }
 
-  getDisplayResponse(item: any): string {
-    if (item.displayResponse !== undefined) return item.displayResponse;
-    item.displayResponse = item.response !== undefined ? this.formatForDisplay(item.response) : '';
-    return item.displayResponse;
+  hasAudio(group: SessionGroup): boolean {
+    return !!group.createItem?.hasAudio || group.methodItems.some((item: any) => item.hasAudio);
+  }
+
+  getMediaUrlsList(item: any): { type: string; url: SafeResourceUrl }[] {
+    if (!item.mediaUrls) {
+      item.mediaUrls = this.extractMediaUrls(item);
+    }
+    return item.mediaUrls;
+  }
+
+  extractMediaUrls(item: any): { type: string; url: SafeResourceUrl }[] {
+    const urls: { type: string; url: SafeResourceUrl }[] = [];
+    const seen = new Set<any>();
+    let count = 0;
+
+    const search = (obj: any, depth: number) => {
+      if (!obj) return;
+      if (typeof obj !== 'object') return;
+      if (seen.has(obj)) return;
+      if (depth > 10 || count > 2000) return;
+
+      seen.add(obj);
+      count++;
+
+      if (obj.__type === 'Blob' && obj.dataUrl) {
+        const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(obj.dataUrl);
+        if (obj.type && obj.type.startsWith('audio/')) {
+          urls.push({ type: 'audio', url: safeUrl });
+        } else if (obj.type && obj.type.startsWith('image/')) {
+          urls.push({ type: 'image', url: safeUrl });
+        } else if (obj.dataUrl.startsWith('data:audio/')) {
+          urls.push({ type: 'audio', url: safeUrl });
+        } else if (obj.dataUrl.startsWith('data:image/')) {
+          urls.push({ type: 'image', url: safeUrl });
+        } else {
+          if (obj.dataUrl.includes('audio')) {
+            urls.push({ type: 'audio', url: safeUrl });
+          } else {
+            urls.push({ type: 'image', url: safeUrl });
+          }
+        }
+        return;
+      }
+
+      const keys = Object.keys(obj);
+      for (const key of keys) {
+        search(obj[key], depth + 1);
+      }
+    };
+
+    if (item.args) search(item.args, 0);
+    if (item.options) search(item.options, 0);
+
+    return urls;
+  }
+
+  get aggregateStats() {
+    if (this.selectedApis.size === 0) return { ttft: { avg: 0, p90: 0, p99: 0 }, create: { avg: 0, p90: 0, p99: 0 }, inference: { avg: 0, p90: 0, p99: 0 } };
+    
+    let ttft: number[] = [];
+    let create: number[] = [];
+    let inference: number[] = [];
+
+    for (const group of this.filteredGroups) {
+      if (this.selectedApis.has(group.api)) {
+        if (group.createItem?.timestamps?.create && group.createItem.timestamps.completed) {
+          create.push(group.createItem.timestamps.completed - group.createItem.timestamps.create);
+        }
+        for (const item of group.methodItems) {
+          if (item.timestamps?.execute && item.timestamps?.completed) {
+            inference.push(item.timestamps.completed - item.timestamps.execute);
+          }
+          if (item.timestamps?.execute && item.timestamps?.first_token) {
+            ttft.push(item.timestamps.first_token - item.timestamps.execute);
+          }
+        }
+      }
+    }
+
+    return {
+      ttft: { avg: Math.round(average(ttft)), p90: Math.round(calculatePercentile(ttft, 90)), p99: Math.round(calculatePercentile(ttft, 99)) },
+      create: { avg: Math.round(average(create)), p90: Math.round(calculatePercentile(create, 90)), p99: Math.round(calculatePercentile(create, 99)) },
+      inference: { avg: Math.round(average(inference)), p90: Math.round(calculatePercentile(inference, 90)), p99: Math.round(calculatePercentile(inference, 99)) }
+    };
+  }
+
+  getApiDef(id: string): ApiConfig {
+    return this.apiConfigs.find(a => a.id === id) || this.apiConfigs[0];
   }
 
   loadHistory() {
@@ -189,14 +235,6 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
             this.error = response.error;
           } else {
             this.rawItems = response.data || [];
-            for (const item of this.rawItems) {
-              item.displayOptions = item.options ? this.formatForDisplay(item.options) : '{}';
-              item.displayArgs = item.args && item.args.length > 0 ? this.formatForDisplay(item.args) : '[]';
-              item.displayResponse = item.response !== undefined ? this.formatForDisplay(item.response) : '';
-              item.computedCreateDuration = this.getCreateDuration(item);
-              item.computedDuration = this.getDuration(item);
-              item.computedTtft = this.getTtft(item);
-            }
             this.groupSessions();
           }
           this.cdr.detectChanges();
@@ -238,9 +276,13 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
     for (const group of groupsMap.values()) {
       group.methodItems.sort((a, b) => a.timestamp - b.timestamp);
+      group.computedStatus = this.getGroupStatus(group);
+      group.computedTtft = this.getGroupTtft(group);
+      group.computedCreateTime = this.getGroupCreateTime(group);
+      group.computedInferenceTime = this.getGroupInferenceTime(group);
     }
 
-    this.sessionGroups = Array.from(groupsMap.values()).sort((a, b) => a.timestamp - b.timestamp);
+    this.sessionGroups = Array.from(groupsMap.values()).sort((a, b) => b.timestamp - a.timestamp); // Sort descending (newest first)
     this.applyFilters();
   }
 
@@ -253,34 +295,12 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       case '500': countLimit = 500; break;
     }
     
-    this.filteredGroups = this.sessionGroups.slice(Math.max(0, this.sessionGroups.length - countLimit));
+    let selectedApiGroups = this.sessionGroups.filter(g => this.selectedApis.has(g.api));
+    this.filteredGroups = selectedApiGroups.slice(0, countLimit);
 
-    this.apiGroupsCache = {};
-    this.paginatedApiGroups = {};
-    for (const api of this.availableApis) {
-      const allGroups = this.filteredGroups.filter(g => g.api === api).reverse();
-      for (const group of allGroups) {
-        if (group.computedStatus === undefined) {
-          group.computedStatus = this.getGroupStatus(group);
-        }
-        if (group.computedTtft === undefined) {
-          group.computedTtft = this.getGroupTtft(group);
-        }
-        if (group.computedCreateTime === undefined) {
-          group.computedCreateTime = this.getGroupCreateTime(group);
-        }
-        if (group.computedInferenceTime === undefined) {
-          group.computedInferenceTime = this.getGroupInferenceTime(group);
-        }
-      }
-      this.apiGroupsCache[api] = allGroups;
-      if (this.apiPages[api] === undefined) {
-        this.apiPages[api] = 0;
-      }
-      this.updatePaginatedGroups(api);
-    }
+    this.displayLimit = 50;
+    this.displayedGroups = this.filteredGroups.slice(0, this.displayLimit);
 
-    this.calculateStats();
     setTimeout(() => {
       if (this.performanceChartRef) {
         this.updateChart();
@@ -293,163 +313,141 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
-  getCountFilterCount(filter: '50' | '100' | '250' | '500' | 'all'): number {
-    if (filter === 'all') return this.sessionGroups.length;
-    const limit = parseInt(filter, 10);
-    return Math.min(this.sessionGroups.length, limit);
+  toggleApi(id: string) {
+    if (this.selectedApis.has(id)) {
+      if (this.selectedApis.size === 1) return; // Prevent deselecting all
+      this.selectedApis.delete(id);
+    } else {
+      this.selectedApis.add(id);
+    }
+    this.applyFilters();
   }
 
-  toggleApiFilter(api: string, event?: Event) {
-    if (event) event.stopPropagation();
+  selectCall(call: SessionGroup | null) {
+    this.selectedCall = call;
+
+    if (call && typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      const fetchMedia = (item: any) => {
+        if (!item.mediaUrlsLoaded && (item.hasMedia || item.hasImage || item.hasAudio)) {
+          chrome.runtime.sendMessage(
+            {
+              action: 'get_history_item',
+              payload: { id: item.id },
+            },
+            (response: any) => {
+              this.ngZone.run(() => {
+                if (response && response.data && !chrome.runtime.lastError) {
+                  item.args = response.data.args;
+                  item.options = response.data.options;
+                  item.mediaUrls = this.extractMediaUrls(item);
+                  item.displayOptions = undefined;
+                  item.displayArgs = undefined;
+                  item.mediaUrlsLoaded = true;
+                  this.cdr.detectChanges();
+                }
+              });
+            },
+          );
+        }
+      };
+
+      if (call.createItem) fetchMedia(call.createItem);
+      call.methodItems.forEach(fetchMedia);
+    }
+  }
+
+  formatForDisplay(obj: any): string {
+    if (obj === undefined) return '';
+    try {
+      return JSON.stringify(
+        obj,
+        (key, value) => {
+          if (key === 'dataUrl' && typeof value === 'string' && value.length > 100) {
+            return `<Base64 Data: ${Math.round(value.length / 1024)}KB>`;
+          }
+          if (Array.isArray(value) && value.length > 100) {
+            const truncated = value.slice(0, 10);
+            truncated.push(`... and ${value.length - 10} more items`);
+            return truncated;
+          }
+          if (typeof value === 'string' && value.length > 50000) {
+            return (
+              value.substring(0, 1000) +
+              `\n... [String truncated: ${Math.round(value.length / 1024)}KB total]`
+            );
+          }
+          return value;
+        },
+        2,
+      );
+    } catch (e) {
+      return String(obj);
+    }
+  }
+
+  getLifecycleSteps(group: SessionGroup): any[] {
+    const steps: any[] = [];
     
-    if (this.selectedApis.has(api)) {
-      this.selectedApis.delete(api);
+    if (group.createItem) {
+      const createDuration = this.getCreateDuration(group.createItem) ?? '-';
+      steps.push({
+        item: group.createItem,
+        step: 'create',
+        duration: createDuration !== '-' ? `${createDuration}ms` : '-',
+        icon: 'fa-database',
+        iconColor: 'text-amber-500 dark:text-amber-400',
+        bg: 'bg-amber-100 dark:bg-amber-400/10',
+        border: 'border-amber-200 dark:border-amber-400/30',
+        payload: group.createItem.options ? this.formatForDisplay(group.createItem.options) : null,
+        error: group.createItem.errorMessage
+      });
     } else {
-      this.selectedApis.add(api);
+      steps.push({
+        item: null,
+        step: 'create (missing)',
+        duration: '-',
+        icon: 'fa-database',
+        iconColor: 'text-gray-400 dark:text-gray-500',
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        border: 'border-gray-300 dark:border-gray-700'
+      });
     }
 
-    this.updateChart();
-  }
+    for (const item of group.methodItems) {
+      const duration = this.getDuration(item) ?? '-';
+      const ttft = this.getTtft(item) ?? '-';
+      
+      const payloadObj = { ...(item.args ? { args: item.args } : {}) };
+      
+      steps.push({
+        item: item,
+        step: item.method,
+        duration: duration !== '-' ? `${duration}ms` : '-',
+        ttft: ttft !== '-' ? `${ttft}ms` : null,
+        icon: 'fa-play-circle',
+        iconColor: 'text-blue-500 dark:text-blue-400',
+        bg: 'bg-blue-100 dark:bg-blue-400/10',
+        border: 'border-blue-200 dark:border-blue-400/30',
+        payload: Object.keys(payloadObj).length > 0 ? this.formatForDisplay(payloadObj) : null,
+        error: item.errorMessage
+      });
 
-  toggleAllApis(event: Event) {
-    if (event) event.stopPropagation();
-    const checked = (event.target as HTMLInputElement).checked;
-    
-    this.selectedApis.clear();
-    if (checked) {
-      for (const api of this.availableApis) {
-        this.selectedApis.add(api);
+      if (item.response !== undefined) {
+        steps.push({
+          item: null,
+          step: 'response',
+          duration: '-',
+          icon: 'fa-square-check',
+          iconColor: 'text-emerald-500 dark:text-emerald-400',
+          bg: 'bg-emerald-100 dark:bg-emerald-400/10',
+          border: 'border-emerald-200 dark:border-emerald-400/30',
+          text: typeof item.response === 'string' ? item.response : JSON.stringify(item.response, null, 2),
+          isFinal: true
+        });
       }
     }
     
-    this.updateChart();
-  }
-
-  setHoveredApi(api: string | null) {
-    if (this.hoveredApi === api) return;
-    this.hoveredApi = api;
-    this.cdr.detectChanges();
-    
-    if (this.chart) {
-      this.chart.data.datasets.forEach((dataset: any, index: number) => {
-        const baseColor = this.apiColors[dataset.apiName] || '#ffffff';
-        if (api === null) {
-          dataset.borderWidth = 2;
-          dataset.borderColor = baseColor;
-          dataset.backgroundColor = baseColor;
-        } else if (dataset.apiName === api) {
-          dataset.borderWidth = 4;
-          dataset.borderColor = baseColor;
-          dataset.backgroundColor = baseColor;
-        } else {
-          dataset.borderWidth = 1;
-          dataset.borderColor = baseColor + '40'; // 25% opacity for dimming
-          dataset.backgroundColor = baseColor + '40';
-        }
-      });
-      this.chart.update('none');
-    }
-  }
-
-  onRowHover(api: string) {
-    this.setHoveredApi(api);
-  }
-
-  onRowLeave() {
-    this.setHoveredApi(null);
-  }
-
-
-  toggleExpandApi(api: string) {
-    if (this.expandedApi === api) {
-      this.expandedApi = null;
-    } else {
-      this.expandedApi = api;
-    }
-  }
-
-  updatePaginatedGroups(api: string) {
-    const all = this.apiGroupsCache[api] || [];
-    const page = this.apiPages[api] || 0;
-    this.paginatedApiGroups[api] = all.slice(page * this.pageSize, (page + 1) * this.pageSize);
-  }
-
-  changePage(api: string, delta: number, event?: Event) {
-    if (event) event.stopPropagation();
-    const current = this.apiPages[api] || 0;
-    const total = this.getGroupsCountForApi(api);
-    const maxPage = Math.ceil(total / this.pageSize) - 1;
-    let newPage = current + delta;
-    if (newPage < 0) newPage = 0;
-    if (maxPage >= 0 && newPage > maxPage) newPage = maxPage;
-    
-    if (newPage !== current) {
-      this.apiPages[api] = newPage;
-      this.updatePaginatedGroups(api);
-    }
-  }
-
-  getPageStart(api: string): number {
-    const page = this.apiPages[api] || 0;
-    const total = this.getGroupsCountForApi(api);
-    return total === 0 ? 0 : page * this.pageSize + 1;
-  }
-
-  getPageEnd(api: string): number {
-    const page = this.apiPages[api] || 0;
-    const total = this.getGroupsCountForApi(api);
-    return Math.min((page + 1) * this.pageSize, total);
-  }
-
-  getGroupsForApi(api: string): SessionGroup[] {
-    return this.paginatedApiGroups[api] || [];
-  }
-
-  getGroupsCountForApi(api: string): number {
-    return (this.apiGroupsCache[api] || []).length;
-  }
-
-  trackByApi(index: number, stat: ApiPerformanceStats): string {
-    return stat.api;
-  }
-
-  trackBySessionId(index: number, group: SessionGroup): string {
-    return group.sessionId;
-  }
-
-  trackByHistoryItem(index: number, item: any): string {
-    return item.id;
-  }
-
-  setHoveredSession(sessionId: string | null) {
-    if (this.hoveredSession === sessionId) return;
-    this.hoveredSession = sessionId;
-    if (this.chart) {
-      this.chart.update('none');
-    }
-  }
-
-  getPointColor(ctx: any, defaultColor: string): string {
-    if (!ctx.raw || !this.hoveredSession) return defaultColor;
-    return ctx.raw.session === this.hoveredSession.substring(0, 8) ? '#ffffff' : defaultColor;
-  }
-
-  getPointRadius(ctx: any): number {
-    if (!ctx.raw || !this.hoveredSession) return 4;
-    return ctx.raw.session === this.hoveredSession.substring(0, 8) ? 8 : 4;
-  }
-
-  toggleExpandSession(sessionId: string, event: Event) {
-    if ((event.target as HTMLElement).closest('button')) return;
-    if (this.expandedSessions.has(sessionId)) {
-      this.expandedSessions.delete(sessionId);
-    } else {
-      this.expandedSessions.add(sessionId);
-    }
-  }
-
-  isSessionExpanded(sessionId: string): boolean {
-    return this.expandedSessions.has(sessionId);
+    return steps;
   }
 
   getCreateDuration(item: any): number | null {
@@ -480,9 +478,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getGroupCreateTime(group: SessionGroup): number | null {
-    if (group.createItem) {
-      return this.getCreateDuration(group.createItem);
-    }
+    if (group.createItem) return this.getCreateDuration(group.createItem);
     return null;
   }
 
@@ -504,12 +500,25 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGroupStatus(group: SessionGroup): 'completed' | 'error' | 'running' {
     if (group.createItem?.errorMessage) return 'error';
+    
+    if (group.methodItems.length === 0) return 'running';
+
     let hasRunning = false;
+    let hasResponse = false;
+
     for (const method of group.methodItems) {
       if (method.errorMessage) return 'error';
-      if (method.response === undefined) hasRunning = true;
+      if (method.response === undefined) {
+        hasRunning = true;
+      } else {
+        hasResponse = true;
+      }
     }
-    return hasRunning ? 'running' : 'completed';
+    
+    if (hasRunning) return 'running';
+    if (!hasResponse) return 'running';
+    
+    return 'completed';
   }
   
   provideFeedback(group: SessionGroup) {
@@ -518,24 +527,6 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     const encodedBody = encodeURIComponent(issueBody);
     const url = `https://github.com/etiennenoel/web-ai.studio/issues/new?title=Feedback%20on%20${group.api}%20Session&body=${encodedBody}`;
     window.open(url, '_blank');
-  }
-
-  deleteSession(sessionId: string) {
-    if (typeof chrome !== 'undefined' && chrome.devtools) {
-      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
-        if (!isException && origin) {
-          chrome.runtime.sendMessage({
-            action: 'delete_api_session',
-            payload: { origin, sessionId }
-          }, () => {
-            this.loadHistory();
-          });
-        }
-      });
-    } else {
-      this.rawItems = this.rawItems.filter(item => item.sessionId !== sessionId && item.id !== sessionId);
-      this.groupSessions();
-    }
   }
 
   exportData() {
@@ -562,79 +553,6 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     linkElement.click();
   }
 
-
-  calculateStats() {
-    const apiData: Record<string, {
-      success: number;
-      errors: number;
-      ttft: number[];
-      create: number[];
-      inference: number[];
-    }> = {};
-
-    // Always initialize all available APIs so they remain in the table
-    for (const api of this.availableApis) {
-      apiData[api] = { success: 0, errors: 0, ttft: [], create: [], inference: [] };
-    }
-
-    for (const group of this.filteredGroups) {
-      const d = apiData[group.api];
-      if (!d) continue;
-      
-      let hasError = false;
-
-      // Create step
-      if (group.createItem) {
-        if (group.createItem.timestamps?.error) {
-          hasError = true;
-        } else if (group.createItem.timestamps?.create && group.createItem.timestamps?.completed) {
-          d.create.push(group.createItem.timestamps.completed - group.createItem.timestamps.create);
-        }
-      }
-
-      // Method steps
-      for (const item of group.methodItems) {
-        if (item.timestamps?.error) {
-          hasError = true;
-        } else {
-          if (item.timestamps?.execute && item.timestamps?.completed) {
-            d.inference.push(item.timestamps.completed - item.timestamps.execute);
-          }
-          if (item.timestamps?.execute && item.timestamps?.first_token) {
-            d.ttft.push(item.timestamps.first_token - item.timestamps.execute);
-          }
-        }
-      }
-
-      if (hasError) d.errors++;
-      else d.success++;
-    }
-
-    this.stats = Object.keys(apiData).map(api => {
-      const d = apiData[api];
-      return {
-        api,
-        success: d.success,
-        errors: d.errors,
-        avgTtft: average(d.ttft),
-        medianTtft: median(d.ttft),
-        p90Ttft: calculatePercentile(d.ttft, 90),
-        p95Ttft: calculatePercentile(d.ttft, 95),
-        p99Ttft: calculatePercentile(d.ttft, 99),
-        avgCreate: average(d.create),
-        medianCreate: median(d.create),
-        p90Create: calculatePercentile(d.create, 90),
-        p95Create: calculatePercentile(d.create, 95),
-        p99Create: calculatePercentile(d.create, 99),
-        avgInference: average(d.inference),
-        medianInference: median(d.inference),
-        p90Inference: calculatePercentile(d.inference, 90),
-        p95Inference: calculatePercentile(d.inference, 95),
-        p99Inference: calculatePercentile(d.inference, 99)
-      };
-    });
-  }
-
   updateChart() {
     if (!this.performanceChartRef) return;
     const ctx = this.performanceChartRef.nativeElement.getContext('2d');
@@ -651,151 +569,57 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       const apiGroups = this.filteredGroups.filter(g => g.api === api);
       if (apiGroups.length === 0) continue;
 
-      const createDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
-      const ttftDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
-      const inferenceDataPoints: { x: string, y: number, session: string, fullSessionId: string }[] = [];
+      const inferenceDataPoints: { x: number, y: number, session: string }[] = [];
 
       for (const group of apiGroups) {
-        const x = new Date(group.timestamp).toLocaleTimeString();
+        const x = group.timestamp;
         const session = group.sessionId.substring(0, 8);
-        const fullSessionId = group.sessionId;
-
-        if (group.createItem?.timestamps?.create && group.createItem?.timestamps?.completed) {
-          createDataPoints.push({ x, y: group.createItem.timestamps.completed - group.createItem.timestamps.create, session, fullSessionId });
-        }
-        for (const item of group.methodItems) {
-          if (item.timestamps?.execute && item.timestamps?.first_token) {
-            ttftDataPoints.push({ x, y: item.timestamps.first_token - item.timestamps.execute, session, fullSessionId });
-            break;
-          }
-        }
         for (const item of group.methodItems) {
           if (item.timestamps?.execute && item.timestamps?.completed) {
-            inferenceDataPoints.push({ x, y: item.timestamps.completed - item.timestamps.execute, session, fullSessionId });
+            inferenceDataPoints.push({ x, y: item.timestamps.completed - item.timestamps.execute, session });
             break;
           }
         }
       }
+      
+      inferenceDataPoints.sort((a, b) => a.x - b.x);
 
-      const color = this.apiColors[api] || '#ffffff';
+      const apiDef = this.apiConfigs.find(a => a.id === api);
+      const color = apiDef ? apiDef.hex : '#ffffff';
 
-      if (createDataPoints.length > 0) {
-        datasets.push({
-          label: `${api} (Create)`,
-          apiName: api,
-          data: createDataPoints,
-          borderColor: color,
-          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
-          borderWidth: 2,
-          borderDash: [2, 2],
-          tension: 0.2,
-          pointRadius: (ctx: any) => this.getPointRadius(ctx),
-          pointHoverRadius: 6
-        });
-      }
-      if (ttftDataPoints.length > 0) {
-        datasets.push({
-          label: `${api} (TTFT)`,
-          apiName: api,
-          data: ttftDataPoints,
-          borderColor: color,
-          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
-          borderWidth: 2,
-          borderDash: [5, 5],
-          tension: 0.2,
-          pointRadius: (ctx: any) => this.getPointRadius(ctx),
-          pointHoverRadius: 6
-        });
-      }
       if (inferenceDataPoints.length > 0) {
         datasets.push({
-          label: `${api} (Inference)`,
+          label: apiDef?.name || api,
           apiName: api,
-          data: inferenceDataPoints,
+          data: inferenceDataPoints.map(p => ({ x: new Date(p.x).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute:'2-digit' }), y: p.y, session: p.session })),
           borderColor: color,
-          backgroundColor: (ctx: any) => this.getPointColor(ctx, color),
           borderWidth: 2,
-          tension: 0.2,
-          pointRadius: (ctx: any) => this.getPointRadius(ctx),
-          pointHoverRadius: 6
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          fill: false,
         });
       }
     }
-
     
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const textColor = isDark ? '#9aa0a6' : '#4b5563'; // gray-600 in light mode
-    const gridColor = isDark ? '#3c4043' : '#e5e7eb'; // gray-200 in light mode
+    const textColor = isDark ? '#64748b' : '#64748b'; 
+    const gridColor = isDark ? '#1e293b' : '#e2e8f0';
 
     this.chart = new Chart(ctx, {
-
       type: 'line',
-      data: {
-        datasets
-      },
+      data: { datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'nearest',
-          intersect: false,
-        },
-        onHover: (event, elements, chart) => {
-          if (event.native?.target) {
-            (event.native.target as HTMLElement).style.cursor = elements && elements.length > 0 ? 'pointer' : 'default';
-          }
-          if (elements && elements.length > 0) {
-            const datasetIndex = elements[0].datasetIndex;
-            const hoveredApiName = chart.data.datasets[datasetIndex] ? (chart.data.datasets[datasetIndex] as any).apiName : null;
-            this.setHoveredApi(hoveredApiName);
-          } else if (this.hoveredApi !== null) {
-            this.setHoveredApi(null);
-          }
-        },
-        onClick: (event, elements, chart) => {
-          if (elements && elements.length > 0) {
-            const datasetIndex = elements[0].datasetIndex;
-            const dataIndex = elements[0].index;
-            const dataset = chart.data.datasets[datasetIndex] as any;
-            const apiName = dataset.apiName;
-            const fullSessionId = dataset.data[dataIndex]?.fullSessionId;
-
-            if (!fullSessionId) {
-              console.warn('WebAI: No fullSessionId found on data point', dataset.data[dataIndex]);
-              return;
-            }
-
-            this.ngZone.run(() => {
-              this.expandedApi = apiName;
-              this.expandedSessions.add(fullSessionId);
-              this.cdr.detectChanges();
-              
-              setTimeout(() => {
-                const rowId = `session-row-${fullSessionId}`;
-                const el = document.getElementById(rowId);
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  // Flash the row slightly to draw attention
-                  el.classList.add('bg-blue-100', 'dark:bg-[#8ab4f8]/20');
-                  setTimeout(() => {
-                    el.classList.remove('bg-blue-100', 'dark:bg-[#8ab4f8]/20');
-                  }, 1500);
-                } else {
-                  console.warn(`WebAI: Could not find row element with id ${rowId}`);
-                }
-              }, 150);
-            });
-          }
-        },
+        interaction: { mode: 'nearest', intersect: false },
         plugins: {
-          legend: {
-            display: false // We use our own legend / filters
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: (context: any) => {
                 const session = context.raw.session;
-                return `${context.dataset.label}: ${context.raw.y.toFixed(2)}ms (Session: ${session})`;
+                return `${context.dataset.label}: ${context.raw.y.toFixed(0)}ms (Session: ${session})`;
               }
             }
           }
@@ -803,30 +627,14 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
         scales: {
           x: {
             type: 'category',
-            title: {
-              display: true,
-              text: 'Time',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            }
+            ticks: { color: textColor, font: { size: 10 } },
+            grid: { color: gridColor },
+            border: { display: false }
           },
           y: {
-            title: {
-              display: true,
-              text: 'Execution Time (ms)',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            },
+            ticks: { color: textColor, font: { size: 10 } },
+            grid: { color: gridColor },
+            border: { display: false },
             beginAtZero: true
           }
         }

@@ -626,26 +626,22 @@ export class HistoryComponent implements OnInit {
       return 'error';
     }
 
-    // If a session has no method calls yet but the create is still running, it's running.
-    if (
-      group.createItem &&
-      group.createItem.response === undefined &&
-      !group.createItem.timestamps?.completed
-    ) {
+    if (group.methodItems.length === 0) {
       group.computedStatus = 'running';
       return 'running';
     }
 
     let hasRunning = false;
     let hasError = false;
+    let hasResponse = false;
 
     for (const method of group.methodItems) {
       if (method.errorMessage) {
         hasError = true;
       }
-      // Only methods that are expected to return a response or explicitly log completion
-      // For synchronous methods like destroy, response might be undefined but timestamps.completed is set
-      if (method.response === undefined && !method.timestamps?.completed && !method.errorMessage) {
+      if (method.response !== undefined) {
+        hasResponse = true;
+      } else if (!method.timestamps?.completed) {
         hasRunning = true;
       }
     }
@@ -655,7 +651,12 @@ export class HistoryComponent implements OnInit {
       return 'error';
     }
 
-    group.computedStatus = hasRunning ? 'running' : 'completed';
+    if (hasRunning || !hasResponse) {
+      group.computedStatus = 'running';
+      return 'running';
+    }
+
+    group.computedStatus = 'completed';
     return group.computedStatus;
   }
 

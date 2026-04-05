@@ -1,302 +1,304 @@
-<div class="h-full flex flex-col p-6 overflow-hidden relative">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">API Performance</h1>
-    <div class="flex gap-2">
-      <button (click)="exportData()" class="px-4 py-2 bg-gray-100 dark:bg-[#3c4043] border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-[#4a4d51] transition-colors text-sm font-medium flex items-center">
-        <i class="fa-solid fa-file-export mr-2"></i>Export
-      </button>
-      <button (click)="loadHistory()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:text-[#202124] rounded-md transition-colors text-sm font-medium flex items-center">
-        <i class="fa-solid fa-arrow-rotate-right mr-2"></i>Refresh
-      </button>
-    </div>
-  </div>
-
-  <div class="flex flex-wrap gap-4 mb-6">
-    <!-- Count Filters -->
-    <div class="flex bg-gray-50 dark:bg-[#292a2d] rounded-md border border-gray-300 dark:border-[#3c4043] overflow-hidden">
-      <button (click)="setCountFilter('50')" [class.bg-gray-300]="countFilter === '50'" [class.dark:bg-[#3c4043]]="countFilter === '50'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 50 ({{ getCountFilterCount('50') }})</button>
-      <button (click)="setCountFilter('100')" [class.bg-gray-300]="countFilter === '100'" [class.dark:bg-[#3c4043]]="countFilter === '100'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 100 ({{ getCountFilterCount('100') }})</button>
-      <button (click)="setCountFilter('250')" [class.bg-gray-300]="countFilter === '250'" [class.dark:bg-[#3c4043]]="countFilter === '250'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 250 ({{ getCountFilterCount('250') }})</button>
-      <button (click)="setCountFilter('500')" [class.bg-gray-300]="countFilter === '500'" [class.dark:bg-[#3c4043]]="countFilter === '500'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors border-r border-gray-300 dark:border-[#3c4043]">Latest 500 ({{ getCountFilterCount('500') }})</button>
-      <button (click)="setCountFilter('all')" [class.bg-gray-300]="countFilter === 'all'" [class.dark:bg-[#3c4043]]="countFilter === 'all'" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#3c4043] transition-colors">All Time ({{ getCountFilterCount('all') }})</button>
-    </div>
-  </div>
-
-  <!-- Loading & Error States -->
-  <div *ngIf="isLoading" class="flex-1 flex justify-center items-center">
-    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 dark:border-[#8ab4f8]"></div>
-  </div>
+<div class="flex flex-col h-full bg-white dark:bg-[#0B1120] text-gray-900 dark:text-slate-300 font-sans overflow-hidden">
   
-  <div *ngIf="error" class="bg-red-50 dark:bg-red-900/20 border border-red-400 dark:border-red-500/50 text-red-200 p-4 rounded-md mb-6">
-    <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ error }}
-  </div>
+  <header class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-slate-800/50 bg-gray-50 dark:bg-slate-900/40 shrink-0">
+    <div class="flex items-center gap-4">
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Performance Profiler</h1>
+      <div class="h-4 w-px bg-gray-300 dark:bg-slate-700"></div>
+    </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!isLoading && !error && filteredGroups.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
-    <i class="fa-solid fa-chart-line text-4xl mb-4 text-gray-600"></i>
-    <p>No API performance data found for the selected filters.</p>
-  </div>
+    <div class="flex items-center gap-3">
+      <button (click)="exportData()" class="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 text-xs font-medium rounded-lg border border-gray-300 dark:border-slate-700 transition-colors">
+        <i class="fa-solid fa-download w-3.5 h-3.5 text-center"></i> Export
+      </button>
+      <button (click)="loadHistory()" class="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg shadow-lg shadow-blue-500/20 transition-all">
+        <i class="fa-solid fa-arrow-rotate-right w-3.5 h-3.5 text-center"></i> Refresh
+      </button>
+    </div>
+  </header>
 
-  <div *ngIf="!isLoading && !error && filteredGroups.length > 0" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6 pr-2">
+  <div class="flex-1 overflow-hidden flex relative">
     
-    <!-- Chart Section -->
-    <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-lg p-4 flex flex-col">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold text-gray-900 dark:text-[#e8eaed]">Execution Time Plot</h2>
-        <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-dotted"></span> Creation Time</div>
-          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-dashed"></span> TTFT</div>
-          <div class="flex items-center gap-1"><span class="w-4 border-t-2 border-current border-solid"></span> Inference Time</div>
-        </div>
+    <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar transition-all duration-300" [style.marginRight]="selectedCall ? '550px' : '0'">
+      
+      <div *ngIf="isLoading" class="p-6 max-w-7xl mx-auto w-full flex justify-center items-center h-full">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 dark:border-blue-500"></div>
       </div>
       
-      <div class="relative w-full h-[300px]">
-        <canvas #performanceChart></canvas>
+      <div *ngIf="error" class="p-6 max-w-7xl mx-auto w-full">
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-400 dark:border-red-500/50 text-red-700 dark:text-red-200 p-4 rounded-md">
+          <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ error }}
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && !error" class="p-6 space-y-6 max-w-7xl mx-auto w-full">
+        
+        <div class="flex flex-wrap gap-3">
+          <button *ngFor="let api of apiConfigs" (click)="toggleApi(api.id)" class="relative flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-left min-w-[200px]"
+            [ngClass]="selectedApis.has(api.id) ? 'bg-gray-50 dark:bg-slate-800 border-gray-300 dark:border-slate-600 shadow-sm dark:shadow-lg ring-1 ring-gray-200 dark:ring-slate-700' : 'bg-white dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/80 hover:border-gray-300 dark:hover:border-slate-700'">
+            <div class="absolute top-3 right-3 w-4 h-4 rounded border flex items-center justify-center transition-colors" [ngClass]="selectedApis.has(api.id) ? 'bg-blue-600 border-blue-600 dark:bg-blue-500 dark:border-blue-500' : 'border-gray-300 bg-gray-100 dark:border-slate-600 dark:bg-slate-800'">
+              <i *ngIf="selectedApis.has(api.id)" class="fa-solid fa-check text-[10px] text-white font-bold"></i>
+            </div>
+            <div class="p-2 rounded-lg" [ngClass]="selectedApis.has(api.id) ? api.activeBg + ' ' + api.activeText : api.bg + ' ' + api.color">
+              <i class="fa-solid {{ api.icon }} text-lg w-5 h-5 flex items-center justify-center"></i>
+            </div>
+            <div class="flex-1 pr-4">
+              <div class="text-sm font-medium" [ngClass]="selectedApis.has(api.id) ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-slate-300'">{{ api.name }}</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- TTFT Card -->
+          <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
+            <h3 class="text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-regular fa-clock text-emerald-500 dark:text-emerald-400"></i> TTFT</h3>
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-2xl font-light text-gray-900 dark:text-slate-100 flex items-baseline gap-1">{{ aggregateStats.ttft.avg }} <span class="text-sm font-medium text-gray-500 dark:text-slate-500">ms</span></div>
+                <div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider mt-1">Average</div>
+              </div>
+              <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.ttft.p90 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.ttft.p99 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Creation Time Card -->
+          <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
+            <h3 class="text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-500 dark:text-amber-400"></i> Creation Time</h3>
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-2xl font-light text-gray-900 dark:text-slate-100 flex items-baseline gap-1">{{ aggregateStats.create.avg }} <span class="text-sm font-medium text-gray-500 dark:text-slate-500">ms</span></div>
+                <div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider mt-1">Average</div>
+              </div>
+              <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.create.p90 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.create.p99 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Inference Time Card -->
+          <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
+            <h3 class="text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-blue-500 dark:text-blue-400"></i> Inference Time</h3>
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-2xl font-light text-gray-900 dark:text-slate-100 flex items-baseline gap-1">{{ aggregateStats.inference.avg }} <span class="text-sm font-medium text-gray-500 dark:text-slate-500">ms</span></div>
+                <div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider mt-1">Average</div>
+              </div>
+              <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.inference.p90 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.inference.p99 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
+          <div class="h-[240px] w-full relative">
+            <canvas #performanceChart></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col mb-10">
+          <div class="px-5 py-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50/80 dark:bg-slate-900/80 backdrop-blur-sm flex justify-between items-center">
+            <div class="flex items-center gap-4">
+              <h2 class="text-sm font-semibold text-gray-900 dark:text-slate-200">Recent Requests</h2>
+              <div class="flex bg-gray-100 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg p-0.5">
+                <button (click)="setCountFilter('50')" [class.bg-white]="countFilter === '50'" [class.shadow-sm]="countFilter === '50'" [class.dark:bg-slate-800]="countFilter === '50'" [class.dark:text-white]="countFilter === '50'" [class.text-gray-900]="countFilter === '50'" class="px-3 py-1 text-xs font-medium rounded-md transition-all text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200">Latest 50</button>
+                <button (click)="setCountFilter('100')" [class.bg-white]="countFilter === '100'" [class.shadow-sm]="countFilter === '100'" [class.dark:bg-slate-800]="countFilter === '100'" [class.dark:text-white]="countFilter === '100'" [class.text-gray-900]="countFilter === '100'" class="px-3 py-1 text-xs font-medium rounded-md transition-all text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200">Latest 100</button>
+                <button (click)="setCountFilter('500')" [class.bg-white]="countFilter === '500'" [class.shadow-sm]="countFilter === '500'" [class.dark:bg-slate-800]="countFilter === '500'" [class.dark:text-white]="countFilter === '500'" [class.text-gray-900]="countFilter === '500'" class="px-3 py-1 text-xs font-medium rounded-md transition-all text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200">Latest 500</button>
+              </div>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-slate-500 font-mono">Showing {{ filteredGroups.length }} of {{ getTotalSelectedCount() }} sessions</span>
+          </div>
+          
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-100/50 dark:bg-slate-950/50 border-b border-gray-200 dark:border-slate-800 text-[10px] uppercase tracking-wider text-gray-500 dark:text-slate-500">
+                <th class="px-5 py-3 font-medium w-10 text-center"></th>
+                <th class="px-5 py-3 font-medium w-24">Status</th>
+                <th class="px-5 py-3 font-medium w-40">API</th>
+                <th class="px-5 py-3 font-medium w-32">Session ID</th>
+                <th class="px-5 py-3 font-medium">Time</th>
+                <th class="px-5 py-3 font-medium text-right w-32">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200/50 dark:divide-slate-800/50">
+              <tr *ngFor="let call of displayedGroups" 
+                  (click)="selectCall(selectedCall?.sessionId === call.sessionId ? null : call)"
+                  class="cursor-pointer transition-colors"
+                  [ngClass]="selectedCall?.sessionId === call.sessionId ? 'bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/15' : 'hover:bg-gray-50 dark:hover:bg-slate-800/40'">
+                <td class="px-5 py-3 w-10 text-center align-middle">
+                  <div class="flex items-center justify-center gap-1.5 text-gray-500">
+                    <i *ngIf="hasText(call)" class="fa-regular fa-file-lines text-xs" title="Text"></i>
+                    <i *ngIf="hasImage(call)" class="fa-regular fa-image text-xs" title="Image"></i>
+                    <i *ngIf="hasAudio(call)" class="fa-solid fa-volume-high text-xs" title="Audio"></i>
+                  </div>
+                </td>
+                <td class="px-5 py-3">
+                  <span *ngIf="call.computedStatus === 'error'" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 text-[10px] font-bold uppercase tracking-wider border border-rose-200 dark:border-rose-500/20"><i class="fa-solid fa-circle-exclamation w-3 h-3 flex items-center justify-center"></i> Error</span>
+                  <span *ngIf="call.computedStatus === 'running'" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider border border-amber-200 dark:border-amber-500/20"><i class="fa-solid fa-spinner fa-spin w-3 h-3 flex items-center justify-center"></i> Run</span>
+                  <span *ngIf="call.computedStatus === 'completed'" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-500/20"><i class="fa-regular fa-square-check w-3 h-3 flex items-center justify-center"></i> Done</span>
+                </td>
+                <td class="px-5 py-3 text-xs text-gray-700 dark:text-slate-300">
+                  <span *ngIf="getApiDef(call.api) as def" class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium border {{ def.bg }} {{ def.color }} {{ def.border }}">
+                    {{ def.name.replace(' API', '').replace('Language ', '') }}
+                  </span>
+                </td>
+                <td class="px-5 py-3 text-xs font-mono text-gray-700 dark:text-slate-300">{{ call.sessionId.substring(0, 8) }}...</td>
+                <td class="px-5 py-3 text-xs font-mono text-gray-500 dark:text-slate-400">
+                  {{ call.timestamp | date:'MMM d, y, h:mm:ss a' }}
+                  <span class="ml-1 opacity-75">({{ getRelativeTime(call.timestamp) }})</span>
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <button class="text-[10px] px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 rounded border border-gray-200 dark:border-slate-700 transition-colors" (click)="provideFeedback(call); $event.stopPropagation()">
+                    Send feedback
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="!isLoading && displayedGroups.length < filteredGroups.length" class="text-xs text-gray-500 text-center mt-4 pb-4">
+            <button (click)="loadMore()" class="px-4 py-2 bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-200 rounded text-sm transition-colors">
+              Load More
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Stats Table Section -->
-    <div class="bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-lg p-4 flex flex-col">
-      <h2 class="text-lg font-bold text-gray-900 dark:text-[#e8eaed] mb-4">Performance Statistics</h2>
-      <div class="overflow-x-auto custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
-          <thead class="bg-white dark:bg-[#202124] sticky top-0 shadow-sm border-b border-gray-300 dark:border-[#3c4043]">
-            <tr>
-              <th colspan="4" class="p-2 border-b border-r border-gray-300 dark:border-[#3c4043]"></th>
-              <th colspan="5" class="p-2 font-bold text-gray-700 dark:text-gray-300 text-center uppercase tracking-wider border-b border-r border-gray-300 dark:border-[#3c4043]">TTFT</th>
-              <th colspan="5" class="p-2 font-bold text-gray-700 dark:text-gray-300 text-center uppercase tracking-wider border-b border-r border-gray-300 dark:border-[#3c4043]">Creation Time</th>
-              <th colspan="5" class="p-2 font-bold text-gray-700 dark:text-gray-300 text-center uppercase tracking-wider border-b border-gray-300 dark:border-[#3c4043]">Inference Time</th>
-            </tr>
-            <tr>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-center w-8 border-r border-gray-300 dark:border-[#3c4043]">
-                <input type="checkbox" class="rounded border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] text-blue-600 dark:text-[#8ab4f8] focus:ring-blue-600 dark:focus:ring-[#8ab4f8]"
-                       [checked]="selectedApis.size === availableApis.length"
-                       (change)="toggleAllApis($event)">
-              </th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">API</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Success</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r border-gray-300 dark:border-[#3c4043]">Errors</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Avg</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Med</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p90</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p95</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r border-gray-300 dark:border-[#3c4043] text-right">p99</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Avg</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Med</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p90</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p95</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider border-r border-gray-300 dark:border-[#3c4043] text-right">p99</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Avg</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Med</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p90</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p95</th>
-              <th class="p-3 font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">p99</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#3c4043]">
-            
-            <ng-container *ngFor="let stat of stats; trackBy: trackByApi">
-              <tr class="transition-colors cursor-pointer" 
-                  [class.bg-gray-100]="hoveredApi === stat.api" [class.dark:bg-[#303134]]="hoveredApi === stat.api" 
-                  [class.hover:bg-gray-100]="true" [class.dark:hover:bg-[#303134]]="true"
-                  (mouseenter)="onRowHover(stat.api)"
-                  (mouseleave)="onRowLeave()"
-                  (click)="toggleExpandApi(stat.api)">
-                <td class="p-3 border-t border-gray-300 dark:border-[#3c4043] text-center border-r" (click)="$event.stopPropagation()">
-                  <input type="checkbox" class="rounded border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] text-blue-600 dark:text-[#8ab4f8] focus:ring-blue-600 dark:focus:ring-[#8ab4f8]"
-                         [checked]="selectedApis.has(stat.api)"
-                         (change)="toggleApiFilter(stat.api, $event)">
-                </td>
-                <td class="p-3 border-t border-gray-300 dark:border-[#3c4043]">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-1 text-[10px] font-bold rounded" [style.color]="'#202124'" [style.backgroundColor]="apiColors[stat.api] || '#6b7280'">
-                      {{ stat.api }}
-                    </span>
-                    <i class="fa-solid fa-chevron-down text-gray-500 transition-transform text-xs" [class.rotate-180]="expandedApi === stat.api"></i>
+    <!-- RIGHT DRAWER: Session Inspector -->
+    <div *ngIf="selectedCall" class="absolute right-0 top-0 bottom-0 w-[550px] bg-white dark:bg-slate-950 border-l border-gray-200 dark:border-slate-800 shadow-2xl flex flex-col z-30 animate-[slideInRight_0.2s_ease-out]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 shrink-0">
+        <div class="flex items-center gap-3">
+          <button (click)="selectCall(null)" class="p-1.5 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-md text-gray-500 dark:text-slate-400 transition-colors">
+            <i class="fa-solid fa-xmark w-4 h-4 flex items-center justify-center"></i>
+          </button>
+          <h3 class="font-semibold text-gray-900 dark:text-slate-200 text-sm">Session Inspector</h3>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-2.5 py-1 rounded border border-gray-200 dark:border-slate-800 shadow-inner">
+          {{ selectedCall.sessionId.substring(0, 12) }}...
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar relative">
+        <div class="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-slate-800/50 bg-gray-50/50 dark:bg-slate-900/30">
+          
+          <div *ngIf="getApiDef(selectedCall.api) as def" class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl border shadow-inner {{ def.bg }} {{ def.color }} {{ def.border }}">
+                <i class="fa-solid {{ def.icon }} text-lg w-5 h-5 flex items-center justify-center"></i>
+              </div>
+              <div>
+                <div class="text-sm font-semibold text-gray-900 dark:text-slate-200">{{ def.name }}</div>
+                <div class="text-[11px] text-gray-500 dark:text-slate-500 font-mono mt-0.5">
+                  <span *ngIf="selectedCall.createItem">create()</span><span *ngIf="!selectedCall.createItem">...()</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-light text-gray-900 dark:text-slate-100">
+                {{ selectedCall.computedCreateTime! + selectedCall.computedInferenceTime! || '-' }} <span class="text-sm text-gray-500 dark:text-slate-500 font-medium">ms</span>
+              </div>
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-500 mt-1">Total Duration</div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedCall.computedCreateTime !== undefined" class="bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between text-[10px] mb-3">
+              <span class="font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Execution Breakdown</span>
+            </div>
+
+            <div class="w-full h-3 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden flex mb-4">
+              <ng-container *ngIf="selectedCall.computedCreateTime || selectedCall.computedInferenceTime">
+                <div *ngIf="selectedCall.computedCreateTime" class="h-full bg-amber-400 border-r border-amber-500/50" [style.width]="(selectedCall.computedCreateTime / ((selectedCall.computedCreateTime||0) + (selectedCall.computedInferenceTime||0)) * 100) + '%'" title="Creation"></div>
+                <div *ngIf="selectedCall.computedTtft" class="h-full bg-emerald-400 border-r border-emerald-500/50" [style.width]="(selectedCall.computedTtft / ((selectedCall.computedCreateTime||0) + (selectedCall.computedInferenceTime||0)) * 100) + '%'" title="TTFT"></div>
+                <div *ngIf="selectedCall.computedInferenceTime !== null && selectedCall.computedTtft !== null" class="h-full bg-blue-500" [style.width]="(((selectedCall.computedInferenceTime || 0) - (selectedCall.computedTtft || 0)) / ((selectedCall.computedCreateTime||0) + (selectedCall.computedInferenceTime||0)) * 100) + '%'" title="Remaining Inference"></div>
+              </ng-container>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-xs font-mono">
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-sans tracking-wide">
+                  <div class="w-2 h-2 rounded-full bg-amber-400"></div> Creation
+                </div>
+                <span class="text-gray-900 dark:text-slate-200 ml-3.5">{{ selectedCall.computedCreateTime !== null ? selectedCall.computedCreateTime + ' ms' : '-' }}</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-sans tracking-wide">
+                  <div class="w-2 h-2 rounded-full bg-emerald-400"></div> TTFT
+                </div>
+                <span class="text-gray-900 dark:text-slate-200 ml-3.5">{{ selectedCall.computedTtft !== null ? selectedCall.computedTtft + ' ms' : '-' }}</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-sans tracking-wide">
+                  <div class="w-2 h-2 rounded-full bg-blue-500"></div> Inference
+                </div>
+                <span class="text-gray-900 dark:text-slate-200 ml-3.5">{{ selectedCall.computedInferenceTime !== null ? selectedCall.computedInferenceTime + ' ms' : '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="selectedCall.computedStatus === 'error'" class="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-lg p-4 mb-6">
+            <div class="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-medium text-sm mb-1"><i class="fa-solid fa-circle-exclamation w-4 h-4 text-center"></i> Request Failed</div>
+            <p class="text-sm text-rose-500 dark:text-rose-300/80 font-mono">Encountered an error during execution. See details below.</p>
+          </div>
+
+          <div class="relative pl-4 space-y-8 pb-4">
+            <div class="absolute top-4 bottom-4 left-[1.35rem] w-px bg-gray-200 dark:bg-slate-800/80 z-0"></div>
+
+            <div *ngFor="let step of getLifecycleSteps(selectedCall)" class="relative z-10">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center border bg-white dark:bg-slate-950 relative -ml-3.5 shadow-sm {{ step.bg }} {{ step.border }} {{ step.iconColor }}">
+                  <i class="fa-solid {{ step.icon }} text-xs"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-slate-200">{{ step.step }}</span>
+                  <span class="text-xs font-mono text-gray-500 dark:text-slate-500 flex items-center gap-1"><i class="fa-regular fa-clock w-3 h-3 text-center"></i> {{ step.duration }}</span>
+                  <span *ngIf="step.ttft" class="text-xs font-mono text-gray-500 dark:text-slate-500 flex items-center gap-1"><i class="fa-solid fa-stopwatch w-3 h-3 text-center"></i> TTFT: {{ step.ttft }}</span>
+                </div>
+              </div>
+
+              <div class="ml-6 pl-2">
+                <div *ngIf="step.error" class="mb-3 text-[10px] text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800/30">
+                  {{ step.error }}
+                </div>
+                <div *ngIf="step.payload" class="mb-3">
+                  <div class="text-[10px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Payload</div>
+                  <div class="bg-gray-50 dark:bg-[#0A0F1A] border border-gray-200 dark:border-slate-800/60 rounded-lg p-2">
+                    <app-inline-code-editor [content]="step.payload" [maxLines]="15"></app-inline-code-editor>
                   </div>
-                </td>
-                <td class="p-3 text-green-600 dark:text-green-400 font-mono border-t border-gray-300 dark:border-[#3c4043]">{{ stat.success }}</td>
-                <td class="p-3 text-red-600 dark:text-red-400 font-mono border-t border-r border-gray-300 dark:border-[#3c4043]">{{ stat.errors }}</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.avgTtft | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.medianTtft | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p90Ttft | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p95Ttft | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-r border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p99Ttft | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.avgCreate | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.medianCreate | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p90Create | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p95Create | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-r border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p99Create | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.avgInference | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.medianInference | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p90Inference | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p95Inference | number:'1.0-0' }} ms</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300 font-mono border-t border-gray-300 dark:border-[#3c4043] text-right">{{ stat.p99Inference | number:'1.0-0' }} ms</td>
-              </tr>
-              <!-- Expanded View for this API -->
-              <tr *ngIf="expandedApi === stat.api" class="bg-white dark:bg-[#202124]">
-                <td colspan="19" class="p-0 border-b border-gray-300 dark:border-[#3c4043]">
-                  <div class="p-4 overflow-y-auto max-h-[500px] custom-scrollbar">
-                    <div class="flex justify-between items-center mb-3 ml-2 border-b border-gray-300 dark:border-[#3c4043] pb-2 pr-4">
-                      <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">
-                        Recent Calls - {{ stat.api }} 
-                      </h3>
-                      <div class="flex items-center gap-4 text-xs text-gray-500" *ngIf="getGroupsCountForApi(stat.api) > 0">
-                        <span>Showing {{ getPageStart(stat.api) }} - {{ getPageEnd(stat.api) }} of {{ getGroupsCountForApi(stat.api) }}</span>
-                        <div class="flex items-center gap-1">
-                          <button (click)="changePage(stat.api, -1, $event)" [disabled]="(apiPages[stat.api] || 0) === 0" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                            <i class="fa-solid fa-chevron-left"></i>
-                          </button>
-                          <button (click)="changePage(stat.api, 1, $event)" [disabled]="getPageEnd(stat.api) >= getGroupsCountForApi(stat.api)" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                            <i class="fa-solid fa-chevron-right"></i>
-                          </button>
-                        </div>
+                  
+                  <div *ngIf="step.item && getMediaUrlsList(step.item).length > 0" class="mt-4 flex flex-wrap gap-4 pt-3 border-t border-gray-200 dark:border-slate-800/60">
+                    <ng-container *ngFor="let media of getMediaUrlsList(step.item)">
+                      <div class="flex flex-col gap-1">
+                        <span class="text-[10px] text-gray-500 uppercase font-semibold">{{ media.type }}</span>
+                        <img *ngIf="media.type === 'image'" [src]="media.url" class="max-h-48 max-w-full rounded border border-gray-200 dark:border-slate-800 bg-white dark:bg-[#0A0F1A]" alt="Prompt input image" />
+                        <audio *ngIf="media.type === 'audio'" [src]="media.url" controls class="w-[300px] h-10"></audio>
                       </div>
-                    </div>
-                    <div *ngIf="getGroupsForApi(stat.api).length === 0" class="text-gray-500 text-sm ml-2">No calls found for this API in the selected time range.</div>
-                    <table *ngIf="getGroupsForApi(stat.api).length > 0" class="w-full text-left border-collapse">
-                      <thead class="bg-gray-50 dark:bg-[#292a2d]">
-                        <tr>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider rounded-tl-md">Session ID</th>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">TTFT</th>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Creation Time</th>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right">Inference Time</th>
-                          <th class="p-2 text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right rounded-tr-md">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-[#3c4043]">
-                        <ng-container *ngFor="let group of getGroupsForApi(stat.api); trackBy: trackBySessionId">
-                          <tr class="hover:bg-gray-100 dark:hover:bg-[#303134] cursor-pointer transition-colors" 
-                              [id]="'session-row-' + group.sessionId"
-                              (mouseenter)="setHoveredSession(group.sessionId)"
-                              (mouseleave)="setHoveredSession(null)"
-                              (click)="toggleExpandSession(group.sessionId, $event)">
-                            <td class="p-2 align-middle border-t border-gray-300 dark:border-[#3c4043]">
-                              <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-700 dark:text-gray-300 font-mono">{{ group.sessionId.substring(0, 8) }}...</span>
-                                <span *ngIf="group.computedStatus === 'error'" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
-                                <span *ngIf="group.computedStatus === 'running'" class="px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 text-[10px] rounded border border-yellow-300 dark:border-yellow-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> Running</span>
-                                <span *ngIf="group.computedStatus === 'completed'" class="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-[10px] rounded border border-green-300 dark:border-green-800/50 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Done</span>
-                              </div>
-                            </td>
-                            <td class="p-2 align-middle border-t border-gray-300 dark:border-[#3c4043]">
-                              <span class="text-xs text-gray-600 dark:text-gray-400">{{ group.timestamp | date:'MMM d, y, h:mm:ss a' }}</span>
-                            </td>
-                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
-                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedTtft !== null ? (group.computedTtft | number:'1.0-0') + ' ms' : '-' }}</span>
-                            </td>
-                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
-                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedCreateTime !== null ? (group.computedCreateTime | number:'1.0-0') + ' ms' : '-' }}</span>
-                            </td>
-                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
-                              <span class="text-xs font-mono text-gray-700 dark:text-gray-300">{{ group.computedInferenceTime !== null ? (group.computedInferenceTime | number:'1.0-0') + ' ms' : '-' }}</span>
-                            </td>
-                            <td class="p-2 align-middle text-right border-t border-gray-300 dark:border-[#3c4043]">
-                              <div class="flex items-center justify-end gap-2">
-                                <button (click)="provideFeedback(group); $event.stopPropagation()" class="text-[10px] text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-[#3c4043] hover:bg-gray-400 dark:hover:bg-[#4a4d51] px-2 py-1 rounded transition-colors flex items-center gap-1" title="Submit Feedback">
-                                  <i class="fa-regular fa-comment-dots"></i> Submit Feedback
-                                </button>
-                                <button (click)="deleteSession(group.sessionId); $event.stopPropagation()" class="text-[10px] text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800/30 px-2 py-1 rounded transition-colors flex items-center gap-1" title="Delete Session">
-                                  <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                                <i class="fa-solid fa-chevron-down text-gray-500 transition-transform ml-2 text-xs" [class.rotate-180]="isSessionExpanded(group.sessionId)"></i>
-                              </div>
-                            </td>
-                          </tr>
-                          
-                          <!-- Expanded Session Details inside Performance view -->
-                          <tr *ngIf="isSessionExpanded(group.sessionId)" class="bg-gray-100 dark:bg-[#1a1b1e]">
-                            <td colspan="6" class="p-3 border-b border-gray-300 dark:border-[#3c4043]">
-                              <div class="relative pl-4 border-l-2 border-gray-300 dark:border-[#3c4043] space-y-4 ml-2 my-2">
-                                
-                                <!-- Create Step -->
-                                <div *ngIf="group.createItem as createItem" class="relative">
-                                  <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-blue-600 dark:bg-[#8ab4f8] ring-4 ring-gray-100 dark:ring-[#1a1b1e]"></div>
-                                  <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-xs font-semibold text-black dark:text-white">create</span>
-                                    <span *ngIf="createItem.timestamps?.error" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
-                                    <span *ngIf="createItem.computedCreateDuration !== null" class="text-[10px] text-gray-500"><i class="fa-regular fa-clock"></i> {{ createItem.computedCreateDuration }}ms</span>
-                                  </div>
-                                  
-                                  <div *ngIf="createItem.errorMessage" class="text-[10px] text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800/30 mt-1 inline-block">
-                                    {{ createItem.errorMessage }}
-                                  </div>
-
-                                  <div *ngIf="getDisplayOptions(createItem) && getDisplayOptions(createItem) !== '{}'" class="mt-1 bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
-                                    <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                    <app-inline-code-editor [content]="getDisplayOptions(createItem) || ''" [maxLines]="15"></app-inline-code-editor>
-                                  </div>
-                                </div>
-                                
-                                <div *ngIf="!group.createItem" class="relative">
-                                  <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600 ring-4 ring-gray-100 dark:ring-[#1a1b1e]"></div>
-                                  <div class="text-xs font-semibold text-gray-500 italic">create (missing)</div>
-                                </div>
-
-                                <!-- Method Steps -->
-                                <ng-container *ngFor="let item of group.methodItems; let last = last">
-                                  <div class="relative" [class.mb-4]="true">
-                                    <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-gray-100 dark:ring-[#1a1b1e]"></div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                      <span class="text-xs font-semibold text-gray-900 dark:text-[#e8eaed]">{{ item.method }}</span>
-                                      <span *ngIf="item.timestamps?.error" class="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] rounded border border-red-300 dark:border-red-800/50">Error</span>
-                                      
-                                      <span *ngIf="item.computedDuration !== null" class="text-[10px] text-gray-500 ml-1"><i class="fa-regular fa-clock"></i> {{ item.computedDuration }}ms</span>
-                                      <span *ngIf="item.computedTtft !== null" class="text-[10px] text-gray-500 ml-1"><i class="fa-solid fa-stopwatch"></i> TTFT: {{ item.computedTtft }}ms</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 gap-2 mt-1">
-                                      <div *ngIf="getDisplayOptions(item) && getDisplayOptions(item) !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
-                                        <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                        <app-inline-code-editor [content]="getDisplayOptions(item) || ''" [maxLines]="15"></app-inline-code-editor>
-                                      </div>
-                                      <div *ngIf="getDisplayArgs(item) && getDisplayArgs(item) !== '[]'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
-                                        <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                                        <app-inline-code-editor [content]="getDisplayArgs(item) || ''" [maxLines]="15"></app-inline-code-editor>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <!-- Result or Error Step -->
-                                  <div class="relative" [class.mb-4]="!last">
-                                    <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full ring-4 ring-gray-100 dark:ring-[#1a1b1e]"
-                                         [ngClass]="item.errorMessage ? 'bg-red-500' : (item.response !== undefined ? 'bg-green-500' : 'bg-yellow-500 animate-pulse')"></div>
-                                    
-                                    <div class="flex items-center gap-2 mb-1">
-                                      <span class="text-xs font-semibold" [ngClass]="item.errorMessage ? 'text-red-600 dark:text-red-400' : (item.response !== undefined ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400')">
-                                        {{ item.errorMessage ? 'error' : (item.response !== undefined ? 'response' : 'running...') }}
-                                      </span>
-                                    </div>
-
-                                    <div *ngIf="item.errorMessage" class="text-[10px] text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800/30 mt-1 inline-block">
-                                      {{ item.errorMessage }}
-                                    </div>
-
-                                    <div *ngIf="getDisplayResponse(item) !== undefined && getDisplayResponse(item) !== ''" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
-                                      <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Response</div>
-                                      <app-inline-code-editor [content]="getDisplayResponse(item) || ''" [maxLines]="30"></app-inline-code-editor>
-                                    </div>
-                                  </div>
-                                </ng-container>
-
-                              </div>
-                            </td>
-                          </tr>
-                        </ng-container>
-                      </tbody>
-                    </table>
+                    </ng-container>
                   </div>
-                </td>
-              </tr>
-            </ng-container>
+                </div>
 
-          </tbody>
-        </table>
+                <div *ngIf="step.text" class="mt-2 bg-gray-50 dark:bg-[#0A0F1A] border border-gray-200 dark:border-slate-800/60 rounded-lg p-2">
+                  <app-inline-code-editor [content]="step.text" [maxLines]="30"></app-inline-code-editor>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <style>
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+  </style>
 </div>
-
->
-
