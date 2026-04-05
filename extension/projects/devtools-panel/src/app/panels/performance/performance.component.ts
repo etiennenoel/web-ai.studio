@@ -84,9 +84,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    if (this.filteredGroups.length > 0) {
-      this.updateChart();
-    }
+    // Left intentionally blank as chart was removed
   }
 
   ngOnDestroy() {
@@ -300,12 +298,6 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.displayLimit = 50;
     this.displayedGroups = this.filteredGroups.slice(0, this.displayLimit);
-
-    setTimeout(() => {
-      if (this.performanceChartRef) {
-        this.updateChart();
-      }
-    }, 0);
   }
 
   setCountFilter(filter: '50' | '100' | '250' | '500' | 'all') {
@@ -321,6 +313,37 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedApis.add(id);
     }
     this.applyFilters();
+  }
+
+  showClearConfirm: boolean = false;
+
+  executeClearHistory() {
+    if (typeof chrome !== 'undefined' && chrome.devtools) {
+      chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (!isException && origin) {
+          chrome.runtime.sendMessage({
+            action: 'clear_api_history',
+            payload: { origin }
+          }, (response: any) => {
+            if (response && response.success) {
+              this.rawItems = [];
+              this.groupSessions();
+              this.selectedCall = null;
+              this.showClearConfirm = false;
+              this.cdr.detectChanges();
+            }
+          });
+        }
+      });
+    }
+  }
+
+  promptClearHistory() {
+    this.showClearConfirm = true;
+  }
+
+  cancelClearHistory() {
+    this.showClearConfirm = false;
   }
 
   selectCall(call: SessionGroup | null) {
@@ -551,94 +574,5 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-  }
-
-  updateChart() {
-    if (!this.performanceChartRef) return;
-    const ctx = this.performanceChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    if (this.chart) {
-      this.chart.destroy();
-    }
-
-    const datasets: any[] = [];
-    const apis = Array.from(this.selectedApis);
-
-    for (const api of apis) {
-      const apiGroups = this.filteredGroups.filter(g => g.api === api);
-      if (apiGroups.length === 0) continue;
-
-      const inferenceDataPoints: { x: number, y: number, session: string }[] = [];
-
-      for (const group of apiGroups) {
-        const x = group.timestamp;
-        const session = group.sessionId.substring(0, 8);
-        for (const item of group.methodItems) {
-          if (item.timestamps?.execute && item.timestamps?.completed) {
-            inferenceDataPoints.push({ x, y: item.timestamps.completed - item.timestamps.execute, session });
-            break;
-          }
-        }
-      }
-      
-      inferenceDataPoints.sort((a, b) => a.x - b.x);
-
-      const apiDef = this.apiConfigs.find(a => a.id === api);
-      const color = apiDef ? apiDef.hex : '#ffffff';
-
-      if (inferenceDataPoints.length > 0) {
-        datasets.push({
-          label: apiDef?.name || api,
-          apiName: api,
-          data: inferenceDataPoints.map(p => ({ x: new Date(p.x).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute:'2-digit' }), y: p.y, session: p.session })),
-          borderColor: color,
-          borderWidth: 2,
-          tension: 0.3,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          fill: false,
-        });
-      }
-    }
-    
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const textColor = isDark ? '#64748b' : '#64748b'; 
-    const gridColor = isDark ? '#1e293b' : '#e2e8f0';
-
-    this.chart = new Chart(ctx, {
-      type: 'line',
-      data: { datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'nearest', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (context: any) => {
-                const session = context.raw.session;
-                return `${context.dataset.label}: ${context.raw.y.toFixed(0)}ms (Session: ${session})`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            type: 'category',
-            ticks: { color: textColor, font: { size: 10 } },
-            grid: { color: gridColor },
-            border: { display: false }
-          },
-          y: {
-            ticks: { color: textColor, font: { size: 10 } },
-            grid: { color: gridColor },
-            border: { display: false },
-            beginAtZero: true
-          }
-        }
-      }
-    });
   }
 }
