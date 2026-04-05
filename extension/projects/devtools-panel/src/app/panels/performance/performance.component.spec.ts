@@ -36,9 +36,9 @@ describe('PerformanceComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should apply time filters', () => {
-    component.setTimeFilter('1h');
-    expect(component.timeFilter).toBe('1h');
+  it('should apply count filters', () => {
+    component.setCountFilter('100');
+    expect(component.countFilter).toBe('100');
   });
 
   it('should toggle api filter', () => {

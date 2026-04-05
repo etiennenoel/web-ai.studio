@@ -235,7 +235,7 @@
                                 </div>
 
                                 <!-- Method Steps -->
-                                <ng-container *ngFor="let item of group.methodItems; let last = last; trackBy: trackByHistoryItem">
+                                <ng-container *ngFor="let item of group.methodItems; let last = last">
                                   <div class="relative" [class.mb-4]="true">
                                     <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-[#a8c7fa] ring-4 ring-gray-100 dark:ring-[#1a1b1e]"></div>
                                     <div class="flex items-center gap-2 mb-1">
@@ -249,11 +249,11 @@
                                     <div class="grid grid-cols-1 gap-2 mt-1">
                                       <div *ngIf="item.options && item.displayOptions !== '{}'" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Options</div>
-                                        <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0">{{ item.displayOptions }}</pre>
+                                        <app-inline-code-editor [content]="item.displayOptions || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
                                       <div *ngIf="item.args && item.args.length > 0" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden">
                                         <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Arguments</div>
-                                        <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.displayArgs }}</pre>
+                                        <app-inline-code-editor [content]="item.displayArgs || ''" [maxLines]="15"></app-inline-code-editor>
                                       </div>
                                     </div>
                                   </div>
@@ -274,7 +274,8 @@
                                     </div>
 
                                     <div *ngIf="item.response !== undefined" class="bg-gray-50 dark:bg-[#292a2d] rounded p-2 border border-gray-300 dark:border-[#3c4043] overflow-hidden mt-1">
-                                      <pre class="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto m-0 whitespace-pre-wrap">{{ item.displayResponse }}</pre>
+                                      <div class="text-[9px] text-gray-500 uppercase font-semibold mb-1">Response</div>
+                                      <app-inline-code-editor [content]="item.displayResponse || ''" [maxLines]="30"></app-inline-code-editor>
                                     </div>
                                   </div>
                                 </ng-container>
@@ -296,3 +297,6 @@
     </div>
   </div>
 </div>
+
+>
+
