@@ -102,5 +102,23 @@
     "ram": 270,
     "model": "Nano V3 4B",
     "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-06-windows-i7-13800H-64gb-litertlm",
+    "name": "Intel Core i7-13800H (LiteRT-LM)",
+    "os": "Windows",
+    "cpu": "Intel Core i7-13800H",
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-06-windows-i7-13800H-64gb-llminferenceengine",
+    "name": "Intel Core i7-13800H (LLM IE)",
+    "os": "Windows",
+    "cpu": "Intel Core i7-13800H",
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
   }
 ]
