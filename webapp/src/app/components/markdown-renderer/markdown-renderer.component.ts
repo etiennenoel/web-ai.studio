@@ -7,8 +7,11 @@ import {
   ChangeDetectionStrategy,
   ViewChild,
   AfterViewInit,
-  HostListener
+  HostListener,
+  Inject,
+  PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
@@ -23,6 +26,8 @@ export class MarkdownRendererComponent implements OnChanges, AfterViewInit {
   @Input() content: string = '';
   @ViewChild('container') container!: ElementRef<HTMLDivElement>;
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['content'] && this.container) {
       this.updateContent();
@@ -34,6 +39,7 @@ export class MarkdownRendererComponent implements OnChanges, AfterViewInit {
   }
 
   private async updateContent() {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (!this.container || !this.container.nativeElement) return;
     
     // Configure marked to inject a copy button for code blocks
