@@ -1178,17 +1178,25 @@
       <div class="max-w-xl mx-auto flex flex-col items-center gap-3">
         <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500/30"><i class="bi bi-ui-checks"></i> {{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
         
-        <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
-                (click)="start()"
-                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
+        @if (this.axonTestSuiteExecutor.results.status === 'Executing' || this.axonTestSuiteExecutor.preTestsStatus === 'Executing') {
+          <button type="button" class="w-full max-w-sm py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md shadow-rose-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
+                  (click)="stop()">
             <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <span>Running...</span>
-          } @else {
+            <span>Stop Execution</span>
+          </button>
+        } @else if (this.axonTestSuiteExecutor.results.status === 'Success' || this.axonTestSuiteExecutor.results.status === 'Error') {
+          <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
+                  (click)="triggerDownloadResults()">
+            <i class="bi bi-download text-lg"></i>
+            <span>Download Report</span>
+          </button>
+        } @else {
+          <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
+                  (click)="start()">
             <i class="bi bi-play-fill text-lg"></i>
             <span>Run Cortex Test</span>
-          }
-        </button>
+          </button>
+        }
         
         @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
           @let overallProgress = getOverallProgress();

@@ -1,4 +1,5 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
@@ -61,11 +62,11 @@ export class CortexInsightsPage implements OnInit {
   variantOptions: string[] = ['All'];
   apiOptions: string[] = ['All'];
 
-  selectedHardware = 'All';
-  selectedCompute = 'All';
-  selectedEngine = 'All';
-  selectedVariant = 'All';
-  selectedApi = 'All';
+  selectedHardwares: string[] = [];
+  selectedComputes: string[] = [];
+  selectedEngines: string[] = [];
+  selectedVariants: string[] = [];
+  selectedApis: string[] = [];
 
   activeDropdown: string | null = null;
 
@@ -76,7 +77,12 @@ export class CortexInsightsPage implements OnInit {
   chartPointsTopCircles: {x: string, y: string}[] = [];
   chartPolygonFleet: string = "";
 
-  constructor(private titleService: Title, private metaService: Meta, private http: HttpClient) {}
+  constructor(
+    private titleService: Title, 
+    private metaService: Meta, 
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
     this.titleService.setTitle("Cortex Insights - Web AI Studio");
@@ -97,71 +103,94 @@ export class CortexInsightsPage implements OnInit {
     this.activeDropdown = this.activeDropdown === dropdown ? null : dropdown;
   }
 
-  selectFilter(filterType: string, value: string) {
-    if (filterType === 'hardware') this.selectedHardware = value;
-    if (filterType === 'compute') this.selectedCompute = value;
-    if (filterType === 'engine') this.selectedEngine = value;
-    if (filterType === 'variant') this.selectedVariant = value;
-    if (filterType === 'api') this.selectedApi = value;
+  selectFilter(filterType: string, value: string, event?: Event | MouseEvent) {
+    if (event) event.stopPropagation();
+
+    const toggle = (arr: string[], val: string) => {
+      if (arr.includes(val)) {
+        return arr.filter(a => a !== val);
+      } else {
+        return [...arr, val];
+      }
+    };
+
+    if (filterType === 'hardware') this.selectedHardwares = toggle(this.selectedHardwares, value);
+    if (filterType === 'compute') this.selectedComputes = toggle(this.selectedComputes, value);
+    if (filterType === 'engine') this.selectedEngines = toggle(this.selectedEngines, value);
+    if (filterType === 'variant') this.selectedVariants = toggle(this.selectedVariants, value);
+    if (filterType === 'api') this.selectedApis = toggle(this.selectedApis, value);
     
-    this.activeDropdown = null;
     this.applyFilters();
   }
 
+  isFilterSelected(filterType: string, value: string): boolean {
+    if (filterType === 'hardware') return this.selectedHardwares.includes(value);
+    if (filterType === 'compute') return this.selectedComputes.includes(value);
+    if (filterType === 'engine') return this.selectedEngines.includes(value);
+    if (filterType === 'variant') return this.selectedVariants.includes(value);
+    if (filterType === 'api') return this.selectedApis.includes(value);
+    return false;
+  }
+
   loadData() {
-    this.http.get<any[]>('/data/baselines/index.json').subscribe(index => {
-      const fetchPromises = index.map(item => {
-        return new Promise<RawBaseline | null>((resolve) => {
-          this.http.get<any>(`/data/baselines/${item.filename}.json`).subscribe({
-            next: (data) => {
-              if (!data?.results?.testsResults) { resolve(null); return; }
-              
-              const tests: RawTestResult[] = [];
-              const apiGroups = new Map<string, any[]>();
+    if (!isPlatformBrowser(this.platformId)) return;
 
-              data.results.testsResults.forEach((testResult: any) => {
-                const api = testResult.api;
-                if (!apiGroups.has(api)) apiGroups.set(api, []);
-                const iterations = (testResult.testIterationResults || []).filter((i: any) => i.status === 'success');
-                apiGroups.get(api)!.push(...iterations);
-              });
+    this.http.get<any[]>('/data/baselines/index.json').subscribe({
+      next: (index) => {
+        const fetchPromises = index.map(item => {
+          return new Promise<RawBaseline | null>((resolve) => {
+            this.http.get<any>(`/data/baselines/${item.filename}.json`).subscribe({
+              next: (data) => {
+                if (!data?.results?.testsResults) { resolve(null); return; }
+                
+                const tests: RawTestResult[] = [];
+                const apiGroups = new Map<string, any[]>();
 
-              apiGroups.forEach((iterations, api) => {
-                if (iterations.length > 0) {
-                  tests.push({
-                    api,
-                    ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
-                    speed: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.tokensPerSecond ?? 0)),
-                    total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
-                  });
-                }
-              });
+                data.results.testsResults.forEach((testResult: any) => {
+                  const api = testResult.api;
+                  if (!apiGroups.has(api)) apiGroups.set(api, []);
+                  const iterations = (testResult.testIterationResults || []).filter((i: any) => i.status === 'Success');
+                  apiGroups.get(api)!.push(...iterations);
+                });
 
-              if (tests.length === 0) { resolve(null); return; }
+                apiGroups.forEach((iterations, api) => {
+                  if (iterations.length > 0) {
+                    tests.push({
+                      api,
+                      ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
+                      speed: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.tokensPerSecond ?? 0)),
+                      total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
+                    });
+                  }
+                });
 
-              let engine = 'Gemini API';
-              if (item.filename.toLowerCase().includes('llminferenceengine')) engine = 'LLM IE';
-              else if (item.filename.toLowerCase().includes('litertlm')) engine = 'LITERT-LM';
+                if (tests.length === 0) { resolve(null); return; }
 
-              resolve({
-                filename: item.filename,
-                hw: item.name,
-                compute: item.executionType || 'CPU',
-                engine: engine,
-                model: item.model || 'Unknown',
-                tests
-              });
-            },
-            error: () => resolve(null)
+                let engine = 'Gemini API';
+                if (item.filename.toLowerCase().includes('llminferenceengine')) engine = 'LLM IE';
+                else if (item.filename.toLowerCase().includes('litertlm')) engine = 'LITERT-LM';
+
+                resolve({
+                  filename: item.filename,
+                  hw: item.name,
+                  compute: item.executionType || 'CPU',
+                  engine: engine,
+                  model: item.model || 'Unknown',
+                  tests
+                });
+              },
+              error: () => resolve(null)
+            });
           });
         });
-      });
 
-      Promise.all(fetchPromises).then(results => {
-        this.rawBaselines = results.filter(r => r !== null) as RawBaseline[];
-        this.extractOptions();
-        this.applyFilters();
-      });
+        Promise.all(fetchPromises).then(results => {
+          this.rawBaselines = results.filter(r => r !== null) as RawBaseline[];
+          this.extractOptions();
+          this.applyFilters();
+        });
+      },
+      error: (err) => console.error("Failed to fetch index.json", err)
     });
   }
 
@@ -180,19 +209,19 @@ export class CortexInsightsPage implements OnInit {
       b.tests.forEach(t => apiSet.add(t.api));
     });
 
-    this.hardwareOptions = ['All', ...Array.from(hwSet).sort()];
-    this.computeOptions = ['All', ...Array.from(computeSet).sort()];
-    this.engineOptions = ['All', ...Array.from(engineSet).sort()];
-    this.variantOptions = ['All', ...Array.from(variantSet).sort()];
-    this.apiOptions = ['All', ...Array.from(apiSet).sort()];
+    this.hardwareOptions = Array.from(hwSet).sort();
+    this.computeOptions = Array.from(computeSet).sort();
+    this.engineOptions = Array.from(engineSet).sort();
+    this.variantOptions = Array.from(variantSet).sort();
+    this.apiOptions = Array.from(apiSet).sort();
   }
 
   applyFilters() {
     let filtered = this.rawBaselines.filter(b => {
-      if (this.selectedHardware !== 'All' && b.hw !== this.selectedHardware) return false;
-      if (this.selectedCompute !== 'All' && b.compute !== this.selectedCompute) return false;
-      if (this.selectedEngine !== 'All' && b.engine !== this.selectedEngine) return false;
-      if (this.selectedVariant !== 'All' && b.model !== this.selectedVariant) return false;
+      if (this.selectedHardwares.length > 0 && !this.selectedHardwares.includes(b.hw)) return false;
+      if (this.selectedComputes.length > 0 && !this.selectedComputes.includes(b.compute)) return false;
+      if (this.selectedEngines.length > 0 && !this.selectedEngines.includes(b.engine)) return false;
+      if (this.selectedVariants.length > 0 && !this.selectedVariants.includes(b.model)) return false;
       return true;
     });
 
@@ -201,8 +230,8 @@ export class CortexInsightsPage implements OnInit {
 
     filtered.forEach(b => {
       let testsToUse = b.tests;
-      if (this.selectedApi !== 'All') {
-        testsToUse = b.tests.filter(t => t.api === this.selectedApi);
+      if (this.selectedApis.length > 0) {
+        testsToUse = b.tests.filter(t => this.selectedApis.includes(t.api));
       }
       
       if (testsToUse.length === 0) return;
@@ -218,7 +247,7 @@ export class CortexInsightsPage implements OnInit {
         compute: b.compute,
         engine: b.engine,
         model: b.model,
-        api: this.selectedApi,
+        api: this.selectedApis.length === 1 ? this.selectedApis[0] : (this.selectedApis.length === 0 ? 'All' : 'Mixed'),
         ttft,
         speed,
         total,
@@ -314,6 +343,34 @@ export class CortexInsightsPage implements OnInit {
   setActiveMetric(metric: string) {
     this.activeMetric = metric;
     this.applyFilters();
+  }
+
+  
+  getFilterIcon(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'CPU') return 'bi-cpu';
+      if (value === 'GPU') return 'bi-gpu-card';
+      if (value === 'NPU') return 'bi-motherboard';
+      if (value === 'Cloud') return 'bi-cloud';
+      return 'bi-pc-horizontal';
+    }
+    if (filterType === 'engine') return 'bi-gear-fill';
+    if (filterType === 'variant') return 'bi-box-seam';
+    if (filterType === 'api') return 'bi-plugin';
+    return 'bi-tag';
+  }
+  
+  getFilterBadgeClass(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'GPU') return this.getBadgeClass('purple');
+      if (value === 'CPU') return this.getBadgeClass('default');
+      if (value === 'Cloud') return this.getBadgeClass('cloud');
+      return this.getBadgeClass('emerald');
+    }
+    if (filterType === 'engine') return this.getBadgeClass('default');
+    if (filterType === 'variant') return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'api') return 'bg-gray-900 border-gray-700 text-gray-400';
+    return this.getBadgeClass('default');
   }
 
   getBadgeClass(variant: string): string {

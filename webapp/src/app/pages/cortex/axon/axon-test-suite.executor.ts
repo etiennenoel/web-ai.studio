@@ -155,7 +155,14 @@ export class AxonTestSuiteExecutor {
     await this.testIdMap[testId].setup();
   }
 
+  isStopped = false;
+
+  stop() {
+    this.isStopped = true;
+  }
+
   async setup(selectedTestIds?: Set<string>): Promise<void> {
+    if (this.isStopped) return;
     this.results.testsResults = [];
     this.preTestsStatus = TestStatus.Executing;
 
@@ -171,8 +178,17 @@ export class AxonTestSuiteExecutor {
     return new Promise(async (resolve, reject) => {
       // Check the status for each API.
       for (const testSuite of testsToRun) {
+        if (this.isStopped) {
+          this.preTestsStatus = TestStatus.Idle;
+          return resolve();
+        }
         const test = this.testIdMap[testSuite];
         await test.setup();
+      }
+
+      if (this.isStopped) {
+        this.preTestsStatus = TestStatus.Idle;
+        return resolve();
       }
 
       // Check if all setup for tests to run are in a final state
@@ -185,6 +201,10 @@ export class AxonTestSuiteExecutor {
 
       await new Promise<void>( (resolve1) => {
         setTimeout(async () => {
+          if (this.isStopped) {
+            this.preTestsStatus = TestStatus.Idle;
+            return resolve1();
+          }
           await this.setup(selectedTestIds);
           return resolve1();
         }, 3000);
@@ -196,6 +216,7 @@ export class AxonTestSuiteExecutor {
   }
 
   async start(selectedTestIds?: Set<string>): Promise<void> {
+    if (this.isStopped) return;
     this.results.status = TestStatus.Executing
 
     const testsToRun = selectedTestIds && selectedTestIds.size > 0 
@@ -203,6 +224,8 @@ export class AxonTestSuiteExecutor {
       : this.testsSuite;
 
     for (const testSuite of testsToRun) {
+      if (this.isStopped) break;
+
       const test = this.testIdMap[testSuite];
 
       if (test.results.apiAvailability === "unavailable") {
@@ -211,8 +234,21 @@ export class AxonTestSuiteExecutor {
       }
 
       await test.preRun();
+      if (this.isStopped) break;
       await test.run();
+      if (this.isStopped) break;
       await test.postRun();
+    }
+
+    if (this.isStopped) {
+      this.results.status = TestStatus.Idle;
+      for (const testSuite of testsToRun) {
+        const test = this.testIdMap[testSuite];
+        if (test.results.status === TestStatus.Executing) {
+          test.results.status = TestStatus.Idle;
+        }
+      }
+      return;
     }
 
     // Compile the data
