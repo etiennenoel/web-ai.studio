@@ -873,4 +873,28 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   closeImage() {
     this.selectedImageUrl = null;
   }
+
+  getBaselineDetails(id: string) {
+    return this.comparisonService.availableBaselinesIndex.find(b => b.filename === id);
+  }
+
+  getExecutionTypeIcon(type?: string): string {
+    switch(type?.toUpperCase()) {
+      case 'CPU': return 'bi-cpu';
+      case 'GPU': return 'bi-gpu-card';
+      case 'NPU': return 'bi-motherboard';
+      case 'CLOUD': return 'bi-cloud';
+      default: return 'bi-gear';
+    }
+  }
+
+  getExecutionTypeColorClass(type?: string): string {
+    switch(type?.toUpperCase()) {
+      case 'CPU': return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+      case 'GPU': return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800/50';
+      case 'NPU': return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50';
+      case 'CLOUD': return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50';
+      default: return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    }
+  }
 }

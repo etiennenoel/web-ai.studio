@@ -1,19 +1,88 @@
 [
   {
-    "filename": "apple_m4_max",
-    "name": "Apple M4 Max",
+    "filename": "2026-04-05-Apple-M4-Max-64gb-litertlm",
+    "name": "Apple M4 Max (LiteRT-LM)",
     "os": "macOS",
     "cpu": "Apple M4 Max",
-    "ram": 64
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-Apple-M4-Max-64gb-llminferenceengine",
+    "name": "Apple M4 Max (LLM IE)",
+    "os": "macOS",
+    "cpu": "Apple M4 Max",
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m1-max-64gb-litertlm",
+    "name": "Apple M1 Max (LiteRT-LM)",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m1-max-64gb-llminferenceengine",
+    "name": "Apple M1 Max (LLM IE)",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m3-ultra-96gb-litertlm",
+    "name": "Apple M3 Ultra (LiteRT-LM)",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m3-ultra-96gb-llminferenceengine",
+    "name": "Apple M3 Ultra (LLM IE)",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m4-16gb-litertlm",
+    "name": "Apple M4 (LiteRT-LM)",
+    "os": "macOS",
+    "cpu": "Apple M4",
+    "ram": 16,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-05-apple-m4-16gb-llminferenceengine",
+    "name": "Apple M4 (LLM IE)",
+    "os": "macOS",
+    "cpu": "Apple M4",
+    "ram": 16,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash",
-    "name": "Cloud Gemini 3.1 Flash",
-    "os": "Cloud"
+    "name": "Gemini 3.1 Flash",
+    "os": "Cloud",
+    "model": "Gemini 3.1 Flash",
+    "executionType": "Cloud"
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash_lite",
-    "name": "Cloud Gemini 3.1 Flash Lite",
-    "os": "Cloud"
+    "name": "Gemini 3.1 Flash Lite",
+    "os": "Cloud",
+    "model": "Gemini 3.1 Flash Lite",
+    "executionType": "Cloud"
   }
 ]
