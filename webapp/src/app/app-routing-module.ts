@@ -7,6 +7,7 @@ import {WritingAssistancePage} from './pages/writing-assistance/writing-assistan
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
+import {CortexInsightsPage} from './pages/cortex-insights/cortex-insights.page';
 import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
 import {TermsOfServicePage} from './pages/terms-of-service/terms-of-service.page';
 import {BugsPage} from './pages/bugs/bugs.page';
@@ -63,6 +64,13 @@ const routes: Routes = [
     component: CortexPage,
     data: {
       route: RouteEnum.Cortex
+    }
+  },
+  {
+    path: "cortex-insights",
+    component: CortexInsightsPage,
+    data: {
+      route: RouteEnum.CortexInsights
     }
   },
   {

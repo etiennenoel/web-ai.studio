@@ -12,6 +12,7 @@ declare const LanguageModel: any;
 @Injectable()
 export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptAudioTranscription46ColdStart;
+  abortSignal?: AbortSignal;
   
   systemInput = "You are a highly accurate audio transcription system. Return the exact spoken text.";
 
@@ -65,7 +66,7 @@ export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInte
       iterationResult.status = TestStatus.Executing;
 
       const start = performance.now();
-      const session = await LanguageModel.create(this.creationOptions);
+      const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -77,7 +78,7 @@ export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInte
       }];
 
       try {
-        const response = session.promptStreaming(promptInput);
+        const response = session.promptStreaming(promptInput, { signal: this.abortSignal });
 
         let output = "";
         for await (const chunk of response) {

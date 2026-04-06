@@ -592,6 +592,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     this.updateUrl();
   }
 
+  stop() {
+    this.axonTestSuiteExecutor.stop();
+  }
+
   async start() {
     // Clear explicit collapse overrides so dynamic opening works based on execution status
     this.apiCollapsedState = {};
@@ -599,12 +603,18 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     // Explicitly open the setup details pane so users can watch the status
     this.viewData.pretests.iterationsCollapsed = false;
 
+    this.axonTestSuiteExecutor.isStopped = false;
+    this.axonTestSuiteExecutor.resetAbortController();
     await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
+
+    if (this.axonTestSuiteExecutor.isStopped) return;
 
     this.viewData.pretests.iterationsCollapsed = true;
 
     // Once everything passes, we can start the tests.
     await this.axonTestSuiteExecutor.start(this.selectedTestIds);
+
+    if (this.axonTestSuiteExecutor.isStopped) return;
     
     await this.generateReport();
   }

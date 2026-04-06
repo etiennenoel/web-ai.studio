@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, AfterViewInit, NgZone, HostListener } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Chart } from 'chart.js/auto';
 import { SessionGroup } from '../history/history.component';
@@ -67,7 +67,31 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
 
+  inspectorWidth = 550;
+  isResizingInspector = false;
+
   constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone, private sanitizer: DomSanitizer) {}
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizingInspector) return;
+    const newWidth = window.innerWidth - event.clientX;
+    this.inspectorWidth = Math.max(300, Math.min(newWidth, window.innerWidth - 100));
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp() {
+    if (this.isResizingInspector) {
+      this.isResizingInspector = false;
+      document.body.style.cursor = 'default';
+    }
+  }
+
+  startResizeInspector(event: MouseEvent) {
+    this.isResizingInspector = true;
+    document.body.style.cursor = 'ew-resize';
+    event.preventDefault();
+  }
 
   ngOnInit() {
     this.loadHistory();

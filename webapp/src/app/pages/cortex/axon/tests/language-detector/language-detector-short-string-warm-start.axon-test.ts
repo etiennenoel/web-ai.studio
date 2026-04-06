@@ -9,6 +9,7 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 @Injectable()
 export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.LanguageDetectorShortStringWarmStart;
+  abortSignal?: AbortSignal;
 
   results: AxonTestResultInterface = {
     id: this.id,
@@ -29,7 +30,7 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
     try {
       this.results.apiAvailability = await this.apiStatus();
 
-      const ld = await LanguageDetector.create({})
+      const ld = await LanguageDetector.create({ signal: this.abortSignal })
     } catch (e) {
       this.results.status = TestStatus.Error;
     }
@@ -49,13 +50,13 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
     }
 
     let start = performance.now()
-    const ld = await LanguageDetector.create({})
+    const ld = await LanguageDetector.create({ signal: this.abortSignal })
     const creationTime = performance.now() - start;
 
     for (let iterationResult of this.results.testIterationResults) {
       iterationResult.status = TestStatus.Executing;
       start = performance.now()
-      const response = await ld.detect(this.results.input);
+      const response = await ld.detect(this.results.input, { signal: this.abortSignal });
 
       iterationResult.creationTime = creationTime;
       iterationResult.output = JSON.stringify(response);

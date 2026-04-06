@@ -6,6 +6,8 @@ export interface AxonTestInterface {
 
   results: AxonTestResultInterface;
 
+  abortSignal?: AbortSignal;
+
   apiStatus(): Promise<Availability | "unknown">;
 
   /**

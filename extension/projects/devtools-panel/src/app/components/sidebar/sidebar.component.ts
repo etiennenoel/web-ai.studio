@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { PanelTab } from '../../enums/panel-tab.enum';
 import { MenuItemConfig } from '../../interfaces/menu-item-config.interface';
 import { APP_VERSION, DiagnosisService } from 'base';
@@ -13,6 +13,9 @@ import { Observable } from 'rxjs';
 export class SidebarComponent {
   appVersion = APP_VERSION;
   errorCount$: Observable<number>;
+
+  sidebarWidth = 256;
+  isResizingSidebar = false;
 
   readonly menuItems: MenuItemConfig[] = [
     { id: PanelTab.OVERVIEW, label: 'Overview', iconClass: 'fa-solid fa-gauge-high', isApi: false, isManagement: false },
@@ -32,6 +35,26 @@ export class SidebarComponent {
 
   constructor(private diagnosisService: DiagnosisService) {
     this.errorCount$ = this.diagnosisService.errorCount$;
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizingSidebar) return;
+    this.sidebarWidth = Math.max(64, Math.min(event.clientX, 600));
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp() {
+    if (this.isResizingSidebar) {
+      this.isResizingSidebar = false;
+      document.body.style.cursor = 'default';
+    }
+  }
+
+  startResizeSidebar(event: MouseEvent) {
+    this.isResizingSidebar = true;
+    document.body.style.cursor = 'ew-resize';
+    event.preventDefault();
   }
 
   get apiItems() { return this.menuItems.filter(item => item.isApi); }

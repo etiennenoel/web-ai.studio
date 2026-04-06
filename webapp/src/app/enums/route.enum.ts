@@ -6,6 +6,7 @@ export enum RouteEnum {
   Build = "/build",
   Evals = "/evals",
   Cortex = "/cortex",
+  CortexInsights = "/cortex-insights",
   Axon = "/cortex/axon",
   Demos = "/demos",
   Docs = "/docs",

@@ -9,6 +9,7 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 @Injectable()
 export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.SummarizerLongNewsArticleColdStart;
+  abortSignal?: AbortSignal;
 
   results: AxonTestResultInterface = {
     id: this.id,
@@ -36,7 +37,7 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
     try {
       this.results.apiAvailability = await this.apiStatus();
 
-      const ld = await Summarizer.create(this.creationOptions)
+      const ld = await Summarizer.create({ ...this.creationOptions, signal: this.abortSignal })
     } catch (e) {
       this.results.status = TestStatus.Error;
     }
@@ -61,6 +62,7 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
       const start = performance.now()
 
       const summarizer = await Summarizer.create({
+        signal: this.abortSignal,
         length: "medium",
         format: "plain-text",
         type: "key-points",
@@ -69,7 +71,7 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
 
       iterationResult.creationTime = performance.now() - start;
 
-      const response = summarizer.summarizeStreaming(this.results.input);
+      const response = summarizer.summarizeStreaming(this.results.input, { signal: this.abortSignal });
 
       let output = "";
       for await (const chunk of response) {
