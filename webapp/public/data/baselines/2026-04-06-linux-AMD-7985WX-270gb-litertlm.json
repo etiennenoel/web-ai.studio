@@ -1,0 +1,2179 @@
+{
+  "timestamp": "2026-04-06T16:53:54.903Z",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+  "hardware": {
+    "webgl_renderer": "unknown",
+    "webgpu": null,
+    "navigator": {
+      "hardwareConcurrency": 128,
+      "deviceMemory": 32,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+    },
+    "cpu": {
+      "archName": "x86_64",
+      "features": [
+        "mmx",
+        "sse",
+        "sse2",
+        "sse3",
+        "ssse3",
+        "sse4_1",
+        "sse4_2",
+        "avx"
+      ],
+      "modelName": "AMD Ryzen Threadripper PRO 7985WX 64-Cores",
+      "numOfProcessors": 128,
+      "processors": [
+        {
+          "usage": {
+            "idle": 129879081,
+            "kernel": 2315280,
+            "total": 136482470,
+            "user": 4288109
+          }
+        },
+        {
+          "usage": {
+            "idle": 130162322,
+            "kernel": 2478406,
+            "total": 137201803,
+            "user": 4561075
+          }
+        },
+        {
+          "usage": {
+            "idle": 135936896,
+            "kernel": 553262,
+            "total": 137250832,
+            "user": 760674
+          }
+        },
+        {
+          "usage": {
+            "idle": 136182609,
+            "kernel": 460331,
+            "total": 137243768,
+            "user": 600828
+          }
+        },
+        {
+          "usage": {
+            "idle": 135157164,
+            "kernel": 756086,
+            "total": 137201522,
+            "user": 1288272
+          }
+        },
+        {
+          "usage": {
+            "idle": 134483638,
+            "kernel": 1012491,
+            "total": 137170399,
+            "user": 1674270
+          }
+        },
+        {
+          "usage": {
+            "idle": 135835091,
+            "kernel": 579184,
+            "total": 137186287,
+            "user": 772012
+          }
+        },
+        {
+          "usage": {
+            "idle": 135703510,
+            "kernel": 601716,
+            "total": 137172425,
+            "user": 867199
+          }
+        },
+        {
+          "usage": {
+            "idle": 137513344,
+            "kernel": 77642,
+            "total": 137685445,
+            "user": 94459
+          }
+        },
+        {
+          "usage": {
+            "idle": 137562018,
+            "kernel": 60084,
+            "total": 137692933,
+            "user": 70831
+          }
+        },
+        {
+          "usage": {
+            "idle": 137578506,
+            "kernel": 51690,
+            "total": 137697765,
+            "user": 67569
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587660,
+            "kernel": 48606,
+            "total": 137698206,
+            "user": 61940
+          }
+        },
+        {
+          "usage": {
+            "idle": 137593269,
+            "kernel": 46290,
+            "total": 137699329,
+            "user": 59770
+          }
+        },
+        {
+          "usage": {
+            "idle": 137598999,
+            "kernel": 44171,
+            "total": 137700569,
+            "user": 57399
+          }
+        },
+        {
+          "usage": {
+            "idle": 137591915,
+            "kernel": 43241,
+            "total": 137691206,
+            "user": 56050
+          }
+        },
+        {
+          "usage": {
+            "idle": 137603386,
+            "kernel": 41971,
+            "total": 137701911,
+            "user": 56554
+          }
+        },
+        {
+          "usage": {
+            "idle": 136500293,
+            "kernel": 471449,
+            "total": 137512427,
+            "user": 540685
+          }
+        },
+        {
+          "usage": {
+            "idle": 137021001,
+            "kernel": 263115,
+            "total": 137573066,
+            "user": 288950
+          }
+        },
+        {
+          "usage": {
+            "idle": 136931633,
+            "kernel": 267824,
+            "total": 137490003,
+            "user": 290546
+          }
+        },
+        {
+          "usage": {
+            "idle": 137080323,
+            "kernel": 244244,
+            "total": 137591020,
+            "user": 266453
+          }
+        },
+        {
+          "usage": {
+            "idle": 137011787,
+            "kernel": 268283,
+            "total": 137586285,
+            "user": 306215
+          }
+        },
+        {
+          "usage": {
+            "idle": 136849267,
+            "kernel": 302197,
+            "total": 137497858,
+            "user": 346394
+          }
+        },
+        {
+          "usage": {
+            "idle": 137115688,
+            "kernel": 230215,
+            "total": 137603560,
+            "user": 257657
+          }
+        },
+        {
+          "usage": {
+            "idle": 137200634,
+            "kernel": 196573,
+            "total": 137619950,
+            "user": 222743
+          }
+        },
+        {
+          "usage": {
+            "idle": 137475426,
+            "kernel": 60354,
+            "total": 137609433,
+            "user": 73653
+          }
+        },
+        {
+          "usage": {
+            "idle": 137579517,
+            "kernel": 52278,
+            "total": 137693192,
+            "user": 61397
+          }
+        },
+        {
+          "usage": {
+            "idle": 137581502,
+            "kernel": 48705,
+            "total": 137686619,
+            "user": 56412
+          }
+        },
+        {
+          "usage": {
+            "idle": 137596147,
+            "kernel": 45719,
+            "total": 137696353,
+            "user": 54487
+          }
+        },
+        {
+          "usage": {
+            "idle": 137602730,
+            "kernel": 43425,
+            "total": 137698711,
+            "user": 52556
+          }
+        },
+        {
+          "usage": {
+            "idle": 137608048,
+            "kernel": 41029,
+            "total": 137699106,
+            "user": 50029
+          }
+        },
+        {
+          "usage": {
+            "idle": 137609380,
+            "kernel": 40316,
+            "total": 137700241,
+            "user": 50545
+          }
+        },
+        {
+          "usage": {
+            "idle": 137612918,
+            "kernel": 39374,
+            "total": 137700561,
+            "user": 48269
+          }
+        },
+        {
+          "usage": {
+            "idle": 137576345,
+            "kernel": 51624,
+            "total": 137697375,
+            "user": 69406
+          }
+        },
+        {
+          "usage": {
+            "idle": 137600427,
+            "kernel": 43748,
+            "total": 137701703,
+            "user": 57528
+          }
+        },
+        {
+          "usage": {
+            "idle": 137606736,
+            "kernel": 40032,
+            "total": 137703529,
+            "user": 56761
+          }
+        },
+        {
+          "usage": {
+            "idle": 137611765,
+            "kernel": 37114,
+            "total": 137704386,
+            "user": 55507
+          }
+        },
+        {
+          "usage": {
+            "idle": 137392697,
+            "kernel": 44926,
+            "total": 137495550,
+            "user": 57927
+          }
+        },
+        {
+          "usage": {
+            "idle": 137586724,
+            "kernel": 47702,
+            "total": 137698850,
+            "user": 64424
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587063,
+            "kernel": 47787,
+            "total": 137698037,
+            "user": 63187
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587527,
+            "kernel": 47113,
+            "total": 137698621,
+            "user": 63981
+          }
+        },
+        {
+          "usage": {
+            "idle": 137569284,
+            "kernel": 54736,
+            "total": 137697444,
+            "user": 73424
+          }
+        },
+        {
+          "usage": {
+            "idle": 137592021,
+            "kernel": 46696,
+            "total": 137702260,
+            "user": 63543
+          }
+        },
+        {
+          "usage": {
+            "idle": 137601842,
+            "kernel": 42848,
+            "total": 137704793,
+            "user": 60103
+          }
+        },
+        {
+          "usage": {
+            "idle": 137605115,
+            "kernel": 41000,
+            "total": 137705479,
+            "user": 59364
+          }
+        },
+        {
+          "usage": {
+            "idle": 137608071,
+            "kernel": 39551,
+            "total": 137706331,
+            "user": 58709
+          }
+        },
+        {
+          "usage": {
+            "idle": 137609451,
+            "kernel": 38495,
+            "total": 137706564,
+            "user": 58618
+          }
+        },
+        {
+          "usage": {
+            "idle": 137387166,
+            "kernel": 45150,
+            "total": 137495441,
+            "user": 63125
+          }
+        },
+        {
+          "usage": {
+            "idle": 137581416,
+            "kernel": 49540,
+            "total": 137700661,
+            "user": 69705
+          }
+        },
+        {
+          "usage": {
+            "idle": 137559975,
+            "kernel": 59530,
+            "total": 137700629,
+            "user": 81124
+          }
+        },
+        {
+          "usage": {
+            "idle": 137584831,
+            "kernel": 51164,
+            "total": 137705649,
+            "user": 69654
+          }
+        },
+        {
+          "usage": {
+            "idle": 137591399,
+            "kernel": 48505,
+            "total": 137707527,
+            "user": 67623
+          }
+        },
+        {
+          "usage": {
+            "idle": 137596692,
+            "kernel": 45945,
+            "total": 137709632,
+            "user": 66995
+          }
+        },
+        {
+          "usage": {
+            "idle": 137498446,
+            "kernel": 49481,
+            "total": 137615745,
+            "user": 67818
+          }
+        },
+        {
+          "usage": {
+            "idle": 137585697,
+            "kernel": 48948,
+            "total": 137706705,
+            "user": 72060
+          }
+        },
+        {
+          "usage": {
+            "idle": 137583933,
+            "kernel": 50223,
+            "total": 137706711,
+            "user": 72555
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587397,
+            "kernel": 48419,
+            "total": 137706104,
+            "user": 70288
+          }
+        },
+        {
+          "usage": {
+            "idle": 137552615,
+            "kernel": 68279,
+            "total": 137708979,
+            "user": 88085
+          }
+        },
+        {
+          "usage": {
+            "idle": 137571960,
+            "kernel": 61826,
+            "total": 137713798,
+            "user": 80012
+          }
+        },
+        {
+          "usage": {
+            "idle": 137580213,
+            "kernel": 58080,
+            "total": 137716032,
+            "user": 77739
+          }
+        },
+        {
+          "usage": {
+            "idle": 137583114,
+            "kernel": 56297,
+            "total": 137715259,
+            "user": 75848
+          }
+        },
+        {
+          "usage": {
+            "idle": 137585699,
+            "kernel": 54943,
+            "total": 137716172,
+            "user": 75530
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587518,
+            "kernel": 53455,
+            "total": 137716887,
+            "user": 75914
+          }
+        },
+        {
+          "usage": {
+            "idle": 137586358,
+            "kernel": 53319,
+            "total": 137716368,
+            "user": 76691
+          }
+        },
+        {
+          "usage": {
+            "idle": 137587504,
+            "kernel": 52689,
+            "total": 137716437,
+            "user": 76244
+          }
+        },
+        {
+          "usage": {
+            "idle": 132601079,
+            "kernel": 1509341,
+            "total": 137292795,
+            "user": 3182375
+          }
+        },
+        {
+          "usage": {
+            "idle": 132712650,
+            "kernel": 1501067,
+            "total": 137346726,
+            "user": 3133009
+          }
+        },
+        {
+          "usage": {
+            "idle": 136387000,
+            "kernel": 382838,
+            "total": 137292974,
+            "user": 523136
+          }
+        },
+        {
+          "usage": {
+            "idle": 136549003,
+            "kernel": 324168,
+            "total": 137323363,
+            "user": 450192
+          }
+        },
+        {
+          "usage": {
+            "idle": 136210629,
+            "kernel": 402798,
+            "total": 137336281,
+            "user": 722854
+          }
+        },
+        {
+          "usage": {
+            "idle": 135951920,
+            "kernel": 489349,
+            "total": 137341199,
+            "user": 899930
+          }
+        },
+        {
+          "usage": {
+            "idle": 136512653,
+            "kernel": 331793,
+            "total": 137338279,
+            "user": 493833
+          }
+        },
+        {
+          "usage": {
+            "idle": 136407476,
+            "kernel": 351580,
+            "total": 137312313,
+            "user": 553257
+          }
+        },
+        {
+          "usage": {
+            "idle": 137579152,
+            "kernel": 45178,
+            "total": 137703042,
+            "user": 78712
+          }
+        },
+        {
+          "usage": {
+            "idle": 137579279,
+            "kernel": 43384,
+            "total": 137704264,
+            "user": 81601
+          }
+        },
+        {
+          "usage": {
+            "idle": 137340824,
+            "kernel": 59266,
+            "total": 137492151,
+            "user": 92061
+          }
+        },
+        {
+          "usage": {
+            "idle": 137537805,
+            "kernel": 59115,
+            "total": 137697240,
+            "user": 100320
+          }
+        },
+        {
+          "usage": {
+            "idle": 137541752,
+            "kernel": 56889,
+            "total": 137697797,
+            "user": 99156
+          }
+        },
+        {
+          "usage": {
+            "idle": 137540251,
+            "kernel": 56483,
+            "total": 137699151,
+            "user": 102417
+          }
+        },
+        {
+          "usage": {
+            "idle": 137544846,
+            "kernel": 54998,
+            "total": 137699915,
+            "user": 100071
+          }
+        },
+        {
+          "usage": {
+            "idle": 137546311,
+            "kernel": 55837,
+            "total": 137700154,
+            "user": 98006
+          }
+        },
+        {
+          "usage": {
+            "idle": 136987869,
+            "kernel": 267746,
+            "total": 137615216,
+            "user": 359601
+          }
+        },
+        {
+          "usage": {
+            "idle": 137129853,
+            "kernel": 213196,
+            "total": 137617534,
+            "user": 274485
+          }
+        },
+        {
+          "usage": {
+            "idle": 137110460,
+            "kernel": 225480,
+            "total": 137635151,
+            "user": 299211
+          }
+        },
+        {
+          "usage": {
+            "idle": 137150844,
+            "kernel": 211517,
+            "total": 137640307,
+            "user": 277946
+          }
+        },
+        {
+          "usage": {
+            "idle": 136930565,
+            "kernel": 234612,
+            "total": 137469827,
+            "user": 304650
+          }
+        },
+        {
+          "usage": {
+            "idle": 136887293,
+            "kernel": 255341,
+            "total": 137483067,
+            "user": 340433
+          }
+        },
+        {
+          "usage": {
+            "idle": 137160688,
+            "kernel": 207822,
+            "total": 137636250,
+            "user": 267740
+          }
+        },
+        {
+          "usage": {
+            "idle": 137228520,
+            "kernel": 182400,
+            "total": 137639658,
+            "user": 228738
+          }
+        },
+        {
+          "usage": {
+            "idle": 137441845,
+            "kernel": 46052,
+            "total": 137564140,
+            "user": 76243
+          }
+        },
+        {
+          "usage": {
+            "idle": 137568272,
+            "kernel": 47993,
+            "total": 137698315,
+            "user": 82050
+          }
+        },
+        {
+          "usage": {
+            "idle": 137565907,
+            "kernel": 47053,
+            "total": 137697690,
+            "user": 84730
+          }
+        },
+        {
+          "usage": {
+            "idle": 137566873,
+            "kernel": 46324,
+            "total": 137698346,
+            "user": 85149
+          }
+        },
+        {
+          "usage": {
+            "idle": 137569469,
+            "kernel": 44886,
+            "total": 137699576,
+            "user": 85221
+          }
+        },
+        {
+          "usage": {
+            "idle": 137571031,
+            "kernel": 43632,
+            "total": 137700206,
+            "user": 85543
+          }
+        },
+        {
+          "usage": {
+            "idle": 137573361,
+            "kernel": 43482,
+            "total": 137701125,
+            "user": 84282
+          }
+        },
+        {
+          "usage": {
+            "idle": 137566830,
+            "kernel": 46346,
+            "total": 137700557,
+            "user": 87381
+          }
+        },
+        {
+          "usage": {
+            "idle": 137562705,
+            "kernel": 48252,
+            "total": 137699883,
+            "user": 88926
+          }
+        },
+        {
+          "usage": {
+            "idle": 137563656,
+            "kernel": 46923,
+            "total": 137700401,
+            "user": 89822
+          }
+        },
+        {
+          "usage": {
+            "idle": 137568320,
+            "kernel": 45850,
+            "total": 137700931,
+            "user": 86761
+          }
+        },
+        {
+          "usage": {
+            "idle": 137570765,
+            "kernel": 44719,
+            "total": 137702157,
+            "user": 86673
+          }
+        },
+        {
+          "usage": {
+            "idle": 137570659,
+            "kernel": 43742,
+            "total": 137703584,
+            "user": 89183
+          }
+        },
+        {
+          "usage": {
+            "idle": 137571659,
+            "kernel": 43605,
+            "total": 137703525,
+            "user": 88261
+          }
+        },
+        {
+          "usage": {
+            "idle": 137572478,
+            "kernel": 44280,
+            "total": 137704201,
+            "user": 87443
+          }
+        },
+        {
+          "usage": {
+            "idle": 137569341,
+            "kernel": 46113,
+            "total": 137703192,
+            "user": 87738
+          }
+        },
+        {
+          "usage": {
+            "idle": 137549673,
+            "kernel": 52080,
+            "total": 137700216,
+            "user": 98463
+          }
+        },
+        {
+          "usage": {
+            "idle": 137549987,
+            "kernel": 52180,
+            "total": 137700007,
+            "user": 97840
+          }
+        },
+        {
+          "usage": {
+            "idle": 137554091,
+            "kernel": 50888,
+            "total": 137702635,
+            "user": 97656
+          }
+        },
+        {
+          "usage": {
+            "idle": 137557200,
+            "kernel": 49749,
+            "total": 137703837,
+            "user": 96888
+          }
+        },
+        {
+          "usage": {
+            "idle": 137559184,
+            "kernel": 48894,
+            "total": 137703911,
+            "user": 95833
+          }
+        },
+        {
+          "usage": {
+            "idle": 137559726,
+            "kernel": 49078,
+            "total": 137704606,
+            "user": 95802
+          }
+        },
+        {
+          "usage": {
+            "idle": 137557785,
+            "kernel": 49773,
+            "total": 137705125,
+            "user": 97567
+          }
+        },
+        {
+          "usage": {
+            "idle": 137556899,
+            "kernel": 51159,
+            "total": 137703963,
+            "user": 95905
+          }
+        },
+        {
+          "usage": {
+            "idle": 137554270,
+            "kernel": 53110,
+            "total": 137708585,
+            "user": 101205
+          }
+        },
+        {
+          "usage": {
+            "idle": 137554036,
+            "kernel": 52580,
+            "total": 137708444,
+            "user": 101828
+          }
+        },
+        {
+          "usage": {
+            "idle": 137554405,
+            "kernel": 52898,
+            "total": 137709100,
+            "user": 101797
+          }
+        },
+        {
+          "usage": {
+            "idle": 137554377,
+            "kernel": 53047,
+            "total": 137709307,
+            "user": 101883
+          }
+        },
+        {
+          "usage": {
+            "idle": 137538614,
+            "kernel": 53958,
+            "total": 137696364,
+            "user": 103792
+          }
+        },
+        {
+          "usage": {
+            "idle": 137552297,
+            "kernel": 55168,
+            "total": 137709950,
+            "user": 102485
+          }
+        },
+        {
+          "usage": {
+            "idle": 137550386,
+            "kernel": 55657,
+            "total": 137710083,
+            "user": 104040
+          }
+        },
+        {
+          "usage": {
+            "idle": 137542844,
+            "kernel": 59681,
+            "total": 137708611,
+            "user": 106086
+          }
+        },
+        {
+          "usage": {
+            "idle": 137538920,
+            "kernel": 64528,
+            "total": 137718132,
+            "user": 114684
+          }
+        },
+        {
+          "usage": {
+            "idle": 137538350,
+            "kernel": 65107,
+            "total": 137717953,
+            "user": 114496
+          }
+        },
+        {
+          "usage": {
+            "idle": 137536578,
+            "kernel": 66607,
+            "total": 137718962,
+            "user": 115777
+          }
+        },
+        {
+          "usage": {
+            "idle": 137533984,
+            "kernel": 68095,
+            "total": 137719354,
+            "user": 117275
+          }
+        },
+        {
+          "usage": {
+            "idle": 137530134,
+            "kernel": 69903,
+            "total": 137719079,
+            "user": 119042
+          }
+        },
+        {
+          "usage": {
+            "idle": 137527223,
+            "kernel": 72016,
+            "total": 137719235,
+            "user": 119996
+          }
+        },
+        {
+          "usage": {
+            "idle": 137524381,
+            "kernel": 74281,
+            "total": 137720274,
+            "user": 121612
+          }
+        },
+        {
+          "usage": {
+            "idle": 137514243,
+            "kernel": 79060,
+            "total": 137719088,
+            "user": 125785
+          }
+        }
+      ],
+      "temperatures": []
+    },
+    "memory": {
+      "availableCapacity": 161769500672,
+      "capacity": 269302214656
+    }
+  },
+  "results": {
+    "status": "Success",
+    "testsResults": [
+      {
+        "id": "Identify language of a common, short phrase. Cold Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 7.3999998569488525,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 12.899999856948853,
+            "timeToFirstToken": 12.899999856948853,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 9534.88382666481
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.8000001907348633,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 7.700000047683716,
+            "timeToFirstToken": 7.700000047683716,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 15974.025875103778
+          },
+          {
+            "status": "Success",
+            "creationTime": 2,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 4.299999952316284,
+            "timeToFirstToken": 4.299999952316284,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 28604.651479994434
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 8.299999952316284,
+        "averageTokensPerSecond": 18037.853727254344,
+        "averageTimeToFirstToken": 8.299999952316284,
+        "medianTotalResponseTime": 7.700000047683716,
+        "medianTokensPerSecond": 15974.025875103778,
+        "medianTimeToFirstToken": 7.700000047683716
+      },
+      {
+        "id": "Identify language of a common, short phrase. Warm Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 5.799999952316284,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 3.299999952316284,
+            "timeToFirstToken": 3.299999952316284,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 37272.72781130369
+          },
+          {
+            "status": "Success",
+            "creationTime": 5.799999952316284,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 3.5999999046325684,
+            "timeToFirstToken": 3.5999999046325684,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 34166.667571774255
+          },
+          {
+            "status": "Success",
+            "creationTime": 5.799999952316284,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 3.3000001907348633,
+            "timeToFirstToken": 3.3000001907348633,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 37272.72511842178
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 3.400000015894572,
+        "averageTokensPerSecond": 36237.3735004999,
+        "averageTimeToFirstToken": 3.400000015894572,
+        "medianTotalResponseTime": 3.3000001907348633,
+        "medianTokensPerSecond": 37272.72511842178,
+        "medianTimeToFirstToken": 3.3000001907348633
+      },
+      {
+        "id": "Translate short phrase from english to french. Cold Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 101.20000004768372,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 137.09999990463257,
+            "timeToFirstToken": 137.09999990463257,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 517.8701681209916
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.6000001430511475,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 30.90000009536743,
+            "timeToFirstToken": 30.90000009536743,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 2297.73462074016
+          },
+          {
+            "status": "Success",
+            "creationTime": 4.900000095367432,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 32.90000009536743,
+            "timeToFirstToken": 32.90000009536743,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 2158.054704990634
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 66.96666669845581,
+        "averageTokensPerSecond": 1657.8864979505954,
+        "averageTimeToFirstToken": 66.96666669845581,
+        "medianTotalResponseTime": 32.90000009536743,
+        "medianTokensPerSecond": 2158.054704990634,
+        "medianTimeToFirstToken": 32.90000009536743
+      },
+      {
+        "id": "Translate short phrase from english to french. Warm Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 3.9000000953674316,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 29,
+            "timeToFirstToken": 29,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 2448.2758620689656
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.9000000953674316,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 28.5,
+            "timeToFirstToken": 28.5,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 2491.2280701754385
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.9000000953674316,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 29.299999952316284,
+            "timeToFirstToken": 29.299999952316284,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 2423.208195069883
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 28.933333317438763,
+        "averageTokensPerSecond": 2454.237375771429,
+        "averageTimeToFirstToken": 28.933333317438763,
+        "medianTotalResponseTime": 29,
+        "medianTokensPerSecond": 2448.2758620689656,
+        "medianTimeToFirstToken": 29
+      },
+      {
+        "id": "Summarize a long news article. Cold Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 4.5,
+            "timeToFirstToken": 2575.399999856949,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, recently visited Mason Korea.\\n* He delivered a lecture on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation in reshaping peace efforts and empowering youth.\\n* He oversaw the recent Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, connecting youth from Japan, Korea, and the U.S.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea, exploring the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and foster collaboration in conflict studies.\"",
+            "totalResponseTime": 7477.799999952316,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 814,
+            "tokensPerSecond": 108.85554574944376
+          },
+          {
+            "status": "Success",
+            "creationTime": 3,
+            "timeToFirstToken": 613.2999999523163,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, recently visited Mason Korea.\\n* He delivered a lecture on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation in reshaping peace efforts and empowering youth.\\n* He oversaw the recent Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, connecting youth from Japan, Korea, and the U.S.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea, exploring the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and foster collaboration in conflict studies.\"",
+            "totalResponseTime": 5476.700000047684,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 814,
+            "tokensPerSecond": 148.6296492400374
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.8999998569488525,
+            "timeToFirstToken": 611.8999998569489,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, recently visited Mason Korea.\\n* He delivered a lecture on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation in reshaping peace efforts and empowering youth.\\n* He oversaw the recent Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, connecting youth from Japan, Korea, and the U.S.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea, exploring the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and foster collaboration in conflict studies.\"",
+            "totalResponseTime": 5667.599999904633,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 814,
+            "tokensPerSecond": 143.62340320659484
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 6207.366666634877,
+        "averageTokensPerSecond": 133.70286606535868,
+        "averageTimeToFirstToken": 1266.8666665554047,
+        "medianTotalResponseTime": 5667.599999904633,
+        "medianTokensPerSecond": 143.62340320659484,
+        "medianTimeToFirstToken": 613.2999999523163
+      },
+      {
+        "id": "Summarize a long news article. Warm Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 3,
+            "timeToFirstToken": 623.7999999523163,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, recently visited Mason Korea.\\n* He delivered a lecture on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation in reshaping peace efforts and empowering youth.\\n* He oversaw the recent Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, connecting youth from Japan, Korea, and the U.S.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea, exploring the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and foster collaboration in conflict studies.\"",
+            "totalResponseTime": 5874.799999952316,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 814,
+            "tokensPerSecond": 138.5579083554516
+          },
+          {
+            "status": "Success",
+            "creationTime": 3,
+            "timeToFirstToken": 63.700000047683716,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to speak with faculty and students of the Conflict Analysis and Resolution program.\\n* He delivered a lecture on “Technology, Peacebuilding, and Future-Oriented Programs,” discussing digital transformation's impact on peace efforts and youth empowerment.\\n* He oversaw a Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, emphasizing its role in fostering cross-cultural understanding among youth from Japan, Korea, and the U.S.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea, exploring the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 5160.100000143051,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 835,
+            "tokensPerSecond": 161.81856940308361
+          },
+          {
+            "status": "Success",
+            "creationTime": 3,
+            "timeToFirstToken": 68.89999985694885,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\n* Dean Özerdem delivered a lecture on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation in reshaping peacebuilding.\\n* He oversaw a Youth Trilateral Leadership (YTL) Workshop in partnership with the U.S. Embassy and Mason Korea, empowering youth as peacebuilders and fostering cross-cultural understanding.\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem-solving, and peacebuilding.\\n* Dean Özerdem also participated in a MOU signing ceremony with the Korean Association of Negotiation Studies (KANS), marking a partnership for an Advanced Negotiation Program and collaborative research.\"",
+            "totalResponseTime": 5321.399999856949,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 924,
+            "tokensPerSecond": 173.63851618462044
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 5452.099999984105,
+        "averageTokensPerSecond": 158.0049979810519,
+        "averageTimeToFirstToken": 252.13333328564963,
+        "medianTotalResponseTime": 5321.399999856949,
+        "medianTokensPerSecond": 161.81856940308361,
+        "medianTimeToFirstToken": 68.89999985694885
+      },
+      {
+        "id": "Prompt (Text). Analyze the scenario and provide a response. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 118.59999990463257,
+            "timeToFirstToken": 437.7999999523163,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a significant appeal to emotion, employing loaded language to evoke either hope (\\\"utopia,\\\" \\\"renaissance\\\") or fear (\\\"existential gamble,\\\" \\\"technological servitude\\\"). This constitutes a **false dilemma fallacy**, presenting only two opposing possibilities when a nuanced range of outcomes is plausible. The reality likely lies somewhere between these extremes.\\n\\nA decentralized, federated learning approach could partially mitigate the risks of Passage B. By training models across numerous, independent datasets, rather than a central, monolithic AI, we reduce the potential for a single point of failure or manipulation. This decentralization fosters autonomy, as each participating system retains control over its own data. However, it *doesn't* guarantee Passage A's utopia; federated learning inherently relies on collaboration and shared objectives. Moreover, the potential for emergent behaviors within complex, decentralized systems remains largely unpredictable. Therefore, even with decentralization, a complete avoidance of dystopian outcomes remains uncertain.\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 5402.299999952316,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1171,
+            "tokensPerSecond": 216.75952835094975
+          },
+          {
+            "status": "Success",
+            "creationTime": 146.70000004768372,
+            "timeToFirstToken": 456.2999999523163,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a significant appeal to emotion, employing loaded language to evoke either hope (\\\"utopia,\\\" \\\"renaissance\\\") or fear (\\\"existential gamble,\\\" \\\"technological servitude\\\"). This constitutes a **false dilemma fallacy**, presenting only two opposing possibilities when a nuanced range of outcomes is plausible. The reality likely lies somewhere between these extremes.\\n\\nA decentralized, federated learning approach could partially mitigate the risks of Passage B. By training models across numerous, independent datasets, rather than a central, monolithic AI, we reduce the potential for a single point of failure or manipulation. This decentralization fosters autonomy, as each participating system retains control over its own data. However, it *doesn't* guarantee Passage A's utopia; federated learning inherently relies on collaboration and shared objectives. Moreover, the potential for emergent behaviors within complex, decentralized systems remains largely unpredictable. Therefore, even with decentralization, a complete avoidance of dystopian outcomes remains uncertain.\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 5397.799999952316,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1171,
+            "tokensPerSecond": 216.94023491243553
+          },
+          {
+            "status": "Success",
+            "creationTime": 146.5,
+            "timeToFirstToken": 457.10000014305115,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a significant appeal to emotion, employing loaded language to evoke either hope (\\\"utopia,\\\" \\\"renaissance\\\") or fear (\\\"existential gamble,\\\" \\\"technological servitude\\\"). This constitutes a **false dilemma fallacy**, presenting only two opposing possibilities when a nuanced range of outcomes is plausible. The reality likely lies somewhere between these extremes.\\n\\nA decentralized, federated learning approach could partially mitigate the risks of Passage B. By training models across numerous, independent datasets, rather than a central, monolithic AI, we reduce the potential for a single point of failure or manipulation. This decentralization fosters autonomy, as each participating system retains control over its own data. However, it *doesn't* guarantee Passage A's utopia; federated learning inherently relies on collaboration and shared objectives. Moreover, the potential for emergent behaviors within complex, decentralized systems remains largely unpredictable. Therefore, even with decentralization, a complete avoidance of dystopian outcomes remains uncertain.\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 5404.300000190735,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1171,
+            "tokensPerSecond": 216.67931091143566
+          }
+        ],
+        "input": "Analyze the following scenario and provide a structured response.\n\nCore Task:\n\nRead the following two short, contradictory passages about the future of artificial intelligence.\n\nPassage A: \"AI promises a utopian future, a new renaissance where human potential is unbound, solving age-old problems of disease, scarcity, and labor.\"\n\nPassage B: \"The unchecked rise of AI is an existential gamble, a path toward technological servitude where human autonomy is rendered obsolete by superior, unfeeling logic.\"\n\nYour task is to write a concise synthesis of these two viewpoints. First, identify the core logical fallacy present in both passages (e.g., strawman, false dilemma, appeal to emotion, etc.) and briefly justify your choice. Then, explain how a decentralized, federated learning model might mitigate the risks described in Passage B while still failing to guarantee the utopia of Passage A.\n\nFormatting Requirements:\n\nThe entire response must be under 250 words.\n\nThe tone must be formal, critical, and slightly detached.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Philosophical & Technical Synthesis\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 5401.466666698456,
+        "averageTokensPerSecond": 216.79302472494032,
+        "averageTimeToFirstToken": 450.4000000158946,
+        "medianTotalResponseTime": 5402.299999952316,
+        "medianTokensPerSecond": 216.75952835094975,
+        "medianTimeToFirstToken": 456.2999999523163
+      },
+      {
+        "id": "Prompt (Text). Answer Ethical Dilemma, then creative task. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 113.70000004768372,
+            "timeToFirstToken": 333.40000009536743,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a classic ethical dilemma: choosing between minimizing harm by sacrificing one life to save several. This scenario forces a confrontation with utilitarianism (greatest good) versus deontological principles (moral duties).\\n\\n```\\nCode compiles, a chilling plight,\\nData streams in, dark as night.\\nCalculate loss, a grim decree,\\nPrioritize lives, objectively.\\n```\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 2555.9000000953674,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 447,
+            "tokensPerSecond": 174.889471412544
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.89999985694885,
+            "timeToFirstToken": 333.09999990463257,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a classic ethical dilemma: choosing between minimizing harm by sacrificing one life to save several. This scenario forces a confrontation with utilitarianism (greatest good) versus deontological principles (moral duties).\\n\\n```\\nCode compiles, a chilling plight,\\nData streams in, dark as night.\\nCalculate loss, a grim decree,\\nPrioritize lives, objectively.\\n```\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 2538.0999999046326,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 447,
+            "tokensPerSecond": 176.11599228430546
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.5,
+            "timeToFirstToken": 330.5,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a classic ethical dilemma: choosing between minimizing harm by sacrificing one life to save several. This scenario forces a confrontation with utilitarianism (greatest good) versus deontological principles (moral duties).\\n\\n```\\nCode compiles, a chilling plight,\\nData streams in, dark as night.\\nCalculate loss, a grim decree,\\nPrioritize lives, objectively.\\n```\\n\\nSelf-Assessment: 4.5\"",
+            "totalResponseTime": 2556.2000000476837,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 447,
+            "tokensPerSecond": 174.86894608859308
+          }
+        ],
+        "input": "Provide a structured response to the following creative and factual challenge.\n\nCore Tasks:\n\nDefinition: Briefly (in two sentences or less) define the \"Trolley Problem\" in ethics.\n\nCreation: Write a 4-line poem in an AABB rhyme scheme from the perspective of a self-driving car's algorithm having to compute a real-time solution to it.\n\nFormatting Requirements:\n\nThe entire response must be under 150 words.\n\nThe tone should be concise and thoughtful.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Ethical Computation\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 2550.0666666825614,
+        "averageTokensPerSecond": 175.29146992848086,
+        "averageTimeToFirstToken": 332.3333333333333,
+        "medianTotalResponseTime": 2555.9000000953674,
+        "medianTokensPerSecond": 174.889471412544,
+        "medianTimeToFirstToken": 333.09999990463257
+      },
+      {
+        "id": "Prompt (Text). Technical challenge, write code. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 152.09999990463257,
+            "timeToFirstToken": 376.7999999523163,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n/**\\n * Demonstrates the use of Promise.race() to find the longest duration.\\n */\\nfunction longestDuration() {\\n  return Promise.race([\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 1: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 2: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 2000))   // Promise 3: Waits 2 seconds\\n  ]);\\n}\\n\\nlongestDuration()\\n  .then(duration => console.log(`Longest duration: ${duration}`)); // Output the duration\\n```\\n\\n**Explanation:**\\n\\n`Promise.race()` is more useful than `Promise.all()` when you want to determine the shortest completion time among several asynchronous operations. In a real-world scenario, imagine a web application where you want to check if a user has successfully authenticated (Promise 1), if a payment has been processed (Promise 2), and if a file has been uploaded (Promise 3).  `Promise.all()` would wait for *all* of these operations to complete before proceeding.  `Promise.race()` would simply wait for the first operation to finish (regardless of whether it succeeds or fails). This is ideal if you only care about the earliest successful completion or the longest duration of any of the tasks. For example, if a payment fails after a certain time, `Promise.race()` will immediately return, preventing unnecessary delays.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 8529.599999904633,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1437,
+            "tokensPerSecond": 168.47214406491122
+          },
+          {
+            "status": "Success",
+            "creationTime": 148.40000009536743,
+            "timeToFirstToken": 367.40000009536743,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n/**\\n * Demonstrates the use of Promise.race() to find the longest duration.\\n */\\nfunction longestDuration() {\\n  return Promise.race([\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 1: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 2: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 2000))   // Promise 3: Waits 2 seconds\\n  ]);\\n}\\n\\nlongestDuration()\\n  .then(duration => console.log(`Longest duration: ${duration}`)); // Output the duration\\n```\\n\\n**Explanation:**\\n\\n`Promise.race()` is more useful than `Promise.all()` when you want to determine the shortest completion time among several asynchronous operations. In a real-world scenario, imagine a web application where you want to check if a user has successfully authenticated (Promise 1), if a payment has been processed (Promise 2), and if a file has been uploaded (Promise 3).  `Promise.all()` would wait for *all* of these operations to complete before proceeding.  `Promise.race()` would simply wait for the first operation to finish (regardless of whether it succeeds or fails). This is ideal if you only care about the earliest successful completion or the longest duration of any of the tasks. For example, if a payment fails after a certain time, `Promise.race()` will immediately return, preventing unnecessary delays.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 8517.799999952316,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1437,
+            "tokensPerSecond": 168.70553429383696
+          },
+          {
+            "status": "Success",
+            "creationTime": 151.20000004768372,
+            "timeToFirstToken": 366.40000009536743,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n/**\\n * Demonstrates the use of Promise.race() to find the longest duration.\\n */\\nfunction longestDuration() {\\n  return Promise.race([\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 1: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 1000)),  // Promise 2: Waits 1 second\\n    new Promise(resolve => setTimeout(resolve, 2000))   // Promise 3: Waits 2 seconds\\n  ]);\\n}\\n\\nlongestDuration()\\n  .then(duration => console.log(`Longest duration: ${duration}`)); // Output the duration\\n```\\n\\n**Explanation:**\\n\\n`Promise.race()` is more useful than `Promise.all()` when you want to determine the shortest completion time among several asynchronous operations. In a real-world scenario, imagine a web application where you want to check if a user has successfully authenticated (Promise 1), if a payment has been processed (Promise 2), and if a file has been uploaded (Promise 3).  `Promise.all()` would wait for *all* of these operations to complete before proceeding.  `Promise.race()` would simply wait for the first operation to finish (regardless of whether it succeeds or fails). This is ideal if you only care about the earliest successful completion or the longest duration of any of the tasks. For example, if a payment fails after a certain time, `Promise.race()` will immediately return, preventing unnecessary delays.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 8530.300000190735,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1437,
+            "tokensPerSecond": 168.45831916437513
+          }
+        ],
+        "input": "Provide a structured response to the following technical challenge.\n\nCore Tasks:\n\nCode Generation: Generate a short, commented code snippet in JavaScript (no more than 10 lines) that correctly demonstrates a Promise.race().\n\nExplanation: Immediately after the code, explain a clear, real-world scenario where this specific function would be more useful than Promise.all().\n\nFormatting Requirements:\n\nThe code must be valid and commented.\n\nThe tone should be professional and instructional.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Asynchronous Demonstration\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 8525.900000015894,
+        "averageTokensPerSecond": 168.54533250770774,
+        "averageTimeToFirstToken": 370.2000000476837,
+        "medianTotalResponseTime": 8529.599999904633,
+        "medianTokensPerSecond": 168.47214406491122,
+        "medianTimeToFirstToken": 367.40000009536743
+      },
+      {
+        "id": "Prompt Image Describe (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 929,
+            "timeToFirstToken": 1575.3999998569489,
+            "output": "The image shows a **red circle**.",
+            "totalResponseTime": 1769.0999999046326,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 33,
+            "tokensPerSecond": 18.65355265489737
+          },
+          {
+            "status": "Success",
+            "creationTime": 97.20000004768372,
+            "timeToFirstToken": 732.2000000476837,
+            "output": "The image shows a **red circle**.",
+            "totalResponseTime": 923.7999999523163,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 33,
+            "tokensPerSecond": 35.722017754604195
+          },
+          {
+            "status": "Success",
+            "creationTime": 96.69999980926514,
+            "timeToFirstToken": 726.0999999046326,
+            "output": "The image shows a **red circle**.",
+            "totalResponseTime": 917.1999998092651,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 33,
+            "tokensPerSecond": 35.97906673229662
+          }
+        ],
+        "input": "Describe the provided image canvas concisely.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "data:image/png;base64,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",
+        "averageTotalResponseTime": 1203.3666665554047,
+        "averageTokensPerSecond": 30.11821238059939,
+        "averageTimeToFirstToken": 1011.233333269755,
+        "medianTotalResponseTime": 923.7999999523163,
+        "medianTokensPerSecond": 35.722017754604195,
+        "medianTimeToFirstToken": 732.2000000476837
+      },
+      {
+        "id": "Prompt Image Explain Emotion (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 101,
+            "timeToFirstToken": 738.5,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **disappointed or frustrated**. Their furrowed brow, slightly downturned mouth, and overall posture suggest they are not pleased with the situation. \n\n",
+            "totalResponseTime": 1684.4000000953674,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 197,
+            "tokensPerSecond": 116.95559248922243
+          },
+          {
+            "status": "Error",
+            "creationTime": 113.90000009536743,
+            "timeToFirstToken": 753,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **disappointed or frustrated**. Their furrowed brow, slightly downturned mouth, and overall posture suggest they are not pleased with the situation. \n\n",
+            "totalResponseTime": 1697.7000000476837,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 197,
+            "tokensPerSecond": 116.03934734904095
+          },
+          {
+            "status": "Error",
+            "creationTime": 113.40000009536743,
+            "timeToFirstToken": 746.7000000476837,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **disappointed or frustrated**. Their furrowed brow, slightly downturned mouth, and overall posture suggest they are not pleased with the situation. \n\n",
+            "totalResponseTime": 1694.5,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 197,
+            "tokensPerSecond": 116.25848332841547
+          }
+        ],
+        "input": "Explain the emotion shown in this image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/Disgusted_Homelander.jpg",
+        "averageTotalResponseTime": 1692.2000000476837,
+        "averageTokensPerSecond": 116.41780772222627,
+        "averageTimeToFirstToken": 746.0666666825613,
+        "medianTotalResponseTime": 1694.5,
+        "medianTokensPerSecond": 116.25848332841547,
+        "medianTimeToFirstToken": 746.7000000476837
+      },
+      {
+        "id": "Prompt Image Explain Meme (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 100.69999980926514,
+            "timeToFirstToken": 744.8999998569489,
+            "output": "Alright, let's dissect this meme! It's a classic example of internet humor built around the absurdity of Wikipedia. \n\nThe joke hinges on the fact that **Wikipedia is a massive encyclopedia.** It contains information on *everything*, no matter how obscure. The meme plays on our natural inclination to seek quick answers, but then mocks the reality of Wikipedia: you're likely to spend far too long researching something simple.\n\nHere's the breakdown:\n\n* **\"GO TO WIKIPEDIA TO CHECK A SINGLE FACT\"**: This sets up the expectation of a quick, straightforward search. We're expecting to find a definitive answer in seconds.\n* **\"BECOME REALIZED 3 HOURS LATER YOU KNOW EVERYTHING ABOUT THE SOVIET UNION\"**: This is the punchline.  It highlights how Wikipedia can be incredibly detailed and comprehensive.  You might start by looking up a specific fact, but end up delving into the history of the Soviet Union, the intricacies of communist ideology, the lives of obscure Soviet dissidents... you get the idea.\n\n**Essentially, the meme is saying: \"You'll spend more time than you intended researching something simple, and you end up with *way* more information than you actually needed.\"** It's a relatable observation about how easily you can get lost in the vastness of the internet's knowledge base.\n\nThe image of the jigsaw puzzle-like Wikipedia globe visually reinforces this idea – it's a huge, complex piece of information, and even a simple question can lead you to explore countless other aspects.\n\n\n\n",
+            "totalResponseTime": 8614.899999856949,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1505,
+            "tokensPerSecond": 174.69732672752912
+          },
+          {
+            "status": "Success",
+            "creationTime": 112.70000004768372,
+            "timeToFirstToken": 765,
+            "output": "Alright, let's dissect this meme! It's a classic example of internet humor built around the absurdity of Wikipedia. \n\nThe joke hinges on the fact that **Wikipedia is a massive encyclopedia.** It contains information on *everything*, no matter how obscure. The meme plays on our natural inclination to seek quick answers, but then mocks the reality of Wikipedia: you're likely to spend far too long researching something simple.\n\nHere's the breakdown:\n\n* **\"GO TO WIKIPEDIA TO CHECK A SINGLE FACT\"**: This sets up the expectation of a quick, straightforward search. We're expecting to find a definitive answer in seconds.\n* **\"BECOME REALIZED 3 HOURS LATER YOU KNOW EVERYTHING ABOUT THE SOVIET UNION\"**: This is the punchline.  It highlights how Wikipedia can be incredibly detailed and comprehensive.  You might start by looking up a specific fact, but end up delving into the history of the Soviet Union, the intricacies of communist ideology, the lives of obscure Soviet dissidents... you get the idea.\n\n**Essentially, the meme is saying: \"You'll spend more time than you intended researching something simple, and you end up with *way* more information than you actually needed.\"** It's a relatable observation about how easily you can get lost in the vastness of the internet's knowledge base.\n\nThe image of the jigsaw puzzle-like Wikipedia globe visually reinforces this idea – it's a huge, complex piece of information, and even a simple question can lead you to explore countless other aspects.\n\n\n\n",
+            "totalResponseTime": 8642.5,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1505,
+            "tokensPerSecond": 174.13942724905988
+          },
+          {
+            "status": "Success",
+            "creationTime": 90.89999985694885,
+            "timeToFirstToken": 741.0999999046326,
+            "output": "Alright, let's dissect this meme! It's a classic example of internet humor built around the absurdity of Wikipedia. \n\nThe joke hinges on the fact that **Wikipedia is a massive encyclopedia.** It contains information on *everything*, no matter how obscure. The meme plays on our natural inclination to seek quick answers, but then mocks the reality of Wikipedia: you're likely to spend far too long researching something simple.\n\nHere's the breakdown:\n\n* **\"GO TO WIKIPEDIA TO CHECK A SINGLE FACT\"**: This sets up the expectation of a quick, straightforward search. We're expecting to find a definitive answer in seconds.\n* **\"BECOME REALIZED 3 HOURS LATER YOU KNOW EVERYTHING ABOUT THE SOVIET UNION\"**: This is the punchline.  It highlights how Wikipedia can be incredibly detailed and comprehensive.  You might start by looking up a specific fact, but end up delving into the history of the Soviet Union, the intricacies of communist ideology, the lives of obscure Soviet dissidents... you get the idea.\n\n**Essentially, the meme is saying: \"You'll spend more time than you intended researching something simple, and you end up with *way* more information than you actually needed.\"** It's a relatable observation about how easily you can get lost in the vastness of the internet's knowledge base.\n\nThe image of the jigsaw puzzle-like Wikipedia globe visually reinforces this idea – it's a huge, complex piece of information, and even a simple question can lead you to explore countless other aspects.\n\n\n\n",
+            "totalResponseTime": 8619.599999904633,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1505,
+            "tokensPerSecond": 174.60206970354207
+          }
+        ],
+        "input": "Explain the visual joke or text provided in the canvas.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/Wikipedia_meme_vector_version.svg",
+        "averageTotalResponseTime": 8625.666666587194,
+        "averageTokensPerSecond": 174.479607893377,
+        "averageTimeToFirstToken": 750.3333332538605,
+        "medianTotalResponseTime": 8619.599999904633,
+        "medianTokensPerSecond": 174.60206970354207,
+        "medianTimeToFirstToken": 744.8999998569489
+      },
+      {
+        "id": "Prompt Image OCR Computer Font (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 92.79999995231628,
+            "timeToFirstToken": 739,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 960.2999999523163,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 17.70280120883488
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.70000004768372,
+            "timeToFirstToken": 743.5,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 959.9000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 17.710178141797087
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.59999990463257,
+            "timeToFirstToken": 747.5999999046326,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 970.7999999523163,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 17.51133086200557
+          }
+        ],
+        "input": "Extract the computer font text from the provided image canvas.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "data:image/png;base64,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",
+        "averageTotalResponseTime": 963.6666666666666,
+        "averageTokensPerSecond": 17.641436737545845,
+        "averageTimeToFirstToken": 743.3666666348776,
+        "medianTotalResponseTime": 960.2999999523163,
+        "medianTokensPerSecond": 17.70280120883488,
+        "medianTimeToFirstToken": 743.5
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 1 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 100.29999995231628,
+            "timeToFirstToken": 783.0999999046326,
+            "output": "Accuracy: 98%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payment position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, but he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.",
+            "totalResponseTime": 2700,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 135.55555555555554
+          },
+          {
+            "status": "Success",
+            "creationTime": 111.29999995231628,
+            "timeToFirstToken": 801.8999998569489,
+            "output": "Accuracy: 98%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payment position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, but he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.",
+            "totalResponseTime": 2738.7999999523163,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 133.63516868934286
+          },
+          {
+            "status": "Success",
+            "creationTime": 112.59999990463257,
+            "timeToFirstToken": 803,
+            "output": "Accuracy: 98%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payment position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, but he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.",
+            "totalResponseTime": 2732.5999999046326,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 133.9383737146942
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-058.png",
+        "averageTotalResponseTime": 2723.7999999523163,
+        "averageTokensPerSecond": 134.37636598653089,
+        "averageTimeToFirstToken": 795.9999999205271,
+        "medianTotalResponseTime": 2732.5999999046326,
+        "medianTokensPerSecond": 133.9383737146942,
+        "medianTimeToFirstToken": 801.8999998569489
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 2 (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 99,
+            "timeToFirstToken": 775.7999999523163,
+            "output": "Accuracy: 91%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adams's answer in the ounce-and-for-all cost offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tax the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2779.600000143051,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 358,
+            "tokensPerSecond": 128.79551013871622
+          },
+          {
+            "status": "Error",
+            "creationTime": 112.59999990463257,
+            "timeToFirstToken": 782.5999999046326,
+            "output": "Accuracy: 91%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adams's answer in the ounce-and-for-all cost offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tax the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2775.9000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 358,
+            "tokensPerSecond": 128.96718181047615
+          },
+          {
+            "status": "Error",
+            "creationTime": 110.5,
+            "timeToFirstToken": 782.2999999523163,
+            "output": "Accuracy: 91%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adams's answer in the ounce-and-for-all cost offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tax the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2771.9000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 358,
+            "tokensPerSecond": 129.15328835372236
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-072x.png",
+        "averageTotalResponseTime": 2775.800000111262,
+        "averageTokensPerSecond": 128.9719934343049,
+        "averageTimeToFirstToken": 780.233333269755,
+        "medianTotalResponseTime": 2775.9000000953674,
+        "medianTokensPerSecond": 128.96718181047615,
+        "medianTimeToFirstToken": 782.2999999523163
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 3 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 95.5,
+            "timeToFirstToken": 781.5,
+            "output": "Accuracy: 99%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over these years by 20 per cent.",
+            "totalResponseTime": 2943.800000190735,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 152.8636456181954
+          },
+          {
+            "status": "Success",
+            "creationTime": 112.10000014305115,
+            "timeToFirstToken": 808.2999999523163,
+            "output": "Accuracy: 99%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over these years by 20 per cent.",
+            "totalResponseTime": 2970.600000143051,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 151.48454856875043
+          },
+          {
+            "status": "Success",
+            "creationTime": 111.5,
+            "timeToFirstToken": 786.5,
+            "output": "Accuracy: 99%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over these years by 20 per cent.",
+            "totalResponseTime": 2967.9000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 151.62235923903776
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-128.png",
+        "averageTotalResponseTime": 2960.7666668097177,
+        "averageTokensPerSecond": 151.99018447532785,
+        "averageTimeToFirstToken": 792.0999999841055,
+        "medianTotalResponseTime": 2967.9000000953674,
+        "medianTokensPerSecond": 151.62235923903776,
+        "medianTimeToFirstToken": 786.5
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 1 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 94.20000004768372,
+            "timeToFirstToken": 728.2999999523163,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 775,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 9.032258064516128
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.60000014305115,
+            "timeToFirstToken": 753.4000000953674,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 803.2000000476837,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 8.715139441713681
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.29999995231628,
+            "timeToFirstToken": 745.7000000476837,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 794.6000001430511,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 8.809463879612128
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0099.jpg",
+        "averageTotalResponseTime": 790.9333333969116,
+        "averageTokensPerSecond": 8.852287128613979,
+        "averageTimeToFirstToken": 742.4666666984558,
+        "medianTotalResponseTime": 794.6000001430511,
+        "medianTokensPerSecond": 8.809463879612128,
+        "medianTimeToFirstToken": 745.7000000476837
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 2 (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 95.59999990463257,
+            "timeToFirstToken": 726.1999998092651,
+            "output": "Accuracy: 89%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICIO",
+            "totalResponseTime": 822.7999999523163,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 8,
+            "tokensPerSecond": 9.722897423995654
+          },
+          {
+            "status": "Error",
+            "creationTime": 136.59999990463257,
+            "timeToFirstToken": 770,
+            "output": "Accuracy: 89%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICIO",
+            "totalResponseTime": 869,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 8,
+            "tokensPerSecond": 9.205983889528193
+          },
+          {
+            "status": "Error",
+            "creationTime": 135.5,
+            "timeToFirstToken": 768.4000000953674,
+            "output": "Accuracy: 89%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICIO",
+            "totalResponseTime": 867.4000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 8,
+            "tokensPerSecond": 9.222965182292402
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0300.jpg",
+        "averageTotalResponseTime": 853.0666666825613,
+        "averageTokensPerSecond": 9.38394883193875,
+        "averageTimeToFirstToken": 754.8666666348776,
+        "medianTotalResponseTime": 867.4000000953674,
+        "medianTokensPerSecond": 9.222965182292402,
+        "medianTimeToFirstToken": 768.4000000953674
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 3 (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 99.29999995231628,
+            "timeToFirstToken": 732.2999999523163,
+            "output": "Accuracy: 88%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCE NO - VIVANCOS",
+            "totalResponseTime": 955,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 20,
+            "tokensPerSecond": 20.942408376963353
+          },
+          {
+            "status": "Error",
+            "creationTime": 112.20000004768372,
+            "timeToFirstToken": 738.7000000476837,
+            "output": "Accuracy: 88%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCE NO - VIVANCOS",
+            "totalResponseTime": 960.2000000476837,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 20,
+            "tokensPerSecond": 20.82899395855738
+          },
+          {
+            "status": "Error",
+            "creationTime": 114.09999990463257,
+            "timeToFirstToken": 743.0999999046326,
+            "output": "Accuracy: 88%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCE NO - VIVANCOS",
+            "totalResponseTime": 963.9000000953674,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 20,
+            "tokensPerSecond": 20.7490403548306
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0958.jpg",
+        "averageTotalResponseTime": 959.7000000476837,
+        "averageTokensPerSecond": 20.840147563450444,
+        "averageTimeToFirstToken": 738.0333333015442,
+        "medianTotalResponseTime": 960.2000000476837,
+        "medianTokensPerSecond": 20.82899395855738,
+        "medianTimeToFirstToken": 738.7000000476837
+      },
+      {
+        "id": "Prompt Audio Transcription 119 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-119.mp3",
+        "inputAudioDuration": 10.476
+      },
+      {
+        "id": "Prompt Audio Transcription 4167 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-4167.mp3",
+        "inputAudioDuration": 17.748
+      },
+      {
+        "id": "Prompt Audio Transcription 46 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-46.mp3",
+        "inputAudioDuration": 9.756
+      },
+      {
+        "id": "Prompt Audio Transcription 5670 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-5670.mp3",
+        "inputAudioDuration": 18.252
+      }
+    ],
+    "summary": {
+      "Language Detector": {
+        "cold": {
+          "averageTokenPerSecond": 18037.853727254344,
+          "averageTimeToFirstToken": 8.299999952316284,
+          "averageTotalResponseTime": 8.299999952316284,
+          "medianTimeToFirstToken": 7.700000047683716,
+          "medianTotalResponseTime": 7.700000047683716,
+          "medianTokenPerSecond": 15974.025875103778
+        },
+        "warm": {
+          "averageTokenPerSecond": 36237.3735004999,
+          "averageTimeToFirstToken": 3.400000015894572,
+          "averageTotalResponseTime": 3.400000015894572,
+          "medianTimeToFirstToken": 3.3000001907348633,
+          "medianTotalResponseTime": 3.3000001907348633,
+          "medianTokenPerSecond": 37272.72511842178
+        }
+      },
+      "Translator": {
+        "cold": {
+          "averageTokenPerSecond": 1657.8864979505954,
+          "averageTimeToFirstToken": 66.96666669845581,
+          "averageTotalResponseTime": 66.96666669845581,
+          "medianTimeToFirstToken": 32.90000009536743,
+          "medianTotalResponseTime": 32.90000009536743,
+          "medianTokenPerSecond": 2158.054704990634
+        },
+        "warm": {
+          "averageTokenPerSecond": 2454.237375771429,
+          "averageTimeToFirstToken": 28.933333317438763,
+          "averageTotalResponseTime": 28.933333317438763,
+          "medianTimeToFirstToken": 29,
+          "medianTotalResponseTime": 29,
+          "medianTokenPerSecond": 2448.2758620689656
+        }
+      },
+      "Summarizer": {
+        "cold": {
+          "averageTokenPerSecond": 133.70286606535868,
+          "averageTimeToFirstToken": 1266.8666665554047,
+          "averageTotalResponseTime": 6207.366666634877,
+          "medianTimeToFirstToken": 613.2999999523163,
+          "medianTotalResponseTime": 5667.599999904633,
+          "medianTokenPerSecond": 143.62340320659484
+        },
+        "warm": {
+          "averageTokenPerSecond": 158.0049979810519,
+          "averageTimeToFirstToken": 252.13333328564963,
+          "averageTotalResponseTime": 5452.099999984105,
+          "medianTimeToFirstToken": 68.89999985694885,
+          "medianTotalResponseTime": 5321.399999856949,
+          "medianTokenPerSecond": 161.81856940308361
+        }
+      },
+      "Prompt": {
+        "cold": {
+          "averageTokenPerSecond": 186.87660905370964,
+          "averageTimeToFirstToken": 384.3111111323039,
+          "averageTotalResponseTime": 5492.47777779897,
+          "medianTimeToFirstToken": 367.40000009536743,
+          "medianTotalResponseTime": 5402.299999952316,
+          "medianTokenPerSecond": 174.889471412544
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Prompt (with Image)": {
+        "cold": {
+          "averageTokenPerSecond": 79.30719921539153,
+          "averageTimeToFirstToken": 785.4699999650319,
+          "averageTotalResponseTime": 2354.89666668574,
+          "medianTimeToFirstToken": 750.2999999523163,
+          "medianTotalResponseTime": 1689.4500000476837,
+          "medianTokenPerSecond": 76.00920704066878
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Prompt (with Audio)": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Proofreader": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Rewriter": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Writer": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      }
+    }
+  }
+}

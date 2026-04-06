@@ -84,5 +84,23 @@
     "os": "Cloud",
     "model": "Gemini 3.1 Flash Lite",
     "executionType": "Cloud"
+  },
+  {
+    "filename": "2026-04-06-linux-AMD-7985WX-270gb-litertlm",
+    "name": "AMD 7985WX (LiteRT-LM)",
+    "os": "Linux",
+    "cpu": "AMD 7985WX",
+    "ram": 270,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-06-linux-AMD-7985WX-270gb-llminferenceengine",
+    "name": "AMD 7985WX (LLM IE)",
+    "os": "Linux",
+    "cpu": "AMD 7985WX",
+    "ram": 270,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
   }
 ]
