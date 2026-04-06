@@ -1,54 +1,45 @@
-<aside class="w-16 md:w-64 bg-gray-50 dark:bg-[#292a2d] border-r border-gray-300 dark:border-[#3c4043] flex flex-col justify-between flex-shrink-0 z-20 h-full">
-  <div class="flex-1 overflow-y-auto">
-      <div class="h-12 flex items-center justify-center md:justify-start md:px-4 border-b border-gray-300 dark:border-[#3c4043] sticky top-0 bg-gray-50 dark:bg-[#292a2d] z-10">
-          <img src="assets/images/icon.png" class="w-8">
-          <span class="ml-3 font-bold text-sm hidden md:block text-gray-800 dark:text-gray-200">WebAI Panel</span>
+<aside class="relative bg-gray-50 dark:bg-[#292a2d] border-r border-gray-300 dark:border-[#3c4043] flex flex-col justify-between flex-shrink-0 z-20 h-full transition-[width] duration-0" [style.width.px]="sidebarWidth" [ngClass]="{'transition-[width] duration-300': !isResizingSidebar}">
+  <div (mousedown)="startResizeSidebar($event)" class="absolute right-0 top-0 bottom-0 w-1.5 cursor-ew-resize hover:bg-blue-500/50 active:bg-blue-500 z-40 transition-colors transform translate-x-1/2"></div>
+  
+  <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div class="h-12 flex items-center justify-center px-4 border-b border-gray-300 dark:border-[#3c4043] sticky top-0 bg-gray-50 dark:bg-[#292a2d] z-10" [ngClass]="{'justify-start': sidebarWidth >= 120}">
+          <img src="assets/images/icon.png" class="w-8 shrink-0">
+          <span *ngIf="sidebarWidth >= 120" class="ml-3 font-bold text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap overflow-hidden">WebAI Panel</span>
       </div>
 
       <nav id="sidebar-nav" class="mt-2 space-y-0.5">
           <!-- Non API Items -->
           <ng-container *ngFor="let item of nonApiItems">
-            <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer">
-              <i [class]="item.iconClass + ' w-5 text-center'"></i>
-              <span class="ml-3 text-xs font-medium hidden md:block">{{item.label}}</span>
-              <span *ngIf="item.id === 'diagnosis' && (errorCount$ | async) as errorCount" class="hidden md:flex ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full items-center justify-center min-w-[1.25rem]">
+            <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer relative group" [title]="sidebarWidth < 120 ? item.label : ''">
+              <i [class]="item.iconClass + ' w-5 text-center shrink-0'"></i>
+              <span *ngIf="sidebarWidth >= 120" class="ml-3 text-xs font-medium whitespace-nowrap overflow-hidden">{{item.label}}</span>
+              <span *ngIf="item.id === 'diagnosis' && (errorCount$ | async) as errorCount" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full items-center justify-center min-w-[1.25rem] flex shrink-0" [ngClass]="{'absolute top-1 right-1': sidebarWidth < 120}">
                   {{ errorCount }}
               </span>
             </a>
           </ng-container>
 
-<!--          <div class="px-4 py-2 mt-2 mb-1 hidden md:block">-->
-<!--              <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Management</span>-->
-<!--          </div>-->
-
-<!--          &lt;!&ndash; Management Items &ndash;&gt;-->
-<!--          <ng-container *ngFor="let item of managementItems">-->
-<!--            <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer">-->
-<!--              <i [class]="item.iconClass + ' w-5 text-center'"></i>-->
-<!--              <span class="ml-3 text-xs font-medium hidden md:block">{{item.label}}</span>-->
-<!--            </a>-->
-<!--          </ng-container>-->
-
-          <div class="px-4 py-2 mt-2 mb-1 hidden md:block">
-              <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">APIs</span>
+          <div *ngIf="sidebarWidth >= 120" class="px-4 py-2 mt-2 mb-1">
+              <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider whitespace-nowrap">APIs</span>
           </div>
+          <div *ngIf="sidebarWidth < 120" class="w-full h-px bg-gray-300 dark:bg-[#3c4043] my-2"></div>
 
           <!-- API Items -->
           <ng-container *ngFor="let item of apiItems">
-            <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer">
-              <i [class]="item.iconClass + ' w-5 text-center'"></i>
-              <span class="ml-3 text-xs font-medium hidden md:block">{{item.label}}</span>
+            <a [routerLink]="['/', item.id]" routerLinkActive="active-nav" class="nav-btn w-full flex items-center p-3 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#35363a] hover:text-black dark:hover:text-white transition-colors border-l-4 border-transparent cursor-pointer group" [title]="sidebarWidth < 120 ? item.label : ''">
+              <i [class]="item.iconClass + ' w-5 text-center shrink-0'"></i>
+              <span *ngIf="sidebarWidth >= 120" class="ml-3 text-xs font-medium whitespace-nowrap overflow-hidden">{{item.label}}</span>
             </a>
           </ng-container>
       </nav>
   </div>
 
-  <div class="p-4 border-t border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d]">
-      <div class="text-xs text-gray-500 text-center md:text-left">
-          <span class="hidden md:inline">Extension v{{ appVersion }}</span>
-          <div class="mt-1 flex items-center justify-center md:justify-start gap-2">
-              <div class="status-dot status-green"></div>
-              <span class="hidden md:inline text-gray-600 dark:text-gray-400">Nano: Ready</span>
+  <div class="p-4 border-t border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] overflow-hidden shrink-0">
+      <div class="text-xs text-gray-500 flex flex-col items-center justify-center" [ngClass]="{'items-start': sidebarWidth >= 120}">
+          <span *ngIf="sidebarWidth >= 120" class="whitespace-nowrap">Extension v{{ appVersion }}</span>
+          <div class="mt-1 flex items-center gap-2">
+              <div class="status-dot status-green shrink-0" title="Nano: Ready"></div>
+              <span *ngIf="sidebarWidth >= 120" class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Nano: Ready</span>
           </div>
       </div>
   </div>

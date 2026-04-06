@@ -13,6 +13,7 @@ import {
   provideZoneChangeDetection,
   provideZonelessChangeDetection, isDevMode
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
@@ -21,6 +22,7 @@ import { TranslationCodeModal } from './components/translation-code-modal/transl
 import { WritingAssistanceCodeModal } from './components/writing-assistance-code-modal/writing-assistance-code-modal';
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import { CortexPage } from './pages/cortex/cortex.page';
+import { CortexInsightsPage } from './pages/cortex-insights/cortex-insights.page';
 import {AxonTestSuiteExecutor} from './pages/cortex/axon/axon-test-suite.executor';
 import {
   LanguageDetectorShortStringColdStartAxonTest
@@ -201,6 +203,7 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
     ReceiptToJsonDemoComponent,
     AutoScrollDirective,
     CortexPage,
+    CortexInsightsPage,
     AxonTestStatusBadgeComponent,
     CodeSnippetComponent,
     DocsSectionHeaderComponent,

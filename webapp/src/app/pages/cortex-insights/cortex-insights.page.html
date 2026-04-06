@@ -1,0 +1,383 @@
+<div class="min-h-screen bg-gray-950 font-sans text-gray-200 selection:bg-indigo-500/30 selection:text-indigo-200 pb-32">
+  
+  <!-- HEADER -->
+  <header class="border-b border-gray-800 px-6 py-4 sticky top-0 z-40 bg-gray-950/80 backdrop-blur-xl">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+          <i class="bi bi-activity text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-tight leading-tight">Cortex Insights</h1>
+          <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Historical Performance Profiler</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-xs font-bold text-gray-300 rounded-lg transition-all">
+          <i class="bi bi-file-earmark-text text-gray-400"></i> Export Report
+        </button>
+        <button class="flex items-center gap-2 px-4 py-1.5 bg-indigo-500 text-white hover:bg-indigo-400 text-xs font-bold rounded-lg transition-all shadow-[0_0_15px_rgba(99,102,241,0.4)]" routerLink="/cortex">
+          <i class="bi bi-play-fill fill-current"></i> Run Suite
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SMART FILTER BAR -->
+  <div class="border-b border-gray-800 bg-gray-900/50">
+    <div class="max-w-[1600px] mx-auto px-6 py-3 flex items-center justify-between gap-4 overflow-x-auto hide-scrollbar">
+      <div class="flex items-center gap-3 shrink-0">
+        <i class="bi bi-funnel text-gray-500"></i>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filters</span>
+        <div class="w-px h-4 bg-gray-800 mx-1"></div>
+        
+        <!-- Hardware Filter -->
+        <div class="relative filter-dropdown">
+          <button (click)="toggleDropdown('hardware', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedHardware !== 'All' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'">
+            <span class="opacity-60">Hardware:</span>
+            <span [ngClass]="selectedHardware !== 'All' ? 'text-indigo-300' : 'text-gray-200'">{{ selectedHardware }}</span>
+            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
+          </button>
+          @if (activeDropdown === 'hardware') {
+            <div class="absolute top-full left-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div class="max-h-60 overflow-y-auto py-1">
+                @for (opt of hardwareOptions; track opt) {
+                  <button (click)="selectFilter('hardware', opt)" class="w-full text-left px-4 py-2 text-xs font-medium hover:bg-gray-800 transition-colors" [class.text-indigo-400]="selectedHardware === opt" [class.text-gray-300]="selectedHardware !== opt">{{ opt }}</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        
+        <!-- Compute Filter -->
+        <div class="relative filter-dropdown">
+          <button (click)="toggleDropdown('compute', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedCompute !== 'All' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'">
+            <span class="opacity-60">Compute:</span>
+            <span [ngClass]="selectedCompute !== 'All' ? 'text-indigo-300' : 'text-gray-200'">{{ selectedCompute }}</span>
+            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
+          </button>
+          @if (activeDropdown === 'compute') {
+            <div class="absolute top-full left-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div class="max-h-60 overflow-y-auto py-1">
+                @for (opt of computeOptions; track opt) {
+                  <button (click)="selectFilter('compute', opt)" class="w-full text-left px-4 py-2 text-xs font-medium hover:bg-gray-800 transition-colors" [class.text-indigo-400]="selectedCompute === opt" [class.text-gray-300]="selectedCompute !== opt">{{ opt }}</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Engine Filter -->
+        <div class="relative filter-dropdown">
+          <button (click)="toggleDropdown('engine', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedEngine !== 'All' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'">
+            <span class="opacity-60">Engine:</span>
+            <span [ngClass]="selectedEngine !== 'All' ? 'text-indigo-300' : 'text-gray-200'">{{ selectedEngine }}</span>
+            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
+          </button>
+          @if (activeDropdown === 'engine') {
+            <div class="absolute top-full left-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div class="max-h-60 overflow-y-auto py-1">
+                @for (opt of engineOptions; track opt) {
+                  <button (click)="selectFilter('engine', opt)" class="w-full text-left px-4 py-2 text-xs font-medium hover:bg-gray-800 transition-colors" [class.text-indigo-400]="selectedEngine === opt" [class.text-gray-300]="selectedEngine !== opt">{{ opt }}</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Variant Filter -->
+        <div class="relative filter-dropdown">
+          <button (click)="toggleDropdown('variant', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedVariant !== 'All' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'">
+            <span class="opacity-60">Variant:</span>
+            <span [ngClass]="selectedVariant !== 'All' ? 'text-indigo-300' : 'text-gray-200'">{{ selectedVariant }}</span>
+            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
+          </button>
+          @if (activeDropdown === 'variant') {
+            <div class="absolute top-full left-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div class="max-h-60 overflow-y-auto py-1">
+                @for (opt of variantOptions; track opt) {
+                  <button (click)="selectFilter('variant', opt)" class="w-full text-left px-4 py-2 text-xs font-medium hover:bg-gray-800 transition-colors" [class.text-indigo-400]="selectedVariant === opt" [class.text-gray-300]="selectedVariant !== opt">{{ opt }}</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- API Filter -->
+        <div class="relative filter-dropdown">
+          <button (click)="toggleDropdown('api', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedApi !== 'All' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'">
+            <span class="opacity-60">API:</span>
+            <span [ngClass]="selectedApi !== 'All' ? 'text-indigo-300' : 'text-gray-200'">{{ selectedApi }}</span>
+            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
+          </button>
+          @if (activeDropdown === 'api') {
+            <div class="absolute top-full left-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div class="max-h-60 overflow-y-auto py-1">
+                @for (opt of apiOptions; track opt) {
+                  <button (click)="selectFilter('api', opt)" class="w-full text-left px-4 py-2 text-xs font-medium hover:bg-gray-800 transition-colors" [class.text-indigo-400]="selectedApi === opt" [class.text-gray-300]="selectedApi !== opt">{{ opt }}</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">
+          <i class="bi bi-calendar"></i> Date Range: <span class="text-gray-300">Last 5 Commits</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-[1600px] mx-auto px-6 py-8 flex flex-col gap-6">
+    
+    <!-- TOP ROW: KPIs & Hero Chart -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      
+      <!-- KPI Column -->
+      <div class="flex flex-col gap-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+          <div class="flex items-center gap-2 text-gray-400 mb-3 relative z-10">
+            <i class="bi bi-speedometer2"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg Speed</span>
+          </div>
+          <div class="flex items-baseline gap-1 relative z-10">
+            <span class="text-3xl font-bold text-white tracking-tight">{{ fleetAvgSpeed | number:'1.0-0' }}</span>
+            <span class="text-xs font-semibold text-gray-500">c/s</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
+            <i class="bi bi-graph-up-arrow"></i> +12% vs previous
+          </div>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+          <div class="flex items-center gap-2 text-gray-400 mb-3 relative z-10">
+            <i class="bi bi-stopwatch"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg TTFT</span>
+          </div>
+          <div class="flex items-baseline gap-1 relative z-10">
+            <span class="text-3xl font-bold text-white tracking-tight">{{ fleetAvgTtft | number:'1.0-0' }}</span>
+            <span class="text-xs font-semibold text-gray-500">ms</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
+            <i class="bi bi-graph-down-arrow"></i> -8% vs previous
+          </div>
+        </div>
+
+        <div class="bg-indigo-500/5 border border-indigo-500/30 rounded-2xl p-5 shadow-[0_0_30px_rgba(99,102,241,0.1)] flex flex-col justify-center">
+           <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+             <i class="bi bi-trophy"></i> Top Configuration
+           </h3>
+           <div class="text-base font-bold text-white mt-1 leading-tight">{{ topConfig?.hw || 'N/A' }} ({{ topConfig?.compute || 'N/A' }})</div>
+           <div class="text-xs font-medium text-indigo-200/70 mt-1">{{ topConfig?.engine || 'N/A' }} &bull; {{ topConfig?.model || 'N/A' }}</div>
+           <div class="mt-3 pt-3 border-t border-indigo-500/20 flex justify-between items-center">
+             <span class="text-[10px] font-bold text-gray-400 uppercase">Peak {{ activeMetric === 'speed' ? 'Speed' : 'TTFT' }}</span>
+             <span class="text-sm font-bold text-emerald-400">{{ activeMetric === 'speed' ? (topSpeed | number:'1.0-0') + ' c/s' : (topConfig?.ttft | number:'1.0-0') + ' ms' }}</span>
+           </div>
+        </div>
+      </div>
+
+      <!-- Hero Chart Column -->
+      <div class="lg:col-span-3 bg-gray-900 border border-gray-800 rounded-2xl shadow-lg p-6 flex flex-col relative overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8 relative z-10">
+          <div>
+            <h2 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <i class="bi bi-activity text-indigo-400"></i> Performance Evolution
+            </h2>
+            <p class="text-[11px] font-medium text-gray-500 mt-1">Tracking Fleet Average vs. Top Performer over selected date range.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-gray-950 rounded-lg p-1 border border-gray-800">
+            <button 
+              (click)="setActiveMetric('speed')"
+              class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors"
+              [class]="activeMetric === 'speed' ? 'bg-indigo-500 text-white' : 'text-gray-500 hover:text-gray-300'"
+            >Speed (c/s)</button>
+            <button 
+              (click)="setActiveMetric('ttft')"
+              class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors"
+              [class]="activeMetric === 'ttft' ? 'bg-indigo-500 text-white' : 'text-gray-500 hover:text-gray-300'"
+            >TTFT (ms)</button>
+          </div>
+        </div>
+
+        <!-- Simulated Hero Chart -->
+        <div class="flex-1 relative min-h-[250px] w-full mt-4">
+          <!-- Y-Axis Labels -->
+          <div class="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-[10px] font-bold text-gray-600 w-10 text-right pr-3">
+            @if (activeMetric === 'speed') {
+              <span>High</span><span>Avg</span><span>Low</span>
+            } @else {
+              <span>High</span><span>Avg</span><span>Low</span>
+            }
+          </div>
+          
+          <!-- Grid Lines -->
+          <div class="absolute left-10 right-0 top-2 bottom-8 flex flex-col justify-between">
+            @for (i of [1,2,3]; track i) {
+              <div class="w-full border-t border-gray-800/60 border-dashed"></div>
+            }
+          </div>
+
+          <!-- X-Axis Labels -->
+          <div class="absolute left-10 right-0 bottom-0 flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4">
+            @for (d of dates; track d; let idx = $index; let last = $last) {
+              <span [class.text-indigo-400]="last">{{d}}</span>
+            }
+          </div>
+
+          <!-- Chart SVG -->
+          <svg class="absolute left-10 right-0 top-2 bottom-8 w-[calc(100%-2.5rem)] h-[calc(100%-2rem)] overflow-visible" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.2" />
+                <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            
+            @if (topConfig) {
+              <!-- Top Performer Line (Emerald) -->
+              <polyline [attr.points]="chartPointsTop" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              @for (c of chartPointsTopCircles; track $index) {
+                <circle [attr.cx]="c.x" [attr.cy]="c.y" r="4" fill="#0B0F19" stroke="#10b981" stroke-width="2" />
+              }
+              
+              <!-- Fleet Avg Line (Purple Gradient) -->
+              <polygon [attr.points]="chartPolygonFleet" fill="url(#gradient)" />
+              <polyline [attr.points]="chartPointsFleet" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              @for (c of chartPointsFleetCircles; track $index) {
+                <circle [attr.cx]="c.x" [attr.cy]="c.y" r="4" fill="#0B0F19" stroke="#8b5cf6" stroke-width="2.5" />
+              }
+            }
+          </svg>
+
+          <!-- Chart Legend -->
+          <div class="absolute top-0 right-4 flex items-center gap-4 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-800">
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-1 bg-purple-500 rounded-full"></div>
+              <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Fleet Avg</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-1 bg-emerald-500 rounded-full"></div>
+              <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Top Config</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW: The Leaderboard Matrix -->
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col">
+      
+      <!-- Table Header Controls -->
+      <div class="px-6 py-4 border-b border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-950/30">
+        <div class="flex items-center gap-3">
+          <i class="bi bi-hdd-network text-indigo-400 text-xl"></i>
+          <h2 class="text-lg font-bold text-white tracking-tight">Configuration Leaderboard</h2>
+          <span class="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px] font-bold ml-2">Showing {{ leaderboard.length }} Configs</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input 
+              type="text" 
+              placeholder="Search hardware or model..." 
+              class="w-64 bg-gray-900 border border-gray-800 text-sm text-white rounded-lg pl-9 pr-4 py-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-gray-600"
+            />
+          </div>
+          <button class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-xs font-bold text-gray-300 rounded-lg transition-all">
+             <i class="bi bi-sliders"></i> View Options
+          </button>
+        </div>
+      </div>
+
+      <!-- The Data Matrix -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[1000px]">
+          <thead>
+            <tr class="bg-gray-900/80 border-b border-gray-800">
+              <th class="px-6 py-3 w-16 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Rank</th>
+              <th class="px-4 py-3 w-80 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Hardware & Config</th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right pr-8">Avg Speed <span class="opacity-50 lowercase">(c/s)</span></th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right pr-8">Avg TTFT <span class="opacity-50 lowercase">(ms)</span></th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right pr-8">Avg Total <span class="opacity-50 lowercase">(ms)</span></th>
+              <th class="px-4 py-3 w-16"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800/50">
+            @for (row of leaderboard; track row.id; let idx = $index) {
+              @let speedWidth = (row.speed / maxSpeed) * 100;
+              @let isCurrent = row.isCurrent;
+
+              <tr class="group transition-colors" [ngClass]="isCurrent ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-gray-800/30'">
+                <!-- Rank -->
+                <td class="px-6 py-4 text-center align-middle">
+                  <div class="w-6 h-6 mx-auto rounded flex items-center justify-center text-xs font-bold"
+                       [ngClass]="idx === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
+                                  idx === 1 ? 'bg-slate-300/20 text-slate-300 border border-slate-400/30' : 
+                                  idx === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 
+                                  'text-gray-500'">
+                    {{ idx + 1 }}
+                  </div>
+                </td>
+
+                <!-- Hardware Config -->
+                <td class="px-4 py-4 align-middle">
+                  <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-bold tracking-tight" [ngClass]="isCurrent ? 'text-indigo-400' : 'text-gray-200'">
+                        {{ row.hw }}
+                      </span>
+                      @if (isCurrent) {
+                        <span class="px-1.5 py-0.5 rounded bg-indigo-500 text-white text-[9px] font-bold uppercase tracking-widest">You</span>
+                      }
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getBadgeClass(row.compute === 'GPU' ? 'purple' : 'default')">{{ row.compute }}</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getBadgeClass('default')">{{ row.engine }}</span>
+                      <span class="text-[10px] font-semibold text-gray-500 ml-1">{{ row.model }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Speed Cell (with Sparkline) -->
+                <td class="px-4 py-4 align-middle pr-8">
+                  <div class="flex flex-col items-end gap-1.5">
+                    <div class="flex items-center gap-2">
+                      @if (row.trend === 'up') { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                      @if (row.trend === 'down') { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="idx === 0 ? 'text-emerald-400' : 'text-gray-200'">
+                        {{ row.speed | number:'1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="w-32 h-1 bg-gray-800 rounded-full overflow-hidden flex justify-end">
+                      <div class="h-full bg-emerald-500 rounded-full" [style.width]="speedWidth + '%'"></div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- TTFT Cell -->
+                <td class="px-4 py-4 align-middle text-right pr-8">
+                   <span class="text-sm font-bold text-gray-300 tabular-nums">{{ row.ttft | number:'1.0-0' }}</span>
+                </td>
+
+                <!-- Total Time Cell -->
+                <td class="px-4 py-4 align-middle text-right pr-8">
+                   <span class="text-sm font-bold text-gray-300 tabular-nums">{{ row.total | number:'1.0-0' }}</span>
+                </td>
+
+                <!-- Action -->
+                <td class="px-4 py-4 align-middle text-center">
+                  <button class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center transition-colors mx-auto">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
