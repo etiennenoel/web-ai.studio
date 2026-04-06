@@ -12,6 +12,7 @@ declare const LanguageModel: any;
 @Injectable()
 export class PromptImageDescribeColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptImageDescribeColdStart;
+  abortSignal?: AbortSignal;
   
   systemInput = "You are a helpful AI assistant that describes images concisely.";
 
@@ -63,7 +64,7 @@ export class PromptImageDescribeColdStartAxonTest implements AxonTestInterface {
       iterationResult.status = TestStatus.Executing;
 
       const start = performance.now();
-      const session = await LanguageModel.create(this.creationOptions);
+      const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -75,7 +76,7 @@ export class PromptImageDescribeColdStartAxonTest implements AxonTestInterface {
       }];
 
       try {
-        const response = session.promptStreaming(promptInput);
+        const response = session.promptStreaming(promptInput, { signal: this.abortSignal });
 
         let output = "";
         for await (const chunk of response) {

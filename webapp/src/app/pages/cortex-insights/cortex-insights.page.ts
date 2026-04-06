@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
 
@@ -11,12 +12,12 @@ export interface LeaderboardEntry {
   compute: string;
   engine: string;
   model: string;
-  api: string;
+  apis: string[];
   ttft: number;
   speed: number;
   total: number;
   isCurrent: boolean;
-  trend: 'up' | 'down' | 'flat';
+  trend: 'best' | 'worst' | 'flat';
 }
 
 interface RawTestResult {
@@ -54,6 +55,10 @@ export class CortexInsightsPage implements OnInit {
   topConfig: LeaderboardEntry | null = null;
   maxSpeed = 0;
   maxTtft = 0;
+  maxTotal = 0;
+  minSpeed = 0;
+  minTtft = 0;
+  minTotal = 0;
 
   // Filters
   hardwareOptions: string[] = ['All'];
@@ -69,6 +74,10 @@ export class CortexInsightsPage implements OnInit {
   selectedApis: string[] = [];
 
   activeDropdown: string | null = null;
+  searchQuery: string = '';
+
+  tableSortColumn: 'speed' | 'ttft' | 'total' | 'hw' = 'speed';
+  tableSortDirection: 'asc' | 'desc' = 'desc';
 
   // Chart data
   chartPointsFleet: string = "";
@@ -81,6 +90,8 @@ export class CortexInsightsPage implements OnInit {
     private titleService: Title, 
     private metaService: Meta, 
     private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -187,10 +198,58 @@ export class CortexInsightsPage implements OnInit {
         Promise.all(fetchPromises).then(results => {
           this.rawBaselines = results.filter(r => r !== null) as RawBaseline[];
           this.extractOptions();
+          this.syncFromUrl();
           this.applyFilters();
         });
       },
       error: (err) => console.error("Failed to fetch index.json", err)
+    });
+  }
+
+  syncFromUrl() {
+    const params = this.route.snapshot.queryParamMap;
+    
+    if (params.has('activeMetric')) this.activeMetric = params.get('activeMetric')!;
+    if (params.has('tableSortColumn')) this.tableSortColumn = params.get('tableSortColumn') as any;
+    if (params.has('tableSortDirection')) this.tableSortDirection = params.get('tableSortDirection') as any;
+
+    const parseArray = (key: string, options: string[]) => {
+      if (!params.has(key)) return [...options];
+      const vals = params.getAll(key);
+      if (vals.length === 1 && vals[0] === '__none__') return [];
+      return vals.filter(v => options.includes(v)); // safely only include valid options
+    };
+
+    if (params.has('hardware')) this.selectedHardwares = parseArray('hardware', this.hardwareOptions);
+    if (params.has('compute')) this.selectedComputes = parseArray('compute', this.computeOptions);
+    if (params.has('engine')) this.selectedEngines = parseArray('engine', this.engineOptions);
+    if (params.has('variant')) this.selectedVariants = parseArray('variant', this.variantOptions);
+    if (params.has('api')) this.selectedApis = parseArray('api', this.apiOptions);
+  }
+
+  syncToUrl() {
+    const queryParams: any = {};
+    
+    if (this.activeMetric !== 'speed') queryParams['activeMetric'] = this.activeMetric;
+    if (this.tableSortColumn !== 'speed') queryParams['tableSortColumn'] = this.tableSortColumn;
+    if (this.tableSortDirection !== 'desc') queryParams['tableSortDirection'] = this.tableSortDirection;
+
+    const syncArray = (key: string, selected: string[], options: string[]) => {
+      if (selected.length === options.length) return; // all selected (default)
+      if (selected.length === 0) queryParams[key] = '__none__';
+      else queryParams[key] = selected;
+    };
+
+    syncArray('hardware', this.selectedHardwares, this.hardwareOptions);
+    syncArray('compute', this.selectedComputes, this.computeOptions);
+    syncArray('engine', this.selectedEngines, this.engineOptions);
+    syncArray('variant', this.selectedVariants, this.variantOptions);
+    syncArray('api', this.selectedApis, this.apiOptions);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      replaceUrl: true
     });
   }
 
@@ -214,14 +273,31 @@ export class CortexInsightsPage implements OnInit {
     this.engineOptions = Array.from(engineSet).sort();
     this.variantOptions = Array.from(variantSet).sort();
     this.apiOptions = Array.from(apiSet).sort();
+
+    this.selectedHardwares = [...this.hardwareOptions];
+    this.selectedComputes = [...this.computeOptions];
+    this.selectedEngines = [...this.engineOptions];
+    this.selectedVariants = [...this.variantOptions];
+    this.selectedApis = [...this.apiOptions];
+  }
+
+  onSearch(event: any) {
+    this.searchQuery = event.target.value.toLowerCase();
+    this.applyFilters();
   }
 
   applyFilters() {
     let filtered = this.rawBaselines.filter(b => {
-      if (this.selectedHardwares.length > 0 && !this.selectedHardwares.includes(b.hw)) return false;
-      if (this.selectedComputes.length > 0 && !this.selectedComputes.includes(b.compute)) return false;
-      if (this.selectedEngines.length > 0 && !this.selectedEngines.includes(b.engine)) return false;
-      if (this.selectedVariants.length > 0 && !this.selectedVariants.includes(b.model)) return false;
+      if (!this.selectedHardwares.includes(b.hw)) return false;
+      if (!this.selectedComputes.includes(b.compute)) return false;
+      if (!this.selectedEngines.includes(b.engine)) return false;
+      if (!this.selectedVariants.includes(b.model)) return false;
+      
+      if (this.searchQuery) {
+        const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
+        if (!searchTarget.includes(this.searchQuery)) return false;
+      }
+      
       return true;
     });
 
@@ -229,10 +305,7 @@ export class CortexInsightsPage implements OnInit {
     let idCounter = 1;
 
     filtered.forEach(b => {
-      let testsToUse = b.tests;
-      if (this.selectedApis.length > 0) {
-        testsToUse = b.tests.filter(t => this.selectedApis.includes(t.api));
-      }
+      let testsToUse = b.tests.filter(t => this.selectedApis.includes(t.api));
       
       if (testsToUse.length === 0) return;
 
@@ -247,7 +320,7 @@ export class CortexInsightsPage implements OnInit {
         compute: b.compute,
         engine: b.engine,
         model: b.model,
-        api: this.selectedApis.length === 1 ? this.selectedApis[0] : (this.selectedApis.length === 0 ? 'All' : 'Mixed'),
+        apis: testsToUse.map(t => t.api),
         ttft,
         speed,
         total,
@@ -257,16 +330,26 @@ export class CortexInsightsPage implements OnInit {
     });
 
     newLeaderboard.sort((a, b) => {
-      if (this.activeMetric === 'ttft' || this.activeMetric === 'total') {
-        return a.ttft - b.ttft; // Lower is better
+      let valA = (a as any)[this.tableSortColumn];
+      let valB = (b as any)[this.tableSortColumn];
+      
+      if (valA === valB) return 0;
+      
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return this.tableSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
-      return b.speed - a.speed;
+      
+      if (this.tableSortDirection === 'asc') {
+        return valA > valB ? 1 : -1;
+      } else {
+        return valA < valB ? 1 : -1;
+      }
     });
 
     newLeaderboard.forEach((r, idx) => {
       r.id = idx + 1;
-      if (idx === 0) r.trend = 'up';
-      else if (idx === newLeaderboard.length - 1) r.trend = 'down';
+      if (idx === 0) r.trend = 'best';
+      else if (idx === newLeaderboard.length - 1) r.trend = 'worst';
     });
 
     this.leaderboard = newLeaderboard;
@@ -280,6 +363,10 @@ export class CortexInsightsPage implements OnInit {
       
       this.maxSpeed = Math.max(...newLeaderboard.map(r => r.speed), 1);
       this.maxTtft = Math.max(...newLeaderboard.map(r => r.ttft), 1);
+      this.maxTotal = Math.max(...newLeaderboard.map(r => r.total), 1);
+      this.minSpeed = Math.min(...newLeaderboard.map(r => r.speed));
+      this.minTtft = Math.min(...newLeaderboard.map(r => r.ttft));
+      this.minTotal = Math.min(...newLeaderboard.map(r => r.total));
     } else {
       this.fleetAvgSpeed = 0;
       this.fleetAvgTtft = 0;
@@ -287,8 +374,13 @@ export class CortexInsightsPage implements OnInit {
       this.topSpeed = 0;
       this.maxSpeed = 1;
       this.maxTtft = 1;
+      this.maxTotal = 1;
+      this.minSpeed = 0;
+      this.minTtft = 0;
+      this.minTotal = 0;
     }
 
+    this.syncToUrl();
     this.generateChartData();
   }
 
@@ -345,6 +437,16 @@ export class CortexInsightsPage implements OnInit {
     this.applyFilters();
   }
 
+  setTableSort(column: 'speed' | 'ttft' | 'total' | 'hw') {
+    if (this.tableSortColumn === column) {
+      this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.tableSortColumn = column;
+      this.tableSortDirection = (column === 'ttft' || column === 'total' || column === 'hw') ? 'asc' : 'desc';
+    }
+    this.applyFilters();
+  }
+
   
   getFilterIcon(filterType: string, value: string): string {
     if (filterType === 'compute') {
@@ -368,20 +470,38 @@ export class CortexInsightsPage implements OnInit {
       return this.getBadgeClass('emerald');
     }
     if (filterType === 'engine') return this.getBadgeClass('default');
-    if (filterType === 'variant') return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
-    if (filterType === 'api') return 'bg-gray-900 border-gray-700 text-gray-400';
+    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
     return this.getBadgeClass('default');
   }
 
   getBadgeClass(variant: string): string {
     const variants: { [key: string]: string } = {
-      default: 'bg-gray-800 text-gray-300 border-gray-700',
-      current: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
-      purple: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      cloud: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+      default: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+      current: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30',
+      purple: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+      emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30',
+      cloud: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
     };
     if (variant === 'Cloud') return variants['cloud'];
     return variants[variant] || variants['default'];
+  }
+
+  getSpeedColor(speed: number, minSpeed: number, maxSpeed: number): string {
+    if (maxSpeed === minSpeed || isNaN(speed) || isNaN(minSpeed) || isNaN(maxSpeed)) return '#10b981'; // emerald-500
+    const ratio = (speed - minSpeed) / (maxSpeed - minSpeed);
+    if (ratio >= 0.75) return '#10b981'; // emerald-500
+    if (ratio >= 0.5) return '#eab308'; // yellow-500
+    if (ratio >= 0.25) return '#f97316'; // orange-500
+    return '#f43f5e'; // rose-500
+  }
+
+  getTimeColor(time: number, minTime: number, maxTime: number): string {
+    if (maxTime === minTime || isNaN(time) || isNaN(minTime) || isNaN(maxTime)) return '#10b981'; // emerald-500
+    const ratio = (time - minTime) / (maxTime - minTime);
+    if (ratio <= 0.25) return '#10b981'; // emerald-500
+    if (ratio <= 0.5) return '#eab308'; // yellow-500
+    if (ratio <= 0.75) return '#f97316'; // orange-500
+    return '#f43f5e'; // rose-500
   }
 }

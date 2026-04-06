@@ -604,6 +604,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     this.viewData.pretests.iterationsCollapsed = false;
 
     this.axonTestSuiteExecutor.isStopped = false;
+    this.axonTestSuiteExecutor.resetAbortController();
     await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
 
     if (this.axonTestSuiteExecutor.isStopped) return;

@@ -9,6 +9,7 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 @Injectable()
 export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.TranslatorShortStringEnglishToFrenchColdStart;
+  abortSignal?: AbortSignal;
 
   results: AxonTestResultInterface = {
     id: this.id,
@@ -34,7 +35,7 @@ export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements Ax
     try {
       this.results.apiAvailability = await this.apiStatus();
 
-      const ld = await Translator.create(this.creationOptions)
+      const ld = await Translator.create({ ...this.creationOptions, signal: this.abortSignal })
     } catch (e) {
       this.results.status = TestStatus.Error;
     }
@@ -58,11 +59,11 @@ export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements Ax
 
       const start = performance.now()
 
-      const translator = await Translator.create(this.creationOptions)
+      const translator = await Translator.create({ ...this.creationOptions, signal: this.abortSignal })
 
       iterationResult.creationTime = performance.now() - start;
 
-      const response = await translator.translate(this.results.input);
+      const response = await translator.translate(this.results.input, { signal: this.abortSignal });
 
       iterationResult.output = JSON.stringify(response);
       iterationResult.totalResponseTime = performance.now() - start;

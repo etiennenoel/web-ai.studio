@@ -156,9 +156,35 @@ export class AxonTestSuiteExecutor {
   }
 
   isStopped = false;
+  abortController?: AbortController;
+
+  resetAbortController() {
+    this.abortController = new AbortController();
+    for (const testSuite of this.testsSuite) {
+      this.testIdMap[testSuite].abortSignal = this.abortController.signal;
+    }
+  }
 
   stop() {
     this.isStopped = true;
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }
+
+  private cleanUpAfterStop(testsToRun: AxonTestId[]) {
+    this.results.status = TestStatus.Idle;
+    for (const testSuite of testsToRun) {
+      const test = this.testIdMap[testSuite];
+      if (test.results.status === TestStatus.Executing || test.results.status === TestStatus.Error) {
+        test.results.status = TestStatus.Idle;
+      }
+      for (const iterationResult of test.results.testIterationResults) {
+        if (iterationResult.status === TestStatus.Executing || iterationResult.status === TestStatus.Error) {
+          iterationResult.status = TestStatus.Idle;
+        }
+      }
+    }
   }
 
   async setup(selectedTestIds?: Set<string>): Promise<void> {
@@ -180,6 +206,7 @@ export class AxonTestSuiteExecutor {
       for (const testSuite of testsToRun) {
         if (this.isStopped) {
           this.preTestsStatus = TestStatus.Idle;
+          this.cleanUpAfterStop(testsToRun);
           return resolve();
         }
         const test = this.testIdMap[testSuite];
@@ -188,6 +215,7 @@ export class AxonTestSuiteExecutor {
 
       if (this.isStopped) {
         this.preTestsStatus = TestStatus.Idle;
+        this.cleanUpAfterStop(testsToRun);
         return resolve();
       }
 
@@ -203,6 +231,7 @@ export class AxonTestSuiteExecutor {
         setTimeout(async () => {
           if (this.isStopped) {
             this.preTestsStatus = TestStatus.Idle;
+            this.cleanUpAfterStop(testsToRun);
             return resolve1();
           }
           await this.setup(selectedTestIds);
@@ -233,19 +262,33 @@ export class AxonTestSuiteExecutor {
         continue;
       }
 
-      await test.preRun();
-      if (this.isStopped) break;
-      await test.run();
-      if (this.isStopped) break;
-      await test.postRun();
+      try {
+        await test.preRun();
+        if (this.isStopped) break;
+        await test.run();
+        if (this.isStopped) break;
+        await test.postRun();
+      } catch (error: any) {
+        console.error(`Error running test ${testSuite}:`, error);
+        if (this.isStopped) {
+          break;
+        } else {
+          test.results.status = TestStatus.Error;
+        }
+      }
     }
 
     if (this.isStopped) {
       this.results.status = TestStatus.Idle;
       for (const testSuite of testsToRun) {
         const test = this.testIdMap[testSuite];
-        if (test.results.status === TestStatus.Executing) {
+        if (test.results.status === TestStatus.Executing || test.results.status === TestStatus.Error) {
           test.results.status = TestStatus.Idle;
+        }
+        for (const iterationResult of test.results.testIterationResults) {
+          if (iterationResult.status === TestStatus.Executing || iterationResult.status === TestStatus.Error) {
+            iterationResult.status = TestStatus.Idle;
+          }
         }
       }
       return;

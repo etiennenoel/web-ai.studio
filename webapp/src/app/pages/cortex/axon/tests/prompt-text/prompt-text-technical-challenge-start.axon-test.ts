@@ -9,6 +9,7 @@ import {AxonTestResultCalculator} from '../../util/axon-test-result-calculator';
 @Injectable()
 export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptTextTechnicalChallengeColdStart;
+  abortSignal?: AbortSignal;
 
   systemInput = "Adopt the persona of a senior software engineer conducting a code review. Your feedback should be direct and practical.";
 
@@ -58,7 +59,7 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
     try {
       this.results.apiAvailability = await this.apiStatus();
 
-      const ld = await LanguageModel.create(this.creationOptions)
+      const ld = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal })
     } catch (e) {
       this.results.status = TestStatus.Error;
     }
@@ -82,11 +83,11 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
 
       const start = performance.now()
 
-      const session = await LanguageModel.create(this.creationOptions)
+      const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal })
 
       iterationResult.creationTime = performance.now() - start;
 
-      const response = session.promptStreaming(this.results.input);
+      const response = session.promptStreaming(this.results.input, { signal: this.abortSignal });
 
       let output = "";
       for await (const chunk of response) {

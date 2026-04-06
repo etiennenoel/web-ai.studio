@@ -31,9 +31,9 @@
         <!-- Hardware Filter -->
 
         <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('hardware', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedHardwares.length > 0 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+          <button (click)="toggleDropdown('hardware', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedHardwares.length > 0 && selectedHardwares.length < hardwareOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
             <span class="opacity-60">Hardware:</span>
-            <span [ngClass]="selectedHardwares.length > 0 ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedHardwares.length === 0 ? 'All' : (selectedHardwares.length === 1 ? selectedHardwares[0] : selectedHardwares.length + ' Selected') }}</span>
+            <span [ngClass]="selectedHardwares.length > 0 && selectedHardwares.length < hardwareOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedHardwares.length === hardwareOptions.length ? 'All' : (selectedHardwares.length === 0 ? 'None' : (selectedHardwares.length === 1 ? selectedHardwares[0] : selectedHardwares.length + ' Selected')) }}</span>
             <i class="bi bi-chevron-down opacity-50 ml-1"></i>
           </button>
           @if (activeDropdown === 'hardware') {
@@ -52,9 +52,9 @@
         <!-- Compute Filter -->
 
         <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('compute', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedComputes.length > 0 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+          <button (click)="toggleDropdown('compute', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedComputes.length > 0 && selectedComputes.length < computeOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
             <span class="opacity-60">Compute:</span>
-            <span [ngClass]="selectedComputes.length > 0 ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedComputes.length === 0 ? 'All' : (selectedComputes.length === 1 ? selectedComputes[0] : selectedComputes.length + ' Selected') }}</span>
+            <span [ngClass]="selectedComputes.length > 0 && selectedComputes.length < computeOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedComputes.length === computeOptions.length ? 'All' : (selectedComputes.length === 0 ? 'None' : (selectedComputes.length === 1 ? selectedComputes[0] : selectedComputes.length + ' Selected')) }}</span>
             <i class="bi bi-chevron-down opacity-50 ml-1"></i>
           </button>
           @if (activeDropdown === 'compute') {
@@ -73,9 +73,21 @@
         <!-- Engine Filter -->
 
         <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('engine', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedEngines.length > 0 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+          <button (click)="toggleDropdown('engine', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedEngines.length > 0 && selectedEngines.length < engineOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
             <span class="opacity-60">Engine:</span>
-            <span [ngClass]="selectedEngines.length > 0 ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedEngines.length === 0 ? 'All' : (selectedEngines.length === 1 ? selectedEngines[0] : selectedEngines.length + ' Selected') }}</span>
+            <div [ngClass]="selectedEngines.length > 0 && selectedEngines.length < engineOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
+              @if (selectedEngines.length === engineOptions.length) {
+                All
+              } @else if (selectedEngines.length === 0) {
+                None
+              } @else {
+                @for (val of selectedEngines; track val) {
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', val)">
+                    <i class="bi" [ngClass]="getFilterIcon('engine', val)"></i> {{ val }}
+                  </span>
+                }
+              }
+            </div>
             <i class="bi bi-chevron-down opacity-50 ml-1"></i>
           </button>
           @if (activeDropdown === 'engine') {
@@ -94,9 +106,21 @@
         <!-- Variant Filter -->
 
         <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('variant', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedVariants.length > 0 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+          <button (click)="toggleDropdown('variant', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedVariants.length > 0 && selectedVariants.length < variantOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
             <span class="opacity-60">Variant:</span>
-            <span [ngClass]="selectedVariants.length > 0 ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedVariants.length === 0 ? 'All' : (selectedVariants.length === 1 ? selectedVariants[0] : selectedVariants.length + ' Selected') }}</span>
+            <div [ngClass]="selectedVariants.length > 0 && selectedVariants.length < variantOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
+              @if (selectedVariants.length === variantOptions.length) {
+                All
+              } @else if (selectedVariants.length === 0) {
+                None
+              } @else {
+                @for (val of selectedVariants; track val) {
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('variant', val)">
+                    <i class="bi" [ngClass]="getFilterIcon('variant', val)"></i> {{ val }}
+                  </span>
+                }
+              }
+            </div>
             <i class="bi bi-chevron-down opacity-50 ml-1"></i>
           </button>
           @if (activeDropdown === 'variant') {
@@ -115,9 +139,21 @@
         <!-- API Filter -->
 
         <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('api', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedApis.length > 0 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+          <button (click)="toggleDropdown('api', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedApis.length > 0 && selectedApis.length < apiOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
             <span class="opacity-60">API:</span>
-            <span [ngClass]="selectedApis.length > 0 ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedApis.length === 0 ? 'All' : (selectedApis.length === 1 ? selectedApis[0] : selectedApis.length + ' Selected') }}</span>
+            <div [ngClass]="selectedApis.length > 0 && selectedApis.length < apiOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
+              @if (selectedApis.length === apiOptions.length) {
+                All
+              } @else if (selectedApis.length === 0) {
+                None
+              } @else {
+                @for (val of selectedApis; track val) {
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('api', val)">
+                    <i class="bi" [ngClass]="getFilterIcon('api', val)"></i> {{ val }}
+                  </span>
+                }
+              }
+            </div>
             <i class="bi bi-chevron-down opacity-50 ml-1"></i>
           </button>
           @if (activeDropdown === 'api') {
@@ -139,139 +175,37 @@
 
   <main class="max-w-[1600px] mx-auto px-6 py-8 flex flex-col gap-6">
     
-    <!-- TOP ROW: KPIs & Hero Chart -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- TOP ROW: KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       
-      <!-- KPI Column -->
-      <div class="flex flex-col gap-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-          <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
-            <i class="bi bi-speedometer2"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg Speed</span>
-          </div>
-          <div class="flex items-baseline gap-1 relative z-10">
-            <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgSpeed | number:'1.0-0' }}</span>
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">c/s</span>
-          </div>
-          <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
-            <i class="bi bi-graph-up-arrow"></i> +12% vs previous
-          </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+        <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
+          <i class="bi bi-speedometer2"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg Speed</span>
         </div>
-
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-          <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
-            <i class="bi bi-stopwatch"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg TTFT</span>
-          </div>
-          <div class="flex items-baseline gap-1 relative z-10">
-            <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgTtft | number:'1.0-0' }}</span>
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">ms</span>
-          </div>
-          <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
-            <i class="bi bi-graph-down-arrow"></i> -8% vs previous
-          </div>
+        <div class="flex items-baseline gap-1 relative z-10">
+          <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgSpeed | number:'1.0-0' }}</span>
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">c/s</span>
         </div>
-
-        <div class="bg-indigo-500/5 border border-indigo-500/30 rounded-2xl p-5 shadow-[0_0_30px_rgba(99,102,241,0.1)] flex flex-col justify-center">
-           <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-             <i class="bi bi-trophy"></i> Top Configuration
-           </h3>
-           <div class="text-base font-bold text-slate-900 dark:text-white mt-1 leading-tight">{{ topConfig?.hw || 'N/A' }} ({{ topConfig?.compute || 'N/A' }})</div>
-           <div class="text-xs font-medium text-indigo-200/70 mt-1">{{ topConfig?.engine || 'N/A' }} &bull; {{ topConfig?.model || 'N/A' }}</div>
-           <div class="mt-3 pt-3 border-t border-indigo-500/20 flex justify-between items-center">
-             <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase">Peak {{ activeMetric === 'speed' ? 'Speed' : 'TTFT' }}</span>
-             <span class="text-sm font-bold text-emerald-400">{{ activeMetric === 'speed' ? (topSpeed | number:'1.0-0') + ' c/s' : (topConfig?.ttft | number:'1.0-0') + ' ms' }}</span>
-           </div>
+        <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
+          <i class="bi bi-graph-up-arrow"></i> +12% vs previous
         </div>
       </div>
 
-      <!-- Hero Chart Column -->
-      <div class="lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg p-6 flex flex-col relative overflow-hidden">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-8 relative z-10">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <i class="bi bi-activity text-indigo-400"></i> Performance Evolution
-            </h2>
-            <p class="text-[11px] font-medium text-slate-500 dark:text-slate-500 mt-1">Tracking Fleet Average vs. Top Performer over selected date range.</p>
-          </div>
-          <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
-            <button 
-              (click)="setActiveMetric('speed')"
-              class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors"
-              [class]="activeMetric === 'speed' ? 'bg-indigo-500 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'"
-            >Speed (c/s)</button>
-            <button 
-              (click)="setActiveMetric('ttft')"
-              class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors"
-              [class]="activeMetric === 'ttft' ? 'bg-indigo-500 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'"
-            >TTFT (ms)</button>
-          </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+        <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
+          <i class="bi bi-stopwatch"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg TTFT</span>
         </div>
-
-        <!-- Simulated Hero Chart -->
-        <div class="flex-1 relative min-h-[250px] w-full mt-4">
-          <!-- Y-Axis Labels -->
-          <div class="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-[10px] font-bold text-slate-400 dark:text-slate-600 w-10 text-right pr-3">
-            @if (activeMetric === 'speed') {
-              <span>High</span><span>Avg</span><span>Low</span>
-            } @else {
-              <span>High</span><span>Avg</span><span>Low</span>
-            }
-          </div>
-          
-          <!-- Grid Lines -->
-          <div class="absolute left-10 right-0 top-2 bottom-8 flex flex-col justify-between">
-            @for (i of [1,2,3]; track i) {
-              <div class="w-full border-t border-slate-200 dark:border-slate-800/60 border-dashed"></div>
-            }
-          </div>
-
-          <!-- X-Axis Labels -->
-          <div class="absolute left-10 right-0 bottom-0 flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest px-4">
-            @for (d of dates; track d; let idx = $index; let last = $last) {
-              <span [class.text-indigo-400]="last">{{d}}</span>
-            }
-          </div>
-
-          <!-- Chart SVG -->
-          <svg class="absolute left-10 right-0 top-2 bottom-8 w-[calc(100%-2.5rem)] h-[calc(100%-2rem)] overflow-visible" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.2" />
-                <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0" />
-              </linearGradient>
-            </defs>
-            
-            @if (topConfig) {
-              <!-- Top Performer Line (Emerald) -->
-              <polyline [attr.points]="chartPointsTop" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-              @for (c of chartPointsTopCircles; track $index) {
-                <circle [attr.cx]="c.x" [attr.cy]="c.y" r="4" fill="currentColor" class="fill-white dark:fill-slate-900" stroke="#10b981" stroke-width="2" />
-              }
-              
-              <!-- Fleet Avg Line (Purple Gradient) -->
-              <polygon [attr.points]="chartPolygonFleet" fill="url(#gradient)" />
-              <polyline [attr.points]="chartPointsFleet" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-              @for (c of chartPointsFleetCircles; track $index) {
-                <circle [attr.cx]="c.x" [attr.cy]="c.y" r="4" fill="currentColor" class="fill-white dark:fill-slate-900" stroke="#8b5cf6" stroke-width="2.5" />
-              }
-            }
-          </svg>
-
-          <!-- Chart Legend -->
-          <div class="absolute top-0 right-4 flex items-center gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
-            <div class="flex items-center gap-1.5">
-              <div class="w-3 h-1 bg-purple-500 rounded-full"></div>
-              <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Fleet Avg</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <div class="w-3 h-1 bg-emerald-500 rounded-full"></div>
-              <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Top Config</span>
-            </div>
-          </div>
+        <div class="flex items-baseline gap-1 relative z-10">
+          <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgTtft | number:'1.0-0' }}</span>
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">ms</span>
+        </div>
+        <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
+          <i class="bi bi-graph-down-arrow"></i> -8% vs previous
         </div>
       </div>
+
     </div>
 
     <!-- BOTTOM ROW: The Leaderboard Matrix -->
@@ -290,12 +224,10 @@
             <input 
               type="text" 
               placeholder="Search hardware or model..." 
+              (input)="onSearch($event)"
               class="w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white rounded-lg pl-9 pr-4 py-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:text-slate-600"
             />
           </div>
-          <button class="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-lg transition-all">
-             <i class="bi bi-sliders"></i> View Options
-          </button>
         </div>
       </div>
 
@@ -305,10 +237,30 @@
           <thead>
             <tr class="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
               <th class="px-6 py-3 w-16 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-center">Rank</th>
-              <th class="px-4 py-3 w-80 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">Hardware & Config</th>
-              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8">Avg Speed <span class="opacity-50 lowercase">(c/s)</span></th>
-              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8">Avg TTFT <span class="opacity-50 lowercase">(ms)</span></th>
-              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8">Avg Total <span class="opacity-50 lowercase">(ms)</span></th>
+              <th class="px-4 py-3 w-80 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('hw')">
+                <div class="flex items-center justify-start gap-1.5">
+                  <span>Hardware & Config</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'hw' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'hw' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'hw'}"></i>
+                </div>
+              </th>
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('speed')">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Avg Speed <span class="opacity-50 lowercase">(c/s)</span></span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'speed'}"></i>
+                </div>
+              </th>
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('ttft')">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Avg TTFT <span class="opacity-50 lowercase">(ms)</span></span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'desc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'ttft'}"></i>
+                </div>
+              </th>
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('total')">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Avg Total <span class="opacity-50 lowercase">(ms)</span></span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'total' && tableSortDirection === 'desc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'total' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'total'}"></i>
+                </div>
+              </th>
               <th class="px-4 py-3 w-16"></th>
             </tr>
           </thead>
@@ -341,44 +293,63 @@
                       }
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getBadgeClass(row.compute === 'GPU' ? 'purple' : 'default')">{{ row.compute }}</span>
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getBadgeClass('default')">{{ row.engine }}</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('compute', row.compute)">
+                        <i class="bi" [ngClass]="getFilterIcon('compute', row.compute)"></i> {{ row.compute }}
+                      </span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', row.engine)">
+                        <i class="bi" [ngClass]="getFilterIcon('engine', row.engine)"></i> {{ row.engine }}
+                      </span>
                       <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 ml-1">{{ row.model }}</span>
                     </div>
                   </div>
                 </td>
 
-                <!-- API Cell -->
-                <td class="px-4 py-4 align-middle">
-                  <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400">
-                    {{ row.api }}
-                  </span>
-                </td>
-
-                <!-- Speed Cell (with Sparkline) -->
-                <td class="px-4 py-4 align-middle pr-8">
+                <!-- Speed Cell -->
+                <td class="px-4 py-4 align-middle pr-8 text-right">
                   <div class="flex flex-col items-end gap-1.5">
                     <div class="flex items-center gap-2">
-                      @if (row.trend === 'up') { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                      @if (row.trend === 'down') { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                      <span class="text-sm font-bold tabular-nums" [ngClass]="idx === 0 ? 'text-emerald-400' : 'text-slate-800 dark:text-slate-200'">
+                      @if (row.speed === maxSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                      @if (row.speed === minSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.speed === maxSpeed && maxSpeed !== minSpeed ? 'text-emerald-400' : (row.speed === minSpeed && maxSpeed !== minSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
                         {{ row.speed | number:'1.0-0' }}
                       </span>
                     </div>
                     <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                      <div class="h-full bg-emerald-500 rounded-full" [style.width]="speedWidth + '%'"></div>
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
                     </div>
                   </div>
                 </td>
 
                 <!-- TTFT Cell -->
                 <td class="px-4 py-4 align-middle text-right pr-8">
-                   <span class="text-sm font-bold text-slate-700 dark:text-slate-300 tabular-nums">{{ row.ttft | number:'1.0-0' }}</span>
+                  <div class="flex flex-col items-end gap-1.5">
+                    <div class="flex items-center gap-2">
+                      @if (row.ttft === minTtft && maxTtft !== minTtft) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (row.ttft === maxTtft && maxTtft !== minTtft) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.ttft === minTtft && maxTtft !== minTtft ? 'text-emerald-400' : (row.ttft === maxTtft && maxTtft !== minTtft ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        {{ row.ttft | number:'1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.ttft, minTtft, maxTtft)" [style.width]="(row.ttft / maxTtft) * 100 + '%'"></div>
+                    </div>
+                  </div>
                 </td>
 
                 <!-- Total Time Cell -->
                 <td class="px-4 py-4 align-middle text-right pr-8">
-                   <span class="text-sm font-bold text-slate-700 dark:text-slate-300 tabular-nums">{{ row.total | number:'1.0-0' }}</span>
+                  <div class="flex flex-col items-end gap-1.5">
+                    <div class="flex items-center gap-2">
+                      @if (row.total === minTotal && maxTotal !== minTotal) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (row.total === maxTotal && maxTotal !== minTotal) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.total === minTotal && maxTotal !== minTotal ? 'text-emerald-400' : (row.total === maxTotal && maxTotal !== minTotal ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        {{ row.total | number:'1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.total, minTotal, maxTotal)" [style.width]="(row.total / maxTotal) * 100 + '%'"></div>
+                    </div>
+                  </div>
                 </td>
 
                 <!-- Action -->

@@ -12,6 +12,7 @@ declare const LanguageModel: any;
 @Injectable()
 export class PromptImageOcrHandwrittenName3ColdStartAxonTest implements AxonTestInterface {
   id: AxonTestId = AxonTestId.PromptImageOcrHandwrittenName3ColdStart;
+  abortSignal?: AbortSignal;
   
   systemInput = "You are a highly accurate OCR system. Return only the exact text present in the image.";
 
@@ -64,7 +65,7 @@ export class PromptImageOcrHandwrittenName3ColdStartAxonTest implements AxonTest
       iterationResult.status = TestStatus.Executing;
 
       const start = performance.now();
-      const session = await LanguageModel.create(this.creationOptions);
+      const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -76,7 +77,7 @@ export class PromptImageOcrHandwrittenName3ColdStartAxonTest implements AxonTest
       }];
 
       try {
-        const response = session.promptStreaming(promptInput);
+        const response = session.promptStreaming(promptInput, { signal: this.abortSignal });
 
         let output = "";
         for await (const chunk of response) {
