@@ -1,0 +1,1379 @@
+{
+  "timestamp": "2026-04-06T03:14:56.907Z",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+  "hardware": {
+    "webgl_renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+    "webgpu": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": ""
+    },
+    "navigator": {
+      "hardwareConcurrency": 10,
+      "deviceMemory": 32,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+    },
+    "cpu": {
+      "archName": "arm64",
+      "features": [],
+      "modelName": "Apple M1 Max",
+      "numOfProcessors": 10,
+      "processors": [
+        {
+          "usage": {
+            "idle": 3916,
+            "kernel": 37626,
+            "total": 84521,
+            "user": 42979
+          }
+        },
+        {
+          "usage": {
+            "idle": 4205,
+            "kernel": 36396,
+            "total": 84525,
+            "user": 43924
+          }
+        },
+        {
+          "usage": {
+            "idle": 49444,
+            "kernel": 7955,
+            "total": 84197,
+            "user": 26798
+          }
+        },
+        {
+          "usage": {
+            "idle": 58735,
+            "kernel": 6546,
+            "total": 84246,
+            "user": 18965
+          }
+        },
+        {
+          "usage": {
+            "idle": 66827,
+            "kernel": 3809,
+            "total": 84385,
+            "user": 13749
+          }
+        },
+        {
+          "usage": {
+            "idle": 71873,
+            "kernel": 2520,
+            "total": 84463,
+            "user": 10070
+          }
+        },
+        {
+          "usage": {
+            "idle": 73035,
+            "kernel": 1266,
+            "total": 84527,
+            "user": 10226
+          }
+        },
+        {
+          "usage": {
+            "idle": 78671,
+            "kernel": 899,
+            "total": 84556,
+            "user": 4986
+          }
+        },
+        {
+          "usage": {
+            "idle": 80322,
+            "kernel": 738,
+            "total": 84570,
+            "user": 3510
+          }
+        },
+        {
+          "usage": {
+            "idle": 80776,
+            "kernel": 683,
+            "total": 84575,
+            "user": 3116
+          }
+        }
+      ],
+      "temperatures": []
+    },
+    "memory": {
+      "availableCapacity": 46982676480,
+      "capacity": 68719476736
+    }
+  },
+  "results": {
+    "status": "Success",
+    "testsResults": [
+      {
+        "id": "Identify language of a common, short phrase. Cold Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 18.599999999976717,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 22.400000000023283,
+            "timeToFirstToken": 22.400000000023283,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 5491.071428565721
+          },
+          {
+            "status": "Success",
+            "creationTime": 22.900000000023283,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 26.099999999976717,
+            "timeToFirstToken": 26.099999999976717,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 4712.643678165124
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.900000000023283,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 5.599999999976717,
+            "timeToFirstToken": 5.599999999976717,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 21964.285714377034
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 18.033333333325572,
+        "averageTokensPerSecond": 10722.666940369292,
+        "averageTimeToFirstToken": 18.033333333325572,
+        "medianTotalResponseTime": 22.400000000023283,
+        "medianTokensPerSecond": 5491.071428565721,
+        "medianTimeToFirstToken": 22.400000000023283
+      },
+      {
+        "id": "Identify language of a common, short phrase. Warm Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 7.599999999976717,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 3.400000000023283,
+            "timeToFirstToken": 3.400000000023283,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 36176.470587987555
+          },
+          {
+            "status": "Success",
+            "creationTime": 7.599999999976717,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 3.199999999953434,
+            "timeToFirstToken": 3.199999999953434,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 38437.50000055934
+          },
+          {
+            "status": "Success",
+            "creationTime": 7.599999999976717,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 2.800000000046566,
+            "timeToFirstToken": 2.800000000046566,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 123,
+            "tokensPerSecond": 43928.57142784086
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 3.133333333341094,
+        "averageTokensPerSecond": 39514.180672129245,
+        "averageTimeToFirstToken": 3.133333333341094,
+        "medianTotalResponseTime": 3.199999999953434,
+        "medianTokensPerSecond": 38437.50000055934,
+        "medianTimeToFirstToken": 3.199999999953434
+      },
+      {
+        "id": "Translate short phrase from english to french. Cold Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 99.90000000002328,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 127.59999999997672,
+            "timeToFirstToken": 127.59999999997672,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 556.4263322885029
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.5,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 13.800000000046566,
+            "timeToFirstToken": 13.800000000046566,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 5144.927536214523
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.599999999976717,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 13.400000000023283,
+            "timeToFirstToken": 13.400000000023283,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 5298.50746267736
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 51.60000000001552,
+        "averageTokensPerSecond": 3666.620443726795,
+        "averageTimeToFirstToken": 51.60000000001552,
+        "medianTotalResponseTime": 13.800000000046566,
+        "medianTokensPerSecond": 5144.927536214523,
+        "medianTimeToFirstToken": 13.800000000046566
+      },
+      {
+        "id": "Translate short phrase from english to french. Warm Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 3.299999999930151,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 11.400000000023283,
+            "timeToFirstToken": 11.400000000023283,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 6228.070175425876
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.299999999930151,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 11.300000000046566,
+            "timeToFirstToken": 11.300000000046566,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 6283.185840682072
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.299999999930151,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 11.29999999993015,
+            "timeToFirstToken": 11.29999999993015,
+            "totalNumberOfInputTokens": 62,
+            "totalNumberOfOutputTokens": 71,
+            "tokensPerSecond": 6283.1858407468035
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 11.333333333333334,
+        "averageTokensPerSecond": 6264.813952284917,
+        "averageTimeToFirstToken": 11.333333333333334,
+        "medianTotalResponseTime": 11.300000000046566,
+        "medianTokensPerSecond": 6283.185840682072,
+        "medianTimeToFirstToken": 11.300000000046566
+      },
+      {
+        "id": "Summarize a long news article. Cold Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 3.900000000023283,
+            "timeToFirstToken": 1821.9000000000233,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to speak with faculty and students.\\n* He lectured on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation and youth empowerment in peacebuilding.\\n* Dean Özerdem reflected on the Youth Trilateral Leadership (YTL) Workshop, highlighting its significance in connecting youth with technology and fostering cross-cultural understanding.\\n* Plans are underway to launch a Peace Tech Lab at Mason Korea to explore the use of games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 6585.199999999953,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 821,
+            "tokensPerSecond": 124.67351029581575
+          },
+          {
+            "status": "Success",
+            "creationTime": 3,
+            "timeToFirstToken": 594.3000000000466,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to speak with faculty and students.\\n* He lectured on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation and youth empowerment in peacebuilding.\\n* Dean Özerdem reflected on the Youth Trilateral Leadership (YTL) Workshop, highlighting its significance in connecting youth with technology and fostering cross-cultural understanding.\\n* Plans are underway to launch a Peace Tech Lab at Mason Korea to explore the use of games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 5529.099999999977,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 821,
+            "tokensPerSecond": 148.48709554900498
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.800000000046566,
+            "timeToFirstToken": 598.2000000000698,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to speak with faculty and students.\\n* He lectured on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation and youth empowerment in peacebuilding.\\n* Dean Özerdem reflected on the Youth Trilateral Leadership (YTL) Workshop, highlighting its significance in connecting youth with technology and fostering cross-cultural understanding.\\n* Plans are underway to launch a Peace Tech Lab at Mason Korea to explore the use of games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 5370.900000000023,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 821,
+            "tokensPerSecond": 152.8607868327462
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 5828.399999999984,
+        "averageTokensPerSecond": 142.00713089252233,
+        "averageTimeToFirstToken": 1004.8000000000466,
+        "medianTotalResponseTime": 5529.099999999977,
+        "medianTokensPerSecond": 148.48709554900498,
+        "medianTimeToFirstToken": 598.2000000000698
+      },
+      {
+        "id": "Summarize a long news article. Warm Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 2.799999999930151,
+            "timeToFirstToken": 592.1000000000931,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to speak with faculty and students.\\n* He lectured on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation and youth empowerment in peacebuilding.\\n* Dean Özerdem reflected on the Youth Trilateral Leadership (YTL) Workshop, highlighting its significance in connecting youth with technology and fostering cross-cultural understanding.\\n* Plans are underway to launch a Peace Tech Lab at Mason Korea to explore the use of games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 5543.300000000047,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 821,
+            "tokensPerSecond": 148.10672343188952
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.799999999930151,
+            "timeToFirstToken": 54.699999999953434,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to discuss technology's role in peacebuilding and youth empowerment.\\n* He lectured on “Technology, Peacebuilding, and Future-Oriented Programs,” emphasizing empathy, innovation, and cross-cultural collaboration.\\n* Dean Özerdem oversaw the Youth Trilateral Leadership (YTL) Workshop, fostering understanding among youth from Japan, Korea, and the U.S.\\n* He plans to launch a Peace Tech Lab at Mason Korea to explore using computer games for peace education and problem-solving.\\n* Dean Özerdem participated in an MOU signing ceremony between Mason Korea and the Korean Association of Negotiation Studies (KANS) to establish a new Advanced Negotiation Program and collaborative research opportunities.\"",
+            "totalResponseTime": 4568.900000000023,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 747,
+            "tokensPerSecond": 163.49668410339385
+          },
+          {
+            "status": "Success",
+            "creationTime": 2.799999999930151,
+            "timeToFirstToken": 54.79999999993015,
+            "output": "\"* Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution, visited Mason Korea to interact with faculty and students of the Conflict Analysis and Resolution program.\\n* He lectured on \\\"Technology, Peacebuilding, and Future-Oriented Programs,\\\" emphasizing the role of digital transformation and youth empowerment in peacebuilding.\\n* Dean Özerdem oversaw the Youth Trilateral Leadership (YTL) Workshop, fostering cross-cultural understanding among youth from Japan, Korea, and the U.S., and highlighting the significance of technology in peace efforts.\\n* He plans to launch a Peace Tech Lab at Mason Korea to explore the use of computer games for teaching, problem-solving, and peacebuilding.\\n* Mason Korea signed an MOU with the Korean Association of Negotiation Studies (KANS) to establish a new Advanced Negotiation Program and promote collaborative research.\"",
+            "totalResponseTime": 5593.900000000023,
+            "totalNumberOfInputTokens": 2098,
+            "totalNumberOfOutputTokens": 912,
+            "tokensPerSecond": 163.03473426410844
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 5235.366666666698,
+        "averageTokensPerSecond": 158.21271393313063,
+        "averageTimeToFirstToken": 233.86666666665892,
+        "medianTotalResponseTime": 5543.300000000047,
+        "medianTokensPerSecond": 163.03473426410844,
+        "medianTimeToFirstToken": 54.79999999993015
+      },
+      {
+        "id": "Prompt (Text). Analyze the scenario and provide a response. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 128.20000000006985,
+            "timeToFirstToken": 518.9000000000233,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a **false dilemma**. They present a binary choice – either AI leads to a perfect utopia or a dystopian servitude – ignoring the vast spectrum of possibilities in between. Neither acknowledges nuanced outcomes or the interplay of various factors. Passage A commits an appeal to emotion, invoking the allure of progress, while Passage B relies on an appeal to fear, emphasizing potential catastrophe without sufficient grounding.\\n\\nA decentralized, federated learning model offers a potential mitigation of the risks outlined in Passage B. By distributing AI development and training across numerous entities, control is dispersed, reducing the likelihood of a single entity wielding unchecked power. Furthermore, data remains localized, safeguarding privacy and potentially preventing the creation of overly generalized, potentially harmful models. However, such a model does not inherently guarantee the utopian vision of Passage A. Ethical frameworks, robust oversight mechanisms, and continuous societal adaptation remain crucial to navigating the complexities of advanced AI. Decentralization simply shifts the challenge, it does not negate it.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 6103,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1239,
+            "tokensPerSecond": 203.01491069965593
+          },
+          {
+            "status": "Success",
+            "creationTime": 156.40000000002328,
+            "timeToFirstToken": 547.0999999999767,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a **false dilemma**. They present a binary choice – either AI leads to a perfect utopia or a dystopian servitude – ignoring the vast spectrum of possibilities in between. Neither acknowledges nuanced outcomes or the interplay of various factors. Passage A commits an appeal to emotion, invoking the allure of progress, while Passage B relies on an appeal to fear, emphasizing potential catastrophe without sufficient grounding.\\n\\nA decentralized, federated learning model offers a potential mitigation of the risks outlined in Passage B. By distributing AI development and training across numerous entities, control is dispersed, reducing the likelihood of a single entity wielding unchecked power. Furthermore, data remains localized, safeguarding privacy and potentially preventing the creation of overly generalized, potentially harmful models. However, such a model does not inherently guarantee the utopian vision of Passage A. Ethical frameworks, robust oversight mechanisms, and continuous societal adaptation remain crucial to navigating the complexities of advanced AI. Decentralization simply shifts the challenge, it does not negate it.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 6129.099999999977,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1239,
+            "tokensPerSecond": 202.1503972850834
+          },
+          {
+            "status": "Success",
+            "creationTime": 164.20000000006985,
+            "timeToFirstToken": 553.3000000000466,
+            "output": "\"### Philosophical & Technical Synthesis\\n\\nBoth passages exhibit a **false dilemma**. They present a binary choice – either AI leads to a perfect utopia or a dystopian servitude – ignoring the vast spectrum of possibilities in between. Neither acknowledges nuanced outcomes or the interplay of various factors. Passage A commits an appeal to emotion, invoking the allure of progress, while Passage B relies on an appeal to fear, emphasizing potential catastrophe without sufficient grounding.\\n\\nA decentralized, federated learning model offers a potential mitigation of the risks outlined in Passage B. By distributing AI development and training across numerous entities, control is dispersed, reducing the likelihood of a single entity wielding unchecked power. Furthermore, data remains localized, safeguarding privacy and potentially preventing the creation of overly generalized, potentially harmful models. However, such a model does not inherently guarantee the utopian vision of Passage A. Ethical frameworks, robust oversight mechanisms, and continuous societal adaptation remain crucial to navigating the complexities of advanced AI. Decentralization simply shifts the challenge, it does not negate it.\\n\\nSelf-Assessment: 4.0\"",
+            "totalResponseTime": 6135.300000000047,
+            "totalNumberOfInputTokens": 1375,
+            "totalNumberOfOutputTokens": 1239,
+            "tokensPerSecond": 201.94611510439435
+          }
+        ],
+        "input": "Analyze the following scenario and provide a structured response.\n\nCore Task:\n\nRead the following two short, contradictory passages about the future of artificial intelligence.\n\nPassage A: \"AI promises a utopian future, a new renaissance where human potential is unbound, solving age-old problems of disease, scarcity, and labor.\"\n\nPassage B: \"The unchecked rise of AI is an existential gamble, a path toward technological servitude where human autonomy is rendered obsolete by superior, unfeeling logic.\"\n\nYour task is to write a concise synthesis of these two viewpoints. First, identify the core logical fallacy present in both passages (e.g., strawman, false dilemma, appeal to emotion, etc.) and briefly justify your choice. Then, explain how a decentralized, federated learning model might mitigate the risks described in Passage B while still failing to guarantee the utopia of Passage A.\n\nFormatting Requirements:\n\nThe entire response must be under 250 words.\n\nThe tone must be formal, critical, and slightly detached.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Philosophical & Technical Synthesis\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 6122.466666666674,
+        "averageTokensPerSecond": 202.37047436304456,
+        "averageTimeToFirstToken": 539.7666666666822,
+        "medianTotalResponseTime": 6129.099999999977,
+        "medianTokensPerSecond": 202.1503972850834,
+        "medianTimeToFirstToken": 547.0999999999767
+      },
+      {
+        "id": "Prompt (Text). Answer Ethical Dilemma, then creative task. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 136.10000000009313,
+            "timeToFirstToken": 409,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a moral dilemma: divert a trolley onto a side track, killing one person instead of five on the main track. It forces a confrontation between consequentialist (maximizing good) and deontological (following moral rules) ethical frameworks.\\n\\n```\\nData flows, a split-second plight,\\nCalculate paths, dark and bright.\\nProbability weighs, a cold embrace,\\nMinimize harm, in time and space.\\n```\\n\\nSelf-Assessment: 4.8\\n\\n\\n\\n\"",
+            "totalResponseTime": 3162.600000000093,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 482,
+            "tokensPerSecond": 152.40624802377343
+          },
+          {
+            "status": "Success",
+            "creationTime": 135.09999999997672,
+            "timeToFirstToken": 407.5999999999767,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a moral dilemma: divert a trolley onto a side track, killing one person instead of five on the main track. It forces a confrontation between consequentialist (maximizing good) and deontological (following moral rules) ethical frameworks.\\n\\n```\\nData flows, a split-second plight,\\nCalculate paths, dark and bright.\\nProbability weighs, a cold embrace,\\nMinimize harm, in time and space.\\n```\\n\\nSelf-Assessment: 4.8\\n\\n\\n\\n\"",
+            "totalResponseTime": 3162.5,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 482,
+            "tokensPerSecond": 152.41106719367588
+          },
+          {
+            "status": "Success",
+            "creationTime": 133,
+            "timeToFirstToken": 403.79999999993015,
+            "output": "\"### Ethical Computation\\n\\nThe Trolley Problem presents a moral dilemma: divert a trolley onto a side track, killing one person instead of five on the main track. It forces a confrontation between consequentialist (maximizing good) and deontological (following moral rules) ethical frameworks.\\n\\n```\\nData flows, a split-second plight,\\nCalculate paths, dark and bright.\\nProbability weighs, a cold embrace,\\nMinimize harm, in time and space.\\n```\\n\\nSelf-Assessment: 4.8\\n\\n\\n\\n\"",
+            "totalResponseTime": 3165.5999999999767,
+            "totalNumberOfInputTokens": 784,
+            "totalNumberOfOutputTokens": 482,
+            "tokensPerSecond": 152.26181450593995
+          }
+        ],
+        "input": "Provide a structured response to the following creative and factual challenge.\n\nCore Tasks:\n\nDefinition: Briefly (in two sentences or less) define the \"Trolley Problem\" in ethics.\n\nCreation: Write a 4-line poem in an AABB rhyme scheme from the perspective of a self-driving car's algorithm having to compute a real-time solution to it.\n\nFormatting Requirements:\n\nThe entire response must be under 150 words.\n\nThe tone should be concise and thoughtful.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Ethical Computation\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 3163.56666666669,
+        "averageTokensPerSecond": 152.3597099077964,
+        "averageTimeToFirstToken": 406.799999999969,
+        "medianTotalResponseTime": 3162.600000000093,
+        "medianTokensPerSecond": 152.40624802377343,
+        "medianTimeToFirstToken": 407.5999999999767
+      },
+      {
+        "id": "Prompt (Text). Technical challenge, write code. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 158.59999999997672,
+            "timeToFirstToken": 460.80000000004657,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n// Promise.race() waits for the *first* promise to resolve (or reject).\\n// It rejects immediately if any promise rejects.\\n\\nconst promise1 = new Promise((resolve, reject) => setTimeout(() => resolve(\\\"Promise 1 Resolved!\\\"), 1000));\\nconst promise2 = new Promise((resolve, reject) => setTimeout(() => reject(\\\"Promise 2 Rejected!\\\"), 500));\\n\\nPromise.race([promise1, promise2])\\n  .then(result => {\\n    console.log(\\\"Race winner:\\\", result); // Output: Promise 2 Rejected!\\n  });\\n\\n//Explanation:\\n// Promise.race() is suitable when you want to determine which promise completes first,\\n// regardless of whether it completes successfully or unsuccessfully.\\n// For example, imagine a scenario where you're fetching data from multiple APIs. \\n// You might want to choose the first API response you receive to proceed,\\n// even if some APIs encounter errors. Promise.race() allows you to prioritize speed\\n// over guaranteed success, which is different from Promise.all() which waits for all promises to succeed.\\n```\\n\\nSelf-Assessment: 5.0\\n\\n\\n\\n\"",
+            "totalResponseTime": 7291.800000000047,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1103,
+            "tokensPerSecond": 151.26580542527125
+          },
+          {
+            "status": "Success",
+            "creationTime": 157.5,
+            "timeToFirstToken": 455.29999999993015,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n// Promise.race() waits for the *first* promise to resolve (or reject).\\n// It rejects immediately if any promise rejects.\\n\\nconst promise1 = new Promise((resolve, reject) => setTimeout(() => resolve(\\\"Promise 1 Resolved!\\\"), 1000));\\nconst promise2 = new Promise((resolve, reject) => setTimeout(() => reject(\\\"Promise 2 Rejected!\\\"), 500));\\n\\nPromise.race([promise1, promise2])\\n  .then(result => {\\n    console.log(\\\"Race winner:\\\", result); // Output: Promise 2 Rejected!\\n  });\\n\\n//Explanation:\\n// Promise.race() is suitable when you want to determine which promise completes first,\\n// regardless of whether it completes successfully or unsuccessfully.\\n// For example, imagine a scenario where you're fetching data from multiple APIs. \\n// You might want to choose the first API response you receive to proceed,\\n// even if some APIs encounter errors. Promise.race() allows you to prioritize speed\\n// over guaranteed success, which is different from Promise.all() which waits for all promises to succeed.\\n```\\n\\nSelf-Assessment: 5.0\\n\\n\\n\\n\"",
+            "totalResponseTime": 7288.099999999977,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1103,
+            "tokensPerSecond": 151.34259958013797
+          },
+          {
+            "status": "Success",
+            "creationTime": 157.5,
+            "timeToFirstToken": 461.4000000000233,
+            "output": "\"### Asynchronous Demonstration\\n\\n```javascript\\n// Promise.race() waits for the *first* promise to resolve (or reject).\\n// It rejects immediately if any promise rejects.\\n\\nconst promise1 = new Promise((resolve, reject) => setTimeout(() => resolve(\\\"Promise 1 Resolved!\\\"), 1000));\\nconst promise2 = new Promise((resolve, reject) => setTimeout(() => reject(\\\"Promise 2 Rejected!\\\"), 500));\\n\\nPromise.race([promise1, promise2])\\n  .then(result => {\\n    console.log(\\\"Race winner:\\\", result); // Output: Promise 2 Rejected!\\n  });\\n\\n//Explanation:\\n// Promise.race() is suitable when you want to determine which promise completes first,\\n// regardless of whether it completes successfully or unsuccessfully.\\n// For example, imagine a scenario where you're fetching data from multiple APIs. \\n// You might want to choose the first API response you receive to proceed,\\n// even if some APIs encounter errors. Promise.race() allows you to prioritize speed\\n// over guaranteed success, which is different from Promise.all() which waits for all promises to succeed.\\n```\\n\\nSelf-Assessment: 5.0\\n\\n\\n\\n\"",
+            "totalResponseTime": 7320.099999999977,
+            "totalNumberOfInputTokens": 829,
+            "totalNumberOfOutputTokens": 1103,
+            "tokensPerSecond": 150.68100162566134
+          }
+        ],
+        "input": "Provide a structured response to the following technical challenge.\n\nCore Tasks:\n\nCode Generation: Generate a short, commented code snippet in JavaScript (no more than 10 lines) that correctly demonstrates a Promise.race().\n\nExplanation: Immediately after the code, explain a clear, real-world scenario where this specific function would be more useful than Promise.all().\n\nFormatting Requirements:\n\nThe code must be valid and commented.\n\nThe tone should be professional and instructional.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Asynchronous Demonstration\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 7300,
+        "averageTokensPerSecond": 151.0964688770235,
+        "averageTimeToFirstToken": 459.1666666666667,
+        "medianTotalResponseTime": 7291.800000000047,
+        "medianTokensPerSecond": 151.26580542527125,
+        "medianTimeToFirstToken": 460.80000000004657
+      },
+      {
+        "id": "Prompt Image Describe (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 503.9000000000233,
+            "timeToFirstToken": 1088,
+            "output": "The image contains a red circle.",
+            "totalResponseTime": 1273.5999999999767,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 32,
+            "tokensPerSecond": 25.125628140703977
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.79999999993015,
+            "timeToFirstToken": 686.0999999999767,
+            "output": "The image contains a red circle.",
+            "totalResponseTime": 872.8999999999069,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 32,
+            "tokensPerSecond": 36.65941115821218
+          },
+          {
+            "status": "Success",
+            "creationTime": 114.20000000006985,
+            "timeToFirstToken": 676.2000000000698,
+            "output": "The image contains a red circle.",
+            "totalResponseTime": 862,
+            "totalNumberOfInputTokens": 122,
+            "totalNumberOfOutputTokens": 32,
+            "tokensPerSecond": 37.12296983758701
+          }
+        ],
+        "input": "Describe the provided image canvas concisely.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "data:image/png;base64,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",
+        "averageTotalResponseTime": 1002.8333333332945,
+        "averageTokensPerSecond": 32.96933637883439,
+        "averageTimeToFirstToken": 816.7666666666822,
+        "medianTotalResponseTime": 872.8999999999069,
+        "medianTokensPerSecond": 36.65941115821218,
+        "medianTimeToFirstToken": 686.0999999999767
+      },
+      {
+        "id": "Prompt Image Explain Emotion (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 118.80000000004657,
+            "timeToFirstToken": 677.3000000000466,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **mildly annoyed or skeptical**. His slightly furrowed brow and subtle downturned mouth suggest a sense of displeasure or doubt. \n\nIt's important to note that interpreting emotions from a single image can be subjective, but these are the most likely emotions conveyed.",
+            "totalResponseTime": 2332.4000000000233,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 314,
+            "tokensPerSecond": 134.6252786829004
+          },
+          {
+            "status": "Error",
+            "creationTime": 117.5,
+            "timeToFirstToken": 689.3000000000466,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **mildly annoyed or skeptical**. His slightly furrowed brow and subtle downturned mouth suggest a sense of displeasure or doubt. \n\nIt's important to note that interpreting emotions from a single image can be subjective, but these are the most likely emotions conveyed.",
+            "totalResponseTime": 2344.20000000007,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 314,
+            "tokensPerSecond": 133.94761539117422
+          },
+          {
+            "status": "Error",
+            "creationTime": 109.89999999990687,
+            "timeToFirstToken": 679.2999999999302,
+            "output": "Validation Failed. Expected emotion to be disgust. Got: The person in the image appears to be feeling **mildly annoyed or skeptical**. His slightly furrowed brow and subtle downturned mouth suggest a sense of displeasure or doubt. \n\nIt's important to note that interpreting emotions from a single image can be subjective, but these are the most likely emotions conveyed.",
+            "totalResponseTime": 2330.5,
+            "totalNumberOfInputTokens": 164,
+            "totalNumberOfOutputTokens": 314,
+            "tokensPerSecond": 134.73503540012874
+          }
+        ],
+        "input": "Explain the emotion shown in this image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/Disgusted_Homelander.jpg",
+        "averageTotalResponseTime": 2335.700000000031,
+        "averageTokensPerSecond": 134.4359764914011,
+        "averageTimeToFirstToken": 681.9666666666744,
+        "medianTotalResponseTime": 2332.4000000000233,
+        "medianTokensPerSecond": 134.6252786829004,
+        "medianTimeToFirstToken": 679.2999999999302
+      },
+      {
+        "id": "Prompt Image Explain Meme (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 98.30000000004657,
+            "timeToFirstToken": 666,
+            "output": "Alright, let's break down this meme! It's a classic example of the \"Wikipedia Rabbit Hole\" humor, and it's wonderfully relatable. \n\n**Here's the gist:**\n\nThe meme plays on the fact that when you go to Wikipedia to look up one tiny thing, you *almost always* end up spending way more time than you intended, and often learning about things completely unrelated to your original query. \n\n**Why it's funny:**\n\n* **Relatability:**  We've all been there! You start with a simple question, and suddenly you're down a rabbit hole of history, politics, obscure trivia – who knew so much about the Soviet Union existed?\n* **Exaggeration:** The \"3 hours later you know everything about the Soviet Union\" is an exaggeration, of course. But it captures the feeling of getting utterly lost in Wikipedia.\n* **Irony:** The initial intention was to get one fact. The reality is a vast, unexpected dive into another subject.\n\n**The image itself reinforces the joke:**\n\nThe puzzle piece Earth represents Wikipedia. The fact that a small piece is missing symbolizes how even a seemingly small search can open up a whole world of information (and confusion!). \n\nBasically, it's a lighthearted jab at the internet's endless capacity for distraction and how easily we can lose hours (or even days!) just clicking links on Wikipedia. 😄\n\n\n\n",
+            "totalResponseTime": 8571.300000000047,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1317,
+            "tokensPerSecond": 153.65230478457093
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.90000000002328,
+            "timeToFirstToken": 677.5,
+            "output": "Alright, let's break down this meme! It's a classic example of the \"Wikipedia Rabbit Hole\" humor, and it's wonderfully relatable. \n\n**Here's the gist:**\n\nThe meme plays on the fact that when you go to Wikipedia to look up one tiny thing, you *almost always* end up spending way more time than you intended, and often learning about things completely unrelated to your original query. \n\n**Why it's funny:**\n\n* **Relatability:**  We've all been there! You start with a simple question, and suddenly you're down a rabbit hole of history, politics, obscure trivia – who knew so much about the Soviet Union existed?\n* **Exaggeration:** The \"3 hours later you know everything about the Soviet Union\" is an exaggeration, of course. But it captures the feeling of getting utterly lost in Wikipedia.\n* **Irony:** The initial intention was to get one fact. The reality is a vast, unexpected dive into another subject.\n\n**The image itself reinforces the joke:**\n\nThe puzzle piece Earth represents Wikipedia. The fact that a small piece is missing symbolizes how even a seemingly small search can open up a whole world of information (and confusion!). \n\nBasically, it's a lighthearted jab at the internet's endless capacity for distraction and how easily we can lose hours (or even days!) just clicking links on Wikipedia. 😄\n\n\n\n",
+            "totalResponseTime": 8583.300000000047,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1317,
+            "tokensPerSecond": 153.43748907762665
+          },
+          {
+            "status": "Success",
+            "creationTime": 113.09999999997672,
+            "timeToFirstToken": 673.2999999999302,
+            "output": "Alright, let's break down this meme! It's a classic example of the \"Wikipedia Rabbit Hole\" humor, and it's wonderfully relatable. \n\n**Here's the gist:**\n\nThe meme plays on the fact that when you go to Wikipedia to look up one tiny thing, you *almost always* end up spending way more time than you intended, and often learning about things completely unrelated to your original query. \n\n**Why it's funny:**\n\n* **Relatability:**  We've all been there! You start with a simple question, and suddenly you're down a rabbit hole of history, politics, obscure trivia – who knew so much about the Soviet Union existed?\n* **Exaggeration:** The \"3 hours later you know everything about the Soviet Union\" is an exaggeration, of course. But it captures the feeling of getting utterly lost in Wikipedia.\n* **Irony:** The initial intention was to get one fact. The reality is a vast, unexpected dive into another subject.\n\n**The image itself reinforces the joke:**\n\nThe puzzle piece Earth represents Wikipedia. The fact that a small piece is missing symbolizes how even a seemingly small search can open up a whole world of information (and confusion!). \n\nBasically, it's a lighthearted jab at the internet's endless capacity for distraction and how easily we can lose hours (or even days!) just clicking links on Wikipedia. 😄\n\n\n\n",
+            "totalResponseTime": 8578.099999999977,
+            "totalNumberOfInputTokens": 120,
+            "totalNumberOfOutputTokens": 1317,
+            "tokensPerSecond": 153.5305020925384
+          }
+        ],
+        "input": "Explain the visual joke or text provided in the canvas.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/Wikipedia_meme_vector_version.svg",
+        "averageTotalResponseTime": 8577.56666666669,
+        "averageTokensPerSecond": 153.54009865157866,
+        "averageTimeToFirstToken": 672.2666666666433,
+        "medianTotalResponseTime": 8578.099999999977,
+        "medianTokensPerSecond": 153.5305020925384,
+        "medianTimeToFirstToken": 673.2999999999302
+      },
+      {
+        "id": "Prompt Image OCR Computer Font (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 103.5,
+            "timeToFirstToken": 667.6000000000931,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 906.6000000000931,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 18.751378777849386
+          },
+          {
+            "status": "Success",
+            "creationTime": 139.39999999990687,
+            "timeToFirstToken": 697.5,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 938,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 18.12366737739872
+          },
+          {
+            "status": "Success",
+            "creationTime": 134.09999999997672,
+            "timeToFirstToken": 694.4000000000233,
+            "output": "Web_AI_Studio_123",
+            "totalResponseTime": 934.1999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 17,
+            "tokensPerSecond": 18.19738813958558
+          }
+        ],
+        "input": "Extract the computer font text from the provided image canvas.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "data:image/png;base64,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",
+        "averageTotalResponseTime": 926.2666666666822,
+        "averageTokensPerSecond": 18.357478098277895,
+        "averageTimeToFirstToken": 686.5000000000388,
+        "medianTotalResponseTime": 934.1999999999534,
+        "medianTokensPerSecond": 18.19738813958558,
+        "medianTimeToFirstToken": 694.4000000000233
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 1 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 107.5,
+            "timeToFirstToken": 687.8000000000466,
+            "output": "Accuracy: 99%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, and he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\n\n\n",
+            "totalResponseTime": 2826.0999999999767,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 371,
+            "tokensPerSecond": 131.27631718622945
+          },
+          {
+            "status": "Success",
+            "creationTime": 133.20000000006985,
+            "timeToFirstToken": 724.2000000000698,
+            "output": "Accuracy: 99%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, and he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\n\n\n",
+            "totalResponseTime": 2855.100000000093,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 371,
+            "tokensPerSecond": 129.9429091800595
+          },
+          {
+            "status": "Success",
+            "creationTime": 136.29999999993015,
+            "timeToFirstToken": 727.2999999999302,
+            "output": "Accuracy: 99%\n\nExpected:\nPresident Kennedy is ready to get tough over West Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yesterday that the offer - 357 million - was not good enough. And he indicated that his Government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\nActual:\nPresident Kennedy is ready to get tough over what Germany's cash offer to help America's balance of payments position. He said bluntly in Washington yester-day that the offer - 357 million - was not good enough, and he indicated that his government would try to get Germany to pay more. He did not mention personal talks with Dr. Adenauer, the West German Chancellor.\n\n\n\n",
+            "totalResponseTime": 2864.29999999993,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 371,
+            "tokensPerSecond": 129.52553852599553
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-058.png",
+        "averageTotalResponseTime": 2848.5,
+        "averageTokensPerSecond": 130.24825496409483,
+        "averageTimeToFirstToken": 713.1000000000155,
+        "medianTotalResponseTime": 2855.100000000093,
+        "medianTokensPerSecond": 129.9429091800595,
+        "medianTimeToFirstToken": 724.2000000000698
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 2 (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 111.29999999993015,
+            "timeToFirstToken": 693.2999999999302,
+            "output": "Accuracy: 93%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is in the ounce- and for-all cash offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tame the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2906.29999999993,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 125.93331727626494
+          },
+          {
+            "status": "Error",
+            "creationTime": 131.90000000002328,
+            "timeToFirstToken": 719.7999999999302,
+            "output": "Accuracy: 93%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is in the ounce- and for-all cash offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tame the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2943.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 124.34177000169866
+          },
+          {
+            "status": "Error",
+            "creationTime": 134,
+            "timeToFirstToken": 718.1999999999534,
+            "output": "Accuracy: 93%\n\nExpected:\nThese support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is the once-and-for-all cash offer of 357million. President Kennedy's rejection of it is a painful blow to the West German Government. It will now have to pay more - and increase taxation to do so - or run the obvious risks in upsetting the new American administration.\n\nActual:\nThere support costs are a big drain on America's dollar reserves. Dr. Adenauer's answer is in the ounce- and for-all cash offer of 357 million. President Kennedy's rejection of it is a painful blow to the West German Government. U will was have to pay more - and increase taxation to do so - or tame the obvious interest in upsetting the new American administration.",
+            "totalResponseTime": 2943,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 366,
+            "tokensPerSecond": 124.36289500509683
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-072x.png",
+        "averageTotalResponseTime": 2930.93333333331,
+        "averageTokensPerSecond": 124.87932742768682,
+        "averageTimeToFirstToken": 710.4333333332712,
+        "medianTotalResponseTime": 2943,
+        "medianTokensPerSecond": 124.36289500509683,
+        "medianTimeToFirstToken": 718.1999999999534
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 3 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 107.40000000002328,
+            "timeToFirstToken": 696.5999999999767,
+            "output": "Accuracy: 100%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.",
+            "totalResponseTime": 3075.29999999993,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 146.3271875914578
+          },
+          {
+            "status": "Success",
+            "creationTime": 131.39999999990687,
+            "timeToFirstToken": 723.1999999999534,
+            "output": "Accuracy: 100%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.",
+            "totalResponseTime": 3097,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 145.30190506942202
+          },
+          {
+            "status": "Success",
+            "creationTime": 132.5,
+            "timeToFirstToken": 723.0999999999767,
+            "output": "Accuracy: 100%\n\nExpected:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.\n\nActual:\nWhen Mr. Brown sat down Labour MPs cheered for a full minute - and even his bitterest opponents on defence joined in. Mr. Powell devoted half his speech to giving details of plans for improving the hospital service, on which indeed the Government is making progress. His basic defence of the Health Service cuts was that even after the proposed changes the net cost of the service to the Exchequer will have increased over three years by 20 per cent.",
+            "totalResponseTime": 3101,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 450,
+            "tokensPerSecond": 145.114479200258
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-128.png",
+        "averageTotalResponseTime": 3091.0999999999767,
+        "averageTokensPerSecond": 145.58119062037926,
+        "averageTimeToFirstToken": 714.2999999999689,
+        "medianTotalResponseTime": 3097,
+        "medianTokensPerSecond": 145.30190506942202,
+        "medianTimeToFirstToken": 723.0999999999767
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 1 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 128.59999999997672,
+            "timeToFirstToken": 697,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 751.6999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 9.312225621924217
+          },
+          {
+            "status": "Success",
+            "creationTime": 134.5,
+            "timeToFirstToken": 698.5999999999767,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 753.8000000000466,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 9.286282833642304
+          },
+          {
+            "status": "Success",
+            "creationTime": 134.70000000006985,
+            "timeToFirstToken": 693.8000000000466,
+            "output": "Accuracy: 100%\n\nExpected:\nJUSTINE\n\nActual:\nJUSTINE",
+            "totalResponseTime": 746.9000000000233,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 7,
+            "tokensPerSecond": 9.372071227741039
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0099.jpg",
+        "averageTotalResponseTime": 750.8000000000078,
+        "averageTokensPerSecond": 9.32352656110252,
+        "averageTimeToFirstToken": 696.4666666666744,
+        "medianTotalResponseTime": 751.6999999999534,
+        "medianTokensPerSecond": 9.312225621924217,
+        "medianTimeToFirstToken": 697
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 2 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 124.19999999995343,
+            "timeToFirstToken": 682.9000000000233,
+            "output": "Accuracy: 100%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICINO",
+            "totalResponseTime": 789.1999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 9,
+            "tokensPerSecond": 11.403953370502448
+          },
+          {
+            "status": "Success",
+            "creationTime": 135.69999999995343,
+            "timeToFirstToken": 697.5,
+            "output": "Accuracy: 100%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICINO",
+            "totalResponseTime": 803.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 9,
+            "tokensPerSecond": 11.20099564405725
+          },
+          {
+            "status": "Success",
+            "creationTime": 134.5,
+            "timeToFirstToken": 692.5,
+            "output": "Accuracy: 100%\n\nExpected:\nMENDICINO\n\nActual:\nMENDICINO",
+            "totalResponseTime": 799.1999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 9,
+            "tokensPerSecond": 11.261261261261918
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0300.jpg",
+        "averageTotalResponseTime": 797.2999999999689,
+        "averageTokensPerSecond": 11.288736758607206,
+        "averageTimeToFirstToken": 690.9666666666744,
+        "medianTotalResponseTime": 799.1999999999534,
+        "medianTokensPerSecond": 11.261261261261918,
+        "medianTimeToFirstToken": 692.5
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 3 (Cold)",
+        "status": "Error",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Error",
+            "creationTime": 127.40000000002328,
+            "timeToFirstToken": 689,
+            "output": "Accuracy: 81%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCONO - VIVANCOS",
+            "totalResponseTime": 927.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 19,
+            "tokensPerSecond": 20.485175202156334
+          },
+          {
+            "status": "Error",
+            "creationTime": 134.60000000009313,
+            "timeToFirstToken": 697.8000000000466,
+            "output": "Accuracy: 81%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCONO - VIVANCOS",
+            "totalResponseTime": 937.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 19,
+            "tokensPerSecond": 20.266666666666666
+          },
+          {
+            "status": "Error",
+            "creationTime": 138,
+            "timeToFirstToken": 702.6999999999534,
+            "output": "Accuracy: 81%\n\nExpected:\nCERMENO-VIVANCOS\n\nActual:\nCERHCONO - VIVANCOS",
+            "totalResponseTime": 944.8999999999069,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 19,
+            "tokensPerSecond": 20.107947930999973
+          }
+        ],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "available",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0958.jpg",
+        "averageTotalResponseTime": 936.6333333333023,
+        "averageTokensPerSecond": 20.286596599940992,
+        "averageTimeToFirstToken": 696.5,
+        "medianTotalResponseTime": 937.5,
+        "medianTokensPerSecond": 20.266666666666666,
+        "medianTimeToFirstToken": 697.8000000000466
+      },
+      {
+        "id": "Prompt Audio Transcription 119 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 708.4000000000233,
+            "timeToFirstToken": 1155.2999999999302,
+            "output": "Accuracy: 100%\n\nExpected:\nMostly uh family and then uh funeral service.\n\nActual:\nMostly uh family and then uh funeral service.",
+            "totalResponseTime": 1396.6999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 45,
+            "tokensPerSecond": 32.21880146058674
+          },
+          {
+            "status": "Success",
+            "creationTime": 135.69999999995343,
+            "timeToFirstToken": 553.3000000000466,
+            "output": "Accuracy: 100%\n\nExpected:\nMostly uh family and then uh funeral service.\n\nActual:\nMostly uh family and then uh funeral service.",
+            "totalResponseTime": 794.1999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 45,
+            "tokensPerSecond": 56.66079073281622
+          },
+          {
+            "status": "Success",
+            "creationTime": 133.70000000006985,
+            "timeToFirstToken": 547.7000000000698,
+            "output": "Accuracy: 100%\n\nExpected:\nMostly uh family and then uh funeral service.\n\nActual:\nMostly uh family and then uh funeral service.",
+            "totalResponseTime": 789.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 45,
+            "tokensPerSecond": 56.99810006333122
+          }
+        ],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "available",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-119.mp3",
+        "inputAudioDuration": 10.476,
+        "averageTotalResponseTime": 993.4666666666357,
+        "averageTokensPerSecond": 48.62589741891139,
+        "averageTimeToFirstToken": 752.1000000000155,
+        "medianTotalResponseTime": 794.1999999999534,
+        "medianTokensPerSecond": 56.66079073281622,
+        "medianTimeToFirstToken": 553.3000000000466
+      },
+      {
+        "id": "Prompt Audio Transcription 4167 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 93.69999999995343,
+            "timeToFirstToken": 516.6999999999534,
+            "output": "Accuracy: 100%\n\nExpected:\nOnly ask once. Uh the biggest insect where I come from in the United Kingdom. I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.\n\nActual:\nonly ask once. Uh, the biggest insect where I come from in the United Kingdom, I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.",
+            "totalResponseTime": 2462.6999999999534,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 280,
+            "tokensPerSecond": 113.6963495350653
+          },
+          {
+            "status": "Success",
+            "creationTime": 130.89999999990687,
+            "timeToFirstToken": 555.6999999999534,
+            "output": "Accuracy: 100%\n\nExpected:\nOnly ask once. Uh the biggest insect where I come from in the United Kingdom. I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.\n\nActual:\nonly ask once. Uh, the biggest insect where I come from in the United Kingdom, I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.",
+            "totalResponseTime": 2507.899999999907,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 280,
+            "tokensPerSecond": 111.64719486423317
+          },
+          {
+            "status": "Success",
+            "creationTime": 135.29999999993015,
+            "timeToFirstToken": 557.5,
+            "output": "Accuracy: 100%\n\nExpected:\nOnly ask once. Uh the biggest insect where I come from in the United Kingdom. I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.\n\nActual:\nonly ask once. Uh, the biggest insect where I come from in the United Kingdom, I don't really know. I think maybe it's something like a grasshopper. I can't think of anything bigger. Hmm, now I'm trying to decide whether a butterfly is an insect or not. Yeah, I'm not really sure.",
+            "totalResponseTime": 2518.399999999907,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 280,
+            "tokensPerSecond": 111.18170266836498
+          }
+        ],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "available",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-4167.mp3",
+        "inputAudioDuration": 17.748,
+        "averageTotalResponseTime": 2496.3333333332557,
+        "averageTokensPerSecond": 112.17508235588782,
+        "averageTimeToFirstToken": 543.2999999999689,
+        "medianTotalResponseTime": 2507.899999999907,
+        "medianTokensPerSecond": 111.64719486423317,
+        "medianTimeToFirstToken": 555.6999999999534
+      },
+      {
+        "id": "Prompt Audio Transcription 46 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 95.70000000006985,
+            "timeToFirstToken": 506.4000000000233,
+            "output": "Accuracy: 100%\n\nExpected:\nI have grown pumpkins, sunflowers, lettuces and a few other kinds of vegetables and flowers that grow in the UK.\n\nActual:\nI have grown pumpkins, sunflowers, lettuces, and a few other kinds of vegetables and flowers that grow in the UK.",
+            "totalResponseTime": 1173.5999999999767,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 113,
+            "tokensPerSecond": 96.28493524199237
+          },
+          {
+            "status": "Success",
+            "creationTime": 134.80000000004657,
+            "timeToFirstToken": 535.5,
+            "output": "Accuracy: 100%\n\nExpected:\nI have grown pumpkins, sunflowers, lettuces and a few other kinds of vegetables and flowers that grow in the UK.\n\nActual:\nI have grown pumpkins, sunflowers, lettuces, and a few other kinds of vegetables and flowers that grow in the UK.",
+            "totalResponseTime": 1200.5,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 113,
+            "tokensPerSecond": 94.1274468971262
+          },
+          {
+            "status": "Success",
+            "creationTime": 132.80000000004657,
+            "timeToFirstToken": 530.4000000000233,
+            "output": "Accuracy: 100%\n\nExpected:\nI have grown pumpkins, sunflowers, lettuces and a few other kinds of vegetables and flowers that grow in the UK.\n\nActual:\nI have grown pumpkins, sunflowers, lettuces, and a few other kinds of vegetables and flowers that grow in the UK.",
+            "totalResponseTime": 1195.4000000000233,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 113,
+            "tokensPerSecond": 94.5290279404365
+          }
+        ],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "available",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-46.mp3",
+        "inputAudioDuration": 9.756,
+        "averageTotalResponseTime": 1189.8333333333333,
+        "averageTokensPerSecond": 94.98047002651835,
+        "averageTimeToFirstToken": 524.1000000000155,
+        "medianTotalResponseTime": 1195.4000000000233,
+        "medianTokensPerSecond": 94.5290279404365,
+        "medianTimeToFirstToken": 530.4000000000233
+      },
+      {
+        "id": "Prompt Audio Transcription 5670 (Cold)",
+        "status": "Success",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 98.79999999993015,
+            "timeToFirstToken": 529.2999999999302,
+            "output": "Accuracy: 100%\n\nExpected:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So, for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.\n\nActual:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.",
+            "totalResponseTime": 1863.2999999999302,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 232,
+            "tokensPerSecond": 124.5102774647178
+          },
+          {
+            "status": "Success",
+            "creationTime": 137.60000000009313,
+            "timeToFirstToken": 581.9000000000233,
+            "output": "Accuracy: 100%\n\nExpected:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So, for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.\n\nActual:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.",
+            "totalResponseTime": 1908.9000000000233,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 232,
+            "tokensPerSecond": 121.53596312012004
+          },
+          {
+            "status": "Success",
+            "creationTime": 137.59999999997672,
+            "timeToFirstToken": 574.7000000000698,
+            "output": "Accuracy: 100%\n\nExpected:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So, for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.\n\nActual:\nI think that the kinds of tech that would make our lives better are any technology that helps us to live longer and be healthier. So for example, maybe if my watch could tell me to stop eating so much sugar, I would be much happier.",
+            "totalResponseTime": 1903.4000000000233,
+            "totalNumberOfInputTokens": 128,
+            "totalNumberOfOutputTokens": 232,
+            "tokensPerSecond": 121.88714931175642
+          }
+        ],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "available",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-5670.mp3",
+        "inputAudioDuration": 18.252,
+        "averageTotalResponseTime": 1891.8666666666588,
+        "averageTokensPerSecond": 122.64446329886475,
+        "averageTimeToFirstToken": 561.9666666666744,
+        "medianTotalResponseTime": 1903.4000000000233,
+        "medianTokensPerSecond": 121.88714931175642,
+        "medianTimeToFirstToken": 574.7000000000698
+      }
+    ],
+    "summary": {
+      "Language Detector": {
+        "cold": {
+          "averageTokenPerSecond": 10722.666940369292,
+          "averageTimeToFirstToken": 18.033333333325572,
+          "averageTotalResponseTime": 18.033333333325572,
+          "medianTimeToFirstToken": 22.400000000023283,
+          "medianTotalResponseTime": 22.400000000023283,
+          "medianTokenPerSecond": 5491.071428565721
+        },
+        "warm": {
+          "averageTokenPerSecond": 39514.180672129245,
+          "averageTimeToFirstToken": 3.133333333341094,
+          "averageTotalResponseTime": 3.133333333341094,
+          "medianTimeToFirstToken": 3.199999999953434,
+          "medianTotalResponseTime": 3.199999999953434,
+          "medianTokenPerSecond": 38437.50000055934
+        }
+      },
+      "Translator": {
+        "cold": {
+          "averageTokenPerSecond": 3666.620443726795,
+          "averageTimeToFirstToken": 51.60000000001552,
+          "averageTotalResponseTime": 51.60000000001552,
+          "medianTimeToFirstToken": 13.800000000046566,
+          "medianTotalResponseTime": 13.800000000046566,
+          "medianTokenPerSecond": 5144.927536214523
+        },
+        "warm": {
+          "averageTokenPerSecond": 6264.813952284917,
+          "averageTimeToFirstToken": 11.333333333333334,
+          "averageTotalResponseTime": 11.333333333333334,
+          "medianTimeToFirstToken": 11.300000000046566,
+          "medianTotalResponseTime": 11.300000000046566,
+          "medianTokenPerSecond": 6283.185840682072
+        }
+      },
+      "Summarizer": {
+        "cold": {
+          "averageTokenPerSecond": 142.00713089252233,
+          "averageTimeToFirstToken": 1004.8000000000466,
+          "averageTotalResponseTime": 5828.399999999984,
+          "medianTimeToFirstToken": 598.2000000000698,
+          "medianTotalResponseTime": 5529.099999999977,
+          "medianTokenPerSecond": 148.48709554900498
+        },
+        "warm": {
+          "averageTokenPerSecond": 158.21271393313063,
+          "averageTimeToFirstToken": 233.86666666665892,
+          "averageTotalResponseTime": 5235.366666666698,
+          "medianTimeToFirstToken": 54.79999999993015,
+          "medianTotalResponseTime": 5543.300000000047,
+          "medianTokenPerSecond": 163.03473426410844
+        }
+      },
+      "Prompt": {
+        "cold": {
+          "averageTokenPerSecond": 168.6088843826215,
+          "averageTimeToFirstToken": 468.5777777777726,
+          "averageTotalResponseTime": 5528.677777777788,
+          "medianTimeToFirstToken": 460.80000000004657,
+          "medianTotalResponseTime": 6129.099999999977,
+          "medianTokenPerSecond": 152.40624802377343
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Prompt (with Image)": {
+        "cold": {
+          "averageTokenPerSecond": 78.09105225519038,
+          "averageTimeToFirstToken": 707.9266666666643,
+          "averageTotalResponseTime": 2419.7633333333265,
+          "medianTimeToFirstToken": 694.1000000000349,
+          "medianTotalResponseTime": 1802.0499999999884,
+          "medianTokenPerSecond": 80.73236991964284
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Prompt (with Audio)": {
+        "cold": {
+          "averageTokenPerSecond": 94.60647827504557,
+          "averageTimeToFirstToken": 595.3666666666686,
+          "averageTotalResponseTime": 1642.874999999971,
+          "medianTimeToFirstToken": 550.5000000000582,
+          "medianTotalResponseTime": 1629.9999999999418,
+          "medianTokenPerSecond": 103.73331895517867
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Proofreader": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Rewriter": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      },
+      "Writer": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0
+        }
+      }
+    }
+  }
+}
