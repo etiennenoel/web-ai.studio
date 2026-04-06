@@ -76,6 +76,14 @@ export class CortexInsightsPage implements OnInit {
   activeDropdown: string | null = null;
   searchQuery: string = '';
 
+  dropdownSearch: { [key: string]: string } = {
+    hardware: '',
+    compute: '',
+    engine: '',
+    variant: '',
+    api: ''
+  };
+
   tableSortColumn: 'speed' | 'ttft' | 'total' | 'hw' = 'speed';
   tableSortDirection: 'asc' | 'desc' = 'desc';
 
@@ -112,6 +120,26 @@ export class CortexInsightsPage implements OnInit {
   toggleDropdown(dropdown: string, event: MouseEvent) {
     event.stopPropagation();
     this.activeDropdown = this.activeDropdown === dropdown ? null : dropdown;
+    if (this.activeDropdown) {
+      this.dropdownSearch[this.activeDropdown] = '';
+    }
+  }
+
+  onDropdownSearch(filterType: string, event: any) {
+    this.dropdownSearch[filterType] = event.target.value.toLowerCase();
+  }
+
+  getFilteredOptions(filterType: 'hardware' | 'compute' | 'engine' | 'variant' | 'api'): string[] {
+    const search = this.dropdownSearch[filterType].toLowerCase();
+    let options: string[] = [];
+    if (filterType === 'hardware') options = this.hardwareOptions;
+    if (filterType === 'compute') options = this.computeOptions;
+    if (filterType === 'engine') options = this.engineOptions;
+    if (filterType === 'variant') options = this.variantOptions;
+    if (filterType === 'api') options = this.apiOptions;
+    
+    if (!search) return options;
+    return options.filter(opt => opt.toLowerCase().includes(search));
   }
 
   selectFilter(filterType: string, value: string, event?: Event | MouseEvent) {
@@ -212,6 +240,7 @@ export class CortexInsightsPage implements OnInit {
     if (params.has('activeMetric')) this.activeMetric = params.get('activeMetric')!;
     if (params.has('tableSortColumn')) this.tableSortColumn = params.get('tableSortColumn') as any;
     if (params.has('tableSortDirection')) this.tableSortDirection = params.get('tableSortDirection') as any;
+    if (params.has('search')) this.searchQuery = params.get('search')!;
 
     const parseArray = (key: string, options: string[]) => {
       if (!params.has(key)) return [...options];
@@ -230,13 +259,14 @@ export class CortexInsightsPage implements OnInit {
   syncToUrl() {
     const queryParams: any = {};
     
-    if (this.activeMetric !== 'speed') queryParams['activeMetric'] = this.activeMetric;
-    if (this.tableSortColumn !== 'speed') queryParams['tableSortColumn'] = this.tableSortColumn;
-    if (this.tableSortDirection !== 'desc') queryParams['tableSortDirection'] = this.tableSortDirection;
+    queryParams['activeMetric'] = this.activeMetric !== 'speed' ? this.activeMetric : null;
+    queryParams['tableSortColumn'] = this.tableSortColumn !== 'speed' ? this.tableSortColumn : null;
+    queryParams['tableSortDirection'] = this.tableSortDirection !== 'desc' ? this.tableSortDirection : null;
+    queryParams['search'] = (this.searchQuery && this.searchQuery.trim() !== '') ? this.searchQuery.trim() : null;
 
     const syncArray = (key: string, selected: string[], options: string[]) => {
-      if (selected.length === options.length) return; // all selected (default)
-      if (selected.length === 0) queryParams[key] = '__none__';
+      if (selected.length === options.length) queryParams[key] = null; // all selected (default)
+      else if (selected.length === 0) queryParams[key] = '__none__';
       else queryParams[key] = selected;
     };
 
@@ -249,7 +279,8 @@ export class CortexInsightsPage implements OnInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
-      replaceUrl: true
+      replaceUrl: true,
+      queryParamsHandling: 'merge'
     });
   }
 
