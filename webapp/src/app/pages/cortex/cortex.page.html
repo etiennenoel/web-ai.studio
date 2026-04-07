@@ -389,10 +389,6 @@
           @let allTotal = getGlobalAllValues('total', totalColdLocal, totalWarmLocal);
           @let totalMax = getMaxArray(allTotal);
 
-          @let charSpeedColdLocal = globalCold?.averageCharactersPerSecond || 0;
-          @let charSpeedWarmLocal = globalWarm?.averageCharactersPerSecond || 0;
-          @let allCharSpeed = getGlobalAllValues('charSpeed', charSpeedColdLocal, charSpeedWarmLocal);
-          @let charSpeedMax = getMaxArray(allCharSpeed);
 
           @let speedColdLocal = globalCold?.averageTokenPerSecond || 0;
           @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
@@ -568,87 +564,7 @@
             </div>
           </div>
 
-          <!-- Global Avg Characters/s Card -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-              </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Characters/s</h3>
-            </div>
-            
-            <div class="flex flex-col gap-4 flex-1 justify-end">
-              <!-- Cold -->
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')">{{ charSpeedColdLocal != null && charSpeedColdLocal > 0 ? (charSpeedColdLocal >= 1000 ? ((charSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (charSpeedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">chars/sec</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(charSpeedColdLocal, charSpeedMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Warm -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')">{{ charSpeedWarmLocal != null && charSpeedWarmLocal > 0 ? (charSpeedWarmLocal >= 1000 ? ((charSpeedWarmLocal/1000) | number:'1.1-1') + 'k' : (charSpeedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">chars/sec</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(charSpeedWarmLocal, charSpeedMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Baselines -->
-              @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let charSpeedBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageCharactersPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')">{{ charSpeedBaseline ? (charSpeedBaseline | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">chars/sec</span>
-                     </div>
-                  </div>
-                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(charSpeedBaseline, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(charSpeedBaseline, charSpeedMax) + '%'"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
+
 
           <!-- Global Avg Output Tokens/s Card -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
@@ -1036,90 +952,7 @@
                 </div>
               </div>
 
-              <!-- Avg Characters/s Card -->
-              @let coldCharSpeed = coldSummaryResults?.averageCharactersPerSecond;
-              @let warmCharSpeed = warmSummaryResults?.averageCharactersPerSecond;
-              @let allCharSpeed = getTestAllValues(element.id, 'charSpeed', coldCharSpeed, warmCharSpeed);
-              @let maxCharSpeed = getMaxArray(allCharSpeed);
-              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                    <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Characters/s</h3>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 justify-end">
-                  <!-- COLD -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ coldCharSpeed != null && coldCharSpeed > 0 ? (coldCharSpeed >= 1000 ? ((coldCharSpeed/1000) | number:'1.1-1') + 'k' : (coldCharSpeed | number:'1.0-0')) : (coldCharSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(coldCharSpeed, maxCharSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- WARM -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ warmCharSpeed != null && warmCharSpeed > 0 ? (warmCharSpeed >= 1000 ? ((warmCharSpeed/1000) | number:'1.1-1') + 'k' : (warmCharSpeed | number:'1.0-0')) : (warmCharSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(warmCharSpeed, maxCharSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- Baselines -->
-                  @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let baselineCharSpeed = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageCharactersPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')" [class.text-slate-500]="!isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')">{{ baselineCharSpeed ? (baselineCharSpeed | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
-                     </div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')" [class.bg-slate-300]="!isWinner(baselineCharSpeed, allCharSpeed, 'charSpeed')" [style.width]="getPercentage(baselineCharSpeed, maxCharSpeed) + '%'"></div>
-                  </div>
-                </div>
-              }
-                </div>
-              </div>
+
 
               <!-- Avg Output Tokens/s Card -->
               @let coldTokenSpeed = coldSummaryResults?.averageTokenPerSecond;
@@ -1397,21 +1230,7 @@
                             </div>
                           </td>
                         </tr>
-                        <!-- Characters/s -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-fonts text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Characters/s</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageCharactersPerSecond != null && test.results.averageCharactersPerSecond > 0 ? (test.results.averageCharactersPerSecond | number:'1.0-0') : (test.results.averageCharactersPerSecond === -1 ? 'N/A' : '—') }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
-                            </div>
-                          </td>
-                        </tr>
+
                         <!-- Output Tokens/s -->
                         <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
                           <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
@@ -1511,8 +1330,7 @@
                                   <th class="px-3 py-2 text-right">Total</th>
                                   <th class="px-3 py-2 text-right">Input Tokens/s</th>
                                   <th class="px-3 py-2 text-right">Output Tokens/s</th>
-                                  <th class="px-3 py-2 text-right">Characters/s</th>
-                                  <th class="px-3 py-2 text-center">Output</th>
+                                                                    <th class="px-3 py-2 text-center">Output</th>
                                 </tr>
                               </thead>
                               <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">

@@ -365,7 +365,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
          }
        }
        const ua = navigator.userAgent;
-       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+(\.\d+)?)/);
+       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+([\.\d]+)?)/);
        if (match) {
          let name = match[1];
          if (name === 'Edg') name = 'Edge';

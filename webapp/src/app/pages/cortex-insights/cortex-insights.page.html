@@ -274,13 +274,7 @@
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'inputSpeed'}"></i>
                 </div>
               </th>
-              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('charSpeed')">
-                <div class="flex items-center justify-end gap-1.5">
-                  <span>Characters/s</span>
-                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'charSpeed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'charSpeed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'charSpeed'}"></i>
-                </div>
-              </th>
-              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('ttft')">
+                            <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('ttft')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Avg TTFT <span class="opacity-50 lowercase">(ms)</span></span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'desc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'ttft'}"></i>
@@ -375,25 +369,6 @@
                   </div>
                 </td>
 
-                <!-- Characters/s Cell -->
-                <td class="px-4 py-4 align-middle pr-8 text-right">
-                  <div class="flex flex-col items-end gap-1.5">
-                    @if (row.charSpeed > 0) {
-                      <div class="flex items-center gap-2">
-                        @if (row.charSpeed === maxCharSpeed && maxCharSpeed !== minCharSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                        @if (row.charSpeed === minCharSpeed && maxCharSpeed !== minCharSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.charSpeed === maxCharSpeed && maxCharSpeed !== minCharSpeed ? 'text-emerald-400' : (row.charSpeed === minCharSpeed && maxCharSpeed !== minCharSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
-                          {{ row.charSpeed | number:'1.0-0' }}
-                        </span>
-                      </div>
-                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.charSpeed, minCharSpeed, maxCharSpeed)" [style.width]="((row.charSpeed / maxCharSpeed) * 100) + '%'"></div>
-                      </div>
-                    } @else {
-                      <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
-                    }
-                  </div>
-                </td>
 
                 <!-- TTFT Cell -->
                 <td class="px-4 py-4 align-middle text-right pr-8">
