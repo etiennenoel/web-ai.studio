@@ -311,15 +311,21 @@ export class AxonTestSuiteExecutor {
 
         const summary = this.results.summary![builtInAiAPI][startType as "cold" | "warm"]!;
 
-        summary.averageTokenPerSecond = MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0));
-        summary.averageInputTokensPerSecond = MathematicalCalculations.calculateAverage(items.map(item => item.inputTokensPerSecond ?? 0));
+        const tokensPerSecondItems = items.map(item => item.tokensPerSecond ?? 0).filter(v => v !== -1);
+        const inputTokensPerSecondItems = items.map(item => item.inputTokensPerSecond ?? 0).filter(v => v !== -1);
+        const charsPerSecondItems = items.map(item => item.charactersPerSecond ?? 0);
+
+        summary.averageTokenPerSecond = MathematicalCalculations.calculateAverage(tokensPerSecondItems);
+        summary.averageInputTokensPerSecond = MathematicalCalculations.calculateAverage(inputTokensPerSecondItems);
+        summary.averageCharactersPerSecond = MathematicalCalculations.calculateAverage(charsPerSecondItems);
         summary.averageTimeToFirstToken = MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0));
         summary.averageTotalResponseTime = MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0));
 
         summary.medianTimeToFirstToken = MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0));
         summary.medianTotalResponseTime = MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0));
-        summary.medianTokenPerSecond = MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0));
-        summary.medianInputTokensPerSecond = MathematicalCalculations.calculateMedian(items.map(item => item.inputTokensPerSecond ?? 0));
+        summary.medianTokenPerSecond = MathematicalCalculations.calculateMedian(tokensPerSecondItems);
+        summary.medianInputTokensPerSecond = MathematicalCalculations.calculateMedian(inputTokensPerSecondItems);
+        summary.medianCharactersPerSecond = MathematicalCalculations.calculateMedian(charsPerSecondItems);
       }
     }
 
