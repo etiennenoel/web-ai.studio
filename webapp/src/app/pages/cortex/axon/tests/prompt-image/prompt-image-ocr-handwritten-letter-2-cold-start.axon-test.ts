@@ -94,7 +94,17 @@ export class PromptImageOcrHandwrittenLetter2ColdStartAxonTest implements AxonTe
 
         iterationResult.output = output;
         iterationResult.totalResponseTime = performance.now() - start;
-        iterationResult.totalNumberOfInputTokens = JSON.stringify(promptInput).length;
+        let inputTokens = JSON.stringify(promptInput).length;
+        try {
+          if (typeof (session as any).measureInputUsage === 'function') {
+            inputTokens = await (session as any).measureInputUsage(promptInput);
+          } else if (typeof (session as any).measureContextUsage === 'function') {
+            inputTokens = await (session as any).measureContextUsage(promptInput);
+          }
+        } catch (e) {
+          console.warn('Could not measure input usage', e);
+        }
+        iterationResult.totalNumberOfInputTokens = inputTokens;
         iterationResult.totalNumberOfOutputTokens = chunkCount;
         iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
         iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);

@@ -83,7 +83,17 @@ export class SummarizerLongNewsArticleWarmStartAxonTest implements AxonTestInter
 
       iterationResult.output = JSON.stringify(output);
       iterationResult.totalResponseTime = performance.now() - start;
-      iterationResult.totalNumberOfInputTokens = this.results.input.length;
+      let inputTokens = this.results.input.length;
+      try {
+        if (typeof (summarizer as any).measureInputUsage === 'function') {
+          inputTokens = await (summarizer as any).measureInputUsage(this.results.input);
+        } else if (typeof (summarizer as any).measureContextUsage === 'function') {
+          inputTokens = await (summarizer as any).measureContextUsage(this.results.input);
+        }
+      } catch (e) {
+        console.warn('Could not measure input usage', e);
+      }
+      iterationResult.totalNumberOfInputTokens = inputTokens;
       iterationResult.totalNumberOfOutputTokens = chunkCount;
       iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
       iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);

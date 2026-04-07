@@ -109,7 +109,17 @@ export class PromptTextFactAnalysisColdStartAxonTest implements AxonTestInterfac
 
       iterationResult.output = JSON.stringify(output);
       iterationResult.totalResponseTime = performance.now() - start;
-      iterationResult.totalNumberOfInputTokens = this.results.input.length;
+      let inputTokens = this.results.input.length;
+      try {
+        if (typeof (session as any).measureInputUsage === 'function') {
+          inputTokens = await (session as any).measureInputUsage(this.results.input);
+        } else if (typeof (session as any).measureContextUsage === 'function') {
+          inputTokens = await (session as any).measureContextUsage(this.results.input);
+        }
+      } catch (e) {
+        console.warn('Could not measure input usage', e);
+      }
+      iterationResult.totalNumberOfInputTokens = inputTokens;
       iterationResult.totalNumberOfOutputTokens = chunkCount;
       iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
       iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);

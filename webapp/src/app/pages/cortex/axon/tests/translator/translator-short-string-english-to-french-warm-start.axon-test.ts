@@ -69,7 +69,17 @@ export class TranslatorShortStringEnglishToFrenchWarmStartAxonTest implements Ax
       iterationResult.output = JSON.stringify(response);
       iterationResult.totalResponseTime = performance.now() - start;
       iterationResult.timeToFirstToken = iterationResult.totalResponseTime;
-      iterationResult.totalNumberOfInputTokens = this.results.input.length;
+      let inputTokens = this.results.input.length;
+      try {
+        if (typeof (translator as any).measureInputUsage === 'function') {
+          inputTokens = await (translator as any).measureInputUsage(this.results.input);
+        } else if (typeof (translator as any).measureContextUsage === 'function') {
+          inputTokens = await (translator as any).measureContextUsage(this.results.input);
+        }
+      } catch (e) {
+        console.warn('Could not measure input usage', e);
+      }
+      iterationResult.totalNumberOfInputTokens = inputTokens;
       iterationResult.totalNumberOfOutputTokens = -1;
       iterationResult.tokensPerSecond = -1;
       iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;

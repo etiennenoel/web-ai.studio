@@ -8,6 +8,7 @@ export class AxonTestResultCalculator {
     const tokensPerSeconds = results.testIterationResults.map(r => r.tokensPerSecond ?? 0).filter(v => v !== -1);
     const charsPerSeconds = results.testIterationResults.map(r => r.charactersPerSecond ?? 0);
     const timeToFirstTokens = results.testIterationResults.map(r => r.timeToFirstToken ?? 0);
+    const inputTokens = results.testIterationResults.map(r => r.totalNumberOfInputTokens ?? 0);
 
     results.averageTotalResponseTime = MathematicalCalculations.calculateAverage(totalResponseTimes);
     if (tokensPerSeconds.length > 0) {
@@ -16,6 +17,10 @@ export class AxonTestResultCalculator {
     }
     results.averageCharactersPerSecond = MathematicalCalculations.calculateAverage(charsPerSeconds);
     results.averageTimeToFirstToken = MathematicalCalculations.calculateAverage(timeToFirstTokens);
+    if (inputTokens.length > 0) {
+        results.averageInputTokens = MathematicalCalculations.calculateAverage(inputTokens);
+        results.medianInputTokens = MathematicalCalculations.calculateMedian(inputTokens);
+    }
 
     results.medianTotalResponseTime = MathematicalCalculations.calculateMedian(totalResponseTimes);
     results.medianCharactersPerSecond = MathematicalCalculations.calculateMedian(charsPerSeconds);
