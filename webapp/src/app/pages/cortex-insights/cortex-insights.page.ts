@@ -207,11 +207,13 @@ export class CortexInsightsPage implements OnInit {
                 apiGroups.forEach((iterations, api) => {
                   if (iterations.length > 0) {
                     const tokensPerSecs = iterations.map((i: any) => i.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
+                    const inputTokensPerSecs = iterations.map((i: any) => i.inputTokensPerSecond ?? 0).filter((v: number) => v !== -1);
                     const charsPerSecs = iterations.map((i: any) => i.charactersPerSecond ?? 0);
                     tests.push({
                       api,
                       ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
                       speed: tokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(tokensPerSecs) : 0,
+                      inputSpeed: inputTokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(inputTokensPerSecs) : 0,
                       charSpeed: MathematicalCalculations.calculateAverage(charsPerSecs),
                       total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
                     });
