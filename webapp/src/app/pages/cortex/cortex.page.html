@@ -645,13 +645,13 @@
             </div>
           </div>
 
-          <!-- Global Avg Tokens/s Card -->
+          <!-- Global Avg Output Tokens/s Card -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
               <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
                 <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
               </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Tokens/s</h3>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Output Tokens/s</h3>
             </div>
             
             <div class="flex flex-col gap-4 flex-1 justify-end">
@@ -1036,7 +1036,7 @@
                 </div>
               </div>
 
-              <!-- Avg Tokens/s Card -->
+              <!-- Avg Output Tokens/s Card -->
               @let coldTokenSpeed = coldSummaryResults?.averageTokenPerSecond;
               @let warmTokenSpeed = warmSummaryResults?.averageTokenPerSecond;
               @let allTokenSpeed = getTestAllValues(element.id, 'speed', coldTokenSpeed, warmTokenSpeed);
@@ -1046,7 +1046,7 @@
                   <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
                     <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
                   </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Tokens/s</h3>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Output Tokens/s</h3>
                 </div>
                 <div class="flex flex-col gap-1 flex-1 justify-end">
                   <!-- COLD -->
@@ -1242,12 +1242,12 @@
                             </div>
                           </td>
                         </tr>
-                        <!-- Tokens/s -->
+                        <!-- Output Tokens/s -->
                         <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
                           <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
                             <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
                               <i class="bi bi-speedometer text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Tokens/s</span>
+                              <span class="text-xs font-bold uppercase tracking-wider">Output Tokens/s</span>
                             </div>
                           </td>
                           <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
@@ -1324,7 +1324,7 @@
                                   <th class="px-3 py-2 w-10">#</th>
                                   <th class="px-3 py-2 text-right">TTFT</th>
                                   <th class="px-3 py-2 text-right">Total</th>
-                                  <th class="px-3 py-2 text-right">Tokens/s</th>
+                                  <th class="px-3 py-2 text-right">Output Tokens/s</th>
                                   <th class="px-3 py-2 text-right">Characters/s</th>
                                   <th class="px-3 py-2 text-center">Output</th>
                                 </tr>
