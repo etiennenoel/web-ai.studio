@@ -60,6 +60,7 @@ export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements Ax
       const start = performance.now()
 
       const translator = await Translator.create({ ...this.creationOptions, signal: this.abortSignal })
+      this.results.inputContextSize = translator.inputQuota;
 
       iterationResult.creationTime = performance.now() - start;
 
@@ -68,9 +69,22 @@ export class TranslatorShortStringEnglishToFrenchColdStartAxonTest implements Ax
       iterationResult.output = JSON.stringify(response);
       iterationResult.totalResponseTime = performance.now() - start;
       iterationResult.timeToFirstToken = iterationResult.totalResponseTime;
-      iterationResult.totalNumberOfInputTokens = this.results.input.length;
-      iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
-      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000)
+      let inputTokens = this.results.input.length;
+      try {
+        if (typeof (translator as any).measureInputUsage === 'function') {
+          inputTokens = await (translator as any).measureInputUsage(this.results.input);
+        } else if (typeof (translator as any).measureContextUsage === 'function') {
+          inputTokens = await (translator as any).measureContextUsage(this.results.input);
+        }
+      } catch (e) {
+        console.warn('Could not measure input usage', e);
+      }
+      iterationResult.totalNumberOfInputTokens = inputTokens;
+      iterationResult.totalNumberOfOutputTokens = -1;
+      iterationResult.tokensPerSecond = -1;
+      iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
+      iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+      iterationResult.inputLength = this.results.input?.length || 0;
 
       // Validate the output of the test here before setting the result.
       iterationResult.status = TestStatus.Success;

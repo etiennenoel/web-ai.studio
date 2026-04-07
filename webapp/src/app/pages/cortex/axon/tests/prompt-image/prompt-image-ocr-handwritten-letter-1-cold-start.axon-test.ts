@@ -66,6 +66,7 @@ export class PromptImageOcrHandwrittenLetter1ColdStartAxonTest implements AxonTe
 
       const start = performance.now();
       const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
+      this.results.inputContextSize = session.inputQuota;
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -80,7 +81,11 @@ export class PromptImageOcrHandwrittenLetter1ColdStartAxonTest implements AxonTe
         const response = session.promptStreaming(promptInput, { signal: this.abortSignal });
 
         let output = "";
+        let chunkCount = 0;
+
         for await (const chunk of response) {
+
+          chunkCount++;
           if(output === "") {
             iterationResult.timeToFirstToken = performance.now() - start;
           }
@@ -89,9 +94,22 @@ export class PromptImageOcrHandwrittenLetter1ColdStartAxonTest implements AxonTe
 
         iterationResult.output = output;
         iterationResult.totalResponseTime = performance.now() - start;
-        iterationResult.totalNumberOfInputTokens = JSON.stringify(promptInput).length;
-        iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
+        let inputTokens = JSON.stringify(promptInput).length;
+        try {
+          if (typeof (session as any).measureInputUsage === 'function') {
+            inputTokens = await (session as any).measureInputUsage(promptInput);
+          } else if (typeof (session as any).measureContextUsage === 'function') {
+            inputTokens = await (session as any).measureContextUsage(promptInput);
+          }
+        } catch (e) {
+          console.warn('Could not measure input usage', e);
+        }
+        iterationResult.totalNumberOfInputTokens = inputTokens;
+        iterationResult.totalNumberOfOutputTokens = chunkCount;
+        iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
         iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+        iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+        iterationResult.inputLength = this.results.input?.length || 0;
 
         const normalizedOutput = output.toLowerCase().replace(/[^a-z0-9]/g, '');
         const normalizedExpected = expectedText.toLowerCase().replace(/[^a-z0-9]/g, '');

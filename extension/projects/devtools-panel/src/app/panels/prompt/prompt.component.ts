@@ -150,13 +150,22 @@ export class PromptComponent implements OnInit {
       if (this.topK !== null) options.topK = Number(this.topK);
 
       const session = await this.promptManager.createSession(options);
-      
+
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof session.measureInputUsage === 'function') {
+          inputTokens = await session.measureInputUsage(this.promptText);
+        }
+      } catch(e) {}
+
       const stream = session.promptStreaming(this.promptText, {
         signal: this.abortController.signal
       });
-      
+
       let previousChunk = '';
+      let chunkCount = 0;
       for await (const chunk of stream) {
+        chunkCount++;
         this.response += chunk;
         this.cdr.detectChanges();
       }
@@ -172,7 +181,10 @@ export class PromptComponent implements OnInit {
           prompt: this.promptText,
           systemPrompt: this.systemPrompt,
           response: this.response,
-          tokens: this.response.length,
+          tokens: chunkCount,
+          characters: this.response.length,
+          inputTokens: inputTokens,
+          inputLength: this.promptText.length,
           latency: this.executionTime,
           status: 'success',
           params: {
@@ -181,8 +193,7 @@ export class PromptComponent implements OnInit {
           }
         });
         this.loadHistory();
-      }
-      
+      }      
       session.destroy();
 
     } catch (e: any) {

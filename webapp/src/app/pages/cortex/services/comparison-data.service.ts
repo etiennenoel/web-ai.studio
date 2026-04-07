@@ -186,10 +186,18 @@ export class ComparisonDataService {
 
     if (items.length === 0) return undefined;
 
+    const calcAvg = (key: string) => {
+      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some((item: any) => item[key] === -1)) return -1;
+      return 0;
+    };
+
     return {
-      averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.tokensPerSecond ?? 0)),
-      averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map((item: any) => item.timeToFirstToken ?? 0)),
-      averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map((item: any) => item.totalResponseTime ?? 0)),
+      averageTokenPerSecond: calcAvg('tokensPerSecond'),
+      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+      averageTotalResponseTime: calcAvg('totalResponseTime'),
     };
   }
 
@@ -202,10 +210,17 @@ export class ComparisonDataService {
 
     if (items.length === 0) return undefined;
 
-    return {
-      averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.tokensPerSecond ?? 0)),
-      averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map((item: any) => item.timeToFirstToken ?? 0)),
-      averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map((item: any) => item.totalResponseTime ?? 0)),
+    const calcAvg = (key: string) => {
+      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some((item: any) => item[key] === -1)) return -1;
+      return 0;
     };
-  }
-}
+
+    return {
+      averageTokenPerSecond: calcAvg('tokensPerSecond'),
+      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+      averageTotalResponseTime: calcAvg('totalResponseTime'),
+    };
+  }}

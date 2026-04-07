@@ -444,9 +444,26 @@ function wrapAPI(apiName: string) {
                 return function(...args: any[]) {
                   const methodCallId = crypto.randomUUID();
                   
+                  let inputLength = 0;
+                  try {
+                    if (args.length > 0 && typeof args[0] === 'string') {
+                      inputLength = args[0].length;
+                    } else if (args.length > 0) {
+                      inputLength = JSON.stringify(args[0]).length;
+                    }
+                  } catch (e) {}
+
                   sanitizeForPostMessage(args).then(sanitizedArgs => {
-                    emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs });
+                    emitStage(methodCallId, callId, methodName, 'execute', { args: sanitizedArgs, inputLength: inputLength });
                   });
+
+                  if (typeof target.measureInputUsage === 'function') {
+                    try {
+                      target.measureInputUsage(...args).then((usage: number) => {
+                         emitStage(methodCallId, callId, methodName, 'input_usage', { inputTokenCount: usage });
+                      }).catch(() => {});
+                    } catch(e) {}
+                  }
 
                   try {
                     const result = value.apply(target, args);

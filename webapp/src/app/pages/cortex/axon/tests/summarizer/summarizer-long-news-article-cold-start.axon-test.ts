@@ -68,13 +68,18 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
         type: "key-points",
         outputLanguage: "en"
       })
+      this.results.inputContextSize = summarizer.inputQuota;
 
       iterationResult.creationTime = performance.now() - start;
 
       const response = summarizer.summarizeStreaming(this.results.input, { signal: this.abortSignal });
 
       let output = "";
+      let chunkCount = 0;
+
       for await (const chunk of response) {
+
+        chunkCount++;
         if(output === "") {
           iterationResult.timeToFirstToken = performance.now() - start;
         }
@@ -84,9 +89,22 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
 
       iterationResult.output = JSON.stringify(output);
       iterationResult.totalResponseTime = performance.now() - start;
-      iterationResult.totalNumberOfInputTokens = this.results.input.length;
-      iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
-      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000)
+      let inputTokens = this.results.input.length;
+      try {
+        if (typeof (summarizer as any).measureInputUsage === 'function') {
+          inputTokens = await (summarizer as any).measureInputUsage(this.results.input);
+        } else if (typeof (summarizer as any).measureContextUsage === 'function') {
+          inputTokens = await (summarizer as any).measureContextUsage(this.results.input);
+        }
+      } catch (e) {
+        console.warn('Could not measure input usage', e);
+      }
+      iterationResult.totalNumberOfInputTokens = inputTokens;
+      iterationResult.totalNumberOfOutputTokens = chunkCount;
+      iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
+      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+      iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+      iterationResult.inputLength = this.results.input?.length || 0;
 
       // Validate the output of the test here before setting the result.
       iterationResult.status = TestStatus.Success;

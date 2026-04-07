@@ -5,10 +5,12 @@ export interface HistoryItem {
     systemPrompt?: string;
     response: string;
     tokens: number;
+    characters?: number;
+    inputTokens?: number;
+    inputLength?: number;
     latency: string;
     status: 'success' | 'error';
     params: {
-        temperature?: number;
-        topK?: number;
+        [key: string]: any;
     };
 }

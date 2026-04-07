@@ -383,11 +383,11 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getMaxArray(values: number[]): number { return values.length > 0 ? Math.max(...values) : 0; }
   
-  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null): number[] {
+  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
   }
 
-  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed', coldVal?: number|null, warmVal?: number|null): number[] {
+  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineValues(testId, metric)];
   }
 
@@ -400,29 +400,31 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(2, (val / max) * 100);
   }
 
-  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed'): number[] {
+  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'charSpeed'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
       return 0;
     });
   }
 
-  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed'): number[] {
+  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'charSpeed'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
       return 0;
     });
   }
 
-  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'): boolean {
+  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'|'charSpeed'): boolean {
     const val = currentVal || 0;
     if (val <= 0) return false;
 
@@ -430,7 +432,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if (activeValues.length === 0) return false;
 
     let bestValue;
-    if (metric === 'speed') {
+    if (metric === 'speed' || metric === 'charSpeed') {
       bestValue = Math.max(...activeValues);
     } else {
       bestValue = Math.min(...activeValues);
@@ -646,13 +648,29 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (items.length === 0) return undefined;
 
+    const calcAvg = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
+    const calcMed = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
     return {
-        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
-        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
-        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
-        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
-        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
-        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+        averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+        averageTotalResponseTime: calcAvg('totalResponseTime'),
+        medianTimeToFirstToken: calcMed('timeToFirstToken'),
+        medianTotalResponseTime: calcMed('totalResponseTime'),
+        medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
 
@@ -664,13 +682,29 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (items.length === 0) return undefined;
 
+    const calcAvg = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
+    const calcMed = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
     return {
-        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
-        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
-        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
-        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
-        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
-        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+        averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+        averageTotalResponseTime: calcAvg('totalResponseTime'),
+        medianTimeToFirstToken: calcMed('timeToFirstToken'),
+        medianTotalResponseTime: calcMed('totalResponseTime'),
+        medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
 

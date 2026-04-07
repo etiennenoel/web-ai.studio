@@ -362,6 +362,7 @@ export class TranslatorComponent implements OnInit {
           };
       }
 
+      const start = performance.now();
       // @ts-ignore
       const translator = await window.Translator.create({
         sourceLanguage: this.sourceLanguage,
@@ -369,6 +370,13 @@ export class TranslatorComponent implements OnInit {
         monitor
       });
       
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof translator.measureInputUsage === 'function') {
+          inputTokens = await translator.measureInputUsage(this.inputText);
+        }
+      } catch(e) {}
+
       this.translationResult = 'Translating...';
       this.cdr.detectChanges();
 
@@ -376,6 +384,30 @@ export class TranslatorComponent implements OnInit {
       const result = await translator.translate(this.inputText);
       
       this.translationResult = result;
+
+      const latency = `${Math.round(performance.now() - start)}ms`;
+
+      if (this.showHistory) {
+        await this.translatorDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.inputText,
+          response: this.translationResult,
+          tokens: -1,
+          characters: this.translationResult.length,
+          inputTokens: inputTokens,
+          inputLength: this.inputText.length,
+          latency: latency,
+          status: 'success',
+          params: { sourceLanguage: this.sourceLanguage, targetLanguage: this.targetLanguage }
+        });
+        this.loadHistory();
+      }
+
+      // @ts-ignore
+      if (typeof translator.destroy === 'function') {
+        translator.destroy();
+      }
     } catch (error: any) {
       this.translationResult = `Error: ${error.message}`;
     } finally {

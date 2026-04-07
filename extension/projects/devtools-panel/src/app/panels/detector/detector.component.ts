@@ -88,19 +88,52 @@ export class DetectorComponent implements OnInit {
     this.detectionResult = [];
     this.errorMsg = '';
 
+    const start = performance.now();
     try {
       // @ts-ignore
       if (!window.LanguageDetector) {
         throw new Error('LanguageDetector API not supported.');
       }
       
+      let inputTokens: number | undefined = undefined;
+      // @ts-ignore
+      const detector = await window.LanguageDetector.create();
+      try {
+        if (typeof detector.measureInputUsage === 'function') {
+          inputTokens = await detector.measureInputUsage(this.inputText);
+        }
+      } catch(e) {}
+
       const result = await this.ngZone.run(async () => {
-        // @ts-ignore
-        const detector = await window.LanguageDetector.create();
         // @ts-ignore
         return await detector.detect(this.inputText);
       });
       
+      const latency = `${Math.round(performance.now() - start)}ms`;
+      const responseStr = JSON.stringify(result);
+
+      if (this.showHistory) {
+        await this.detectorDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.inputText,
+          response: responseStr,
+          tokens: -1,
+          characters: responseStr.length,
+          inputTokens: inputTokens,
+          inputLength: this.inputText.length,
+          latency: latency,
+          status: 'success',
+          params: {}
+        });
+        this.loadHistory();
+      }
+
+      // @ts-ignore
+      if (typeof detector.destroy === 'function') {
+        detector.destroy();
+      }
+
       // Result is array of { detectedLanguage, confidence }
       this.ngZone.run(() => {
         this.detectionResult = result;

@@ -32,12 +32,16 @@ export interface SessionGroup {
   sessionId: string;
   api: string;
   timestamp: number;
-  createItem: HistoryItem | null;
-  methodItems: HistoryItem[];
+  createItem: any | null;
+  methodItems: any[];
   computedStatus?: 'completed' | 'error' | 'running';
   computedTtft?: number | null;
   computedCreateTime?: number | null;
   computedInferenceTime?: number | null;
+  computedTokensPerSecond?: number | null;
+  computedCharsPerSecond?: number | null;
+  computedInputTokens?: number | null;
+  computedInputLength?: number | null;
 }
 
 @Component({

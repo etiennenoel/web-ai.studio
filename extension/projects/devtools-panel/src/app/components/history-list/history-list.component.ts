@@ -41,8 +41,8 @@ export class HistoryListComponent {
 
   generateCodeSnippet(item: HistoryItem): string {
     const escapedPrompt = item.prompt.replace(/"/g, '\\"');
-    const temperature = item.params?.temperature ?? 'undefined';
-    const topK = item.params?.topK ?? 'undefined';
+    const temperature = item.params?.['temperature'] ?? 'undefined';
+    const topK = item.params?.['topK'] ?? 'undefined';
 
     return `// Configuration
 const params = {

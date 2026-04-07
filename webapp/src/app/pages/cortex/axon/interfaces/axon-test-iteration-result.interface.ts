@@ -17,4 +17,12 @@ export interface AxonTestIterationResultInterface {
   totalNumberOfInputTokens?: number;
 
   totalNumberOfOutputTokens?: number;
+
+  totalNumberOfOutputCharacters?: number;
+
+  charactersPerSecond?: number;
+
+  inputLength?: number;
+
+  inputTokenCount?: number;
 }

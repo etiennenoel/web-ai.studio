@@ -9,7 +9,7 @@ describe('DetectorComponent', () => {
   let fixture: ComponentFixture<DetectorComponent>;
 
   beforeEach(async () => {
-    const mockDataService = { getHistory: jasmine.createSpy('getHistory').and.returnValue(Promise.resolve([])) };
+    const mockDataService = { getHistory: jasmine.createSpy('getHistory').and.returnValue(Promise.resolve([])), addHistoryItem: jasmine.createSpy('addHistoryItem').and.returnValue(Promise.resolve()) };
     const mockToastService = { show: jasmine.createSpy('show') };
     const mockDetectorManager = {
       getStatus: jasmine.createSpy('getStatus').and.returnValue(Promise.resolve({ status: ApiStatus.AVAILABLE, message: 'Ready', checks: [] })),
