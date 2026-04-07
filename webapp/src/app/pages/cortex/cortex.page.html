@@ -418,7 +418,7 @@
                          @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
                    </div>
                 </div>
@@ -500,7 +500,7 @@
                          @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
                    </div>
                 </div>
@@ -584,7 +584,7 @@
                          @if (isWinner(speedColdLocal || 0, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">{{ speedColdLocal != null && speedColdLocal > 0 ? (speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">{{ speedColdLocal != null && speedColdLocal > 0 ? (speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0')) : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                    </div>
                 </div>
@@ -664,7 +664,7 @@
                          @if (isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedColdLocal != null && inputSpeedColdLocal > 0 ? (inputSpeedColdLocal >= 1000 ? ((inputSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedColdLocal != null && inputSpeedColdLocal > 0 ? (inputSpeedColdLocal >= 1000 ? ((inputSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedColdLocal | number:'1.0-0')) : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                    </div>
                 </div>

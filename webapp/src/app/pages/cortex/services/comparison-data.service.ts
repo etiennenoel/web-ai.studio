@@ -18,18 +18,7 @@ export class ComparisonDataService {
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
-      const savedBaselines = this.getSavedBaselines();
-      if (savedBaselines) {
-        savedBaselines.forEach(b => {
-          this.intendedSelections.set(b.id, b.name);
-          this.fetchBaseline(b.id, b.name);
-        });
-        this.loadAvailableBaselinesIndex();
-      } else {
-        this.addBaseline('2026-04-03_gemini_3.1_flash', 'Cloud Gemini 3.1 Flash', false);
-        this.addBaseline('2026-04-03_gemini_3.1_flash_lite', 'Cloud Gemini 3.1 Flash Lite', false);
-        this.loadAvailableBaselinesIndex();
-      }
+      this.loadAvailableBaselinesIndex(undefined, true);
     }
   }
 
@@ -51,11 +40,28 @@ export class ComparisonDataService {
       localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(baselinesToSave));
   }
 
-  loadAvailableBaselinesIndex(hardwareInfo?: any) {
+  loadAvailableBaselinesIndex(hardwareInfo?: any, initializeFromStorage: boolean = false) {
     this.http.get<{filename: string, name: string, os?: string, cpu?: string, ram?: number, model?: string, executionType?: 'CPU' | 'GPU' | 'NPU' | 'Cloud'}[]>('/data/baselines/index.json').subscribe({
         next: (data) => {
             this.availableBaselinesIndex = data;
-            if (hardwareInfo && !this.getSavedBaselines()) {
+            if (initializeFromStorage) {
+              const savedBaselines = this.getSavedBaselines();
+              if (savedBaselines && savedBaselines.length > 0) {
+                const validSavedBaselines = savedBaselines.filter(b => this.availableBaselinesIndex.some(idx => idx.filename === b.id));
+                
+                if (validSavedBaselines.length !== savedBaselines.length) {
+                   this.saveBaselines(validSavedBaselines);
+                }
+
+                validSavedBaselines.forEach(b => {
+                  this.intendedSelections.set(b.id, b.name);
+                  this.fetchBaseline(b.id, b.name);
+                });
+              } else {
+                this.addBaseline('2026-04-03_gemini_3.1_flash', 'Cloud Gemini 3.1 Flash', false);
+                this.addBaseline('2026-04-03_gemini_3.1_flash_lite', 'Cloud Gemini 3.1 Flash Lite', false);
+              }
+            } else if (hardwareInfo && (!this.getSavedBaselines() || this.getSavedBaselines()?.length === 0)) {
               this.matchAndLoadBaseline(hardwareInfo);
             }
         },
@@ -123,7 +129,8 @@ export class ComparisonDataService {
   loadBaselineData(hardwareInfo: any) {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    if (this.getSavedBaselines()) {
+    const savedBaselines = this.getSavedBaselines();
+    if (savedBaselines && savedBaselines.length > 0) {
       return;
     }
 
