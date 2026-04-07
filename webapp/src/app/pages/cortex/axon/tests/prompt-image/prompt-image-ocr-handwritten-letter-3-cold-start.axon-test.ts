@@ -108,6 +108,7 @@ export class PromptImageOcrHandwrittenLetter3ColdStartAxonTest implements AxonTe
         iterationResult.totalNumberOfOutputTokens = chunkCount;
         iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
         iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+      iterationResult.inputTokensPerSecond = (iterationResult.timeToFirstToken && iterationResult.totalNumberOfInputTokens) ? iterationResult.totalNumberOfInputTokens / (iterationResult.timeToFirstToken / 1000) : -1;
         iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
         iterationResult.inputLength = this.results.input?.length || 0;
 

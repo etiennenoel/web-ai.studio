@@ -398,6 +398,11 @@
           @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
           @let allSpeed = getGlobalAllValues('speed', speedColdLocal, speedWarmLocal);
           @let speedMax = getMaxArray(allSpeed);
+
+          @let inputSpeedColdLocal = globalCold?.averageInputTokensPerSecond || 0;
+          @let inputSpeedWarmLocal = globalWarm?.averageInputTokensPerSecond || 0;
+          @let allInputSpeed = getGlobalAllValues('inputSpeed', inputSpeedColdLocal, inputSpeedWarmLocal);
+          @let inputSpeedMax = getMaxArray(allInputSpeed);
           
           <!-- Global Avg TTFT Card -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
@@ -720,6 +725,86 @@
                   </div>
                   <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                      <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(speedBaseline, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedBaseline, allSpeed, 'speed')" [style.width]="getPercentage(speedBaseline, speedMax) + '%'"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          <!-- Global Avg Input Tokens/s Card -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Input Tokens/s</h3>
+            </div>
+            
+            <div class="flex flex-col gap-4 flex-1 justify-end">
+              <!-- Cold -->
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold
+                         @if (isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedColdLocal != null && inputSpeedColdLocal > 0 ? (inputSpeedColdLocal >= 1000 ? ((inputSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedColdLocal, inputSpeedMax) + '%'"></div>
+                </div>
+              </div>
+              <!-- Warm -->
+              <div class="flex flex-col gap-1.5 mt-2">
+                <div class="flex items-center justify-between">
+                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')">
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm
+                         @if (isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                   </span>
+                   <div class="flex items-baseline gap-1">
+                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedWarmLocal != null && inputSpeedWarmLocal > 0 ? (inputSpeedWarmLocal >= 1000 ? ((inputSpeedWarmLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
+                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                   </div>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedWarmLocal, inputSpeedMax) + '%'"></div>
+                </div>
+              </div>              <!-- Baselines -->
+              @for (baseline of comparisonService.baselines; track baseline.id) {
+                @let inputSpeedBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageInputTokensPerSecond || 0;
+                @let baselineDetails = getBaselineDetails(baseline.id);
+                <div class="flex flex-col gap-1.5 mt-2">
+                  <div class="flex items-center justify-between gap-2">
+                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')">
+                         {{ baseline.name }}
+                       </span>
+                       @if (baselineDetails?.executionType) {
+                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                         </span>
+                       }
+                       @if (baselineDetails?.model) {
+                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                           {{ baselineDetails?.model }}
+                         </span>
+                       }
+                       @if (!isExtensionInstalled) {
+                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
+                           <i class="bi bi-browser-chrome"></i> Install Extension
+                         </a>
+                       }
+                       @if (isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                     </div>
+                     <div class="flex items-baseline gap-1 flex-shrink-0">
+                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')">{{ inputSpeedBaseline != null && inputSpeedBaseline > 0 ? (inputSpeedBaseline >= 1000 ? ((inputSpeedBaseline/1000) | number:'1.1-1') + 'k' : (inputSpeedBaseline | number:'1.0-0')) : (inputSpeedBaseline === -1 ? 'N/A' : '—') }}</span>
+                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                     </div>
+                  </div>
+                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedBaseline, inputSpeedMax) + '%'"></div>
                   </div>
                 </div>
               }
@@ -1120,6 +1205,91 @@
               }
                 </div>
               </div>
+
+              <!-- Avg Input Tokens/s Card -->
+              @let coldInputTokenSpeed = coldSummaryResults?.averageInputTokensPerSecond;
+              @let warmInputTokenSpeed = warmSummaryResults?.averageInputTokensPerSecond;
+              @let allInputTokenSpeed = getTestAllValues(element.id, 'inputSpeed', coldInputTokenSpeed, warmInputTokenSpeed);
+              @let maxInputTokenSpeed = getMaxArray(allInputTokenSpeed);
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                    <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Input Tokens/s</h3>
+                </div>
+                <div class="flex flex-col gap-1 flex-1 justify-end">
+                  <!-- COLD -->
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         @if (isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">{{ coldInputTokenSpeed != null && coldInputTokenSpeed > 0 ? (coldInputTokenSpeed >= 1000 ? ((coldInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (coldInputTokenSpeed | number:'1.0-0')) : (coldInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(coldInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                  <!-- WARM -->
+                  <div class="flex flex-col gap-1.5 mt-2">
+                    <div class="flex items-center justify-between">
+                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         @if (isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                       </span>
+                       <div class="flex items-baseline gap-1">
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">{{ warmInputTokenSpeed != null && warmInputTokenSpeed > 0 ? (warmInputTokenSpeed >= 1000 ? ((warmInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (warmInputTokenSpeed | number:'1.0-0')) : (warmInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
+                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                       </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(warmInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
+                    </div>
+                  </div>
+                  <!-- Baselines -->
+                  @for (baseline of comparisonService.baselines; track baseline.id) {
+                @let baselineInputTokenSpeed = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageInputTokensPerSecond || 0;
+                @let baselineDetails = getBaselineDetails(baseline.id);
+                <div class="flex flex-col gap-1.5 mt-2">
+                  <div class="flex items-center justify-between gap-2">
+                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')">
+                         {{ baseline.name }}
+                       </span>
+                       @if (baselineDetails?.executionType) {
+                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                         </span>
+                       }
+                       @if (baselineDetails?.model) {
+                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                           {{ baselineDetails?.model }}
+                         </span>
+                       }
+                       @if (!isExtensionInstalled) {
+                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
+                           <i class="bi bi-browser-chrome"></i> Install Extension
+                         </a>
+                       }
+                       @if (isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                     </div>
+                     <div class="flex items-baseline gap-1 flex-shrink-0">
+                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')">{{ baselineInputTokenSpeed != null && baselineInputTokenSpeed > 0 ? (baselineInputTokenSpeed >= 1000 ? ((baselineInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (baselineInputTokenSpeed | number:'1.0-0')) : (baselineInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
+                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                     </div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(baselineInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
+                  </div>
+                </div>
+              }
+                </div>
+              </div>
             </div>
           </div>
           }
@@ -1257,6 +1427,21 @@
                             </div>
                           </td>
                         </tr>
+                        <!-- Input Tokens/s -->
+                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
+                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
+                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
+                              <i class="bi bi-speedometer text-slate-400 dark:text-slate-500"></i>
+                              <span class="text-xs font-bold uppercase tracking-wider">Input Tokens/s</span>
+                            </div>
+                          </td>
+                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
+                            <div class="flex items-baseline gap-1">
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageInputTokensPerSecond != null && test.results.averageInputTokensPerSecond > 0 ? (test.results.averageInputTokensPerSecond | number:'1.0-0') : (test.results.averageInputTokensPerSecond === -1 ? 'N/A' : '—') }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                            </div>
+                          </td>
+                        </tr>
                         <!-- Average Input Tokens -->
                         <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
                           <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
@@ -1324,6 +1509,7 @@
                                   <th class="px-3 py-2 w-10">#</th>
                                   <th class="px-3 py-2 text-right">TTFT</th>
                                   <th class="px-3 py-2 text-right">Total</th>
+                                  <th class="px-3 py-2 text-right">Input Tokens/s</th>
                                   <th class="px-3 py-2 text-right">Output Tokens/s</th>
                                   <th class="px-3 py-2 text-right">Characters/s</th>
                                   <th class="px-3 py-2 text-center">Output</th>

@@ -312,12 +312,14 @@ export class AxonTestSuiteExecutor {
         const summary = this.results.summary![builtInAiAPI][startType as "cold" | "warm"]!;
 
         summary.averageTokenPerSecond = MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0));
+        summary.averageInputTokensPerSecond = MathematicalCalculations.calculateAverage(items.map(item => item.inputTokensPerSecond ?? 0));
         summary.averageTimeToFirstToken = MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0));
         summary.averageTotalResponseTime = MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0));
 
         summary.medianTimeToFirstToken = MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0));
         summary.medianTotalResponseTime = MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0));
         summary.medianTokenPerSecond = MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0));
+        summary.medianInputTokensPerSecond = MathematicalCalculations.calculateMedian(items.map(item => item.inputTokensPerSecond ?? 0));
       }
     }
 

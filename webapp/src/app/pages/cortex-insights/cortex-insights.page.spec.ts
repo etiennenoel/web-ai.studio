@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { CortexInsightsPage } from './cortex-insights.page';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { PLATFORM_ID } from '@angular/core';
 
@@ -236,4 +237,123 @@ describe('CortexInsightsPage', () => {
     expect(component.maxTotal).toBe(1500);
     expect(component.minTotal).toBe(500);
   }));
+
+  it('should sync from URL', () => {
+    const route = TestBed.inject(ActivatedRoute);
+    (route as any).snapshot = {
+      queryParamMap: {
+        has: (key: string) => ['activeMetric', 'tableSortColumn', 'tableSortDirection', 'search', 'hardware', 'api'].includes(key),
+        get: (key: string) => {
+          if (key === 'activeMetric') return 'ttft';
+          if (key === 'tableSortColumn') return 'hw';
+          if (key === 'tableSortDirection') return 'asc';
+          if (key === 'search') return 'test search';
+          return null;
+        },
+        getAll: (key: string) => {
+          if (key === 'hardware') return ['HW 1'];
+          if (key === 'api') return ['__none__'];
+          return [];
+        }
+      } as any
+    } as any;
+
+    component.hardwareOptions = ['HW 1', 'HW 2'];
+    component.apiOptions = ['api1'];
+
+    component.syncFromUrl();
+
+    expect(component.activeMetric).toBe('ttft');
+    expect(component.tableSortColumn).toBe('hw');
+    expect(component.tableSortDirection).toBe('asc');
+    expect(component.searchQuery).toBe('test search');
+    expect(component.selectedHardwares).toEqual(['HW 1']);
+    expect(component.selectedApis).toEqual([]);
+  });
+
+  it('should sync to URL', () => {
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate');
+
+    component.activeMetric = 'ttft';
+    component.tableSortColumn = 'hw';
+    component.tableSortDirection = 'asc';
+    component.searchQuery = ' test search ';
+
+    component.hardwareOptions = ['HW 1', 'HW 2'];
+    component.selectedHardwares = ['HW 1']; // 1 selected
+    
+    component.apiOptions = ['api1', 'api2'];
+    component.selectedApis = []; // none selected
+
+    component.computeOptions = ['CPU'];
+    component.selectedComputes = ['CPU']; // all selected
+
+    component.syncToUrl();
+
+    expect(navigateSpy).toHaveBeenCalledWith([], {
+      relativeTo: TestBed.inject(ActivatedRoute),
+      queryParams: jasmine.objectContaining({
+        activeMetric: 'ttft',
+        tableSortColumn: 'hw',
+        tableSortDirection: 'asc',
+        search: 'test search',
+        hardware: ['HW 1'],
+        api: '__none__',
+        compute: null
+      }),
+      replaceUrl: true,
+      queryParamsHandling: 'merge'
+    });
+  });
+
+  it('should return correct badge class', () => {
+    expect(component.getBadgeClass('current')).toContain('bg-indigo-100');
+    expect(component.getBadgeClass('purple')).toContain('bg-purple-100');
+    expect(component.getBadgeClass('emerald')).toContain('bg-emerald-100');
+    expect(component.getBadgeClass('cloud')).toContain('bg-blue-100');
+    expect(component.getBadgeClass('Cloud')).toContain('bg-blue-100');
+    expect(component.getBadgeClass('unknown')).toContain('bg-gray-100');
+  });
+
+  it('should return correct speed color', () => {
+    expect(component.getSpeedColor(100, 10, 100)).toBe('#10b981'); // 1.0 >= 0.75
+    expect(component.getSpeedColor(70, 10, 100)).toBe('#eab308'); // ~0.66 >= 0.5
+    expect(component.getSpeedColor(40, 10, 100)).toBe('#f97316'); // ~0.33 >= 0.25
+    expect(component.getSpeedColor(20, 10, 100)).toBe('#f43f5e'); // < 0.25
+    expect(component.getSpeedColor(10, 10, 10)).toBe('#10b981'); // max === min
+    expect(component.getSpeedColor(NaN, 10, 100)).toBe('#10b981'); // isNaN
+  });
+
+  it('should return correct time color', () => {
+    expect(component.getTimeColor(20, 10, 100)).toBe('#10b981'); // ~0.11 <= 0.25
+    expect(component.getTimeColor(40, 10, 100)).toBe('#eab308'); // ~0.33 <= 0.5
+    expect(component.getTimeColor(70, 10, 100)).toBe('#f97316'); // ~0.66 <= 0.75
+    expect(component.getTimeColor(100, 10, 100)).toBe('#f43f5e'); // > 0.75
+    expect(component.getTimeColor(10, 10, 10)).toBe('#10b981'); // max === min
+    expect(component.getTimeColor(NaN, 10, 100)).toBe('#10b981'); // isNaN
+  });
+
+  it('should generate chart data correctly', () => {
+    component.topConfig = null;
+    component.generateChartData();
+    expect(component.chartPointsFleet).toBe('');
+    expect(component.chartPointsTop).toBe('');
+
+    component.topConfig = {
+      id: 1, filename: 'test', hw: 'test', compute: 'test', engine: 'test', model: 'test',
+      apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, isCurrent: false, trend: 'best'
+    };
+    component.activeMetric = 'speed';
+    component.fleetAvgSpeed = 100;
+    
+    component.generateChartData();
+
+    expect(component.chartPointsFleetCircles.length).toBe(5);
+    expect(component.chartPointsTopCircles.length).toBe(5);
+    expect(component.chartPointsFleet).toContain(',');
+    expect(component.chartPointsTop).toContain(',');
+    expect(component.chartPolygonFleet).toContain('0,100');
+    expect(component.chartPolygonFleet).toContain('100%,100');
+  });
 });

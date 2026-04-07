@@ -195,6 +195,7 @@ export class ComparisonDataService {
 
     return {
       averageTokenPerSecond: calcAvg('tokensPerSecond'),
+      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
       averageCharactersPerSecond: calcAvg('charactersPerSecond'),
       averageTimeToFirstToken: calcAvg('timeToFirstToken'),
       averageTotalResponseTime: calcAvg('totalResponseTime'),
@@ -219,6 +220,7 @@ export class ComparisonDataService {
 
     return {
       averageTokenPerSecond: calcAvg('tokensPerSecond'),
+      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
       averageCharactersPerSecond: calcAvg('charactersPerSecond'),
       averageTimeToFirstToken: calcAvg('timeToFirstToken'),
       averageTotalResponseTime: calcAvg('totalResponseTime'),

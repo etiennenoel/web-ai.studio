@@ -268,6 +268,12 @@
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'speed'}"></i>
                 </div>
               </th>
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('inputSpeed')">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Input Tokens/s</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'inputSpeed'}"></i>
+                </div>
+              </th>
               <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('charSpeed')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Characters/s</span>
@@ -342,6 +348,26 @@
                       </div>
                       <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
                         <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
+                      </div>
+                    } @else {
+                      <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Input Tokens/s Cell -->
+                <td class="px-4 py-4 align-middle pr-8 text-right">
+                  <div class="flex flex-col items-end gap-1.5">
+                    @if (row.inputSpeed > 0) {
+                      <div class="flex items-center gap-2">
+                        @if (row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                        @if (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-emerald-400' : (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                          {{ row.inputSpeed | number:'1.0-0' }}
+                        </span>
+                      </div>
+                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
+                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.inputSpeed, minInputSpeed, maxInputSpeed)" [style.width]="speedWidth + '%'"></div>
                       </div>
                     } @else {
                       <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>

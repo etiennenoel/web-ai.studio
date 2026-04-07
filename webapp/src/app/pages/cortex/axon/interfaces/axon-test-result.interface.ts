@@ -28,6 +28,7 @@ export interface AxonTestResultInterface {
   averageTotalResponseTime?: number;
 
   averageTokensPerSecond?: number;
+  averageInputTokensPerSecond?: number;
 
   averageCharactersPerSecond?: number;
 
@@ -38,6 +39,7 @@ export interface AxonTestResultInterface {
   medianTotalResponseTime?: number;
 
   medianTokensPerSecond?: number;
+  medianInputTokensPerSecond?: number;
 
   medianCharactersPerSecond?: number;
 
