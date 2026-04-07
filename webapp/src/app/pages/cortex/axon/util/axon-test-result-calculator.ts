@@ -15,10 +15,16 @@ export class AxonTestResultCalculator {
     if (tokensPerSeconds.length > 0) {
         results.averageTokensPerSecond = MathematicalCalculations.calculateAverage(tokensPerSeconds);
         results.medianTokensPerSecond = MathematicalCalculations.calculateMedian(tokensPerSeconds);
+    } else if (results.testIterationResults.some(r => r.tokensPerSecond === -1)) {
+        results.averageTokensPerSecond = -1;
+        results.medianTokensPerSecond = -1;
     }
     if (inputTokensPerSeconds.length > 0) {
         results.averageInputTokensPerSecond = MathematicalCalculations.calculateAverage(inputTokensPerSeconds);
         results.medianInputTokensPerSecond = MathematicalCalculations.calculateMedian(inputTokensPerSeconds);
+    } else if (results.testIterationResults.some(r => r.inputTokensPerSecond === -1)) {
+        results.averageInputTokensPerSecond = -1;
+        results.medianInputTokensPerSecond = -1;
     }
     results.averageCharactersPerSecond = MathematicalCalculations.calculateAverage(charsPerSeconds);
     results.averageTimeToFirstToken = MathematicalCalculations.calculateAverage(timeToFirstTokens);

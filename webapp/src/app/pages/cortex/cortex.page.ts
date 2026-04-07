@@ -666,12 +666,14 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     return {
         averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
         averageCharactersPerSecond: calcAvg('charactersPerSecond'),
         averageTimeToFirstToken: calcAvg('timeToFirstToken'),
         averageTotalResponseTime: calcAvg('totalResponseTime'),
         medianTimeToFirstToken: calcMed('timeToFirstToken'),
         medianTotalResponseTime: calcMed('totalResponseTime'),
         medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianInputTokensPerSecond: calcMed('inputTokensPerSecond'),
         medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
@@ -700,12 +702,14 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     return {
         averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
         averageCharactersPerSecond: calcAvg('charactersPerSecond'),
         averageTimeToFirstToken: calcAvg('timeToFirstToken'),
         averageTotalResponseTime: calcAvg('totalResponseTime'),
         medianTimeToFirstToken: calcMed('timeToFirstToken'),
         medianTotalResponseTime: calcMed('totalResponseTime'),
         medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianInputTokensPerSecond: calcMed('inputTokensPerSecond'),
         medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
