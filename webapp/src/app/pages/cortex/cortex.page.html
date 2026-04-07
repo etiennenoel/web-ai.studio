@@ -1,1555 +1,459 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-32 dark:text-slate-100 dark:bg-slate-950">
-  <!-- Top Navigation -->
-  <header class="bg-white/90 border-b border-slate-200 px-6 sm:px-8 py-4 sticky top-0 z-30 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:border-slate-700">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
+<div class="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans overflow-hidden text-slate-900 dark:text-slate-100 selection:bg-indigo-100 selection:text-indigo-900">
+  
+  <!-- GLOBAL LEFT SIDEBAR -->
+  <aside class="w-[340px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 shrink-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] dark:shadow-none">
+    
+    <!-- Branding Header -->
+    <div class="h-[72px] px-6 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-indigo-200 dark:shadow-none shrink-0">
+          <i class="bi bi-activity text-white text-lg"></i>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2 dark:text-slate-200">
-            Cortex Test Suite
-            @if (isImportedReport) {
-              <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500/30">Imported Report</span>
-            }
-          </h1>
-          <p class="text-xs text-slate-500 font-medium mt-0.5 dark:text-slate-400">Measure raw, unconstrained speed of the AI APIs.</p>
+        <div class="min-w-0">
+          <h1 class="text-base font-bold text-slate-900 dark:text-white leading-tight truncate">Cortex Test Suite</h1>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">Hardware API Benchmarking</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <a routerLink="/cortex-insights" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-sm font-semibold text-indigo-700 rounded-lg hover:bg-indigo-100 transition-all shadow-sm active:scale-95 dark:bg-indigo-900/30 dark:border-indigo-800/50 dark:text-indigo-300 dark:hover:bg-indigo-900/50">
-          <i class="bi bi-graph-up text-indigo-500 dark:text-indigo-400"></i> Cortex Insights
-          <i class="bi bi-box-arrow-up-right text-[10px] opacity-70 ml-1"></i>
-        </a>
-        @if (!isExtensionInstalled) {
-          <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 bg-blue-600 border border-blue-700 text-sm font-semibold text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm active:scale-95">
-            <i class="bi bi-browser-chrome"></i> Add to Chrome
-          </a>
-        }
-        @if (isImportedReport) {
-          <button type="button" (click)="resetState()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-slate-100">
-            <i class="bi bi-arrow-counterclockwise text-slate-400 dark:text-slate-500"></i> Reset
-          </button>
-        } @else {
-          <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
-          <button type="button" (click)="triggerImport()" [disabled]="isTestingRunning" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-slate-100">
-            <i class="bi bi-upload text-slate-400 dark:text-slate-500"></i> Import Report
-          </button>
-          <button type="button" (click)="openAboutModal()" class="flex items-center justify-center w-10 h-10 bg-white border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 hover:text-slate-700 transition-all shadow-sm active:scale-95 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300" title="About the Benchmark">
-            <i class="bi bi-question-circle text-lg"></i>
-          </button>
-        }
-      </div>
+      <button class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" (click)="openAboutModal()"><i class="bi bi-gear-fill"></i></button>
     </div>
-  </header>
 
-  <main class="w-full mx-auto px-6 sm:px-8 py-8 flex flex-col gap-6">
+    <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+      
+      <!-- Main Navigation Views -->
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 space-y-1">
+        <button 
+          (click)="setActiveView('overview')"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all"
+          [ngClass]="activeView === 'overview' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 shadow-sm ring-1 ring-indigo-100 dark:ring-indigo-500/30' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'"
+        >
+          <i class="bi bi-speedometer2 text-lg" [ngClass]="activeView === 'overview' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'"></i>
+          Dashboard Overview
+        </button>
+      </div>
 
-<!-- Suite Execution Planner -->
-    <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-10 shadow-sm dark:bg-slate-900 dark:border-slate-700">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-indigo-600 shadow-sm dark:bg-slate-900 dark:border-slate-700 dark:text-indigo-400">
-            <i class="bi bi-check2-square text-lg"></i>
-          </div>
-          <h2 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Suite Execution Planner</h2>
-          <span class="bg-indigo-100 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border dark:bg-indigo-900/50 dark:text-indigo-400 dark:border-indigo-500/30">{{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Selected</span>
+      <!-- Local Environment Block -->
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+         <div class="flex justify-between items-center mb-3">
+           <h3 class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+             <i class="bi bi-pc-display"></i> Local Target
+           </h3>
+           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" [ngClass]="isExtensionInstalled ? 'bg-emerald-100/50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30' : 'bg-slate-100 text-slate-500 border border-slate-200'">
+             {{ isExtensionInstalled ? 'READY' : 'EXT REQ' }}
+           </span>
+         </div>
+         
+         <div class="grid grid-cols-2 gap-2">
+            <div class="bg-white dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5 flex items-center gap-1"><i class="bi bi-cpu"></i> CPU</div>
+              <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate" [title]="getComputeUnit()">{{ getComputeUnit() }}</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div class="text-[9px] font-bold text-purple-400 dark:text-purple-500 uppercase tracking-wider mb-0.5 flex items-center gap-1"><i class="bi bi-lightning-charge-fill"></i> Accel</div>
+              <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate" [title]="getNpuInfo()">{{ getNpuInfo() }}</div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Test Explorer -->
+      <div class="flex-1 flex flex-col">
+        <div class="p-4 pb-2 flex justify-between items-center">
+          <h3 class="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
+            <i class="bi bi-flask text-lg" [ngClass]="activeView === 'test-lab' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'"></i> Test Explorer
+          </h3>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30">
+            {{ selectedTestIds.size }}/{{ axonTestSuiteExecutor.testsSuite.length }} SEL
+          </span>
         </div>
-        <label class="flex items-center gap-2 cursor-pointer group mb-0">
-          <input type="checkbox"
-                 class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-blue-600"
-                 [checked]="isAllSelected()"
-                 [indeterminate]="isPartiallySelected()"
-                 [disabled]="isTestingRunning"
-                 (change)="toggleAllSelection($event)">
-          <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors dark:text-slate-300 dark:group-hover:text-slate-100">Select All API Suites</span>
-        </label>
-      </div>
+        
+        <div class="px-4 py-2 flex items-center">
+          <label class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 cursor-pointer group">
+            <input 
+              type="checkbox" 
+              [checked]="isAllSelected()"
+              [indeterminate]="isPartiallySelected()"
+              (change)="toggleAllSelection($event)"
+              class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600" 
+            /> 
+            <span class="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Select All Suites</span>
+          </label>
+        </div>
+        
+        <div class="flex-1 px-2 pb-6 space-y-1">
+          @for (api of builtInAiApis; track api.id) {
+            @let tests = getTests(getBuiltInAiAPIFromItemInterface(api));
+            @let isSelected = isCategorySelected(getBuiltInAiAPIFromItemInterface(api));
+            @let isPartiallySelectedCategory = isCategoryPartiallySelected(getBuiltInAiAPIFromItemInterface(api));
+            @let scenarios = getScenarios(getBuiltInAiAPIFromItemInterface(api));
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        @for (element of builtInAiApis; track $index) {
-          @let api = getBuiltInAiAPIFromItemInterface(element);
-          @let tests = getTests(api);
-          @if (tests.length > 0) {
-            @let selectedCount = getSelectedTestsCountForApi(api);
-            <label class="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-indigo-300 transition-colors cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:hover:border-indigo-500/50" [class.border-dashed]="isCategoryPartiallySelected(api)" [class.ring-1]="selectedCount > 0" [class.ring-indigo-500]="selectedCount > 0" [class.border-indigo-500]="selectedCount > 0">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600 dark:bg-slate-900 dark:border-slate-800 dark:text-indigo-400">
-                  <i class="bi text-lg" [ngClass]="getIconForApi(api)"></i>
-                </div>
-                <div class="flex flex-col">
-                  <div class="flex items-center gap-2 mb-0">
-                    <h3 class="text-sm font-bold text-slate-800 tracking-tight dark:text-slate-200">{{ element.id }}</h3>
-                    <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
+            <div class="pb-1 border-b border-slate-50 dark:border-slate-800/50 last:border-0">
+              <div class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <div class="flex items-center gap-2 min-w-0">
+                  <input 
+                    type="checkbox" 
+                    [checked]="isSelected" 
+                    [indeterminate]="isPartiallySelectedCategory"
+                    (change)="toggleCategorySelection(getBuiltInAiAPIFromItemInterface(api), $event)"
+                    class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 cursor-pointer dark:bg-slate-800 dark:border-slate-600" 
+                  />
+                  <div class="p-1 rounded shrink-0" [ngClass]="isSelected || isPartiallySelectedCategory ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/30 dark:text-indigo-400' : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'">
+                    <i class="bi {{ getIconForApi(getBuiltInAiAPIFromItemInterface(api)) }} text-xs"></i>
                   </div>
-                  <span class="text-xs text-slate-500 font-medium dark:text-slate-400">{{ tests.length }} Total Tests Available</span>
+                  <span class="text-sm font-semibold truncate" [ngClass]="isSelected || isPartiallySelectedCategory ? 'text-slate-800 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400'">
+                    {{ itemDisplay(api) }}
+                  </span>
                 </div>
+                <span class="text-[10px] font-bold text-slate-400">{{ tests.length }} tests</span>
               </div>
-              <div class="flex items-center gap-4">
-                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">{{ selectedCount }} / {{ tests.length }}</span>
-                <input type="checkbox"
-                       class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-blue-600"
-                       [checked]="isCategorySelected(api)"
-                       [indeterminate]="isCategoryPartiallySelected(api)"
-                       [disabled]="isTestingRunning"
-                       (change)="toggleCategorySelection(api, $event)">
-              </div>
-            </label>
+              
+              @if (scenarios.length > 0) {
+                <div class="pl-8 pr-2 mt-1 space-y-1">
+                  @for (scen of scenarios; track scen.id) {
+                    @let isScenActive = activeView === 'test-lab' && activeScenarioId === scen.id;
+                    <button 
+                      (click)="setActiveScenario(scen.id)"
+                      class="w-full text-left px-2 py-1.5 rounded-md flex items-center justify-between transition-colors"
+                      [ngClass]="isScenActive ? 'bg-indigo-50 text-indigo-700 font-bold shadow-sm dark:bg-indigo-500/20 dark:text-indigo-300' : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800'"
+                    >
+                      <div class="flex items-center gap-2 truncate text-xs">
+                        <i class="bi {{ getScenarioStatusIcon(scen) }} text-xs"></i>
+                        <span class="truncate">{{ scen.name }}</span>
+                      </div>
+                      <span class="text-[9px] px-1 py-0.5 rounded border" [ngClass]="isScenActive ? 'bg-white border-indigo-100 text-indigo-500 dark:bg-slate-800 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-500'">
+                        {{ scen.tests.length }}x
+                      </span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
           }
-        }
+        </div>
       </div>
-
-      <div class="mt-8 flex justify-center border-t border-slate-200 pt-6 dark:border-slate-700">
-        <button type="button" class="w-full max-w-xs py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
-                (click)="start()"
-                [disabled]="this.axonTestSuiteExecutor.results.status === 'Executing'">
-          @if (this.axonTestSuiteExecutor.results.status === 'Executing') {
-            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <span>Running...</span>
+      
+      <!-- Action Area -->
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-6 z-10 relative">
+        <button 
+          (click)="handleRunClick()"
+          [disabled]="isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 text-sm"
+        >
+          @if(isTestingRunning) {
+             <i class="bi bi-square-fill"></i> Executing...
           } @else {
-            <i class="bi bi-play-fill text-lg"></i>
-            <span>Run Cortex Test</span>
+             <i class="bi bi-play-fill"></i> Execute Workflow
           }
         </button>
       </div>
     </div>
+  </aside>
 
-    <!-- Cortex Report & Chart -->
+  <!-- MAIN CONTENT AREA -->
+  <div class="flex-1 flex flex-col relative min-w-0 bg-slate-50 dark:bg-slate-950">
+    
+    <!-- Top Utility Nav -->
+    <header class="h-[72px] px-8 flex items-center justify-between bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-sm sticky top-0 z-10 shrink-0 border-b border-transparent dark:border-slate-800">
+       <div class="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400">
+         <span class="text-slate-400 dark:text-slate-500">Workspace</span> <i class="bi bi-chevron-right text-slate-300 dark:text-slate-600 text-xs"></i>
+         @if (activeView === 'overview') {
+           <span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i class="bi bi-speedometer2"></i> Overview</span>
+         } @else {
+           <span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i class="bi bi-flask"></i> Interactive Test Lab</span>
+         }
+       </div>
+       <div class="flex gap-3">
+        <button (click)="triggerImport()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-upload"></i> Import</button>
+        <button (click)="saveReportToUrl()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-share"></i> Share</button>
+        <button (click)="triggerDownloadResults()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-download"></i> Export JSON</button>
+      </div>
+    </header>
 
-<!-- Setup Accordion -->
-    @if (!isImportedReport && this.axonTestSuiteExecutor.preTestsStatus !== TestStatus.Idle) {
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-colors dark:bg-slate-900 dark:border-slate-700"
-           [class.border-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-2]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.ring-indigo-400]="axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing"
-           [class.border-slate-200]="axonTestSuiteExecutor.preTestsStatus !== TestStatus.Executing">
-        <div class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50" (click)="this.viewData.pretests.iterationsCollapsed = !this.viewData.pretests.iterationsCollapsed">
-          <div class="flex items-center gap-4">
-            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800">
-              <span class="text-xs font-bold text-slate-500 dark:text-slate-400">1</span>
+    <!-- Scrollable Body -->
+    <main class="flex-1 overflow-y-auto px-8 pb-32 custom-scrollbar">
+      
+      @if (activeView === 'overview') {
+        <div class="max-w-[1600px] mx-auto space-y-8 pb-12 pt-6">
+          <section class="space-y-4">
+            <div class="flex items-end justify-between mb-4">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <i class="bi bi-globe text-indigo-600 dark:text-indigo-400"></i> Dashboard Overview
+                </h2>
+                <p class="text-xs font-bold text-slate-400 tracking-widest uppercase mt-2">High-level metrics and aggregate baselines</p>
+              </div>
             </div>
-            <h3 class="text-sm font-bold text-slate-800 mb-0 dark:text-slate-200">Setup Details & Availability</h3>
-            @if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Executing) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-amber-50 text-amber-700 border-amber-200 ml-2 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
-                <svg class="animate-spin h-3 w-3 text-amber-700 dark:text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Checking...
-              </span>
-            } @else if (axonTestSuiteExecutor.preTestsStatus === TestStatus.Success) {
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border bg-emerald-50 text-emerald-700 border-emerald-200 ml-2 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50">
-                <i class="bi bi-check-circle-fill text-xs"></i> Setup Complete
-              </span>
-            }
-          </div>
-          <i class="bi text-slate-400 text-lg dark:text-slate-500" [class.bi-chevron-right]="this.viewData.pretests.iterationsCollapsed" [class.bi-chevron-down]="!this.viewData.pretests.iterationsCollapsed"></i>
+
+            <!-- High-Level Average Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+               <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md shadow-indigo-200 dark:shadow-none p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-100 mb-1">Total Tests Selected</div>
+                  <div class="text-3xl font-bold">{{ selectedTestIds.size }}</div>
+               </div>
+               
+               @let stats = getGlobalSummaryResults('warm');
+               @let passedStats = getGlobalPassedAndFailed();
+               @let totalTestsRan = passedStats.passed + passedStats.failed;
+               @let successRate = totalTestsRan > 0 ? (passedStats.passed / totalTestsRan) * 100 : 0;
+
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg TTFT (Warm)</div>
+                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ stats?.averageTimeToFirstToken ? (stats?.averageTimeToFirstToken | number:'1.0-0') : '--' }} ms</div>
+               </div>
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg Total Time (Warm)</div>
+                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ stats?.averageTotalResponseTime ? (stats?.averageTotalResponseTime | number:'1.0-0') : '--' }} ms</div>
+               </div>
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Overall Success Rate</div>
+                  <div class="text-2xl font-bold" [ngClass]="successRate > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'">{{ totalTestsRan > 0 ? (successRate | number:'1.0-1') + '%' : '--' }}</div>
+               </div>
+            </div>
+
+            <!-- Merged Insights / Leaderboard Component -->
+            <div class="mt-8 relative -mx-8 sm:mx-0">
+               <app-cortex-insights [embedded]="true"></app-cortex-insights>
+            </div>
+            
+          </section>
         </div>
-        
-        <div class="px-6 py-4 bg-white border-t border-slate-100 dark:bg-slate-900 dark:border-slate-800" [class.hidden]="this.viewData.pretests.iterationsCollapsed">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (result of this.axonTestSuiteExecutor.results.testsResults; track $index) {
-              <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 shadow-sm dark:border-slate-800 dark:bg-slate-900/30">
-                <div class="font-bold text-sm text-slate-700 truncate pr-4 dark:text-slate-300" [title]="result.id">{{ result.id }}</div>
-                <div class="shrink-0">
-                  @switch (result.apiAvailability) {
-                    @case ("unknown") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50">
-                        <svg class="animate-spin h-3 w-3 text-blue-700 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Checking
-                      </span>
-                    }
-                    @case ("available") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50">
-                        <i class="bi bi-check-circle-fill"></i> Ready
-                      </span>
-                    }
-                    @case ("downloading") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider animate-pulse dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
-                        <i class="bi bi-cloud-arrow-down-fill"></i> Downloading
-                      </span>
-                    }
-                    @case ("downloadable") {
-                      <button class="inline-flex items-center gap-1.5 px-3 py-1 border border-transparent text-[11px] font-bold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 uppercase tracking-wider" (click)="this.forceSetup(result.id)">
-                        <i class="bi bi-download"></i> Download
+      } @else {
+        <div class="max-w-[1600px] mx-auto space-y-8 pt-6">
+           <!-- Scenario Inspector -->
+          <section>
+            @let scen = getScenarioById(activeScenarioId);
+            @if (scen) {
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-[700px] overflow-hidden">
+                <!-- Header & Phase Selector -->
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-4 shrink-0 bg-white dark:bg-slate-900">
+                  <div>
+                    <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 mb-1">
+                      <i class="bi {{ getIconForApi(getBuiltInAiAPIFromItemInterface({id: scen.api, label: ''})) }}"></i>
+                      <span class="text-[10px] font-bold uppercase tracking-wider">{{ scen.api }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ scen.name }}</h3>
+                  </div>
+                  
+                  <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg shrink-0 border border-slate-200/50 dark:border-slate-700">
+                    @for (test of scen.tests; track test.id) {
+                      <button
+                        (click)="activeTestIdInLab = test.id"
+                        class="flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all"
+                        [ngClass]="activeTestIdInLab === test.id ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm border border-slate-200/50 dark:border-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 border border-transparent'"
+                      >
+                        <i class="bi {{ getTestStatusIcon(test.results.status) }}"></i>
+                        {{ test.results.startType === 'cold' ? 'Cold Start' : 'Warm Start' }}
                       </button>
                     }
-                    @case ("unavailable") {
-                      <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50">
-                        <i class="bi bi-x-circle-fill"></i> Unavailable
-                      </span>
-                    }
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- API Categories -->
-
-<!-- Cortex Report & Chart -->
-    @if (isReportReady) {
-      <section class="mt-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-400">
-              <i class="bi bi-bar-chart-fill text-lg"></i>
-            </div>
-            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Cortex Report</h2>
-          </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 text-sm font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800/50" (click)="saveReportToUrl()">
-              <i class="bi bi-share text-indigo-600 dark:text-indigo-400"></i> Share via URL
-            </button>
-            <button type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white border border-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200 dark:shadow-none" (click)="triggerDownloadResults()">
-              <i class="bi bi-download"></i> Download Report
-            </button>
-          </div>
-        </div>
-
-        @if (hardwareInfo) {
-        }
-
-      </section>
-    }
-
-    <!-- Legend / Context -->
-
-<!-- Local System Environment Card -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-700">
-      <div class="px-5 py-4 border-b border-slate-100 bg-white flex items-center justify-between dark:border-slate-800 dark:bg-slate-900">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center dark:bg-indigo-900/30 dark:text-indigo-400">
-            <i class="bi bi-lightning-charge-fill text-lg"></i>
-          </div>
-          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-0 dark:text-slate-200">Local System Environment</h3>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">Status:</span>
-          @if (isExtensionInstalled) {
-            <span class="bg-emerald-50 text-emerald-700 border-emerald-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50">
-              <i class="bi bi-check-circle"></i> Extension installed
-            </span>
-          } @else {
-            <span class="bg-amber-50 text-amber-700 border-amber-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
-              Extension not found
-            </span>
-            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-              <i class="bi bi-browser-chrome"></i> Install Extension
-            </a>
-          }
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-900">
-        <div class="p-5 flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
-            <i class="bi bi-cpu text-slate-400 dark:text-slate-500"></i> Compute Unit
-          </div>
-          @if (isExtensionInstalled) {
-            <div class="font-medium text-[15px] text-slate-800 mt-1 dark:text-slate-200">{{ getComputeUnit() }}</div>
-          } @else {
-            <div class="mt-1">
-              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 dark:border-blue-800/50">
-                <i class="bi bi-browser-chrome"></i> Install Extension
-              </a>
-            </div>
-          }
-        </div>
-        <div class="p-5 flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
-            <i class="bi bi-motherboard text-slate-400 dark:text-slate-500"></i> NPU / AI Accel
-          </div>
-          @if (isExtensionInstalled) {
-            <div class="font-medium text-[15px] text-slate-800 mt-1 dark:text-slate-200">{{ getNpuInfo() }}</div>
-          } @else {
-            <div class="mt-1">
-              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 dark:border-blue-800/50">
-                <i class="bi bi-browser-chrome"></i> Install Extension
-              </a>
-            </div>
-          }
-        </div>
-        <div class="p-5 flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
-            <i class="bi bi-memory text-slate-400 dark:text-slate-500"></i> Memory
-          </div>
-          @if (isExtensionInstalled) {
-            <div class="font-medium text-[15px] text-slate-800 mt-1 dark:text-slate-200">{{ getMemoryInfo() }}</div>
-          } @else {
-            <div class="mt-1">
-              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 dark:border-blue-800/50">
-                <i class="bi bi-browser-chrome"></i> Install Extension
-              </a>
-            </div>
-          }
-        </div>
-        <div class="p-5 flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
-            <i class="bi bi-pc-display text-slate-400 dark:text-slate-500"></i> OS Profile
-          </div>
-          <div class="font-medium text-[15px] text-slate-800 mt-1 dark:text-slate-200">{{ getOsProfile() }}</div>
-        </div>
-        <div class="p-5 flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
-            <i class="bi bi-globe text-slate-400 dark:text-slate-500"></i> Browser
-          </div>
-          <div class="font-medium text-[15px] text-slate-800 mt-1 dark:text-slate-200">{{ getBrowserInfo() }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Global Suite Performance Card -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-6 mb-2 dark:bg-slate-900 dark:border-slate-700">
-      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between dark:border-slate-800">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl border border-indigo-100 flex items-center justify-center shrink-0 dark:border-indigo-500/30" style="background-color: #F8F9FC;" class="dark:!bg-slate-800">
-            <i class="bi bi-globe2 text-lg text-indigo-600 dark:text-indigo-400"></i>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3 dark:text-slate-200">
-              Global Suite Performance
-            </h2>
-            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 dark:text-slate-400">
-              Aggregate across all {{ getTestedApiCategoriesCount() }} API categories
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <button type="button" (click)="showBaselineDropdown = !showBaselineDropdown" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-indigo-200 text-sm font-bold text-indigo-700 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm active:scale-95 mr-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-900/30 dark:hover:border-indigo-500/50">
-              <i class="bi bi-bar-chart text-indigo-500 dark:text-indigo-400"></i> Compare Baselines <i class="bi bi-chevron-down text-xs ml-1 text-indigo-400"></i>
-            </button>
-            
-            @if (showBaselineDropdown) {
-              <!-- Backdrop -->
-              <div class="fixed inset-0 z-40" (click)="showBaselineDropdown = false"></div>
-              
-              <!-- Dropdown Menu -->
-              <div class="absolute right-2 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 dark:bg-slate-900 dark:border-slate-700">
-                <div class="p-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between dark:border-slate-800 dark:bg-slate-900">
-                  <span class="text-xs font-bold text-slate-600 uppercase tracking-wider dark:text-slate-400">Select Baselines</span>
-                  <button (click)="showBaselineDropdown = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-400"><i class="bi bi-x-lg"></i></button>
-                </div>
-                <div class="max-h-64 overflow-y-auto p-2 flex flex-col gap-1">
-                  @for (baseline of comparisonService.availableBaselinesIndex; track baseline.filename) {
-                    <label class="flex items-center gap-3 p-2.5 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50" [class.bg-indigo-50]="isBaselineSelected(baseline.filename)" [class.dark:bg-indigo-900/30]="isBaselineSelected(baseline.filename)">
-                      <input type="checkbox" 
-                             class="w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 dark:text-indigo-400 dark:bg-slate-800 dark:border-slate-600" 
-                             [checked]="isBaselineSelected(baseline.filename)" 
-                             (change)="toggleBaseline(baseline.filename, baseline.name, $event)">
-                      <div class="flex items-center gap-2">
-                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ baseline.name }}</span>
-                        @if (baseline.executionType) {
-                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baseline.executionType)">
-                            <i class="bi" [ngClass]="getExecutionTypeIcon(baseline.executionType)"></i> {{ baseline.executionType }}
-                          </span>
-                        }
-                        @if (baseline.model) {
-                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                            {{ baseline.model }}
-                          </span>
-                        }
-                      </div>
-                    </label>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-          @let passFail = getGlobalPassedAndFailed();
-          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm dark:bg-emerald-900/30 dark:border-emerald-800/50 dark:text-emerald-400">
-            <i class="bi bi-check-circle text-lg"></i>
-            <div class="flex flex-col">
-              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Passed</span>
-              <span class="text-sm font-bold leading-none mt-1">{{ passFail.passed }}</span>
-            </div>
-          </div>
-          <div class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm dark:bg-rose-900/30 dark:border-rose-800/50 dark:text-rose-400">
-            <i class="bi bi-exclamation-circle text-lg"></i>
-            <div class="flex flex-col">
-              <span class="text-[9px] font-bold uppercase tracking-widest leading-none">Failed</span>
-              <span class="text-sm font-bold leading-none mt-1">{{ passFail.failed }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="p-6 bg-slate-50/50 dark:bg-slate-900/30">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          @let globalCold = getGlobalSummaryResults('cold');
-          @let globalWarm = getGlobalSummaryResults('warm');
-
-          @let ttftColdLocal = globalCold?.averageTimeToFirstToken || 0;
-          @let ttftWarmLocal = globalWarm?.averageTimeToFirstToken || 0;
-          @let allTtft = getGlobalAllValues('ttft', ttftColdLocal, ttftWarmLocal);
-          @let ttftMax = getMaxArray(allTtft);
-
-          @let totalColdLocal = globalCold?.averageTotalResponseTime || 0;
-          @let totalWarmLocal = globalWarm?.averageTotalResponseTime || 0;
-          @let allTotal = getGlobalAllValues('total', totalColdLocal, totalWarmLocal);
-          @let totalMax = getMaxArray(allTotal);
-
-
-          @let speedColdLocal = globalCold?.averageTokenPerSecond || 0;
-          @let speedWarmLocal = globalWarm?.averageTokenPerSecond || 0;
-          @let allSpeed = getGlobalAllValues('speed', speedColdLocal, speedWarmLocal);
-          @let speedMax = getMaxArray(allSpeed);
-
-          @let inputSpeedColdLocal = globalCold?.averageInputTokensPerSecond || 0;
-          @let inputSpeedWarmLocal = globalWarm?.averageInputTokensPerSecond || 0;
-          @let allInputSpeed = getGlobalAllValues('inputSpeed', inputSpeedColdLocal, inputSpeedWarmLocal);
-          @let inputSpeedMax = getMaxArray(allInputSpeed);
-          
-          <!-- Global Avg TTFT Card -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi bi-stopwatch text-slate-600 dark:text-slate-400"></i>
-              </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg TTFT</h3>
-            </div>
-            
-            <div class="flex flex-col gap-4 flex-1 justify-end">
-              <!-- Cold -->
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftColdLocal, ttftMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Warm -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ ttftWarmLocal ? (ttftWarmLocal | number:'1.0-0') : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftWarmLocal, ttftMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Baselines -->
-              @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let ttftBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTimeToFirstToken || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(ttftBaseline, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftBaseline, allTtft, 'ttft')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(ttftBaseline, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(ttftBaseline, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(ttftBaseline, allTtft, 'ttft')">{{ ttftBaseline ? (ttftBaseline | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                     </div>
-                  </div>
-                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(ttftBaseline, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftBaseline, allTtft, 'ttft')" [style.width]="getPercentage(ttftBaseline, ttftMax) + '%'"></div>
                   </div>
                 </div>
-              }
-            </div>
-          </div>
 
-          <!-- Global Avg Total Time Card -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi bi-activity text-slate-600 dark:text-slate-400"></i>
-              </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Total Time</h3>
-            </div>
-            
-            <div class="flex flex-col gap-4 flex-1 justify-end">
-              <!-- Cold -->
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(totalColdLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')" [style.width]="getPercentage(totalColdLocal, totalMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Warm -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ totalWarmLocal ? (totalWarmLocal | number:'1.0-0') : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(totalWarmLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')" [style.width]="getPercentage(totalWarmLocal, totalMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Baselines -->
-              @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let totalBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTotalResponseTime || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(totalBaseline, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalBaseline, allTotal, 'total')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(totalBaseline, allTotal, 'total')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(totalBaseline, allTotal, 'total')" [class.text-slate-800]="!isWinner(totalBaseline, allTotal, 'total')">{{ totalBaseline ? (totalBaseline | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                     </div>
-                  </div>
-                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(totalBaseline, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalBaseline, allTotal, 'total')" [style.width]="getPercentage(totalBaseline, totalMax) + '%'"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-
-
-          <!-- Global Avg Output Tokens/s Card -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-              </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Output Tokens/s</h3>
-            </div>
-            
-            <div class="flex flex-col gap-4 flex-1 justify-end">
-              <!-- Cold -->
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold
-                         @if (isWinner(speedColdLocal || 0, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">{{ speedColdLocal != null && speedColdLocal > 0 ? (speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0')) : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')" [style.width]="getPercentage(speedColdLocal, speedMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Warm -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm
-                         @if (isWinner(speedWarmLocal || 0, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')">{{ speedWarmLocal != null && speedWarmLocal > 0 ? (speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [style.width]="getPercentage(speedWarmLocal, speedMax) + '%'"></div>
-                </div>
-              </div>              <!-- Baselines -->
-              @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let speedBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTokenPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(speedBaseline, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedBaseline, allSpeed, 'speed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(speedBaseline, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(speedBaseline, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedBaseline, allSpeed, 'speed')">{{ speedBaseline != null && speedBaseline > 0 ? (speedBaseline >= 1000 ? ((speedBaseline/1000) | number:'1.1-1') + 'k' : (speedBaseline | number:'1.0-0')) : (speedBaseline === -1 ? 'N/A' : '—') }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                     </div>
-                  </div>
-                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(speedBaseline, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedBaseline, allSpeed, 'speed')" [style.width]="getPercentage(speedBaseline, speedMax) + '%'"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-          <!-- Global Avg Input Tokens/s Card -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-              </div>
-              <h3 class="text-base font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Input Tokens/s</h3>
-            </div>
-            
-            <div class="flex flex-col gap-4 flex-1 justify-end">
-              <!-- Cold -->
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold
-                         @if (isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedColdLocal != null && inputSpeedColdLocal > 0 ? (inputSpeedColdLocal >= 1000 ? ((inputSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedColdLocal | number:'1.0-0')) : (ttftColdLocal === -1 ? 'N/A' : '—') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedColdLocal || 0, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedColdLocal, inputSpeedMax) + '%'"></div>
-                </div>
-              </div>
-              <!-- Warm -->
-              <div class="flex flex-col gap-1.5 mt-2">
-                <div class="flex items-center justify-between">
-                   <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm
-                         @if (isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                   </span>
-                   <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')">{{ inputSpeedWarmLocal != null && inputSpeedWarmLocal > 0 ? (inputSpeedWarmLocal >= 1000 ? ((inputSpeedWarmLocal/1000) | number:'1.1-1') + 'k' : (inputSpeedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
-                     <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                   </div>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                   <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedWarmLocal || 0, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedWarmLocal, inputSpeedMax) + '%'"></div>
-                </div>
-              </div>              <!-- Baselines -->
-              @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let inputSpeedBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageInputTokensPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')">{{ inputSpeedBaseline != null && inputSpeedBaseline > 0 ? (inputSpeedBaseline >= 1000 ? ((inputSpeedBaseline/1000) | number:'1.1-1') + 'k' : (inputSpeedBaseline | number:'1.0-0')) : (inputSpeedBaseline === -1 ? 'N/A' : '—') }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                     </div>
-                  </div>
-                  <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inputSpeedBaseline, allInputSpeed, 'inputSpeed')" [style.width]="getPercentage(inputSpeedBaseline, inputSpeedMax) + '%'"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Setup Accordion -->
-
-    <!-- API Categories -->
-    @for (element of builtInAiApis; track $index) {
-      @let api = getBuiltInAiAPIFromItemInterface(element);
-      @let tests = getTests(api);
-      @if (tests.length > 0) {
-        @let coldSummaryResults = this.getSummaryResults(element.id, "cold");
-        @let warmSummaryResults = this.getSummaryResults(element.id, "warm");
-        @let progress = getApiProgress(api);
-        @let isCollapsed = isApiCollapsed(api, progress);
-
-        <div class="mb-14">
-          <!-- Category Header -->
-          <div class="flex items-center justify-between gap-3 mb-6 px-1 relative z-10">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0 dark:bg-slate-900 dark:border-slate-700">
-                <i class="bi text-lg text-slate-700 dark:text-slate-300" [ngClass]="getIconForApi(api)"></i>
-              </div>
-              <h2 class="text-2xl font-bold text-slate-800 tracking-tight mb-0 flex items-center gap-3 dark:text-slate-200">
-                {{ element.id }}
-                <axon-test-status-badge [status]="getCategoryStatus(api)" [selected]="isCategorySelected(api) || isCategoryPartiallySelected(api)"></axon-test-status-badge>
-              </h2>
-            </div>
-            <label class="flex items-center gap-2 cursor-pointer group mb-0 bg-white px-3 py-1.5 rounded-lg border border-transparent hover:border-slate-200 hover:shadow-sm transition-all dark:bg-slate-900">
-              <input type="checkbox"
-                     class="w-5 h-5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-blue-600"
-                     [checked]="isCategorySelected(api)"
-                     [indeterminate]="isCategoryPartiallySelected(api)"
-                     [disabled]="isTestingRunning"
-                     (change)="toggleCategorySelection(api, $event)">
-              <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors dark:text-slate-300 dark:group-hover:text-slate-100">Select All</span>
-            </label>
-          </div>
-
-          <!-- Indented Grouping Container -->
-          <div class="ml-5 pl-8 border-l-2 border-slate-200/80 pb-4 flex flex-col relative dark:border-slate-700/50">
-            
-          <!-- Aggregate Overview Container -->
-          @let catStatus = getCategoryStatus(api);
-          @let catSelected = isCategorySelected(api) || isCategoryPartiallySelected(api);
-          @if (catSelected) {
-          <div class="bg-slate-50/80 rounded-2xl border p-5 sm:p-6 mb-2 shadow-sm transition-colors dark:bg-slate-900/50"
-               [class.border-dashed]="isCategoryPartiallySelected(api)"
-               [class.border-red-300]="catStatus === TestStatus.Fail || catStatus === TestStatus.Error"
-               [class.border-blue-300]="catStatus === TestStatus.Executing"
-               [class.border-indigo-300]="catStatus === TestStatus.Idle && catSelected"
-               [class.border-slate-200]="catStatus === TestStatus.Idle && !catSelected"
-               [class.border-green-300]="catStatus === TestStatus.Success">
-            <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 dark:text-slate-400">Category Aggregate Performance</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <!-- Avg TTFT Card -->
-              @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
-              @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
-              @let allTtft = getTestAllValues(element.id, 'ttft', coldTtft, warmTtft);
-                          @let maxTtft = getMaxArray(allTtft);
-              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                    <i class="bi bi-stopwatch text-slate-600 dark:text-slate-400"></i>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Time To First Token</h3>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 justify-end">
-                  <!-- COLD -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ coldTtft ? (coldTtft | number:'1.0-0') : '—' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                       </div>
+                <!-- Run Details Split View -->
+                @let activeTest = getTestById(activeTestIdInLab || scen.tests[0].id);
+                @if (activeTest) {
+                  @if (activeTest.results.status === TestStatus.Idle || activeTest.results.status === TestStatus.Skipped) {
+                    <div class="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-950/50 text-slate-400 p-12 text-center">
+                      <i class="bi bi-circle text-4xl text-slate-300 dark:text-slate-700 mb-4"></i>
+                      <p class="text-sm font-semibold text-slate-600 dark:text-slate-400">Awaiting Execution</p>
+                      <p class="text-xs text-slate-500 mt-1 max-w-xs">This scenario has not been executed yet.</p>
                     </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [style.width]="getPercentage(coldTtft, maxTtft) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- WARM -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ warmTtft ? (warmTtft | number:'1.0-0') : '—' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [style.width]="getPercentage(warmTtft, maxTtft) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- Baselines -->
-                  @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let baselineTtft = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageTimeToFirstToken || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(baselineTtft, allTtft, 'ttft')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(baselineTtft, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(baselineTtft, allTtft, 'ttft')">{{ baselineTtft ? (baselineTtft | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                     </div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTtft, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(baselineTtft, allTtft, 'ttft')" [style.width]="getPercentage(baselineTtft, maxTtft) + '%'"></div>
-                  </div>
-                </div>
-              }
-                </div>
-              </div>
-
-              <!-- Avg Execution Time Card -->
-              @let coldTotal = coldSummaryResults?.averageTotalResponseTime;
-              @let warmTotal = warmSummaryResults?.averageTotalResponseTime;
-              @let allTotal = getTestAllValues(element.id, 'total', coldTotal, warmTotal);
-                          @let maxTotal = getMaxArray(allTotal);
-              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                    <i class="bi bi-activity text-slate-600 dark:text-slate-400"></i>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Execution Time</h3>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 justify-end">
-                  <!-- COLD -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalColdLocal, allTotal, 'total')">{{ coldTotal ? (coldTotal | number:'1.0-0') : '—' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(totalColdLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')" [style.width]="getPercentage(coldTotal, maxTotal) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- WARM -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ warmTotal ? (warmTotal | number:'1.0-0') : '—' }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(totalWarmLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')" [style.width]="getPercentage(warmTotal, maxTotal) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- Baselines -->
-                  @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let baselineTotal = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageTotalResponseTime || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-500]="!isWinner(baselineTotal, allTotal, 'total')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(baselineTotal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-800]="!isWinner(baselineTotal, allTotal, 'total')">{{ baselineTotal ? (baselineTotal | number:'1.0-0') : 'N/A' }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                     </div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTotal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(baselineTotal, allTotal, 'total')" [style.width]="getPercentage(baselineTotal, maxTotal) + '%'"></div>
-                  </div>
-                </div>
-              }
-                </div>
-              </div>
-
-
-
-              <!-- Avg Output Tokens/s Card -->
-              @let coldTokenSpeed = coldSummaryResults?.averageTokenPerSecond;
-              @let warmTokenSpeed = warmSummaryResults?.averageTokenPerSecond;
-              @let allTokenSpeed = getTestAllValues(element.id, 'speed', coldTokenSpeed, warmTokenSpeed);
-              @let maxTokenSpeed = getMaxArray(allTokenSpeed);
-              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                    <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Output Tokens/s</h3>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 justify-end">
-                  <!-- COLD -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-500]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')">{{ coldTokenSpeed != null && coldTokenSpeed > 0 ? (coldTokenSpeed >= 1000 ? ((coldTokenSpeed/1000) | number:'1.1-1') + 'k' : (coldTokenSpeed | number:'1.0-0')) : (coldTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [style.width]="getPercentage(coldTokenSpeed, maxTokenSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- WARM -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-500]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')">{{ warmTokenSpeed != null && warmTokenSpeed > 0 ? (warmTokenSpeed >= 1000 ? ((warmTokenSpeed/1000) | number:'1.1-1') + 'k' : (warmTokenSpeed | number:'1.0-0')) : (warmTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [style.width]="getPercentage(warmTokenSpeed, maxTokenSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- Baselines -->
-                  @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let baselineTokenSpeed = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageTokenPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.text-slate-500]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')">{{ baselineTokenSpeed != null && baselineTokenSpeed > 0 ? (baselineTokenSpeed >= 1000 ? ((baselineTokenSpeed/1000) | number:'1.1-1') + 'k' : (baselineTokenSpeed | number:'1.0-0')) : (baselineTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                     </div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [style.width]="getPercentage(baselineTokenSpeed, maxTokenSpeed) + '%'"></div>
-                  </div>
-                </div>
-              }
-                </div>
-              </div>
-
-              <!-- Avg Input Tokens/s Card -->
-              @let coldInputTokenSpeed = coldSummaryResults?.averageInputTokensPerSecond;
-              @let warmInputTokenSpeed = warmSummaryResults?.averageInputTokensPerSecond;
-              @let allInputTokenSpeed = getTestAllValues(element.id, 'inputSpeed', coldInputTokenSpeed, warmInputTokenSpeed);
-              @let maxInputTokenSpeed = getMaxArray(allInputTokenSpeed);
-              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
-                <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
-                    <i class="bi bi-speedometer text-slate-600 dark:text-slate-400"></i>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Input Tokens/s</h3>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 justify-end">
-                  <!-- COLD -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
-                         @if (isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">{{ coldInputTokenSpeed != null && coldInputTokenSpeed > 0 ? (coldInputTokenSpeed >= 1000 ? ((coldInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (coldInputTokenSpeed | number:'1.0-0')) : (coldInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(coldInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(coldInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- WARM -->
-                  <div class="flex flex-col gap-1.5 mt-2">
-                    <div class="flex items-center justify-between">
-                       <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
-                         @if (isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
-                       </span>
-                       <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')">{{ warmInputTokenSpeed != null && warmInputTokenSpeed > 0 ? (warmInputTokenSpeed >= 1000 ? ((warmInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (warmInputTokenSpeed | number:'1.0-0')) : (warmInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                         <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                       </div>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                       <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(warmInputTokenSpeed || 0, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(warmInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
-                    </div>
-                  </div>
-                  <!-- Baselines -->
-                  @for (baseline of comparisonService.baselines; track baseline.id) {
-                @let baselineInputTokenSpeed = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageInputTokensPerSecond || 0;
-                @let baselineDetails = getBaselineDetails(baseline.id);
-                <div class="flex flex-col gap-1.5 mt-2">
-                  <div class="flex items-center justify-between gap-2">
-                     <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
-                       <span class="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-500]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')">
-                         {{ baseline.name }}
-                       </span>
-                       @if (baselineDetails?.executionType) {
-                         <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
-                           <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
-                         </span>
-                       }
-                       @if (baselineDetails?.model) {
-                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                           {{ baselineDetails?.model }}
-                         </span>
-                       }
-                       @if (!isExtensionInstalled) {
-                         <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-colors shadow-sm dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800/50">
-                           <i class="bi bi-browser-chrome"></i> Install Extension
-                         </a>
-                       }
-                       @if (isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
-                     </div>
-                     <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.text-slate-800]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')">{{ baselineInputTokenSpeed != null && baselineInputTokenSpeed > 0 ? (baselineInputTokenSpeed >= 1000 ? ((baselineInputTokenSpeed/1000) | number:'1.1-1') + 'k' : (baselineInputTokenSpeed | number:'1.0-0')) : (baselineInputTokenSpeed === -1 ? 'N/A' : '—') }}</span>
-                       <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                     </div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-                     <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(baselineInputTokenSpeed, allInputTokenSpeed, 'inputSpeed')" [style.width]="getPercentage(baselineInputTokenSpeed, maxInputTokenSpeed) + '%'"></div>
-                  </div>
-                </div>
-              }
-                </div>
-              </div>
-            </div>
-          </div>
-          }
-
-          <!-- Collapsible Divider for Tests -->
-          <div class="flex items-center py-4 relative -ml-8">
-            <div class="w-8 h-px bg-slate-200/80 mr-4 dark:bg-slate-700/50"></div>
-            <button (click)="toggleApi(api, progress)" class="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 shadow-sm rounded-full text-[10px] uppercase tracking-wider font-bold text-slate-600 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all active:scale-95 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-900/20">
-              @if (isCollapsed) {
-                <i class="bi bi-chevron-down"></i> Expand {{ tests.length }} Tests
-              } @else {
-                <i class="bi bi-chevron-up"></i> Collapse Tests
-              }
-            </button>
-            <div class="flex-1 h-px bg-slate-200/80 ml-4 dark:bg-slate-700/50"></div>
-          </div>
-
-          <!-- Detailed Tests List -->
-          @if (!isCollapsed) {
-            <div class="mt-4 flex flex-col gap-2">
-              @for (test of tests; track $index) {
-                @let isTestExpanded = !isTestCollapsed(test);
-                <div class="relative">
-                  <!-- Horizontal connecting line -->
-                  <div class="absolute w-8 h-px bg-slate-200/80 -left-8 top-7 dark:bg-slate-700/50"></div>
-                  <!-- Test Block -->
-                  <div class="bg-white rounded-xl border shadow-sm overflow-hidden mb-6 transition-all duration-300 dark:bg-slate-900"
-                     [class.border-red-300]="test.results.status === TestStatus.Fail || test.results.status === TestStatus.Error"
-                     [class.border-blue-300]="test.results.status === TestStatus.Executing"
-                     [class.border-indigo-300]="test.results.status === TestStatus.Idle && selectedTestIds.has(test.id)"
-                     [class.border-slate-200]="test.results.status === TestStatus.Idle && !selectedTestIds.has(test.id)"
-                     [class.border-green-300]="test.results.status === TestStatus.Success">
-                  <!-- Test Header -->
-                  <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-800" (click)="toggleTestSelection(test.id, $event)">
-                    <div class="flex items-start gap-3">
-                      <div class="mt-0.5">
-                        <input type="checkbox"
-                               class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed dark:text-indigo-400 dark:border-slate-600"
-                               [checked]="selectedTestIds.has(test.id)"
-                               [disabled]="isTestingRunning"
-                               (click)="$event.stopPropagation()"
-                               (change)="toggleTestSelection(test.id, $event)">
-                      </div>
-                      <div>
-                        <h3 class="text-sm font-bold text-slate-800 tracking-tight dark:text-slate-200">{{ test.id }}</h3>
-                        <div class="flex flex-wrap gap-2 mt-1.5 items-center">
-                          <axon-test-status-badge [status]="test.results.status" [selected]="selectedTestIds.has(test.id)"></axon-test-status-badge>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                            @if (test.results.inputAudioDuration) {
-                              {{ test.results.inputAudioDuration | number:'1.0-1' }} secs
-                            } @else {
-                              {{ test.results.input.length | number:'1.0-0' }} chars
-                            }
-                          </span>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                            @if (test.results.inputImageDataUrl) { Image }
-                            @else if (test.results.inputAudioUrl) { Audio }
-                            @else { Text }
-                          </span>
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" [ngClass]="test.results.startType === 'cold' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-orange-50 text-orange-700 border border-orange-200'">
-                            <i class="bi" [ngClass]="test.results.startType === 'cold' ? 'bi-thermometer-snow' : 'bi-thermometer-sun'"></i> {{ test.results.startType }} Start
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Test Metric Overview (Always Visible) -->
-                  <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead>
-                        <tr class="bg-white border-b border-slate-200 dark:bg-slate-900 dark:border-slate-700">
-                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Performance Metric</th>
-                          <th class="px-4 py-3 w-1/4 text-[10px] font-bold uppercase tracking-widest border-l border-slate-100 dark:border-slate-800" [ngClass]="test.results.startType === 'cold' ? 'text-blue-600 bg-blue-50/30 dark:text-blue-400 dark:bg-blue-900/20' : 'text-orange-600 bg-orange-50/30 dark:text-orange-400 dark:bg-orange-900/20'">Local Result</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <!-- Time To First Token -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-stopwatch text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Time To First Token</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageTimeToFirstToken != null ? (test.results.averageTimeToFirstToken | number:'1.0-0') : '—' }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                            </div>
-                          </td>
-                        </tr>
-                        <!-- Total Execution Time -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-activity text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Total Execution Time</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageTotalResponseTime != null ? (test.results.averageTotalResponseTime | number:'1.0-0') : '—' }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
-                            </div>
-                          </td>
-                        </tr>
-
-                        <!-- Output Tokens/s -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-speedometer text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Output Tokens/s</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageTokensPerSecond != null && test.results.averageTokensPerSecond > 0 ? (test.results.averageTokensPerSecond | number:'1.0-0') : (test.results.averageTokensPerSecond === -1 ? 'N/A' : '—') }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                            </div>
-                          </td>
-                        </tr>
-                        <!-- Input Tokens/s -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-speedometer text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Input Tokens/s</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageInputTokensPerSecond != null && test.results.averageInputTokensPerSecond > 0 ? (test.results.averageInputTokensPerSecond | number:'1.0-0') : (test.results.averageInputTokensPerSecond === -1 ? 'N/A' : '—') }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
-                            </div>
-                          </td>
-                        </tr>
-                        <!-- Average Input Tokens -->
-                        <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
-                          <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
-                            <div class="flex items-center gap-2.5 text-slate-600 group-hover:text-slate-900 transition-colors dark:text-slate-400 dark:group-hover:text-slate-100">
-                              <i class="bi bi-file-earmark-text text-slate-400 dark:text-slate-500"></i>
-                              <span class="text-xs font-bold uppercase tracking-wider">Avg Input Tokens</span>
-                            </div>
-                          </td>
-                          <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
-                            <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageInputTokens != null && test.results.averageInputTokens !== 0 ? (test.results.averageInputTokens | number:'1.0-0') : '—' }}</span>
-                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t</span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Deep Dive Expander -->
-                  <button (click)="toggleTest(test.id)" class="w-full py-2.5 bg-slate-50 border-t border-slate-200 text-[11px] font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-indigo-900/20">
-                    @if (isTestExpanded) {
-                      <i class="bi bi-chevron-up"></i> Hide Deep Dive Details
-                    } @else {
-                      <i class="bi bi-chevron-down"></i> View Test Deep Dive
-                    }
-                  </button>
-
-                  <!-- Expanded Details Area -->
-                  @if (isTestExpanded) {
-                    <div class="border-t border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:border-slate-700 dark:bg-slate-900/30 dark:divide-slate-700">
+                  } @else {
+                    <div class="flex-1 flex flex-col lg:flex-row min-h-0 bg-white dark:bg-slate-900">
                       
-                      <!-- Left Col: Payload -->
-                      <div class="flex-1 p-5 lg:w-1/2">
-                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3 dark:text-slate-400">
-                          <i class="bi bi-terminal"></i> Input Payload
-                        </h4>
-                        <div class="bg-slate-900 rounded-lg p-4 shadow-inner border border-slate-800 flex flex-col gap-3 dark:bg-slate-950 dark:border-slate-700">
-                          <pre class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto custom-scrollbar dark:text-slate-600">{{ test.results.input }}</pre>
-                          @if (test.results.inputImageDataUrl) {
-                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-sm flex items-center justify-center cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all self-start dark:bg-slate-900 dark:border-slate-700" (click)="openImage(test.results.inputImageDataUrl, $event)">
-                              <img [src]="test.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                      <!-- Left Side: Telemetry & Input -->
+                      <div class="w-full lg:w-[45%] border-r border-slate-100 dark:border-slate-800 flex flex-col bg-slate-50/30 dark:bg-slate-900/30 min-h-0">
+                        <div class="p-5 grid grid-cols-2 gap-y-5 gap-x-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><i class="bi bi-clock"></i> TTFT</div>
+                            <div class="font-mono text-xl font-bold text-slate-800 dark:text-slate-200">
+                               {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">ms</span>
                             </div>
-                          }
-                          @if (test.results.inputAudioUrl) {
-                            <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-3 shadow-sm flex items-center justify-center self-start dark:bg-slate-900 dark:border-slate-700">
-                              <audio controls [src]="test.results.inputAudioUrl" class="max-w-xs"></audio>
+                          </div>
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><i class="bi bi-activity"></i> Total Time</div>
+                            <div class="font-mono text-xl font-bold text-slate-800 dark:text-slate-200">
+                               {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">ms</span>
                             </div>
-                          }
-                        </div>
-                      </div>
-
-                      <!-- Right Col: Iterations & Chart -->
-                      <div class="flex-1 p-5 lg:w-1/2 flex flex-col gap-6">
-
-                        <!-- Micro Iterations Log -->
-                        <div>
-                          <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3 dark:text-slate-400">
-                            <i class="bi bi-list"></i> Local Iteration Log
-                          </h4>
-                          <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-700">
-                            <table class="w-full text-left">
-                              <thead class="bg-slate-50 border-b border-slate-100 dark:bg-slate-900 dark:border-slate-800">
-                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-wider dark:text-slate-500">
-                                  <th class="px-3 py-2 w-10">#</th>
-                                  <th class="px-3 py-2 text-right">TTFT</th>
-                                  <th class="px-3 py-2 text-right">Total</th>
-                                  <th class="px-3 py-2 text-right">Input Tokens/s</th>
-                                  <th class="px-3 py-2 text-right">Output Tokens/s</th>
-                                  <th class="px-3 py-2 text-right">Chars/s</th>
-                                  <th class="px-3 py-2 text-center">Output</th>
-                                </tr>
-                              </thead>
-                              <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                                @for (iter of test.results.testIterationResults; track $index) {
-                                  <tr class="text-xs hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50" [class.bg-amber-50]="iter.status === TestStatus.Executing">
-                                    <td class="px-3 py-1.5 text-slate-400 font-mono dark:text-slate-500">{{ $index + 1 }}</td>
-                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }} ms</td>
-                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }} ms</td>
-                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                                      {{ iter.inputTokensPerSecond != null && iter.inputTokensPerSecond > 0 ? (iter.inputTokensPerSecond | number:'1.0-0') : (iter.inputTokensPerSecond === -1 ? 'N/A' : '—') }}
-                                    </td>
-                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                                      {{ iter.tokensPerSecond != null && iter.tokensPerSecond > 0 ? (iter.tokensPerSecond | number:'1.0-0') : (iter.tokensPerSecond === -1 ? 'N/A' : '—') }}
-                                    </td>
-                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                                      {{ iter.charactersPerSecond != null && iter.charactersPerSecond > 0 ? (iter.charactersPerSecond | number:'1.0-0') : (iter.charactersPerSecond === -1 ? 'N/A' : '—') }}
-                                    </td>
-                                    <td class="px-3 py-1.5 text-center">
-                                      <button class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-[10px] dark:text-indigo-400 dark:hover:bg-indigo-900/30" 
-                                              title="Toggle Output"
-                                              [disabled]="!iter.output"
-                                              (click)="$event.stopPropagation(); toggleOutput(test.id, $index)">
-                                        @if (!viewData[test.id].expandedOutputs?.[$index]) {
-                                          <i class="bi bi-file-text"></i> View
-                                        } @else {
-                                          <i class="bi bi-chevron-up"></i> Hide
-                                        }
-                                      </button>
-                                    </td>
-                                  </tr>
-                                  @if (viewData[test.id].expandedOutputs?.[$index]) {
-                                    <tr class="bg-slate-900 border-b border-slate-200 dark:bg-slate-950 dark:border-slate-700">
-                                      <td colspan="5" class="p-4 !text-left">
-                                        <div class="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed dark:text-slate-600">
-                                          {{ unescapeOutput(iter.output ?? '') }}
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  }
-                                }
-                              </tbody>
-                            </table>
+                          </div>
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Output Speed</div>
+                            <div class="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
+                               {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">t/s</span>
+                            </div>
+                          </div>
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Input Speed</div>
+                            <div class="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
+                               {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageInputTokensPerSecond ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageInputTokensPerSecond | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">t/s</span>
+                            </div>
                           </div>
                         </div>
+                        
+                        <div class="flex-1 flex flex-col min-h-0">
+                          <div class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border-y border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+                            <div class="flex items-center gap-1.5"><i class="bi bi-code-slash"></i> Input Payload</div>
+                          </div>
+                          <div class="flex-1 p-5 bg-slate-900 text-slate-300 font-mono text-[11px] overflow-y-auto custom-scrollbar relative">
+                            <pre class="whitespace-pre-wrap leading-relaxed">{{ activeTest.results.input }}</pre>
+                            @if (activeTest.results.inputImageDataUrl) {
+                              <div class="shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-sm flex items-center justify-center mt-3 cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all self-start dark:bg-slate-900 dark:border-slate-700" (click)="openImage(activeTest.results.inputImageDataUrl, $event)">
+                                <img [src]="activeTest.results.inputImageDataUrl" class="max-h-32 max-w-xs object-contain rounded-sm" alt="Input Image">
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
 
+                      <!-- Right Side: Output & Logs -->
+                      <div class="w-full lg:w-[55%] flex flex-col min-h-0 bg-white dark:bg-slate-900">
+                        <div class="px-5 py-2.5 bg-white dark:bg-slate-900 text-[9px] font-bold uppercase tracking-widest text-slate-500 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+                          <div class="flex items-center gap-1.5"><i class="bi bi-layout-split"></i> Execution Logs & Output</div>
+                          @if (activeTest.results.status === TestStatus.Executing) {
+                            <span class="text-indigo-500 font-bold animate-pulse flex items-center gap-1"><i class="bi bi-arrow-repeat animate-spin"></i> RUNNING</span>
+                          }
+                        </div>
+                        <div class="flex-1 p-6 bg-white dark:bg-slate-950 overflow-y-auto custom-scrollbar shadow-inner text-sm text-slate-800 dark:text-slate-300 space-y-4">
+                           @for(iteration of activeTest.results.testIterationResults; track $index) {
+                              <div class="border border-slate-100 dark:border-slate-800 rounded-lg p-3">
+                                 <div class="text-[10px] font-bold uppercase text-slate-400 mb-2 flex justify-between">
+                                    <span>Iteration {{ $index + 1 }}</span>
+                                    <span [ngClass]="iteration.status === TestStatus.Success ? 'text-emerald-500' : 'text-rose-500'">{{ iteration.status }}</span>
+                                 </div>
+                                 @if (iteration.output) {
+                                   <div class="font-mono text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-100 dark:border-slate-800">{{ unescapeOutput(iteration.output) }}</div>
+                                 }
+                              </div>
+                           }
+                           @if (activeTest.results.status === TestStatus.Error || activeTest.results.status === TestStatus.Fail) {
+                              <div class="font-mono text-xs text-rose-500 mt-2 whitespace-pre-wrap p-2 border border-rose-200 bg-rose-50 rounded dark:bg-rose-950/30 dark:border-rose-800/50">Execution failed or encountered an error.</div>
+                           }
+                           @if(activeTest.results.testIterationResults.length === 0 && activeTest.results.status !== TestStatus.Error && activeTest.results.status !== TestStatus.Fail) {
+                              <div class="text-slate-400 text-xs italic">Waiting for iteration results...</div>
+                           }
+                        </div>
                       </div>
                     </div>
                   }
-                </div>
-                </div>
-              }
-            </div>
-          }
-          </div> <!-- End Indented Grouping Container -->
+                }
+              </div>
+            } @else {
+              <div class="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-950/50 text-slate-400 p-12 text-center h-[600px] border border-slate-200 dark:border-slate-800 rounded-xl">
+                 <i class="bi bi-layout-wtf text-4xl text-slate-200 dark:text-slate-800 mb-4"></i>
+                 <p class="text-sm font-semibold text-slate-600 dark:text-slate-400">No Scenario Selected</p>
+                 <p class="text-xs text-slate-500 mt-1 max-w-xs">Select a scenario from the Test Explorer to view details.</p>
+              </div>
+            }
+          </section>
         </div>
       }
-    }
 
-  </main>
+    </main>
+  </div>
 
-  @if (!isImportedReport) {
-    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 py-4 px-6 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] dark:bg-slate-900/80 dark:border-slate-700">
-      <div class="max-w-xl mx-auto flex flex-col items-center gap-3">
-        <span class="bg-indigo-50 text-indigo-700 border-indigo-200 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500/30"><i class="bi bi-ui-checks"></i> {{ selectedTestIds.size }} / {{ axonTestSuiteExecutor.testsSuite.length }} Tests Selected</span>
-        
-        @if (this.axonTestSuiteExecutor.results.status === 'Executing' || this.axonTestSuiteExecutor.preTestsStatus === 'Executing') {
-          <button type="button" class="w-full max-w-sm py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md shadow-rose-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
-                  (click)="stop()">
-            <svg class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <span>Stop Execution</span>
-          </button>
-        } @else if (this.axonTestSuiteExecutor.results.status === 'Success' || this.axonTestSuiteExecutor.results.status === 'Error') {
-          <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
-                  (click)="triggerDownloadResults()">
-            <i class="bi bi-download text-lg"></i>
-            <span>Download Report</span>
-          </button>
-        } @else {
-          <button type="button" class="w-full max-w-sm py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-wait disabled:active:scale-100"
-                  (click)="start()">
-            <i class="bi bi-play-fill text-lg"></i>
-            <span>Run Cortex Test</span>
-          </button>
-        }
-        
-        @if (axonTestSuiteExecutor.results.status !== TestStatus.Idle) {
-          @let overallProgress = getOverallProgress();
-          <div class="w-full max-w-sm flex items-center gap-3">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24 text-right dark:text-slate-400">{{ overallProgress.percentage }}% Complete</span>
-            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
-              <div class="h-full bg-indigo-600 rounded-full transition-all duration-300" [style.width]="overallProgress.percentage + '%'"></div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  }
-
-  @if (selectedImageUrl) {
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm p-4" (click)="closeImage()">
-      <button class="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors focus:outline-none dark:text-slate-500" (click)="closeImage()">
-        <i class="bi bi-x-lg text-4xl"></i>
-      </button>
-      <img [src]="selectedImageUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
-    </div>
-  }
-
-  @if (showShareModal) {
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 dark:bg-slate-950/80">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 dark:bg-slate-900 dark:border-slate-700">
-        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30">
-          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2 dark:text-slate-100">
-            <i class="bi bi-share text-indigo-600 dark:text-indigo-400"></i> Share Report
-          </h3>
-          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none dark:text-slate-500 dark:hover:text-slate-400" (click)="closeShareModal()">
-            <i class="bi bi-x-lg text-xl"></i>
-          </button>
-        </div>
-        
-        <div class="p-6">
-          @if (isGeneratingUrl) {
-            <div class="flex flex-col items-center justify-center py-8">
-              <svg class="animate-spin h-10 w-10 text-indigo-600 mb-4 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p class="text-slate-600 font-medium dark:text-slate-400">Compressing and generating URL...</p>
-            </div>
-          } @else if (generatedShareUrl) {
-            <p class="text-sm text-slate-600 mb-4 dark:text-slate-400">
-              Your report has been compressed and attached to the URL below. Anyone with this link can view the exact state of this benchmark.
-            </p>
-            
-            <div class="flex gap-2">
-              <input type="text" readonly [value]="generatedShareUrl" class="block w-full rounded-lg border-slate-300 bg-slate-50 text-slate-900 text-sm focus:ring-indigo-500 focus:border-indigo-500 font-mono dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100" (click)="$any($event.target).select()">
-              <button class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white rounded-lg transition-colors shrink-0" [ngClass]="isUrlCopied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'" (click)="copyShareUrl()">
-                @if (isUrlCopied) {
-                  <i class="bi bi-check2"></i> Copied!
-                } @else {
-                  <i class="bi bi-copy"></i> Copy
-                }
-              </button>
-            </div>
-            
-            <div class="mt-4 p-3 bg-amber-50 text-amber-800 text-xs rounded-lg border border-amber-200 flex gap-3 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50">
-              <i class="bi bi-exclamation-triangle-fill text-lg shrink-0"></i>
-              <span>Because this relies on URL length, very large reports (e.g. ones with large base64 image outputs) might exceed browser URL limits and fail to load for some users.</span>
-            </div>
-          }
-        </div>
-        
-        <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end dark:border-slate-800 dark:bg-slate-900/30">
-          <button class="px-4 py-2 border border-slate-300 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors dark:border-slate-600 dark:text-slate-300 dark:bg-slate-900 dark:hover:bg-slate-800/50" (click)="closeShareModal()">Close</button>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (showExtensionModal) {
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 dark:bg-slate-950/80">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 dark:bg-slate-900 dark:border-slate-700">
-        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30">
-          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2 dark:text-slate-100">
-            <i class="bi bi-puzzle text-blue-600 dark:text-blue-500"></i> Install WebAI Extension
-          </h3>
-          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none dark:text-slate-500 dark:hover:text-slate-400" (click)="closeExtensionModal()">
-            <i class="bi bi-x-lg text-xl"></i>
-          </button>
-        </div>
-        
-        <div class="p-6">
-          <p class="text-sm text-slate-600 mb-4 dark:text-slate-400">
-            The Chrome WebAI Extension is required to capture important hardware information (CPU model, memory, architecture) which makes your benchmark reports significantly more valuable and comparable.
-          </p>
-          <div class="flex flex-col gap-3 mt-6">
-            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm w-full">
-              <i class="bi bi-browser-chrome"></i> Install from Chrome Web Store
-            </a>
-            <button class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors shadow-sm w-full dark:text-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:hover:bg-slate-800/50" (click)="confirmDownloadResults()">
-              <i class="bi bi-download"></i> Download Report Anyway
+  <!-- GLOBAL BOTTOM EXECUTION DRAWER -->
+  <div 
+    class="fixed bottom-0 left-[340px] right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out z-50 flex flex-col"
+    [ngClass]="isDrawerOpen ? 'h-[350px]' : 'h-0 border-transparent overflow-hidden'"
+  >
+    <!-- Drawer Header -->
+    <div 
+      class="h-16 px-6 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shrink-0"
+      (click)="isDrawerOpen = !isDrawerOpen"
+    >
+       <div class="flex items-center gap-6 flex-1">
+          <div class="flex items-center gap-3 w-64">
+            <button 
+              (click)="toggleExecution($event)"
+              class="w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm shrink-0"
+              [ngClass]="isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing ? 'bg-rose-100 text-rose-600 hover:bg-rose-200 dark:bg-rose-500/20 dark:hover:bg-rose-500/30 dark:text-rose-400' : 'bg-indigo-600 text-white hover:bg-indigo-700'"
+            >
+              <i class="bi" [ngClass]="isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing ? 'bi-stop-fill' : 'bi-play-fill'"></i>
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (showAboutModal) {
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 dark:bg-slate-950/80">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 dark:bg-slate-900 dark:border-slate-700">
-        <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30">
-          <h3 class="text-lg font-bold text-slate-900 m-0 flex items-center gap-2 dark:text-slate-100">
-            <i class="bi bi-info-circle text-blue-600 dark:text-blue-500"></i> About the Benchmark
-          </h3>
-          <button class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none dark:text-slate-500 dark:hover:text-slate-400" (click)="closeAboutModal()">
-            <i class="bi bi-x-lg text-xl"></i>
-          </button>
-        </div>
-        
-        <div class="p-6">
-          <p class="text-sm text-slate-600 leading-relaxed mb-0 dark:text-slate-400">
-            The Cortex Test measures the raw, unconstrained speed of the AI APIs. It evaluates the APIs fundamental processing efficiency from both a "cold" (initial load) and "warm" (cached, subsequent use) state. This test focuses on the speed of signal transmission, assessing how quickly and efficiently the AI API can deliver its output when dedicated resources are available.
-          </p>
-          @if (isImportedReport && importedTimestamp) {
-            <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm dark:bg-slate-900 dark:border-slate-700">
-              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2 dark:text-slate-400">Report Details</div>
-              <div class="text-sm text-slate-800 font-medium dark:text-slate-200"><strong>Generated:</strong> {{ importedTimestamp | date:'medium' }}</div>
-              <div class="text-xs text-slate-500 font-mono mt-1.5 truncate dark:text-slate-400" [title]="importedUserAgent">{{ importedUserAgent }}</div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">{{ isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing ? 'Running API Tests...' : 'Execution Paused' }}</h3>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-0.5">{{ selectedTestIds.size }} Tests Selected</p>
             </div>
-          }
-        </div>
-        <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end dark:border-slate-800 dark:bg-slate-900/30">
-          <button class="px-4 py-2 border border-slate-300 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors dark:border-slate-600 dark:text-slate-300 dark:bg-slate-900 dark:hover:bg-slate-800/50" (click)="closeAboutModal()">Close</button>
-        </div>
+          </div>
+          
+          <!-- Global Progress Bar Area -->
+          <div class="flex-1 max-w-3xl px-8 hidden sm:block">
+             <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+               <span class="flex items-center gap-2">
+                 @if (isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing) {
+                   <i class="bi bi-arrow-repeat animate-spin text-indigo-600 dark:text-indigo-400 text-xs"></i>
+                   Processing...
+                 } @else {
+                   Awaiting execution command
+                 }
+               </span>
+               <span class="text-indigo-600 dark:text-indigo-400 font-mono">{{ getOverallProgress().percentage }}% Complete</span>
+             </div>
+             <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+               <div class="h-full bg-indigo-600 dark:bg-indigo-500 rounded-full transition-all duration-500" [style.width]="getOverallProgress().percentage + '%'"></div>
+             </div>
+          </div>
+       </div>
+
+       <div class="flex items-center gap-4 text-slate-400">
+          <div class="text-xs font-bold uppercase tracking-wider hidden md:block">{{ isDrawerOpen ? 'Hide Console' : 'Show Console' }}</div>
+          <i class="bi" [ngClass]="isDrawerOpen ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+       </div>
+    </div>
+
+    <!-- Drawer Expanded Content -->
+    <div class="flex-1 flex overflow-hidden bg-slate-900 dark:bg-slate-950">
+      
+      <!-- Left Column: Live Test Queue -->
+      <div class="w-1/3 max-w-[350px] bg-slate-800 dark:bg-slate-900 border-r border-slate-700 dark:border-slate-800 flex flex-col hidden lg:flex">
+         <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/80 dark:bg-slate-900/80 shrink-0">
+           <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+             <i class="bi bi-layers"></i> Active Queue
+           </h4>
+         </div>
+         
+         <div class="p-3 space-y-1.5 overflow-y-auto flex-1 custom-scrollbar">
+            @for (api of builtInAiApis; track api.id) {
+               @if (isCategorySelected(getBuiltInAiAPIFromItemInterface(api)) || isCategoryPartiallySelected(getBuiltInAiAPIFromItemInterface(api))) {
+                 @let stat = getCategoryStatus(getBuiltInAiAPIFromItemInterface(api));
+                 <div class="flex items-center justify-between p-3 rounded-lg bg-slate-700/30 dark:bg-slate-800/50 border border-slate-600/50 dark:border-slate-700/50 transition-colors">
+                   <div class="flex items-center gap-3 text-sm font-medium text-slate-200">
+                     @if (stat === TestStatus.Success) {
+                        <i class="bi bi-check-circle-fill text-emerald-400"></i>
+                     } @else if (stat === TestStatus.Executing) {
+                        <i class="bi bi-arrow-repeat animate-spin text-indigo-400"></i>
+                     } @else if (stat === TestStatus.Error || stat === TestStatus.Fail) {
+                        <i class="bi bi-x-circle-fill text-rose-400"></i>
+                     } @else {
+                        <i class="bi bi-circle text-slate-500"></i>
+                     }
+                     {{ itemDisplay(api) }}
+                   </div>
+                   <span class="text-[10px] text-slate-400 font-mono uppercase">
+                     {{ stat }}
+                   </span>
+                 </div>
+               }
+            }
+         </div>
+      </div>
+      
+      <!-- Right Column: Live Logs Terminal -->
+      <div class="flex-1 p-5 font-mono text-xs overflow-y-auto text-slate-300 custom-scrollbar relative" id="logTerminal">
+         <div class="sticky top-0 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur pb-4 mb-2 z-10 flex justify-between">
+            <h4 class="font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 font-sans text-[10px]">
+              <i class="bi bi-terminal"></i> System Output Console
+            </h4>
+         </div>
+         <div class="space-y-2 leading-relaxed pb-8">
+           @if (systemLogs.length === 0) {
+             <div class="text-slate-500">[System] Ready. Waiting for execution command...</div>
+           }
+           @for (log of systemLogs; track $index) {
+             <div [ngClass]="getLogClass(log)">{{ log }}</div>
+           }
+         </div>
       </div>
     </div>
-  }
-</div>
+  </div>
 
-    
-    
+  <!-- Shared File Input for Imports -->
+  <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">
+</div>

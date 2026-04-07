@@ -41,6 +41,13 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   showBaselineDropdown = false;
   isUrlCopied = false;
 
+  // New Design State
+  activeView: 'overview' | 'test-lab' = 'overview';
+  activeScenarioId: string | null = null;
+  activeTestIdInLab: string | null = null;
+  isDrawerOpen: boolean = false;
+  systemLogs: string[] = [];
+
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
     [AxonTestId.LanguageDetectorShortStringWarmStart]: {},
@@ -246,7 +253,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.comparisonService.loadBaselineData(this.hardwareInfo);
 
-    this.route.queryParamMap.subscribe(params => {      const reportParam = params.get('report');
+    this.route.queryParamMap.subscribe(params => {      
+      const reportParam = params.get('report');
       if (reportParam) {
         // If we have a report, prioritize loading it and don't overwrite with default test selections
         this.loadReportFromUrl(reportParam);
@@ -260,6 +268,19 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         this.selectedTestIds = new Set(this.axonTestSuiteExecutor.testsSuite);
       }
     });
+
+    // Simple observer for test logs
+    setInterval(() => {
+       if (this.isTestingRunning) {
+          const current = this.currentExecutingTest;
+          if (current) {
+            const logMsg = `▶ Executing: ${current.results.api} - ${current.id}...`;
+            if (!this.systemLogs.includes(logMsg) && !this.systemLogs.some(log => log.includes(`✓ ${current.id}`))) {
+               this.systemLogs.push(logMsg);
+            }
+          }
+       }
+    }, 1000);
   }
 
   ngOnDestroy() {}
@@ -287,6 +308,106 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         }
       }, 50);
     }
+  }
+
+  // --- New Methods for Scenarios & Sidebar ---
+
+  setActiveView(view: 'overview' | 'test-lab') {
+    this.activeView = view;
+  }
+
+  setActiveScenario(id: string) {
+    this.activeScenarioId = id;
+    const scen = this.getScenarioById(id);
+    if (scen && scen.tests.length > 0) {
+       this.activeTestIdInLab = scen.tests[0].id;
+    }
+    this.activeView = 'test-lab';
+  }
+
+  itemDisplay(api: ItemInterface): string {
+    return api.label || (api.id as string);
+  }
+
+  getScenarios(api: BuiltInAiApi) {
+    const tests = this.getTests(api);
+    const scenariosMap = new Map<string, any>();
+
+    for (const test of tests) {
+      let baseName = test.id.replace('ColdStart', '').replace('WarmStart', '');
+      baseName = baseName.replace(/([A-Z])/g, ' $1').trim();
+
+      if (!scenariosMap.has(baseName)) {
+        scenariosMap.set(baseName, {
+          id: baseName,
+          name: baseName,
+          api: api,
+          tests: []
+        });
+      }
+      scenariosMap.get(baseName).tests.push(test);
+    }
+    return Array.from(scenariosMap.values());
+  }
+
+  getScenarioById(id: string | null) {
+    if (!id) return null;
+    for (const api of this.builtInAiApis) {
+      const scenarios = this.getScenarios(this.getBuiltInAiAPIFromItemInterface(api));
+      const scen = scenarios.find(s => s.id === id);
+      if (scen) return scen;
+    }
+    return null;
+  }
+
+  getScenarioStatusIcon(scen: any): string {
+    if (scen.tests.some((t: any) => t.results.status === TestStatus.Error || t.results.status === TestStatus.Fail)) {
+       return 'bi-x-circle-fill text-rose-500';
+    }
+    if (scen.tests.some((t: any) => t.results.status === TestStatus.Executing)) {
+       return 'bi-arrow-repeat animate-spin text-indigo-500';
+    }
+    if (scen.tests.every((t: any) => t.results.status === TestStatus.Success || t.results.status === TestStatus.Skipped)) {
+       if (scen.tests.some((t: any) => t.results.status === TestStatus.Success)) {
+          return 'bi-check-circle-fill text-emerald-500';
+       }
+    }
+    return 'bi-circle text-slate-400';
+  }
+
+  getTestStatusIcon(status: TestStatus): string {
+    switch (status) {
+      case TestStatus.Success: return 'bi-check-circle-fill text-emerald-500';
+      case TestStatus.Executing: return 'bi-arrow-repeat animate-spin text-indigo-500';
+      case TestStatus.Error:
+      case TestStatus.Fail: return 'bi-x-circle-fill text-rose-500';
+      case TestStatus.Skipped: return 'bi-slash-circle text-slate-400';
+      default: return 'bi-circle text-slate-400';
+    }
+  }
+
+  handleRunClick() {
+    if (!this.isTestingRunning) {
+      this.isDrawerOpen = true;
+      this.start();
+    }
+  }
+
+  toggleExecution(event: Event) {
+    event.stopPropagation();
+    if (this.isTestingRunning && this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
+      this.stop();
+      this.systemLogs.push(`[System] Execution paused.`);
+    } else {
+      this.start();
+    }
+  }
+
+  getLogClass(log: string): string {
+    if (log.includes('✓')) return 'text-emerald-400';
+    if (log.includes('Error') || log.includes('Fail')) return 'text-rose-400';
+    if (log.includes('▶')) return 'text-indigo-400';
+    return 'text-slate-400';
   }
 
   async loadInitialHardwareInfo() {
@@ -609,17 +730,23 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.axonTestSuiteExecutor.isStopped = false;
     this.axonTestSuiteExecutor.resetAbortController();
+    
+    this.systemLogs = [`[System] Preparing test environment for ${this.selectedTestIds.size} tests...`];
+
     await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
 
     this.viewData.pretests.iterationsCollapsed = true;
+    
+    this.systemLogs.push(`[System] Starting test suite execution...`);
 
     // Once everything passes, we can start the tests.
     await this.axonTestSuiteExecutor.start(this.selectedTestIds);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
     
+    this.systemLogs.push(`[System] Execution finished successfully.`);
     await this.generateReport();
   }
   
@@ -903,6 +1030,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   unescapeOutput(output: string): string {
+    if (!output) return output;
     return output.replace(/\\\\/g, '\\') // 1. Unescape backslashes
       .replace(/\\"/g, '"')   // 2. Unescape double quotes
       .replace(/\\'/g, "'")   // 3. Unescape single quotes
