@@ -581,7 +581,7 @@
                          @if (isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')">{{ charSpeedColdLocal ? (charSpeedColdLocal >= 1000 ? ((charSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (charSpeedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedColdLocal, allCharSpeed, 'charSpeed')">{{ charSpeedColdLocal != null && charSpeedColdLocal > 0 ? (charSpeedColdLocal >= 1000 ? ((charSpeedColdLocal/1000) | number:'1.1-1') + 'k' : (charSpeedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">chars/sec</span>
                    </div>
                 </div>
@@ -597,7 +597,7 @@
                          @if (isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')">{{ charSpeedWarmLocal ? (charSpeedWarmLocal >= 1000 ? ((charSpeedWarmLocal/1000) | number:'1.1-1') + 'k' : (charSpeedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')" [class.text-slate-800]="!isWinner(charSpeedWarmLocal, allCharSpeed, 'charSpeed')">{{ charSpeedWarmLocal != null && charSpeedWarmLocal > 0 ? (charSpeedWarmLocal >= 1000 ? ((charSpeedWarmLocal/1000) | number:'1.1-1') + 'k' : (charSpeedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">chars/sec</span>
                    </div>
                 </div>
@@ -646,7 +646,6 @@
           </div>
 
           <!-- Global Avg Tokens/s Card -->
-          @if (speedMax > 0) {
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
               <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
@@ -657,15 +656,14 @@
             
             <div class="flex flex-col gap-4 flex-1 justify-end">
               <!-- Cold -->
-              @if (speedColdLocal) {
               <div class="flex flex-col gap-1.5">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold 
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Cold
                          @if (isWinner(speedColdLocal || 0, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">{{ speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')">{{ speedColdLocal != null && speedColdLocal > 0 ? (speedColdLocal >= 1000 ? ((speedColdLocal/1000) | number:'1.1-1') + 'k' : (speedColdLocal | number:'1.0-0')) : (['cold', 'warm'].includes('cold') ? '—' : 'N/A') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                    </div>
                 </div>
@@ -673,30 +671,25 @@
                    <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(speedColdLocal || 0, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedColdLocal || 0, allSpeed, 'speed')" [style.width]="getPercentage(speedColdLocal, speedMax) + '%'"></div>
                 </div>
               </div>
-              }
               <!-- Warm -->
-              @if (speedWarmLocal) {
               <div class="flex flex-col gap-1.5 mt-2">
                 <div class="flex items-center justify-between">
                    <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')">
-                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm 
+                         You {{ isExtensionInstalled && hardwareInfo?.cpu?.modelName ? '- ' + hardwareInfo.cpu.modelName + ' ' : '' }}- Warm
                          @if (isWinner(speedWarmLocal || 0, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
                    </span>
                    <div class="flex items-baseline gap-1">
-                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')">{{ speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0') }}</span>
+                     <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')">{{ speedWarmLocal != null && speedWarmLocal > 0 ? (speedWarmLocal >= 1000 ? ((speedWarmLocal/1000) | number:'1.1-1') + 'k' : (speedWarmLocal | number:'1.0-0')) : (['cold', 'warm'].includes('warm') ? '—' : 'N/A') }}</span>
                      <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                    </div>
                 </div>
                 <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                    <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedWarmLocal || 0, allSpeed, 'speed')" [style.width]="getPercentage(speedWarmLocal, speedMax) + '%'"></div>
                 </div>
-              </div>
-              }
-              <!-- Baselines -->
+              </div>              <!-- Baselines -->
               @for (baseline of comparisonService.baselines; track baseline.id) {
                 @let speedBaseline = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTokenPerSecond || 0;
                 @let baselineDetails = getBaselineDetails(baseline.id);
-                @if (speedBaseline > 0) {
                 <div class="flex flex-col gap-1.5 mt-2">
                   <div class="flex items-center justify-between gap-2">
                      <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
@@ -721,7 +714,7 @@
                        @if (isWinner(speedBaseline, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
                      </div>
                      <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(speedBaseline, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedBaseline, allSpeed, 'speed')">{{ speedBaseline >= 1000 ? ((speedBaseline/1000) | number:'1.1-1') + 'k' : (speedBaseline | number:'1.0-0') }}</span>
+                       <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(speedBaseline, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(speedBaseline, allSpeed, 'speed')">{{ speedBaseline != null && speedBaseline > 0 ? (speedBaseline >= 1000 ? ((speedBaseline/1000) | number:'1.1-1') + 'k' : (speedBaseline | number:'1.0-0')) : (speedBaseline === -1 ? 'N/A' : '—') }}</span>
                        <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                      </div>
                   </div>
@@ -729,11 +722,9 @@
                      <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(speedBaseline, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedBaseline, allSpeed, 'speed')" [style.width]="getPercentage(speedBaseline, speedMax) + '%'"></div>
                   </div>
                 </div>
-                }
               }
             </div>
           </div>
-          }
 
         </div>
       </div>
@@ -789,7 +780,7 @@
                [class.border-slate-200]="catStatus === TestStatus.Idle && !catSelected"
                [class.border-green-300]="catStatus === TestStatus.Success">
             <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 dark:text-slate-400">Category Aggregate Performance</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <!-- Avg TTFT Card -->
               @let coldTtft = coldSummaryResults?.averageTimeToFirstToken;
               @let warmTtft = warmSummaryResults?.averageTimeToFirstToken;
@@ -981,7 +972,7 @@
                          @if (isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ coldCharSpeed ? (coldCharSpeed >= 1000 ? ((coldCharSpeed/1000) | number:'1.1-1') + 'k' : (coldCharSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(coldCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ coldCharSpeed != null && coldCharSpeed > 0 ? (coldCharSpeed >= 1000 ? ((coldCharSpeed/1000) | number:'1.1-1') + 'k' : (coldCharSpeed | number:'1.0-0')) : (coldCharSpeed === -1 ? 'N/A' : '—') }}</span>
                          <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
                        </div>
                     </div>
@@ -997,7 +988,7 @@
                          @if (isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ warmCharSpeed ? (warmCharSpeed >= 1000 ? ((warmCharSpeed/1000) | number:'1.1-1') + 'k' : (warmCharSpeed | number:'1.0-0')) : '—' }}</span>
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')" [class.text-slate-700]="!isWinner(warmCharSpeed || 0, allCharSpeed, 'charSpeed')">{{ warmCharSpeed != null && warmCharSpeed > 0 ? (warmCharSpeed >= 1000 ? ((warmCharSpeed/1000) | number:'1.1-1') + 'k' : (warmCharSpeed | number:'1.0-0')) : (warmCharSpeed === -1 ? 'N/A' : '—') }}</span>
                          <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
                        </div>
                     </div>
@@ -1050,7 +1041,6 @@
               @let warmTokenSpeed = warmSummaryResults?.averageTokenPerSecond;
               @let allTokenSpeed = getTestAllValues(element.id, 'speed', coldTokenSpeed, warmTokenSpeed);
               @let maxTokenSpeed = getMaxArray(allTokenSpeed);
-              @if (maxTokenSpeed > 0) {
               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col dark:bg-slate-900 dark:border-slate-700">
                 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
@@ -1060,7 +1050,6 @@
                 </div>
                 <div class="flex flex-col gap-1 flex-1 justify-end">
                   <!-- COLD -->
-                  @if (coldTokenSpeed) {
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-500]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')">
@@ -1068,7 +1057,7 @@
                          @if (isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')">{{ coldTokenSpeed >= 1000 ? ((coldTokenSpeed/1000) | number:'1.1-1') + 'k' : (coldTokenSpeed | number:'1.0-0') }}</span>
+                         <span class="text-xs tabular-nums font-bold" [class.text-blue-700]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')">{{ coldTokenSpeed != null && coldTokenSpeed > 0 ? (coldTokenSpeed >= 1000 ? ((coldTokenSpeed/1000) | number:'1.1-1') + 'k' : (coldTokenSpeed | number:'1.0-0')) : (coldTokenSpeed === -1 ? 'N/A' : '—') }}</span>
                          <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                        </div>
                     </div>
@@ -1076,9 +1065,7 @@
                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(coldTokenSpeed || 0, allTokenSpeed, 'speed')" [style.width]="getPercentage(coldTokenSpeed, maxTokenSpeed) + '%'"></div>
                     </div>
                   </div>
-                  }
                   <!-- WARM -->
-                  @if (warmTokenSpeed) {
                   <div class="flex flex-col gap-1.5 mt-2">
                     <div class="flex items-center justify-between">
                        <span class="text-[10px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-500]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')">
@@ -1086,7 +1073,7 @@
                          @if (isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
                        </span>
                        <div class="flex items-baseline gap-1">
-                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')">{{ warmTokenSpeed >= 1000 ? ((warmTokenSpeed/1000) | number:'1.1-1') + 'k' : (warmTokenSpeed | number:'1.0-0') }}</span>
+                         <span class="text-xs tabular-nums font-bold" [class.text-orange-700]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.text-slate-700]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')">{{ warmTokenSpeed != null && warmTokenSpeed > 0 ? (warmTokenSpeed >= 1000 ? ((warmTokenSpeed/1000) | number:'1.1-1') + 'k' : (warmTokenSpeed | number:'1.0-0')) : (warmTokenSpeed === -1 ? 'N/A' : '—') }}</span>
                          <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                        </div>
                     </div>
@@ -1094,12 +1081,10 @@
                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(warmTokenSpeed || 0, allTokenSpeed, 'speed')" [style.width]="getPercentage(warmTokenSpeed, maxTokenSpeed) + '%'"></div>
                     </div>
                   </div>
-                  }
                   <!-- Baselines -->
                   @for (baseline of comparisonService.baselines; track baseline.id) {
                 @let baselineTokenSpeed = comparisonService.getSummaryResults(baseline.data, element.id, selectedTestIds)?.averageTokenPerSecond || 0;
                 @let baselineDetails = getBaselineDetails(baseline.id);
-                @if (baselineTokenSpeed > 0) {
                 <div class="flex flex-col gap-1.5 mt-2">
                   <div class="flex items-center justify-between gap-2">
                      <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
@@ -1124,7 +1109,7 @@
                        @if (isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
                      </div>
                      <div class="flex items-baseline gap-1 flex-shrink-0">
-                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')">{{ baselineTokenSpeed >= 1000 ? ((baselineTokenSpeed/1000) | number:'1.1-1') + 'k' : (baselineTokenSpeed | number:'1.0-0') }}</span>
+                       <span class="text-xs tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')">{{ baselineTokenSpeed != null && baselineTokenSpeed > 0 ? (baselineTokenSpeed >= 1000 ? ((baselineTokenSpeed/1000) | number:'1.1-1') + 'k' : (baselineTokenSpeed | number:'1.0-0')) : (baselineTokenSpeed === -1 ? 'N/A' : '—') }}</span>
                        <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                      </div>
                   </div>
@@ -1132,11 +1117,9 @@
                      <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [class.bg-slate-300]="!isWinner(baselineTokenSpeed, allTokenSpeed, 'speed')" [style.width]="getPercentage(baselineTokenSpeed, maxTokenSpeed) + '%'"></div>
                   </div>
                 </div>
-                }
               }
                 </div>
               </div>
-              }
             </div>
           </div>
           }
@@ -1254,12 +1237,11 @@
                           </td>
                           <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
                             <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageCharactersPerSecond != null ? (test.results.averageCharactersPerSecond | number:'1.0-0') : '—' }}</span>
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageCharactersPerSecond != null && test.results.averageCharactersPerSecond > 0 ? (test.results.averageCharactersPerSecond | number:'1.0-0') : (test.results.averageCharactersPerSecond === -1 ? 'N/A' : '—') }}</span>
                               <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
                             </div>
                           </td>
                         </tr>
-                        @if (test.results.averageTokensPerSecond != null && test.results.averageTokensPerSecond !== -1 && test.results.averageTokensPerSecond !== 0) {
                         <!-- Tokens/s -->
                         <tr class="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/30">
                           <td class="p-4 border-b border-slate-100 align-middle dark:border-slate-800">
@@ -1270,12 +1252,11 @@
                           </td>
                           <td class="p-4 border-b border-slate-100 transition-colors bg-white dark:border-slate-800 dark:bg-transparent">
                             <div class="flex items-baseline gap-1">
-                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageTokensPerSecond | number:'1.0-0' }}</span>
+                              <span class="text-sm tabular-nums font-bold tracking-tight text-slate-700 dark:text-slate-300">{{ test.results.averageTokensPerSecond != null && test.results.averageTokensPerSecond > 0 ? (test.results.averageTokensPerSecond | number:'1.0-0') : (test.results.averageTokensPerSecond === -1 ? 'N/A' : '—') }}</span>
                               <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
                             </div>
                           </td>
                         </tr>
-                        }
                       </tbody>
                     </table>
                   </div>
@@ -1328,7 +1309,8 @@
                                   <th class="px-3 py-2 w-10">#</th>
                                   <th class="px-3 py-2 text-right">TTFT</th>
                                   <th class="px-3 py-2 text-right">Total</th>
-                                  <th class="px-3 py-2 text-right">Speed</th>
+                                  <th class="px-3 py-2 text-right">Tokens/s</th>
+                                  <th class="px-3 py-2 text-right">Characters/s</th>
                                   <th class="px-3 py-2 text-center">Output</th>
                                 </tr>
                               </thead>
@@ -1339,10 +1321,10 @@
                                     <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }} ms</td>
                                     <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }} ms</td>
                                     <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                                      @if (iter.tokensPerSecond != null && iter.tokensPerSecond !== -1 && iter.tokensPerSecond !== 0) {
-                                        {{ iter.tokensPerSecond | number:'1.0-0' }} <span class="text-[10px] opacity-75">t/s</span> <span class="mx-0.5 opacity-50">/</span>
-                                      }
-                                      {{ iter.charactersPerSecond != null ? (iter.charactersPerSecond | number:'1.0-0') : "—" }} <span class="text-[10px] opacity-75">c/s</span>
+                                      {{ iter.tokensPerSecond != null && iter.tokensPerSecond > 0 ? (iter.tokensPerSecond | number:'1.0-0') : (iter.tokensPerSecond === -1 ? 'N/A' : '—') }}
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
+                                      {{ iter.charactersPerSecond != null && iter.charactersPerSecond > 0 ? (iter.charactersPerSecond | number:'1.0-0') : (iter.charactersPerSecond === -1 ? 'N/A' : '—') }}
                                     </td>
                                     <td class="px-3 py-1.5 text-center">
                                       <button class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-[10px] dark:text-indigo-400 dark:hover:bg-indigo-900/30" 

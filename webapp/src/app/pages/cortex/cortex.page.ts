@@ -648,13 +648,29 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (items.length === 0) return undefined;
 
+    const calcAvg = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
+    const calcMed = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
     return {
-        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
-        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
-        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
-        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
-        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
-        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+        averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+        averageTotalResponseTime: calcAvg('totalResponseTime'),
+        medianTimeToFirstToken: calcMed('timeToFirstToken'),
+        medianTotalResponseTime: calcMed('totalResponseTime'),
+        medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
 
@@ -666,13 +682,29 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
     if (items.length === 0) return undefined;
 
+    const calcAvg = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
+    const calcMed = (key: string) => {
+      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
+      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
+      if (items.some(item => (item as any)[key] === -1)) return -1;
+      return 0;
+    };
+
     return {
-        averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map(item => item.tokensPerSecond ?? 0)),
-        averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map(item => item.timeToFirstToken ?? 0)),
-        averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map(item => item.totalResponseTime ?? 0)),
-        medianTimeToFirstToken: MathematicalCalculations.calculateMedian(items.map(item => item.timeToFirstToken ?? 0)),
-        medianTotalResponseTime: MathematicalCalculations.calculateMedian(items.map(item => item.totalResponseTime ?? 0)),
-        medianTokenPerSecond: MathematicalCalculations.calculateMedian(items.map(item => item.tokensPerSecond ?? 0))
+        averageTokenPerSecond: calcAvg('tokensPerSecond'),
+        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
+        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
+        averageTotalResponseTime: calcAvg('totalResponseTime'),
+        medianTimeToFirstToken: calcMed('timeToFirstToken'),
+        medianTotalResponseTime: calcMed('totalResponseTime'),
+        medianTokenPerSecond: calcMed('tokensPerSecond'),
+        medianCharactersPerSecond: calcMed('charactersPerSecond')
     };
   }
 
