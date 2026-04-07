@@ -42,9 +42,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   isUrlCopied = false;
 
   // New Design State
-  activeView: 'overview' | 'test-lab' = 'overview';
+  activeView: 'overview' | 'test-lab' | 'api' = 'overview';
   activeScenarioId: string | null = null;
   activeTestIdInLab: string | null = null;
+  activeApiId: BuiltInAiApi | null = null;
   isDrawerOpen: boolean = false;
   systemLogs: string[] = [];
 
@@ -312,8 +313,13 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   // --- New Methods for Scenarios & Sidebar ---
 
-  setActiveView(view: 'overview' | 'test-lab') {
+  setActiveView(view: 'overview' | 'test-lab' | 'api') {
     this.activeView = view;
+  }
+
+  setActiveApi(api: BuiltInAiApi) {
+    this.activeApiId = api;
+    this.activeView = 'api';
   }
 
   setActiveScenario(id: string) {

@@ -86,12 +86,15 @@
             @let scenarios = getScenarios(getBuiltInAiAPIFromItemInterface(api));
 
             <div class="pb-1 border-b border-slate-50 dark:border-slate-800/50 last:border-0">
-              <div class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+              <div class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                   [ngClass]="activeView === 'api' && activeApiId === getBuiltInAiAPIFromItemInterface(api) ? 'bg-slate-100 dark:bg-slate-800' : ''"
+                   (click)="setActiveApi(getBuiltInAiAPIFromItemInterface(api))">
                 <div class="flex items-center gap-2 min-w-0">
                   <input 
                     type="checkbox" 
                     [checked]="isSelected" 
                     [indeterminate]="isPartiallySelectedCategory"
+                    (click)="$event.stopPropagation()"
                     (change)="toggleCategorySelection(getBuiltInAiAPIFromItemInterface(api), $event)"
                     class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 cursor-pointer dark:bg-slate-800 dark:border-slate-600" 
                   />
@@ -140,7 +143,7 @@
           @if(isTestingRunning) {
              <i class="bi bi-square-fill"></i> Executing...
           } @else {
-             <i class="bi bi-play-fill"></i> Execute Workflow
+             <i class="bi bi-play-fill"></i> Run Cortex Test
           }
         </button>
       </div>
@@ -156,11 +159,36 @@
          <span class="text-slate-400 dark:text-slate-500">Workspace</span> <i class="bi bi-chevron-right text-slate-300 dark:text-slate-600 text-xs"></i>
          @if (activeView === 'overview') {
            <span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i class="bi bi-speedometer2"></i> Overview</span>
+         } @else if (activeView === 'api' && activeApiId) {
+           <span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i class="bi" [ngClass]="getIconForApi(activeApiId)"></i> {{ activeApiId }} Dashboard</span>
          } @else {
            <span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5"><i class="bi bi-flask"></i> Interactive Test Lab</span>
          }
        </div>
-       <div class="flex gap-3">
+       <div class="flex gap-3 relative">
+        <div class="relative">
+          <button (click)="showBaselineDropdown = !showBaselineDropdown" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm">
+            <i class="bi bi-bar-chart-steps"></i> Compare Baselines <i class="bi bi-chevron-down text-[10px]"></i>
+          </button>
+          @if (showBaselineDropdown) {
+            <div class="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden">
+              <div class="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Available Baselines</span>
+              </div>
+              <div class="max-h-64 overflow-y-auto custom-scrollbar">
+                @for (baseline of comparisonService.availableBaselinesIndex; track baseline.filename) {
+                  <label class="flex items-start gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 last:border-0 cursor-pointer transition-colors">
+                    <input type="checkbox" [checked]="isBaselineSelected(baseline.filename)" (change)="toggleBaseline(baseline.filename, baseline.name, $event)" class="mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">{{ baseline.name }}</span>
+                      <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{{ baseline.os }} | {{ baseline.cpu }}</span>
+                    </div>
+                  </label>
+                }
+              </div>
+            </div>
+          }
+        </div>
         <button (click)="triggerImport()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-upload"></i> Import</button>
         <button (click)="saveReportToUrl()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-share"></i> Share</button>
         <button (click)="triggerDownloadResults()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"><i class="bi bi-download"></i> Export JSON</button>
@@ -213,6 +241,64 @@
                <app-cortex-insights [embedded]="true"></app-cortex-insights>
             </div>
             
+          </section>
+        </div>
+      } @else if (activeView === 'api' && activeApiId) {
+        <div class="max-w-[1600px] mx-auto space-y-8 pb-12 pt-6">
+          <section class="space-y-4">
+            <div class="flex items-end justify-between mb-4">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <i class="bi" [ngClass]="getIconForApi(activeApiId)"></i> {{ activeApiId }} Dashboard
+                </h2>
+                <p class="text-xs font-bold text-slate-400 tracking-widest uppercase mt-2">Aggregate API Metrics</p>
+              </div>
+            </div>
+
+            <!-- API Level Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+               <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md shadow-indigo-200 dark:shadow-none p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-100 mb-1">Scenarios Selected</div>
+                  <div class="text-3xl font-bold">{{ getSelectedTestsCountForApi(activeApiId) }} / {{ getTests(activeApiId).length }}</div>
+               </div>
+               
+               @let apiStats = getSummaryResults(activeApiId, 'warm');
+               @let passedStats = getGlobalPassedAndFailed();
+
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Avg TTFT (Warm)</div>
+                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTimeToFirstToken ? (apiStats?.averageTimeToFirstToken | number:'1.0-0') : '--' }} ms</div>
+               </div>
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Avg Total Time (Warm)</div>
+                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTotalResponseTime ? (apiStats?.averageTotalResponseTime | number:'1.0-0') : '--' }} ms</div>
+               </div>
+               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Output Speed (Warm)</div>
+                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTokenPerSecond ? (apiStats?.averageTokenPerSecond | number:'1.0-0') : '--' }} <span class="text-sm font-medium">t/s</span></div>
+               </div>
+            </div>
+
+            <!-- API Scenarios List -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/30">
+                 <h3 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                   <i class="bi bi-list-ul"></i> API Scenarios
+                 </h3>
+               </div>
+               <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                 @for (scen of getScenarios(activeApiId); track scen.id) {
+                   <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer" (click)="setActiveScenario(scen.id)">
+                     <div class="flex flex-col">
+                       <span class="font-bold text-slate-800 dark:text-slate-200">{{ scen.name }}</span>
+                       <span class="text-xs text-slate-500">{{ scen.tests.length }} Tests (Cold / Warm)</span>
+                     </div>
+                     <i class="bi bi-chevron-right text-slate-400"></i>
+                   </div>
+                 }
+               </div>
+            </div>
+
           </section>
         </div>
       } @else {
@@ -287,6 +373,50 @@
                           </div>
                         </div>
                         
+                        <div class="px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                          <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                            <i class="bi bi-bar-chart-steps"></i> Baseline Comparisons
+                          </h4>
+                          @let ttftVals = getTestAllValues(activeTest.id, 'ttft', getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken, 0);
+                          @let totalVals = getTestAllValues(activeTest.id, 'total', getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime, 0);
+                          @let speedVals = getTestAllValues(activeTest.id, 'speed', getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond, 0);
+                          <div class="space-y-2">
+                             <div class="flex items-center justify-between text-xs py-1.5 border-b border-slate-50 dark:border-slate-800/50">
+                               <div class="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-semibold truncate">
+                                 <span class="text-[9px] uppercase bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded dark:bg-indigo-900/50 dark:text-indigo-400 shrink-0">Local</span>
+                                 <span class="truncate">{{ getComputeUnit() }}</span>
+                               </div>
+                               <div class="flex gap-4 font-mono shrink-0">
+                                 <span class="w-16 text-right" [ngClass]="isWinner(getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken, ttftVals, 'ttft') ? 'text-emerald-500 font-bold' : 'text-slate-600 dark:text-slate-400'">{{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTimeToFirstToken | number:'1.0-0') : '--' }}</span>
+                                 <span class="w-16 text-right" [ngClass]="isWinner(getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime, totalVals, 'total') ? 'text-emerald-500 font-bold' : 'text-slate-600 dark:text-slate-400'">{{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTotalResponseTime | number:'1.0-0') : '--' }}</span>
+                                 <span class="w-16 text-right" [ngClass]="isWinner(getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond, speedVals, 'speed') ? 'text-emerald-500 font-bold' : 'text-slate-600 dark:text-slate-400'">{{ getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageTokenPerSecond | number:'1.0-0') : '--' }}</span>
+                               </div>
+                             </div>
+                             @for (baseline of comparisonService.baselines; track baseline.id; let i = $index) {
+                               @let baselineTtft = comparisonService.getSummaryResults(baseline.data, activeTest.id, selectedTestIds)?.averageTimeToFirstToken;
+                               @let baselineTotal = comparisonService.getSummaryResults(baseline.data, activeTest.id, selectedTestIds)?.averageTotalResponseTime;
+                               @let baselineSpeed = comparisonService.getSummaryResults(baseline.data, activeTest.id, selectedTestIds)?.averageTokenPerSecond;
+                               
+                               <div class="flex items-center justify-between text-xs py-1.5 border-b border-slate-50 dark:border-slate-800/50 last:border-0">
+                                 <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 truncate">
+                                   <span class="text-[9px] uppercase px-1.5 py-0.5 rounded shrink-0" [ngClass]="getExecutionTypeColorClass(getBaselineDetails(baseline.id)?.executionType)"><i class="bi" [ngClass]="getExecutionTypeIcon(getBaselineDetails(baseline.id)?.executionType)"></i> {{ getBaselineDetails(baseline.id)?.executionType || 'Unknown' }}</span>
+                                   <span class="truncate">{{ baseline.name }}</span>
+                                 </div>
+                                 <div class="flex gap-4 font-mono text-slate-500 dark:text-slate-500 shrink-0">
+                                   <span class="w-16 text-right" [ngClass]="isWinner(baselineTtft, ttftVals, 'ttft') ? 'text-emerald-500 font-bold' : ''">{{ baselineTtft ? (baselineTtft | number:'1.0-0') : '--' }}</span>
+                                   <span class="w-16 text-right" [ngClass]="isWinner(baselineTotal, totalVals, 'total') ? 'text-emerald-500 font-bold' : ''">{{ baselineTotal ? (baselineTotal | number:'1.0-0') : '--' }}</span>
+                                   <span class="w-16 text-right" [ngClass]="isWinner(baselineSpeed, speedVals, 'speed') ? 'text-emerald-500 font-bold' : ''">{{ baselineSpeed ? (baselineSpeed | number:'1.0-0') : '--' }}</span>
+                                 </div>
+                               </div>
+                             }
+                             <div class="flex justify-end gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 pt-1">
+                               <span class="w-16 text-right">TTFT</span>
+                               <span class="w-16 text-right">Total</span>
+                               <span class="w-16 text-right">Speed</span>
+                             </div>
+                          </div>
+                        </div>
+
                         <div class="flex-1 flex flex-col min-h-0">
                           <div class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border-y border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
                             <div class="flex items-center gap-1.5"><i class="bi bi-code-slash"></i> Input Payload</div>
@@ -351,7 +481,7 @@
   <!-- GLOBAL BOTTOM EXECUTION DRAWER -->
   <div 
     class="fixed bottom-0 left-[340px] right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out z-50 flex flex-col"
-    [ngClass]="isDrawerOpen ? 'h-[350px]' : 'h-0 border-transparent overflow-hidden'"
+    [ngClass]="isDrawerOpen ? 'h-[350px]' : 'h-[72px] overflow-hidden'"
   >
     <!-- Drawer Header -->
     <div 
@@ -373,6 +503,12 @@
             </div>
           </div>
           
+          <div class="flex items-center gap-3">
+             @let stats = getGlobalPassedAndFailed();
+             <span class="text-emerald-500 font-bold text-xs flex items-center gap-1 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded"><i class="bi bi-check-circle-fill"></i> {{ stats.passed }}</span>
+             <span class="text-rose-500 font-bold text-xs flex items-center gap-1 bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded"><i class="bi bi-x-circle-fill"></i> {{ stats.failed }}</span>
+          </div>
+
           <!-- Global Progress Bar Area -->
           <div class="flex-1 max-w-3xl px-8 hidden sm:block">
              <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
