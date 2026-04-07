@@ -76,6 +76,7 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
       iterationResult.totalNumberOfInputTokens = inputTokens;
       iterationResult.totalNumberOfOutputTokens = -1;
       iterationResult.tokensPerSecond = -1;
+      iterationResult.inputTokensPerSecond = -1;
       iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
       iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
       iterationResult.inputLength = this.results.input?.length || 0;

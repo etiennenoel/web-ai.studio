@@ -365,7 +365,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
          }
        }
        const ua = navigator.userAgent;
-       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+(\.\d+)?)/);
+       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+([\.\d]+)?)/);
        if (match) {
          let name = match[1];
          if (name === 'Edg') name = 'Edge';
@@ -383,11 +383,11 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getMaxArray(values: number[]): number { return values.length > 0 ? Math.max(...values) : 0; }
   
-  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
+  getGlobalAllValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
   }
 
-  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
+  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineValues(testId, metric)];
   }
 
@@ -400,31 +400,33 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(2, (val / max) * 100);
   }
 
-  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'charSpeed'): number[] {
+  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
       if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
       return 0;
     });
   }
 
-  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'charSpeed'): number[] {
+  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
       if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
       return 0;
     });
   }
 
-  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'|'charSpeed'): boolean {
+  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'|'inputSpeed'|'charSpeed'): boolean {
     const val = currentVal || 0;
     if (val <= 0) return false;
 
@@ -432,7 +434,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if (activeValues.length === 0) return false;
 
     let bestValue;
-    if (metric === 'speed' || metric === 'charSpeed') {
+    if (metric === 'speed' || metric === 'inputSpeed' || metric === 'charSpeed') {
       bestValue = Math.max(...activeValues);
     } else {
       bestValue = Math.min(...activeValues);

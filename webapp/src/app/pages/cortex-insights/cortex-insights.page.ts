@@ -15,6 +15,7 @@ export interface LeaderboardEntry {
   apis: string[];
   ttft: number;
   speed: number;
+  inputSpeed: number;
   charSpeed: number;
   total: number;
   isCurrent: boolean;
@@ -25,6 +26,7 @@ interface RawTestResult {
   api: string;
   ttft: number;
   speed: number;
+  inputSpeed?: number;
   charSpeed?: number;
   total: number;
 }
@@ -52,16 +54,20 @@ export class CortexInsightsPage implements OnInit {
   leaderboard: LeaderboardEntry[] = [];
   
   fleetAvgSpeed = 0;
+  fleetAvgInputSpeed = 0;
   fleetAvgCharSpeed = 0;
   fleetAvgTtft = 0;
   topSpeed = 0;
+  topInputSpeed = 0;
   topCharSpeed = 0;
   topConfig: LeaderboardEntry | null = null;
   maxSpeed = 0;
+  maxInputSpeed = 0;
   maxCharSpeed = 0;
   maxTtft = 0;
   maxTotal = 0;
   minSpeed = 0;
+  minInputSpeed = 0;
   minCharSpeed = 0;
   minTtft = 0;
   minTotal = 0;
@@ -90,7 +96,7 @@ export class CortexInsightsPage implements OnInit {
     api: ''
   };
 
-  tableSortColumn: 'speed' | 'charSpeed' | 'ttft' | 'total' | 'hw' = 'speed';
+  tableSortColumn: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' = 'speed';
   tableSortDirection: 'asc' | 'desc' = 'desc';
 
   // Chart data
@@ -351,6 +357,7 @@ export class CortexInsightsPage implements OnInit {
 
       const ttft = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.ttft)));
       const speed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.speed).filter(v => v !== -1)));
+      const inputSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.inputSpeed ?? 0).filter(v => v !== -1)));
       const charSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.charSpeed ?? 0)));
       const total = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.total)));
 
@@ -364,6 +371,7 @@ export class CortexInsightsPage implements OnInit {
         apis: testsToUse.map(t => t.api),
         ttft,
         speed: speed || 0,
+        inputSpeed: inputSpeed || 0,
         charSpeed,
         total,
         isCurrent: b.filename === 'local',
@@ -486,7 +494,7 @@ export class CortexInsightsPage implements OnInit {
     this.applyFilters();
   }
 
-  setTableSort(column: 'speed' | 'charSpeed' | 'ttft' | 'total' | 'hw') {
+  setTableSort(column: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw') {
     if (this.tableSortColumn === column) {
       this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
