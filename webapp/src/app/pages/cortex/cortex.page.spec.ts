@@ -218,4 +218,258 @@ describe('CortexPage', () => {
       }, 100);
     });
   });
+
+  describe('loadReportFromUrl', () => {
+    it('should decompress and load report', fakeAsync(() => {
+      spyOn(component, 'loadReport');
+      
+      const originalDecompressionStream = (window as any).DecompressionStream;
+      (window as any).DecompressionStream = class {
+        writable = {};
+        readable = {};
+      };
+      
+      const OriginalResponse = window.Response;
+      (window as any).Response = class {
+        constructor(stream: any) {}
+        text() {
+          return Promise.resolve('{"results": {"testsResults": []}}');
+        }
+      };
+      
+      const originalBlob = window.Blob;
+      (window as any).Blob = class extends originalBlob {
+        override stream() {
+          return {
+            pipeThrough: () => ({})
+          } as any;
+        }
+      }
+
+      // Valid base64url payload
+      component.loadReportFromUrl('dGVzdA');
+      tick();
+
+      expect(component.loadReport).toHaveBeenCalledWith({ results: { testsResults: [] } });
+
+      (window as any).DecompressionStream = originalDecompressionStream;
+      (window as any).Response = OriginalResponse;
+      (window as any).Blob = originalBlob;
+    }));
+
+    it('should alert and clear url on error', fakeAsync(() => {
+      spyOn(window, 'alert');
+      spyOn(console, 'error');
+      
+      // Invalid base64
+      component.loadReportFromUrl('!!!!');
+      tick();
+
+      expect(window.alert).toHaveBeenCalledWith('Failed to load report from URL. The link might be broken or expired.');
+      expect(console.error).toHaveBeenCalled();
+    }));
+  });
+
+  describe('Hardware Information Formatting', () => {
+    it('should format compute unit', () => {
+      component.hardwareInfo = { cpu: { modelName: 'Test CPU', numOfProcessors: 4 } };
+      fixture.detectChanges();
+      expect(component.getComputeUnit()).toBe('Test CPU (4-Core)');
+      
+      component.hardwareInfo = { cpu: { modelName: 'Test CPU' } };
+      fixture.detectChanges();
+      expect(component.getComputeUnit()).toBe('Test CPU');
+
+      component.hardwareInfo = null;
+      fixture.detectChanges();
+      expect(component.getComputeUnit()).toBe('Extension Required');
+    });
+
+    it('should determine NPU info', () => {
+      component.hardwareInfo = { cpu: { modelName: 'Apple M1' } };
+      fixture.detectChanges();
+      expect(component.getNpuInfo()).toBe('Apple Neural Engine');
+
+      component.hardwareInfo = { cpu: { modelName: 'Snapdragon X' } };
+      fixture.detectChanges();
+      expect(component.getNpuInfo()).toBe('Qualcomm Hexagon');
+
+      component.hardwareInfo = { cpu: { modelName: 'Intel Core' } };
+      fixture.detectChanges();
+      expect(component.getNpuInfo()).toBe('Intel NPU (if available)');
+
+      component.hardwareInfo = { cpu: { modelName: 'AMD Ryzen' } };
+      fixture.detectChanges();
+      expect(component.getNpuInfo()).toBe('AMD Ryzen AI (if available)');
+
+      component.hardwareInfo = { cpu: { modelName: 'Generic CPU' } };
+      fixture.detectChanges();
+      expect(component.getNpuInfo()).toBe('Unknown or None');
+    });
+
+    it('should format memory info', () => {
+      component.hardwareInfo = { memory: { capacity: 17179869184 } }; // 16GB
+      fixture.detectChanges();
+      expect(component.getMemoryInfo()).toBe('16 GB RAM');
+
+      component.hardwareInfo = null;
+      fixture.detectChanges();
+      expect(component.getMemoryInfo()).toBe('Extension Required');
+    });
+
+    it('should format OS profile', () => {
+      // Mocking navigator properties can be tricky depending on the test environment.
+      // We will spy on the methods if they call external, but here we can mock by redefining on the component instance if possible, or use spyOnProperty.
+      const userAgentSpy = spyOnProperty(window.navigator, 'userAgent', 'get');
+      const userAgentDataSpy = (window.navigator as any).userAgentData !== undefined ? spyOnProperty(window.navigator as any, 'userAgentData', 'get') : null;
+      
+      if (userAgentDataSpy) userAgentDataSpy.and.returnValue(undefined);
+      
+      userAgentSpy.and.returnValue('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
+      expect(component.getOsProfile()).toBe('macOS 10.15.7');
+
+      userAgentSpy.and.returnValue('Windows NT 10.0');
+      expect(component.getOsProfile()).toBe('Windows 10/11');
+
+      userAgentSpy.and.returnValue('Linux');
+      expect(component.getOsProfile()).toBe('Linux');
+
+      userAgentSpy.and.returnValue('Android');
+      expect(component.getOsProfile()).toBe('Android');
+
+      userAgentSpy.and.returnValue('iPhone');
+      expect(component.getOsProfile()).toBe('iOS / iPadOS');
+    });
+
+    it('should format Browser info', () => {
+      const userAgentSpy = spyOnProperty(window.navigator, 'userAgent', 'get');
+      const userAgentDataSpy = (window.navigator as any).userAgentData !== undefined ? spyOnProperty(window.navigator as any, 'userAgentData', 'get') : null;
+      
+      if (userAgentDataSpy) userAgentDataSpy.and.returnValue(undefined);
+
+      userAgentSpy.and.returnValue('Chrome/100.0.0.0');
+      expect(component.getBrowserInfo()).toBe('Chrome 100.0.0.0');
+
+      userAgentSpy.and.returnValue('Edg/100.0.0.0');
+      expect(component.getBrowserInfo()).toBe('Edge 100.0.0.0');
+    });
+  });
+
+  describe('Calculations and Comparisons', () => {
+    beforeEach(() => {
+      const mockTestId = 'PromptTextFactAnalysisColdStart' as AxonTestId;
+      component.selectedTestIds.add(mockTestId);
+      component.axonTestSuiteExecutor.results = {
+        status: TestStatus.Success,
+        testsResults: [
+          {
+            id: mockTestId,
+            api: 'prompt' as any,
+            startType: 'cold',
+            testIterationResults: [
+              { status: TestStatus.Success, tokensPerSecond: 10, charactersPerSecond: 50, timeToFirstToken: 100, totalResponseTime: 500 },
+              { status: TestStatus.Success, tokensPerSecond: 20, charactersPerSecond: 100, timeToFirstToken: 200, totalResponseTime: 1000 }
+            ]
+          } as any
+        ]
+      };
+      fixture.detectChanges();
+    });
+
+    it('should calculate global summary results', () => {
+      const results = component.getGlobalSummaryResults('cold');
+      expect(results?.averageTokenPerSecond).toBe(15);
+      expect(results?.medianTokenPerSecond).toBe(15);
+    });
+
+    it('should calculate summary results for a specific test', () => {
+      const mockTestId = 'PromptTextFactAnalysisColdStart' as AxonTestId;
+      // In component getSummaryResults uses builtInAIApi string and startType
+      const results = component.getSummaryResults('prompt', 'cold');
+      expect(results?.averageTokenPerSecond).toBe(15);
+      expect(results?.medianTokenPerSecond).toBe(15);
+    });
+
+    it('should determine winner correctly', () => {
+      expect(component.isWinner(15, [10, 15, 20], 'speed')).toBeFalse();
+      expect(component.isWinner(20, [10, 15, 20], 'speed')).toBeTrue();
+      expect(component.isWinner(100, [100, 200, 300], 'ttft')).toBeTrue();
+      expect(component.isWinner(200, [100, 200, 300], 'ttft')).toBeFalse();
+    });
+  });
+
+  describe('UI State Methods', () => {
+    it('should return api collapsed state', () => {
+      const api = 'prompt' as any;
+      const progress = { percentage: 0 };
+      
+      // Default
+      expect(component.isApiCollapsed(api, progress)).toBeTrue();
+
+      // Explicitly set
+      component.apiCollapsedState[api] = false;
+      expect(component.isApiCollapsed(api, progress)).toBeFalse();
+
+      component.apiCollapsedState = {};
+      component.axonTestSuiteExecutor.results.status = TestStatus.Executing;
+      fixture.detectChanges();
+      
+      // If none explicitly expanded, it should be true when percentage 0
+      expect(component.isApiCollapsed(api, progress)).toBeTrue();
+
+      progress.percentage = 50;
+      const spy = spyOnProperty(component, 'currentExecutingTest').and.returnValue({ results: { api } } as any);
+      expect(component.isApiCollapsed(api, progress)).toBeFalse();
+
+      progress.percentage = 100;
+      spy.and.returnValue(undefined as any);
+      expect(component.isApiCollapsed(api, progress)).toBeTrue();
+    });
+
+    it('should return test collapsed state', () => {
+      const mockTestId = 'PromptTextFactAnalysisColdStart' as AxonTestId;
+      component.viewData[mockTestId] = {};
+      const test = { id: mockTestId, results: { status: TestStatus.Idle } } as any;
+
+      // Default
+      expect(component.isTestCollapsed(test)).toBeTrue();
+
+      // Explicit
+      component.viewData[mockTestId].iterationsCollapsed = false;
+      expect(component.isTestCollapsed(test)).toBeFalse();
+
+      // Expanded output
+      component.viewData[mockTestId].iterationsCollapsed = undefined;
+      component.viewData[mockTestId].expandedOutputs = { 0: true };
+      expect(component.isTestCollapsed(test)).toBeFalse();
+
+      component.viewData[mockTestId].expandedOutputs = { 0: false };
+      test.results.status = TestStatus.Executing;
+      expect(component.isTestCollapsed(test)).toBeFalse();
+    });
+  });
+
+  describe('ngAfterViewInit', () => {
+    afterEach(() => {
+      (window as any).webai = undefined;
+    });
+    
+    it('should check for extension installation', fakeAsync(() => {
+      spyOn(component, 'loadInitialHardwareInfo');
+      
+      (window as any).webai = undefined;
+      
+      component.ngAfterViewInit();
+      expect(component.isExtensionInstalled).toBeFalse();
+
+      // Simulate extension loading
+      setTimeout(() => {
+        (window as any).webai = { getHardwareInformation: () => Promise.resolve({}) };
+      }, 100);
+
+      tick(150);
+      expect(component.isExtensionInstalled).toBeTrue();
+      expect(component.loadInitialHardwareInfo).toHaveBeenCalled();
+    }));
+  });
 });
