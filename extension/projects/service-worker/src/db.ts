@@ -66,6 +66,9 @@ export class WebAIDatabase {
         if (data.options !== undefined) record.options = data.options;
         if (data.args !== undefined) record.args = data.args;
         if (data.response !== undefined) record.response = data.response;
+        if (data.chunkCount !== undefined) record.chunkCount = data.chunkCount;
+        if (data.inputTokenCount !== undefined) record.inputTokenCount = data.inputTokenCount;
+        if (data.inputLength !== undefined) record.inputLength = data.inputLength;
 
         const putReq = store.put(record);
         putReq.onsuccess = () => resolve();

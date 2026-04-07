@@ -68,13 +68,18 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
         type: "key-points",
         outputLanguage: "en"
       })
+      this.results.inputContextSize = summarizer.inputQuota;
 
       iterationResult.creationTime = performance.now() - start;
 
       const response = summarizer.summarizeStreaming(this.results.input, { signal: this.abortSignal });
 
       let output = "";
+      let chunkCount = 0;
+
       for await (const chunk of response) {
+
+        chunkCount++;
         if(output === "") {
           iterationResult.timeToFirstToken = performance.now() - start;
         }
@@ -85,8 +90,11 @@ export class SummarizerLongNewsArticleColdStartAxonTest implements AxonTestInter
       iterationResult.output = JSON.stringify(output);
       iterationResult.totalResponseTime = performance.now() - start;
       iterationResult.totalNumberOfInputTokens = this.results.input.length;
-      iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
-      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000)
+      iterationResult.totalNumberOfOutputTokens = chunkCount;
+      iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
+      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+      iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+      iterationResult.inputLength = this.results.input?.length || 0;
 
       // Validate the output of the test here before setting the result.
       iterationResult.status = TestStatus.Success;

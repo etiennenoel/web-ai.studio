@@ -108,20 +108,51 @@ export class RewriterComponent implements OnInit {
     this.lastOptions = options;
     this.updateGeneratedCode(); // Update code snippet with new options
 
+    const start = performance.now();
     try {
       const rewriter = await this.rewriterManager.create(options);
+
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof rewriter.measureInputUsage === 'function') {
+          inputTokens = await rewriter.measureInputUsage(this.inputText);
+        }
+      } catch(e) {}
+
+      let chunkCount = -1;
 
       if (rewriter.rewriteStreaming) {
           const stream = rewriter.rewriteStreaming(this.inputText);
           this.rewriterOutput = '';
+          chunkCount = 0;
           
           for await (const chunk of stream) {
+              chunkCount++;
               this.rewriterOutput += chunk;
               this.cdr.detectChanges();
           }
       } else {
           const result = await rewriter.rewrite(this.inputText);
           this.rewriterOutput = result;
+      }
+
+      const latency = `${Math.round(performance.now() - start)}ms`;
+
+      if (this.showHistory) {
+        await this.rewriterDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.inputText,
+          response: this.rewriterOutput,
+          tokens: chunkCount,
+          characters: this.rewriterOutput.length,
+          inputTokens: inputTokens,
+          inputLength: this.inputText.length,
+          latency: latency,
+          status: 'success',
+          params: options
+        });
+        this.loadHistory();
       }
 
       rewriter.destroy();

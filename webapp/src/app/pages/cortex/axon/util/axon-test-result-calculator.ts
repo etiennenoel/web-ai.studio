@@ -4,15 +4,21 @@ import { MathematicalCalculations } from './mathematical-calculations';
 export class AxonTestResultCalculator {
   static calculate(results: AxonTestResultInterface): void {
     const totalResponseTimes = results.testIterationResults.map(r => r.totalResponseTime ?? 0);
-    const tokensPerSeconds = results.testIterationResults.map(r => r.tokensPerSecond ?? 0);
+    // Ignore -1 for non-streaming token calculations
+    const tokensPerSeconds = results.testIterationResults.map(r => r.tokensPerSecond ?? 0).filter(v => v !== -1);
+    const charsPerSeconds = results.testIterationResults.map(r => r.charactersPerSecond ?? 0);
     const timeToFirstTokens = results.testIterationResults.map(r => r.timeToFirstToken ?? 0);
 
     results.averageTotalResponseTime = MathematicalCalculations.calculateAverage(totalResponseTimes);
-    results.averageTokensPerSecond = MathematicalCalculations.calculateAverage(tokensPerSeconds);
+    if (tokensPerSeconds.length > 0) {
+        results.averageTokensPerSecond = MathematicalCalculations.calculateAverage(tokensPerSeconds);
+        results.medianTokensPerSecond = MathematicalCalculations.calculateMedian(tokensPerSeconds);
+    }
+    results.averageCharactersPerSecond = MathematicalCalculations.calculateAverage(charsPerSeconds);
     results.averageTimeToFirstToken = MathematicalCalculations.calculateAverage(timeToFirstTokens);
 
     results.medianTotalResponseTime = MathematicalCalculations.calculateMedian(totalResponseTimes);
-    results.medianTokensPerSecond = MathematicalCalculations.calculateMedian(tokensPerSeconds);
+    results.medianCharactersPerSecond = MathematicalCalculations.calculateMedian(charsPerSeconds);
     results.medianTimeToFirstToken = MathematicalCalculations.calculateMedian(timeToFirstTokens);
   }
 }

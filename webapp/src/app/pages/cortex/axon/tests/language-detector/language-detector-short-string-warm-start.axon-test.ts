@@ -51,6 +51,7 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
 
     let start = performance.now()
     const ld = await LanguageDetector.create({ signal: this.abortSignal })
+    this.results.inputContextSize = ld.inputQuota;
     const creationTime = performance.now() - start;
 
     for (let iterationResult of this.results.testIterationResults) {
@@ -63,8 +64,11 @@ export class LanguageDetectorShortStringWarmStartAxonTest implements AxonTestInt
       iterationResult.totalResponseTime = performance.now() - start;
       iterationResult.timeToFirstToken = iterationResult.totalResponseTime;
       iterationResult.totalNumberOfInputTokens = this.results.input.length;
-      iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
-      iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000)
+      iterationResult.totalNumberOfOutputTokens = -1;
+      iterationResult.tokensPerSecond = -1;
+      iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
+      iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+      iterationResult.inputLength = this.results.input?.length || 0;
 
       // Validate the output of the test here before setting the result.
       iterationResult.status = TestStatus.Success;

@@ -96,6 +96,7 @@ export class WriterComponent implements OnInit {
     this.writerOutput = 'Writing...';
     this.cdr.detectChanges(); // Ensure UI updates immediately
 
+    const start = performance.now();
     try {
       // Use WriterManager to create instance
       const writer = await this.writerManager.create({
@@ -105,12 +106,23 @@ export class WriterComponent implements OnInit {
         sharedContext: this.sharedContext
       });
 
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof writer.measureInputUsage === 'function') {
+          inputTokens = await writer.measureInputUsage(this.topic);
+        }
+      } catch(e) {}
+
+      let chunkCount = -1;
+
       // Use streaming if available, else fallback to regular write
       if (writer.writeStreaming) {
           const stream = writer.writeStreaming(this.topic);
           this.writerOutput = '';
+          chunkCount = 0;
           
           for await (const chunk of stream) {
+              chunkCount++;
               this.writerOutput += chunk;
               this.cdr.detectChanges();
           }
@@ -119,6 +131,25 @@ export class WriterComponent implements OnInit {
           this.writerOutput = result;
       }
       
+      const latency = `${Math.round(performance.now() - start)}ms`;
+
+      if (this.showHistory) {
+        await this.writerDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.topic,
+          response: this.writerOutput,
+          tokens: chunkCount,
+          characters: this.writerOutput.length,
+          inputTokens: inputTokens,
+          inputLength: this.topic.length,
+          latency: latency,
+          status: 'success',
+          params: { tone: this.selectedTone, format: this.selectedFormat, length: this.selectedLength }
+        });
+        this.loadHistory();
+      }
+
       writer.destroy();
     } catch (error: any) {
       this.writerOutput = `Error: ${error.message}`;

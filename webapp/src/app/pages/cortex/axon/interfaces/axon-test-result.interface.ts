@@ -27,11 +27,17 @@ export interface AxonTestResultInterface {
 
   averageTokensPerSecond?: number;
 
+  averageCharactersPerSecond?: number;
+
   medianTimeToFirstToken?: number;
 
   medianTotalResponseTime?: number;
 
   medianTokensPerSecond?: number;
+
+  medianCharactersPerSecond?: number;
+
+  inputContextSize?: number;
 
   startType: "cold" | "warm";
 

@@ -200,24 +200,30 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get aggregateStats() {
-    if (this.selectedApis.size === 0) return { ttft: { avg: 0, p90: 0, p99: 0 }, create: { avg: 0, p90: 0, p99: 0 }, inference: { avg: 0, p90: 0, p99: 0 } };
+    if (this.selectedApis.size === 0) return { ttft: { avg: 0, p90: 0, p99: 0 }, create: { avg: 0, p90: 0, p99: 0 }, inference: { avg: 0, p90: 0, p99: 0 }, tokensPerSec: { avg: 0, p90: 0, p99: 0 }, charsPerSec: { avg: 0, p90: 0, p99: 0 } };
     
     let ttft: number[] = [];
     let create: number[] = [];
     let inference: number[] = [];
+    let tokensPerSec: number[] = [];
+    let charsPerSec: number[] = [];
 
     for (const group of this.filteredGroups) {
       if (this.selectedApis.has(group.api)) {
-        if (group.createItem?.timestamps?.create && group.createItem.timestamps.completed) {
-          create.push(group.createItem.timestamps.completed - group.createItem.timestamps.create);
+        if (group.computedCreateTime !== null && group.computedCreateTime !== undefined) {
+          create.push(group.computedCreateTime);
         }
-        for (const item of group.methodItems) {
-          if (item.timestamps?.execute && item.timestamps?.completed) {
-            inference.push(item.timestamps.completed - item.timestamps.execute);
-          }
-          if (item.timestamps?.execute && item.timestamps?.first_token) {
-            ttft.push(item.timestamps.first_token - item.timestamps.execute);
-          }
+        if (group.computedInferenceTime !== null && group.computedInferenceTime !== undefined) {
+          inference.push(group.computedInferenceTime);
+        }
+        if (group.computedTtft !== null && group.computedTtft !== undefined) {
+          ttft.push(group.computedTtft);
+        }
+        if (group.computedTokensPerSecond !== null && group.computedTokensPerSecond !== undefined && group.computedTokensPerSecond !== -1) {
+          tokensPerSec.push(group.computedTokensPerSecond);
+        }
+        if (group.computedCharsPerSecond !== null && group.computedCharsPerSecond !== undefined) {
+          charsPerSec.push(group.computedCharsPerSecond);
         }
       }
     }
@@ -225,7 +231,9 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
       ttft: { avg: Math.round(average(ttft)), p90: Math.round(calculatePercentile(ttft, 90)), p99: Math.round(calculatePercentile(ttft, 99)) },
       create: { avg: Math.round(average(create)), p90: Math.round(calculatePercentile(create, 90)), p99: Math.round(calculatePercentile(create, 99)) },
-      inference: { avg: Math.round(average(inference)), p90: Math.round(calculatePercentile(inference, 90)), p99: Math.round(calculatePercentile(inference, 99)) }
+      inference: { avg: Math.round(average(inference)), p90: Math.round(calculatePercentile(inference, 90)), p99: Math.round(calculatePercentile(inference, 99)) },
+      tokensPerSec: { avg: Math.round(average(tokensPerSec)), p90: Math.round(calculatePercentile(tokensPerSec, 90)), p99: Math.round(calculatePercentile(tokensPerSec, 99)) },
+      charsPerSec: { avg: Math.round(average(charsPerSec)), p90: Math.round(calculatePercentile(charsPerSec, 90)), p99: Math.round(calculatePercentile(charsPerSec, 99)) }
     };
   }
 
@@ -541,6 +549,45 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const item of group.methodItems) {
       const duration = this.getDuration(item);
       if (duration !== null) return duration;
+    }
+    return null;
+  }
+
+  getGroupTokensPerSecond(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      if (item.chunkCount !== undefined && item.chunkCount !== null) {
+        const duration = this.getDuration(item);
+        if (duration && duration > 0) {
+          if (item.chunkCount === -1) return -1;
+          return item.chunkCount / (duration / 1000);
+        }
+      }
+    }
+    return null;
+  }
+
+  getGroupCharsPerSecond(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      if (item.response && typeof item.response === 'string') {
+        const duration = this.getDuration(item);
+        if (duration && duration > 0) {
+          return item.response.length / (duration / 1000);
+        }
+      }
+    }
+    return null;
+  }
+
+  getGroupInputTokens(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      if (item.inputTokenCount !== undefined && item.inputTokenCount !== null) return item.inputTokenCount;
+    }
+    return null;
+  }
+
+  getGroupInputLength(group: SessionGroup): number | null {
+    for (const item of group.methodItems) {
+      if (item.inputLength !== undefined && item.inputLength !== null) return item.inputLength;
     }
     return null;
   }

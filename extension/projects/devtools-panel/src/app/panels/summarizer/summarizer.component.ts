@@ -97,12 +97,21 @@ export class SummarizerComponent implements OnInit {
       }
       // @ts-ignore
       const summarizer = await window.Summarizer.create({ type: this.selectedType });
+
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof summarizer.measureInputUsage === 'function') {
+          inputTokens = await summarizer.measureInputUsage(this.inputText);
+        }
+      } catch(e) {}
       
       // @ts-ignore
       const stream = await summarizer.summarizeStreaming(this.inputText);
 
       this.summaryResult = '';
+      let chunkCount = 0;
       for await (const chunk of stream) {
+        chunkCount++;
         this.ngZone.run(() => {
           this.summaryResult += chunk;
           this.cdr.detectChanges();
@@ -112,6 +121,28 @@ export class SummarizerComponent implements OnInit {
       this.ngZone.run(() => {
         this.latency = `${Math.round(performance.now() - start)}ms`;
       });
+
+      if (this.showHistory) {
+        await this.summarizerDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.inputText,
+          response: this.summaryResult,
+          tokens: chunkCount,
+          characters: this.summaryResult.length,
+          inputTokens: inputTokens,
+          inputLength: this.inputText.length,
+          latency: this.latency,
+          status: 'success',
+          params: { type: this.selectedType }
+        });
+        this.loadHistory();
+      }
+
+      // @ts-ignore
+      if (typeof summarizer.destroy === 'function') {
+        summarizer.destroy();
+      }
     } catch (error: any) {
       this.ngZone.run(() => {
         this.summaryResult = `Error: ${error.message}`;

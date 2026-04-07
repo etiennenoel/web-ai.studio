@@ -66,6 +66,7 @@ export class PromptImageOcrComputerFontColdStartAxonTest implements AxonTestInte
 
       const start = performance.now();
       const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
+      this.results.inputContextSize = session.inputQuota;
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -80,7 +81,11 @@ export class PromptImageOcrComputerFontColdStartAxonTest implements AxonTestInte
         const response = session.promptStreaming(promptInput, { signal: this.abortSignal });
 
         let output = "";
+        let chunkCount = 0;
+
         for await (const chunk of response) {
+
+          chunkCount++;
           if(output === "") {
             iterationResult.timeToFirstToken = performance.now() - start;
           }
@@ -90,8 +95,11 @@ export class PromptImageOcrComputerFontColdStartAxonTest implements AxonTestInte
         iterationResult.output = output;
         iterationResult.totalResponseTime = performance.now() - start;
         iterationResult.totalNumberOfInputTokens = JSON.stringify(promptInput).length;
-        iterationResult.totalNumberOfOutputTokens = iterationResult.output.length;
+        iterationResult.totalNumberOfOutputTokens = chunkCount;
+        iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
         iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+        iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+        iterationResult.inputLength = this.results.input?.length || 0;
 
         if (output.toLowerCase().includes(testWord.toLowerCase())) {
            iterationResult.status = TestStatus.Success;

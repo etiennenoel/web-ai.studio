@@ -186,8 +186,11 @@ export class ComparisonDataService {
 
     if (items.length === 0) return undefined;
 
+    const tokens = items.map((item: any) => item.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
+    
     return {
-      averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.tokensPerSecond ?? 0)),
+      averageTokenPerSecond: tokens.length > 0 ? MathematicalCalculations.calculateAverage(tokens) : 0,
+      averageCharactersPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.charactersPerSecond ?? 0)),
       averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map((item: any) => item.timeToFirstToken ?? 0)),
       averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map((item: any) => item.totalResponseTime ?? 0)),
     };
@@ -202,8 +205,11 @@ export class ComparisonDataService {
 
     if (items.length === 0) return undefined;
 
+    const tokens = items.map((item: any) => item.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
+    
     return {
-      averageTokenPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.tokensPerSecond ?? 0)),
+      averageTokenPerSecond: tokens.length > 0 ? MathematicalCalculations.calculateAverage(tokens) : 0,
+      averageCharactersPerSecond: MathematicalCalculations.calculateAverage(items.map((item: any) => item.charactersPerSecond ?? 0)),
       averageTimeToFirstToken: MathematicalCalculations.calculateAverage(items.map((item: any) => item.timeToFirstToken ?? 0)),
       averageTotalResponseTime: MathematicalCalculations.calculateAverage(items.map((item: any) => item.totalResponseTime ?? 0)),
     };

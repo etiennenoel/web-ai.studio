@@ -47,7 +47,7 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <!-- TTFT Card -->
           <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
@@ -90,6 +90,36 @@
               <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
                 <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.inference.p90 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
                 <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.inference.p99 }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Tokens/sec Card -->
+          <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
+            <h3 class="text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-bolt-lightning text-purple-500 dark:text-purple-400"></i> Tokens / sec</h3>
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-2xl font-light text-gray-900 dark:text-slate-100 flex items-baseline gap-1">{{ aggregateStats.tokensPerSec.avg || '-' }} <span class="text-sm font-medium text-gray-500 dark:text-slate-500">tk/s</span></div>
+                <div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider mt-1">Average</div>
+              </div>
+              <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.tokensPerSec.p90 || '-' }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.tokensPerSec.p99 || '-' }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Chars/sec Card -->
+          <div class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-500 to-transparent opacity-5 rounded-full blur-2xl -mr-8 -mt-8 transition-opacity group-hover:opacity-10"></div>
+            <h3 class="text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-font text-pink-500 dark:text-pink-400"></i> Chars / sec</h3>
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-2xl font-light text-gray-900 dark:text-slate-100 flex items-baseline gap-1">{{ aggregateStats.charsPerSec.avg || '-' }} <span class="text-sm font-medium text-gray-500 dark:text-slate-500">ch/s</span></div>
+                <div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider mt-1">Average</div>
+              </div>
+              <div class="flex gap-4 border-l border-gray-200 dark:border-slate-800 pl-4">
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.charsPerSec.p90 || '-' }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P90</div></div>
+                <div><div class="text-sm font-mono text-gray-700 dark:text-slate-300">{{ aggregateStats.charsPerSec.p99 || '-' }}</div><div class="text-[10px] text-gray-500 dark:text-slate-500 font-medium uppercase tracking-wider">P99</div></div>
               </div>
             </div>
           </div>

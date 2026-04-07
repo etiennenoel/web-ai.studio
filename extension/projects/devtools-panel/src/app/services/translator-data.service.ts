@@ -30,6 +30,11 @@ export class TranslatorDataService extends BaseHistoryDataService {
         return Promise.resolve([...this.MOCK_HISTORY]);
     }
 
+    public addHistoryItem(item: HistoryItem): Promise<void> {
+        this.MOCK_HISTORY.unshift(item);
+        return Promise.resolve();
+    }
+
     public getLanguagePacks(): Promise<LanguagePack[]> {
         return Promise.resolve([...this.MOCK_LANGS]);
     }

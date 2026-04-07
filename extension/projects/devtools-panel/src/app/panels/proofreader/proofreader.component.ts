@@ -97,11 +97,40 @@ export class ProofreaderComponent implements OnInit {
     this.proofreaderOutput = 'Proofreading...';
     this.cdr.detectChanges(); // Ensure UI updates immediately
 
+    const start = performance.now();
     try {
       const proofreader = await this.proofreaderManager.create();
+
+      let inputTokens: number | undefined = undefined;
+      try {
+        if (typeof proofreader.measureInputUsage === 'function') {
+          inputTokens = await proofreader.measureInputUsage(this.inputText);
+        }
+      } catch(e) {}
+
       const result = await proofreader.proofread(this.inputText);
       
       this.proofreaderOutput = result.correctedInput;
+
+      const latency = `${Math.round(performance.now() - start)}ms`;
+
+      if (this.showHistory) {
+        await this.proofreaderDataService.addHistoryItem({
+          id: crypto.randomUUID(),
+          timestamp: new Date().toLocaleTimeString(),
+          prompt: this.inputText,
+          response: this.proofreaderOutput,
+          tokens: -1,
+          characters: this.proofreaderOutput.length,
+          inputTokens: inputTokens,
+          inputLength: this.inputText.length,
+          latency: latency,
+          status: 'success',
+          params: {}
+        });
+        this.loadHistory();
+      }
+
       proofreader.destroy();
     } catch (error: any) {
       this.proofreaderOutput = `Error: ${error.message}`;

@@ -15,6 +15,7 @@ export interface LeaderboardEntry {
   apis: string[];
   ttft: number;
   speed: number;
+  charSpeed: number;
   total: number;
   isCurrent: boolean;
   trend: 'best' | 'worst' | 'flat';
@@ -24,6 +25,7 @@ interface RawTestResult {
   api: string;
   ttft: number;
   speed: number;
+  charSpeed?: number;
   total: number;
 }
 
@@ -50,13 +52,17 @@ export class CortexInsightsPage implements OnInit {
   leaderboard: LeaderboardEntry[] = [];
   
   fleetAvgSpeed = 0;
+  fleetAvgCharSpeed = 0;
   fleetAvgTtft = 0;
   topSpeed = 0;
+  topCharSpeed = 0;
   topConfig: LeaderboardEntry | null = null;
   maxSpeed = 0;
+  maxCharSpeed = 0;
   maxTtft = 0;
   maxTotal = 0;
   minSpeed = 0;
+  minCharSpeed = 0;
   minTtft = 0;
   minTotal = 0;
 
@@ -84,7 +90,7 @@ export class CortexInsightsPage implements OnInit {
     api: ''
   };
 
-  tableSortColumn: 'speed' | 'ttft' | 'total' | 'hw' = 'speed';
+  tableSortColumn: 'speed' | 'charSpeed' | 'ttft' | 'total' | 'hw' = 'speed';
   tableSortDirection: 'asc' | 'desc' = 'desc';
 
   // Chart data
@@ -194,10 +200,13 @@ export class CortexInsightsPage implements OnInit {
 
                 apiGroups.forEach((iterations, api) => {
                   if (iterations.length > 0) {
+                    const tokensPerSecs = iterations.map((i: any) => i.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
+                    const charsPerSecs = iterations.map((i: any) => i.charactersPerSecond ?? 0);
                     tests.push({
                       api,
                       ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
-                      speed: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.tokensPerSecond ?? 0)),
+                      speed: tokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(tokensPerSecs) : 0,
+                      charSpeed: MathematicalCalculations.calculateAverage(charsPerSecs),
                       total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
                     });
                   }
@@ -341,7 +350,8 @@ export class CortexInsightsPage implements OnInit {
       if (testsToUse.length === 0) return;
 
       const ttft = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.ttft)));
-      const speed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.speed)));
+      const speed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.speed).filter(v => v !== -1)));
+      const charSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.charSpeed ?? 0)));
       const total = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.total)));
 
       newLeaderboard.push({
@@ -353,9 +363,10 @@ export class CortexInsightsPage implements OnInit {
         model: b.model,
         apis: testsToUse.map(t => t.api),
         ttft,
-        speed,
+        speed: speed || 0,
+        charSpeed,
         total,
-        isCurrent: false,
+        isCurrent: b.filename === 'local',
         trend: 'flat'
       });
     });
@@ -387,30 +398,37 @@ export class CortexInsightsPage implements OnInit {
 
     if (newLeaderboard.length > 0) {
       this.fleetAvgSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.speed)));
+      this.fleetAvgCharSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.charSpeed)));
       this.fleetAvgTtft = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.ttft)));
-      
+
       this.topConfig = newLeaderboard[0];
       this.topSpeed = Math.round(newLeaderboard[0].speed);
-      
+      this.topCharSpeed = Math.round(newLeaderboard[0].charSpeed);
+
       this.maxSpeed = Math.max(...newLeaderboard.map(r => r.speed), 1);
+      this.maxCharSpeed = Math.max(...newLeaderboard.map(r => r.charSpeed), 1);
       this.maxTtft = Math.max(...newLeaderboard.map(r => r.ttft), 1);
       this.maxTotal = Math.max(...newLeaderboard.map(r => r.total), 1);
       this.minSpeed = Math.min(...newLeaderboard.map(r => r.speed));
+      this.minCharSpeed = Math.min(...newLeaderboard.map(r => r.charSpeed));
       this.minTtft = Math.min(...newLeaderboard.map(r => r.ttft));
       this.minTotal = Math.min(...newLeaderboard.map(r => r.total));
     } else {
       this.fleetAvgSpeed = 0;
+      this.fleetAvgCharSpeed = 0;
       this.fleetAvgTtft = 0;
       this.topConfig = null;
       this.topSpeed = 0;
+      this.topCharSpeed = 0;
       this.maxSpeed = 1;
+      this.maxCharSpeed = 1;
       this.maxTtft = 1;
       this.maxTotal = 1;
       this.minSpeed = 0;
+      this.minCharSpeed = 0;
       this.minTtft = 0;
       this.minTotal = 0;
     }
-
     this.syncToUrl();
     this.generateChartData();
   }
@@ -468,7 +486,7 @@ export class CortexInsightsPage implements OnInit {
     this.applyFilters();
   }
 
-  setTableSort(column: 'speed' | 'ttft' | 'total' | 'hw') {
+  setTableSort(column: 'speed' | 'charSpeed' | 'ttft' | 'total' | 'hw') {
     if (this.tableSortColumn === column) {
       this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
