@@ -1092,6 +1092,14 @@
              <span class="text-rose-500 font-bold text-xs flex items-center gap-1 bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded"><i class="bi bi-x-circle-fill"></i> {{ stats.failed }}</span>
           </div>
 
+          @if (!isExtensionInstalled) {
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider" (click)="$event.stopPropagation()">
+              <i class="bi bi-exclamation-triangle-fill text-amber-500"></i>
+              <span>Extension Required</span>
+              <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer" class="ml-1 underline hover:text-amber-900 dark:hover:text-amber-300 normal-case tracking-normal font-semibold">Install</a>
+            </div>
+          }
+
           <!-- Global Progress Bar Area -->
           <div class="flex-1 max-w-3xl px-8 hidden sm:block">
              <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
@@ -1315,6 +1323,15 @@
             <button (click)="reloadPage()" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors">
               <i class="bi bi-arrow-clockwise"></i> Reload Page
             </button>
+          </div>
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-3">
+            <button (click)="runWithoutExtension()" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors">
+              <i class="bi bi-play-fill"></i> Run without extension
+            </button>
+            <label class="flex items-center gap-2 cursor-pointer justify-center">
+              <input type="checkbox" [checked]="skipExtensionCheck" (change)="toggleSkipExtensionCheck()" class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 dark:bg-slate-800 dark:border-slate-600">
+              <span class="text-[11px] text-slate-400 dark:text-slate-500">Don't ask again</span>
+            </label>
           </div>
         </div>
       </div>

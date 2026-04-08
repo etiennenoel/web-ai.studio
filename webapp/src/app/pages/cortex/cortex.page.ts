@@ -38,6 +38,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   generatedShareUrl: string | null = null;
   showShareModal = false;
   showExtensionModal = false;
+  skipExtensionCheck = false;
   showAboutModal = false;
   showBaselineDropdown = false;
   baselineSearchQuery: string = '';
@@ -344,6 +345,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.skipExtensionCheck = localStorage.getItem('cortex_skip_extension_check') === 'true';
+
     
 
     this.route.queryParamMap.subscribe(params => {      
@@ -478,7 +481,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleRunClick() {
-    if (!this.isExtensionInstalled) {
+    if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
       this.showExtensionModal = true;
       return;
     }
@@ -490,14 +493,14 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   toggleExecution(event: Event) {
     event.stopPropagation();
-    if (!this.isExtensionInstalled) {
-      this.showExtensionModal = true;
-      return;
-    }
     if (this.isTestingRunning && this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
       this.stop();
       this.addLog('Execution paused', 'system');
     } else {
+      if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
+        this.showExtensionModal = true;
+        return;
+      }
       this.start();
     }
   }
@@ -511,6 +514,17 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   reloadPage() {
     window.location.reload();
+  }
+
+  toggleSkipExtensionCheck() {
+    this.skipExtensionCheck = !this.skipExtensionCheck;
+    localStorage.setItem('cortex_skip_extension_check', String(this.skipExtensionCheck));
+  }
+
+  runWithoutExtension() {
+    this.showExtensionModal = false;
+    this.isDrawerOpen = true;
+    this.start();
   }
 
   onDrawerResizeStart(event: MouseEvent) {
