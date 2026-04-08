@@ -39,6 +39,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   showExtensionModal = false;
   showAboutModal = false;
   showBaselineDropdown = false;
+  baselineSearchQuery: string = '';
   isUrlCopied = false;
 
   // New Design State
@@ -48,6 +49,19 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   activeApiId: BuiltInAiApi | null = null;
   isDrawerOpen: boolean = false;
   systemLogs: string[] = [];
+
+  get filteredBaselines() {
+    if (!this.baselineSearchQuery) {
+      return this.comparisonService.availableBaselinesIndex;
+    }
+    const query = this.baselineSearchQuery.toLowerCase();
+    return this.comparisonService.availableBaselinesIndex.filter(b => 
+      (b.name && b.name.toLowerCase().includes(query)) ||
+      (b.os && b.os.toLowerCase().includes(query)) ||
+      (b.cpu && b.cpu.toLowerCase().includes(query)) ||
+      (b.executionType && b.executionType.toLowerCase().includes(query))
+    );
+  }
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
