@@ -119,12 +119,12 @@ export class ComparisonDataService {
         }
     });
   }
-getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults || !selectedTestIds) return undefined;
+getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
+    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
 
     const results = reportData.results.testsResults;
     const items = results.filter((value: any) => {
-      return value.api === builtInAIApi && selectedTestIds.has(value.id);
+      return value.api === builtInAIApi && (ignoreSelection || selectedTestIds.has(value.id));
     }).map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;
@@ -146,11 +146,11 @@ getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestId
     };
   }
 
-  getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults || !selectedTestIds) return undefined;
+  getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
+    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
 
     const results = reportData.results.testsResults;
-    const items = results.filter((value: any) => selectedTestIds.has(value.id))
+    const items = results.filter((value: any) => ignoreSelection || selectedTestIds.has(value.id))
       .map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;

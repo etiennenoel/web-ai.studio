@@ -619,7 +619,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
-      const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds);
+      const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds, true);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
@@ -633,7 +633,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
-      const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds);
+      const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds, true);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
@@ -663,8 +663,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       if (col === 'name') {
         return dir * a.name.localeCompare(b.name);
       }
-      const aSummary = this.comparisonService.getSummaryResults(a.data, apiId, selectedTestIds);
-      const bSummary = this.comparisonService.getSummaryResults(b.data, apiId, selectedTestIds);
+      const aSummary = this.comparisonService.getSummaryResults(a.data, apiId, selectedTestIds, true);
+      const bSummary = this.comparisonService.getSummaryResults(b.data, apiId, selectedTestIds, true);
       let aVal = 0, bVal = 0;
       if (col === 'ttft') { aVal = aSummary?.averageTimeToFirstToken || 0; bVal = bSummary?.averageTimeToFirstToken || 0; }
       else if (col === 'total') { aVal = aSummary?.averageTotalResponseTime || 0; bVal = bSummary?.averageTotalResponseTime || 0; }
@@ -922,10 +922,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return this.axonTestSuiteExecutor.forceSetup(testId);
   }
 
-  getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
+  getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm", ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
     const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
     const items = results.filter(value => {
-      return value.api === builtInAIApi && value.startType === startType && this.selectedTestIds.has(value.id);
+      return value.api === builtInAIApi && value.startType === startType && (ignoreSelection || this.selectedTestIds.has(value.id));
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;
