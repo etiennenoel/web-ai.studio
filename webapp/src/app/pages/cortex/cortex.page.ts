@@ -49,7 +49,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   activeTestIdInLab: string | null = null;
   activeApiId: BuiltInAiApi | null = null;
   isDrawerOpen: boolean = false;
-  systemLogs: string[] = [];
+  systemLogs: {message: string, timestamp: Date, type: 'system'|'start'|'success'|'error'|'iteration'|'result'|'info', duration?: number}[] = [];
+  private _lastLogTime: number = 0;
 
   sidebarWidth: number = 340;
   isResizing: boolean = false;
@@ -360,18 +361,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       this.cdr.markForCheck();
     });
 
-    // Simple observer for test logs
-    setInterval(() => {
-       if (this.isTestingRunning) {
-          const current = this.currentExecutingTest;
-          if (current) {
-            const logMsg = `▶ Executing: ${current.results.api} - ${current.id}...`;
-            if (!this.systemLogs.includes(logMsg) && !this.systemLogs.some(log => log.includes(`✓ ${current.id}`))) {
-               this.systemLogs.push(logMsg);
-            }
-          }
-       }
-    }, 1000);
   }
 
   ngOnDestroy() {}
@@ -493,17 +482,17 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     event.stopPropagation();
     if (this.isTestingRunning && this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
       this.stop();
-      this.systemLogs.push(`[System] Execution paused.`);
+      this.addLog('Execution paused', 'system');
     } else {
       this.start();
     }
   }
 
-  getLogClass(log: string): string {
-    if (log.includes('✓')) return 'text-emerald-400';
-    if (log.includes('Error') || log.includes('Fail')) return 'text-rose-400';
-    if (log.includes('▶')) return 'text-indigo-400';
-    return 'text-slate-400';
+  addLog(message: string, type: 'system'|'start'|'success'|'error'|'iteration'|'result'|'info' = 'system') {
+    const now = Date.now();
+    const duration = this._lastLogTime > 0 ? now - this._lastLogTime : undefined;
+    this.systemLogs.push({message, timestamp: new Date(), type, duration});
+    this._lastLogTime = now;
   }
 
   async loadInitialHardwareInfo() {
@@ -877,29 +866,97 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   async start() {
     // Clear explicit collapse overrides so dynamic opening works based on execution status
     this.apiCollapsedState = {};
-    
+
     // Explicitly open the setup details pane so users can watch the status
     this.viewData.pretests.iterationsCollapsed = false;
 
     this.axonTestSuiteExecutor.isStopped = false;
     this.axonTestSuiteExecutor.resetAbortController();
-    
-    this.systemLogs = [`[System] Preparing test environment for ${this.selectedTestIds.size} tests...`];
+
+    this.systemLogs = [];
+    this._lastLogTime = 0;
+    this.addLog(`Preparing test environment for ${this.selectedTestIds.size} tests...`, 'system');
 
     await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
 
     this.viewData.pretests.iterationsCollapsed = true;
-    
-    this.systemLogs.push(`[System] Starting test suite execution...`);
+
+    this.addLog('Environment ready. Starting test suite execution...', 'system');
+
+    // Start execution observer for rich logging
+    const executionStartTime = Date.now();
+    const trackedTests = new Set<string>();
+    const trackedIterations = new Map<string, number>();
+
+    const observer = setInterval(() => {
+      if (!this.isTestingRunning || this.axonTestSuiteExecutor.results.status !== TestStatus.Executing) {
+        clearInterval(observer);
+        return;
+      }
+
+      const testsToRun = this.axonTestSuiteExecutor.testsSuite.filter(id => this.selectedTestIds.has(id));
+      for (const testId of testsToRun) {
+        const test = this.axonTestSuiteExecutor.testIdMap[testId];
+        const testKey = test.id;
+
+        // Log when a test starts executing
+        if (test.results.status === TestStatus.Executing && !trackedTests.has(testKey)) {
+          trackedTests.add(testKey);
+          trackedIterations.set(testKey, 0);
+          this.addLog(`${test.results.api} — ${test.id} (${test.results.startType})`, 'start');
+        }
+
+        // Log iteration progress
+        if (trackedTests.has(testKey)) {
+          const lastTracked = trackedIterations.get(testKey) || 0;
+          for (let i = lastTracked; i < test.results.testIterationResults.length; i++) {
+            const iter = test.results.testIterationResults[i];
+            if (iter.status === TestStatus.Executing && i === lastTracked) {
+              this.addLog(`  Iteration ${i + 1}/${test.results.numberOfIterations}`, 'iteration');
+              trackedIterations.set(testKey, i + 1);
+            }
+            if (iter.status === TestStatus.Success && i < (trackedIterations.get(testKey) || 0)) {
+              const ttft = iter.timeToFirstToken != null ? `TTFT: ${Math.round(iter.timeToFirstToken)}ms` : '';
+              const total = iter.totalResponseTime != null ? `Total: ${Math.round(iter.totalResponseTime)}ms` : '';
+              const speed = iter.tokensPerSecond != null && iter.tokensPerSecond > 0 ? `${Math.round(iter.tokensPerSecond)} t/s` : '';
+              const parts = [ttft, total, speed].filter(Boolean).join(' · ');
+              this.addLog(`  ✓ Iteration ${i + 1} complete — ${parts}`, 'result');
+            }
+            if (iter.status === TestStatus.Error || iter.status === TestStatus.Fail) {
+              this.addLog(`  ✗ Iteration ${i + 1} failed`, 'error');
+            }
+          }
+        }
+
+        // Log when a test completes
+        if ((test.results.status === TestStatus.Success || test.results.status === TestStatus.Error || test.results.status === TestStatus.Skipped) && trackedTests.has(testKey)) {
+          trackedTests.delete(testKey);
+          if (test.results.status === TestStatus.Success) {
+            const avgTtft = test.results.averageTimeToFirstToken ? `Avg TTFT: ${Math.round(test.results.averageTimeToFirstToken)}ms` : '';
+            const avgTotal = test.results.averageTotalResponseTime ? `Avg Total: ${Math.round(test.results.averageTotalResponseTime)}ms` : '';
+            const avgSpeed = test.results.averageTokensPerSecond && test.results.averageTokensPerSecond > 0 ? `Avg Speed: ${Math.round(test.results.averageTokensPerSecond)} t/s` : '';
+            const parts = [avgTtft, avgTotal, avgSpeed].filter(Boolean).join(' · ');
+            this.addLog(`✓ ${test.id} complete${parts ? ' — ' + parts : ''}`, 'success');
+          } else if (test.results.status === TestStatus.Skipped) {
+            this.addLog(`⊘ ${test.id} skipped (API unavailable)`, 'info');
+          } else {
+            this.addLog(`✗ ${test.id} failed`, 'error');
+          }
+        }
+      }
+    }, 250);
 
     // Once everything passes, we can start the tests.
     await this.axonTestSuiteExecutor.start(this.selectedTestIds);
+    clearInterval(observer);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
-    
-    this.systemLogs.push(`[System] Execution finished successfully.`);
+
+    const totalTime = ((Date.now() - executionStartTime) / 1000).toFixed(1);
+    const stats = this.getGlobalPassedAndFailed();
+    this.addLog(`Execution complete — ${stats.passed} passed, ${stats.failed} failed in ${totalTime}s`, 'success');
     await this.generateReport();
   }
   
