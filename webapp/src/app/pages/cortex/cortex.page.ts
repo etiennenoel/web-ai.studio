@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID, OnDestroy, HostListener} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
@@ -11,6 +11,7 @@ import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
 import {ComparisonDataService} from './services/comparison-data.service';
+import {GlobalFilterService} from './services/global-filter.service';
 
 @Component({
   selector: 'page-cortex',
@@ -49,6 +50,27 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   activeApiId: BuiltInAiApi | null = null;
   isDrawerOpen: boolean = false;
   systemLogs: string[] = [];
+
+  sidebarWidth: number = 340;
+  isResizing: boolean = false;
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizing) return;
+    this.sidebarWidth = Math.max(260, Math.min(600, event.clientX));
+  }
+
+  @HostListener('window:mouseup')
+  onMouseUp() {
+    this.isResizing = false;
+    document.body.style.userSelect = '';
+  }
+
+  startResizing(event: MouseEvent) {
+    this.isResizing = true;
+    document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+    event.preventDefault();
+  }
 
   get filteredBaselines() {
     if (!this.baselineSearchQuery) {
@@ -96,8 +118,52 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private readonly platformId: Object,
-
+    public filterService: GlobalFilterService
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event?: any) {
+    this.filterService.activeDropdown = null;
+  }
+
+  getFilterIcon(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'CPU') return 'bi-cpu';
+      if (value === 'GPU') return 'bi-gpu-card';
+      if (value === 'NPU') return 'bi-motherboard';
+      if (value === 'Cloud') return 'bi-cloud';
+      return 'bi-pc-horizontal';
+    }
+    if (filterType === 'engine') return 'bi-gear-fill';
+    if (filterType === 'variant') return 'bi-box-seam';
+    if (filterType === 'api') return 'bi-plugin';
+    return 'bi-tag';
+  }
+  
+  getFilterBadgeClass(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'GPU') return this.getBadgeClass('purple');
+      if (value === 'CPU') return this.getBadgeClass('default');
+      if (value === 'Cloud') return this.getBadgeClass('cloud');
+      return this.getBadgeClass('emerald');
+    }
+    if (filterType === 'engine') return this.getBadgeClass('default');
+    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
+    return this.getBadgeClass('default');
+  }
+
+  getBadgeClass(variant: string): string {
+    const variants: { [key: string]: string } = {
+      default: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+      current: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30',
+      purple: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+      emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30',
+      cloud: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
+    };
+    if (variant === 'Cloud') return variants['cloud'];
+    return variants[variant] || variants['default'];
+  }
 
   triggerImport() {
     const fileInput = document.getElementById('cortex-report-upload') as HTMLInputElement;
@@ -129,7 +195,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if (data && data.results) {
       this.axonTestSuiteExecutor.results = data.results;
       this.hardwareInfo = data.hardware;
-      this.comparisonService.loadBaselineData(this.hardwareInfo);
+      
       this.importedTimestamp = data.timestamp;
       this.importedUserAgent = data.userAgent;
       
@@ -266,7 +332,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.comparisonService.loadBaselineData(this.hardwareInfo);
+    
 
     this.route.queryParamMap.subscribe(params => {      
       const reportParam = params.get('report');
@@ -433,7 +499,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   async loadInitialHardwareInfo() {
       try {
         this.hardwareInfo = await (window as any).webai.getHardwareInformation();
-        this.comparisonService.loadBaselineData(this.hardwareInfo);
+        
       } catch (e) {
         console.error("Failed to get hardware info", e);
       }
@@ -621,9 +687,9 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   toggleBaseline(filename: string, name: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
-      this.comparisonService.addBaseline(filename, name);
+      
     } else {
-      this.comparisonService.removeBaseline(filename);
+      
     }
   }
 
@@ -711,6 +777,27 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     const tests = this.getTests(api);
     return tests.length > 0 && tests.every(t => this.selectedTestIds.has(t.id));
   }
+
+
+  isScenarioSelected(scen: any): boolean {
+    return scen.tests.every((t: any) => this.selectedTestIds.has(t.id));
+  }
+
+  isScenarioPartiallySelected(scen: any): boolean {
+    const selectedCount = scen.tests.filter((t: any) => this.selectedTestIds.has(t.id)).length;
+    return selectedCount > 0 && selectedCount < scen.tests.length;
+  }
+
+  toggleScenarioSelection(scen: any, event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (isChecked) {
+      scen.tests.forEach((t: any) => this.selectedTestIds.add(t.id));
+    } else {
+      scen.tests.forEach((t: any) => this.selectedTestIds.delete(t.id));
+    }
+  }
+
+
 
   isCategoryPartiallySelected(api: BuiltInAiApi): boolean {
     const tests = this.getTests(api);

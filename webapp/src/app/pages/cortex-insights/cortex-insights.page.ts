@@ -4,6 +4,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
+import { GlobalFilterService } from '../cortex/services/global-filter.service';
 
 export interface LeaderboardEntry {
   id: number;
@@ -109,18 +110,22 @@ export class CortexInsightsPage implements OnInit {
   chartPolygonFleet: string = "";
 
   constructor(
-    private titleService: Title, 
-    private metaService: Meta, 
+    private titleService: Title,
+    private metaService: Meta,
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    public filterService: GlobalFilterService
   ) {}
 
   ngOnInit() {
     this.titleService.setTitle("Cortex Insights - Web AI Studio");
-    this.metaService.updateTag({ name: 'description', content: 'Historical Performance Profiler for Web AI Studio' });
+    this.metaService.updateTag({ name: 'description', content: 'Historical performance profiler and leaderboard for Chrome WebAI Cortex benchmark suites.' });
     this.loadData();
+    this.filterService.filtersChanged.subscribe(() => {
+      this.applyFilters();
+    });
   }
 
   @HostListener('document:click', ['$event'])
@@ -129,60 +134,6 @@ export class CortexInsightsPage implements OnInit {
     if (!target.closest('.filter-dropdown')) {
       this.activeDropdown = null;
     }
-  }
-
-  toggleDropdown(dropdown: string, event: MouseEvent) {
-    event.stopPropagation();
-    this.activeDropdown = this.activeDropdown === dropdown ? null : dropdown;
-    if (this.activeDropdown) {
-      this.dropdownSearch[this.activeDropdown] = '';
-    }
-  }
-
-  onDropdownSearch(filterType: string, event: any) {
-    this.dropdownSearch[filterType] = event.target.value.toLowerCase();
-  }
-
-  getFilteredOptions(filterType: 'hardware' | 'compute' | 'engine' | 'variant' | 'api'): string[] {
-    const search = this.dropdownSearch[filterType].toLowerCase();
-    let options: string[] = [];
-    if (filterType === 'hardware') options = this.hardwareOptions;
-    if (filterType === 'compute') options = this.computeOptions;
-    if (filterType === 'engine') options = this.engineOptions;
-    if (filterType === 'variant') options = this.variantOptions;
-    if (filterType === 'api') options = this.apiOptions;
-    
-    if (!search) return options;
-    return options.filter(opt => opt.toLowerCase().includes(search));
-  }
-
-  selectFilter(filterType: string, value: string, event?: Event | MouseEvent) {
-    if (event) event.stopPropagation();
-
-    const toggle = (arr: string[], val: string) => {
-      if (arr.includes(val)) {
-        return arr.filter(a => a !== val);
-      } else {
-        return [...arr, val];
-      }
-    };
-
-    if (filterType === 'hardware') this.selectedHardwares = toggle(this.selectedHardwares, value);
-    if (filterType === 'compute') this.selectedComputes = toggle(this.selectedComputes, value);
-    if (filterType === 'engine') this.selectedEngines = toggle(this.selectedEngines, value);
-    if (filterType === 'variant') this.selectedVariants = toggle(this.selectedVariants, value);
-    if (filterType === 'api') this.selectedApis = toggle(this.selectedApis, value);
-    
-    this.applyFilters();
-  }
-
-  isFilterSelected(filterType: string, value: string): boolean {
-    if (filterType === 'hardware') return this.selectedHardwares.includes(value);
-    if (filterType === 'compute') return this.selectedComputes.includes(value);
-    if (filterType === 'engine') return this.selectedEngines.includes(value);
-    if (filterType === 'variant') return this.selectedVariants.includes(value);
-    if (filterType === 'api') return this.selectedApis.includes(value);
-    return false;
   }
 
   loadData() {
@@ -259,7 +210,7 @@ export class CortexInsightsPage implements OnInit {
     if (params.has('activeMetric')) this.activeMetric = params.get('activeMetric')!;
     if (params.has('tableSortColumn')) this.tableSortColumn = params.get('tableSortColumn') as any;
     if (params.has('tableSortDirection')) this.tableSortDirection = params.get('tableSortDirection') as any;
-    if (params.has('search')) this.searchQuery = params.get('search')!;
+    if (params.has('search')) this.filterService.searchQuery = params.get('search')!;
 
     const parseArray = (key: string, options: string[]) => {
       if (!params.has(key)) return [...options];
@@ -268,11 +219,11 @@ export class CortexInsightsPage implements OnInit {
       return vals.filter(v => options.includes(v)); // safely only include valid options
     };
 
-    if (params.has('hardware')) this.selectedHardwares = parseArray('hardware', this.hardwareOptions);
-    if (params.has('compute')) this.selectedComputes = parseArray('compute', this.computeOptions);
-    if (params.has('engine')) this.selectedEngines = parseArray('engine', this.engineOptions);
-    if (params.has('variant')) this.selectedVariants = parseArray('variant', this.variantOptions);
-    if (params.has('api')) this.selectedApis = parseArray('api', this.apiOptions);
+    if (params.has('hardware')) this.filterService.selectedHardwares = parseArray('hardware', this.filterService.hardwareOptions);
+    if (params.has('compute')) this.filterService.selectedComputes = parseArray('compute', this.filterService.computeOptions);
+    if (params.has('engine')) this.filterService.selectedEngines = parseArray('engine', this.filterService.engineOptions);
+    if (params.has('variant')) this.filterService.selectedVariants = parseArray('variant', this.filterService.variantOptions);
+    if (params.has('api')) this.filterService.selectedApis = parseArray('api', this.filterService.apiOptions);
   }
 
   syncToUrl() {
@@ -281,7 +232,7 @@ export class CortexInsightsPage implements OnInit {
     queryParams['activeMetric'] = this.activeMetric !== 'speed' ? this.activeMetric : null;
     queryParams['tableSortColumn'] = this.tableSortColumn !== 'speed' ? this.tableSortColumn : null;
     queryParams['tableSortDirection'] = this.tableSortDirection !== 'desc' ? this.tableSortDirection : null;
-    queryParams['search'] = (this.searchQuery && this.searchQuery.trim() !== '') ? this.searchQuery.trim() : null;
+    queryParams['search'] = (this.filterService.searchQuery && this.filterService.searchQuery.trim() !== '') ? this.filterService.searchQuery.trim() : null;
 
     const syncArray = (key: string, selected: string[], options: string[]) => {
       if (selected.length === options.length) queryParams[key] = null; // all selected (default)
@@ -289,11 +240,11 @@ export class CortexInsightsPage implements OnInit {
       else queryParams[key] = selected;
     };
 
-    syncArray('hardware', this.selectedHardwares, this.hardwareOptions);
-    syncArray('compute', this.selectedComputes, this.computeOptions);
-    syncArray('engine', this.selectedEngines, this.engineOptions);
-    syncArray('variant', this.selectedVariants, this.variantOptions);
-    syncArray('api', this.selectedApis, this.apiOptions);
+    syncArray('hardware', this.filterService.selectedHardwares, this.filterService.hardwareOptions);
+    syncArray('compute', this.filterService.selectedComputes, this.filterService.computeOptions);
+    syncArray('engine', this.filterService.selectedEngines, this.filterService.engineOptions);
+    syncArray('variant', this.filterService.selectedVariants, this.filterService.variantOptions);
+    syncArray('api', this.filterService.selectedApis, this.filterService.apiOptions);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -318,34 +269,30 @@ export class CortexInsightsPage implements OnInit {
       b.tests.forEach(t => apiSet.add(t.api));
     });
 
-    this.hardwareOptions = Array.from(hwSet).sort();
-    this.computeOptions = Array.from(computeSet).sort();
-    this.engineOptions = Array.from(engineSet).sort();
-    this.variantOptions = Array.from(variantSet).sort();
-    this.apiOptions = Array.from(apiSet).sort();
-
-    this.selectedHardwares = [...this.hardwareOptions];
-    this.selectedComputes = [...this.computeOptions];
-    this.selectedEngines = [...this.engineOptions];
-    this.selectedVariants = [...this.variantOptions];
-    this.selectedApis = [...this.apiOptions];
+    this.filterService.setOptions(
+      Array.from(hwSet).sort(),
+      Array.from(computeSet).sort(),
+      Array.from(engineSet).sort(),
+      Array.from(variantSet).sort(),
+      Array.from(apiSet).sort()
+    );
   }
 
   onSearch(event: any) {
-    this.searchQuery = event.target.value.toLowerCase();
+    this.filterService.searchQuery = event.target.value.toLowerCase();
     this.applyFilters();
   }
 
   applyFilters() {
     let filtered = this.rawBaselines.filter(b => {
-      if (!this.selectedHardwares.includes(b.hw)) return false;
-      if (!this.selectedComputes.includes(b.compute)) return false;
-      if (!this.selectedEngines.includes(b.engine)) return false;
-      if (!this.selectedVariants.includes(b.model)) return false;
+      if (!this.filterService.selectedHardwares.includes(b.hw)) return false;
+      if (!this.filterService.selectedComputes.includes(b.compute)) return false;
+      if (!this.filterService.selectedEngines.includes(b.engine)) return false;
+      if (!this.filterService.selectedVariants.includes(b.model)) return false;
       
-      if (this.searchQuery) {
+      if (this.filterService.searchQuery) {
         const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
-        if (!searchTarget.includes(this.searchQuery)) return false;
+        if (!searchTarget.includes(this.filterService.searchQuery)) return false;
       }
       
       return true;
@@ -355,7 +302,7 @@ export class CortexInsightsPage implements OnInit {
     let idCounter = 1;
 
     filtered.forEach(b => {
-      let testsToUse = b.tests.filter(t => this.selectedApis.includes(t.api));
+      let testsToUse = b.tests.filter(t => this.filterService.selectedApis.includes(t.api));
       
       if (testsToUse.length === 0) return;
 
