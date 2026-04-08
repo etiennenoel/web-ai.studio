@@ -368,14 +368,14 @@
                       <td class="px-3 py-1.5 align-middle text-right">
                         <div class="flex items-center justify-end gap-1.5">
                           <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [class.dark:bg-slate-600]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftColdLocal, maxTtft) + '%'"></div></div>
-                          @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px]"></i>}
+                          @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                           <span class="tabular-nums font-semibold w-10 text-right" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.dark:text-blue-400]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [class.dark:text-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : '—' }}</span>@if (ttftColdLocal) {<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>}
                         </div>
                       </td>
                       <td class="px-3 py-1.5 align-middle text-right">
                         <div class="flex items-center justify-end gap-1.5">
                           <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="isWinner(totalColdLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')" [class.dark:bg-slate-600]="!isWinner(totalColdLocal, allTotal, 'total')" [style.width]="getPercentage(totalColdLocal, maxTotal) + '%'"></div></div>
-                          @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px]"></i>}
+                          @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                           <span class="tabular-nums font-semibold w-10 text-right" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.dark:text-blue-400]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalColdLocal, allTotal, 'total')" [class.dark:text-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : '—' }}</span>@if (totalColdLocal) {<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>}
                         </div>
                       </td>
@@ -393,7 +393,7 @@
                         <div class="flex items-center justify-end gap-1.5">
                           @if (inSpeedColdLocal && inSpeedColdLocal > 0) {
                             <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [class.dark:bg-slate-600]="!isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [style.width]="getPercentage(inSpeedColdLocal, maxInSpeed) + '%'"></div></div>
-                            @if (isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px]"></i>}
+                            @if (isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                             <span class="tabular-nums font-semibold w-10 text-right" [class.text-blue-700]="isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [class.dark:text-blue-400]="isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')" [class.dark:text-slate-300]="!isWinner(inSpeedColdLocal, allInSpeed, 'inputSpeed')">{{ inSpeedColdLocal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                           } @else {
                             <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -404,7 +404,7 @@
                         <div class="flex items-center justify-end gap-1.5">
                           @if (outSpeedColdLocal && outSpeedColdLocal > 0) {
                             <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [class.bg-slate-300]="!isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [class.dark:bg-slate-600]="!isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [style.width]="getPercentage(outSpeedColdLocal, maxOutSpeed) + '%'"></div></div>
-                            @if (isWinner(outSpeedColdLocal, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px]"></i>}
+                            @if (isWinner(outSpeedColdLocal, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-blue-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                             <span class="tabular-nums font-semibold w-10 text-right" [class.text-blue-700]="isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [class.dark:text-blue-400]="isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [class.text-slate-700]="!isWinner(outSpeedColdLocal, allOutSpeed, 'speed')" [class.dark:text-slate-300]="!isWinner(outSpeedColdLocal, allOutSpeed, 'speed')">{{ outSpeedColdLocal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                           } @else {
                             <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -425,14 +425,14 @@
                       <td class="px-3 py-1.5 align-middle text-right">
                         <div class="flex items-center justify-end gap-1.5">
                           <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-orange-500]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.dark:bg-slate-600]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftWarmLocal, maxTtft) + '%'"></div></div>
-                          @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px]"></i>}
+                          @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                           <span class="tabular-nums font-semibold w-10 text-right" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.dark:text-orange-400]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.dark:text-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ ttftWarmLocal ? (ttftWarmLocal | number:'1.0-0') : '—' }}</span>@if (ttftWarmLocal) {<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>}
                         </div>
                       </td>
                       <td class="px-3 py-1.5 align-middle text-right">
                         <div class="flex items-center justify-end gap-1.5">
                           <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-orange-500]="isWinner(totalWarmLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')" [class.dark:bg-slate-600]="!isWinner(totalWarmLocal, allTotal, 'total')" [style.width]="getPercentage(totalWarmLocal, maxTotal) + '%'"></div></div>
-                          @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px]"></i>}
+                          @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                           <span class="tabular-nums font-semibold w-10 text-right" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.dark:text-orange-400]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalWarmLocal, allTotal, 'total')" [class.dark:text-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ totalWarmLocal ? (totalWarmLocal | number:'1.0-0') : '—' }}</span>@if (totalWarmLocal) {<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>}
                         </div>
                       </td>
@@ -450,7 +450,7 @@
                         <div class="flex items-center justify-end gap-1.5">
                           @if (inSpeedWarmLocal && inSpeedWarmLocal > 0) {
                             <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-orange-500]="isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [class.dark:bg-slate-600]="!isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [style.width]="getPercentage(inSpeedWarmLocal, maxInSpeed) + '%'"></div></div>
-                            @if (isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px]"></i>}
+                            @if (isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                             <span class="tabular-nums font-semibold w-10 text-right" [class.text-orange-700]="isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [class.dark:text-orange-400]="isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [class.text-slate-700]="!isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')" [class.dark:text-slate-300]="!isWinner(inSpeedWarmLocal, allInSpeed, 'inputSpeed')">{{ inSpeedWarmLocal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                           } @else {
                             <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -461,7 +461,7 @@
                         <div class="flex items-center justify-end gap-1.5">
                           @if (outSpeedWarmLocal && outSpeedWarmLocal > 0) {
                             <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-orange-500]="isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [class.bg-slate-300]="!isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [class.dark:bg-slate-600]="!isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [style.width]="getPercentage(outSpeedWarmLocal, maxOutSpeed) + '%'"></div></div>
-                            @if (isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px]"></i>}
+                            @if (isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-orange-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                             <span class="tabular-nums font-semibold w-10 text-right" [class.text-orange-700]="isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [class.dark:text-orange-400]="isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [class.text-slate-700]="!isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')" [class.dark:text-slate-300]="!isWinner(outSpeedWarmLocal, allOutSpeed, 'speed')">{{ outSpeedWarmLocal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                           } @else {
                             <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -495,7 +495,7 @@
                           <div class="flex items-center justify-end gap-1.5">
                             @if (bTtft > 0) {
                               <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bTtft, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(bTtft, allTtft, 'ttft')" [class.dark:bg-slate-600]="!isWinner(bTtft, allTtft, 'ttft')" [style.width]="getPercentage(bTtft, maxTtft) + '%'"></div></div>
-                              @if (isWinner(bTtft, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                              @if (isWinner(bTtft, allTtft, 'ttft')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                               <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bTtft | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                             } @else {
                               <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -506,7 +506,7 @@
                           <div class="flex items-center justify-end gap-1.5">
                             @if (bTotal > 0) {
                               <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bTotal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(bTotal, allTotal, 'total')" [class.dark:bg-slate-600]="!isWinner(bTotal, allTotal, 'total')" [style.width]="getPercentage(bTotal, maxTotal) + '%'"></div></div>
-                              @if (isWinner(bTotal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                              @if (isWinner(bTotal, allTotal, 'total')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                               <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bTotal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                             } @else {
                               <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -527,7 +527,7 @@
                           <div class="flex items-center justify-end gap-1.5">
                             @if (bInSpeed > 0) {
                               <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bInSpeed, allInSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(bInSpeed, allInSpeed, 'inputSpeed')" [class.dark:bg-slate-600]="!isWinner(bInSpeed, allInSpeed, 'inputSpeed')" [style.width]="getPercentage(bInSpeed, maxInSpeed) + '%'"></div></div>
-                              @if (isWinner(bInSpeed, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                              @if (isWinner(bInSpeed, allInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                               <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bInSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                             } @else {
                               <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -538,7 +538,7 @@
                           <div class="flex items-center justify-end gap-1.5">
                             @if (bOutSpeed > 0) {
                               <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bOutSpeed, allOutSpeed, 'speed')" [class.bg-slate-300]="!isWinner(bOutSpeed, allOutSpeed, 'speed')" [class.dark:bg-slate-600]="!isWinner(bOutSpeed, allOutSpeed, 'speed')" [style.width]="getPercentage(bOutSpeed, maxOutSpeed) + '%'"></div></div>
-                              @if (isWinner(bOutSpeed, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                              @if (isWinner(bOutSpeed, allOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                               <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bOutSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                             } @else {
                               <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -880,7 +880,7 @@
                               <div class="flex items-center justify-end gap-1.5">
                                 @if (testLocalTtft && testLocalTtft > 0) {
                                   <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="activeTestForBenchmark.results.startType === 'cold' && isWinner(testLocalTtft, testAllTtft, 'ttft')" [class.bg-orange-500]="activeTestForBenchmark.results.startType !== 'cold' && isWinner(testLocalTtft, testAllTtft, 'ttft')" [class.bg-slate-300]="!isWinner(testLocalTtft, testAllTtft, 'ttft')" [class.dark:bg-slate-600]="!isWinner(testLocalTtft, testAllTtft, 'ttft')" [style.width]="getPercentage(testLocalTtft, testMaxTtft) + '%'"></div></div>
-                                  @if (isWinner(testLocalTtft, testAllTtft, 'ttft')) {<i class="bi bi-trophy-fill text-[8px]" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
+                                  @if (isWinner(testLocalTtft, testAllTtft, 'ttft')) {<i class="bi bi-trophy-fill text-[8px] -ml-1.5 w-0 overflow-visible" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
                                   <span class="tabular-nums font-semibold w-10 text-right text-slate-700 dark:text-slate-300">{{ testLocalTtft | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                                 } @else {
                                   <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -891,7 +891,7 @@
                               <div class="flex items-center justify-end gap-1.5">
                                 @if (testLocalTotal && testLocalTotal > 0) {
                                   <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="activeTestForBenchmark.results.startType === 'cold' && isWinner(testLocalTotal, testAllTotal, 'total')" [class.bg-orange-500]="activeTestForBenchmark.results.startType !== 'cold' && isWinner(testLocalTotal, testAllTotal, 'total')" [class.bg-slate-300]="!isWinner(testLocalTotal, testAllTotal, 'total')" [class.dark:bg-slate-600]="!isWinner(testLocalTotal, testAllTotal, 'total')" [style.width]="getPercentage(testLocalTotal, testMaxTotal) + '%'"></div></div>
-                                  @if (isWinner(testLocalTotal, testAllTotal, 'total')) {<i class="bi bi-trophy-fill text-[8px]" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
+                                  @if (isWinner(testLocalTotal, testAllTotal, 'total')) {<i class="bi bi-trophy-fill text-[8px] -ml-1.5 w-0 overflow-visible" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
                                   <span class="tabular-nums font-semibold w-10 text-right text-slate-700 dark:text-slate-300">{{ testLocalTotal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                                 } @else {
                                   <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -912,7 +912,7 @@
                               <div class="flex items-center justify-end gap-1.5">
                                 @if (testLocalInSpeed && testLocalInSpeed > 0) {
                                   <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="activeTestForBenchmark.results.startType === 'cold' && isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')" [class.bg-orange-500]="activeTestForBenchmark.results.startType !== 'cold' && isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')" [class.dark:bg-slate-600]="!isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')" [style.width]="getPercentage(testLocalInSpeed, testMaxInSpeed) + '%'"></div></div>
-                                  @if (isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-[8px]" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
+                                  @if (isWinner(testLocalInSpeed, testAllInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-[8px] -ml-1.5 w-0 overflow-visible" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
                                   <span class="tabular-nums font-semibold w-10 text-right text-slate-700 dark:text-slate-300">{{ testLocalInSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                                 } @else {
                                   <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -923,7 +923,7 @@
                               <div class="flex items-center justify-end gap-1.5">
                                 @if (testLocalOutSpeed && testLocalOutSpeed > 0) {
                                   <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-blue-500]="activeTestForBenchmark.results.startType === 'cold' && isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')" [class.bg-orange-500]="activeTestForBenchmark.results.startType !== 'cold' && isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')" [class.bg-slate-300]="!isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')" [class.dark:bg-slate-600]="!isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')" [style.width]="getPercentage(testLocalOutSpeed, testMaxOutSpeed) + '%'"></div></div>
-                                  @if (isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-[8px]" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
+                                  @if (isWinner(testLocalOutSpeed, testAllOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-[8px] -ml-1.5 w-0 overflow-visible" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'text-blue-500' : 'text-orange-500'"></i>}
                                   <span class="tabular-nums font-semibold w-10 text-right text-slate-700 dark:text-slate-300">{{ testLocalOutSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                                 } @else {
                                   <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -957,7 +957,7 @@
                                 <div class="flex items-center justify-end gap-1.5">
                                   @if (bTtft > 0) {
                                     <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bTtft, testAllTtft, 'ttft')" [class.bg-slate-300]="!isWinner(bTtft, testAllTtft, 'ttft')" [class.dark:bg-slate-600]="!isWinner(bTtft, testAllTtft, 'ttft')" [style.width]="getPercentage(bTtft, testMaxTtft) + '%'"></div></div>
-                                    @if (isWinner(bTtft, testAllTtft, 'ttft')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                                    @if (isWinner(bTtft, testAllTtft, 'ttft')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                                     <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bTtft | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                                   } @else {
                                     <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -968,7 +968,7 @@
                                 <div class="flex items-center justify-end gap-1.5">
                                   @if (bTotal > 0) {
                                     <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bTotal, testAllTotal, 'total')" [class.bg-slate-300]="!isWinner(bTotal, testAllTotal, 'total')" [class.dark:bg-slate-600]="!isWinner(bTotal, testAllTotal, 'total')" [style.width]="getPercentage(bTotal, testMaxTotal) + '%'"></div></div>
-                                    @if (isWinner(bTotal, testAllTotal, 'total')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                                    @if (isWinner(bTotal, testAllTotal, 'total')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                                     <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bTotal | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
                                   } @else {
                                     <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -989,7 +989,7 @@
                                 <div class="flex items-center justify-end gap-1.5">
                                   @if (bInSpeed > 0) {
                                     <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bInSpeed, testAllInSpeed, 'inputSpeed')" [class.bg-slate-300]="!isWinner(bInSpeed, testAllInSpeed, 'inputSpeed')" [class.dark:bg-slate-600]="!isWinner(bInSpeed, testAllInSpeed, 'inputSpeed')" [style.width]="getPercentage(bInSpeed, testMaxInSpeed) + '%'"></div></div>
-                                    @if (isWinner(bInSpeed, testAllInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                                    @if (isWinner(bInSpeed, testAllInSpeed, 'inputSpeed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                                     <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bInSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                                   } @else {
                                     <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
@@ -1000,7 +1000,7 @@
                                 <div class="flex items-center justify-end gap-1.5">
                                   @if (bOutSpeed > 0) {
                                     <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800"><div class="h-full rounded-full" [class.bg-slate-500]="isWinner(bOutSpeed, testAllOutSpeed, 'speed')" [class.bg-slate-300]="!isWinner(bOutSpeed, testAllOutSpeed, 'speed')" [class.dark:bg-slate-600]="!isWinner(bOutSpeed, testAllOutSpeed, 'speed')" [style.width]="getPercentage(bOutSpeed, testMaxOutSpeed) + '%'"></div></div>
-                                    @if (isWinner(bOutSpeed, testAllOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px]"></i>}
+                                    @if (isWinner(bOutSpeed, testAllOutSpeed, 'speed')) {<i class="bi bi-trophy-fill text-slate-500 text-[8px] -ml-1.5 w-0 overflow-visible"></i>}
                                     <span class="tabular-nums font-semibold text-slate-800 dark:text-slate-200 w-10 text-right">{{ bOutSpeed | number:'1.0-0' }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">t/s</span>
                                   } @else {
                                     <span class="font-semibold text-slate-400 dark:text-slate-500 w-10 text-right">N/A</span>
