@@ -49,6 +49,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   activeTestIdInLab: string | null = null;
   activeApiId: BuiltInAiApi | null = null;
   isDrawerOpen: boolean = false;
+  drawerHeight: number = 350;
+  isDrawerResizing: boolean = false;
+  private _drawerResizeStartY: number = 0;
+  private _drawerResizeStartHeight: number = 0;
+  private _boundDrawerResizeMove = this.onDrawerResizeMove.bind(this);
+  private _boundDrawerResizeEnd = this.onDrawerResizeEnd.bind(this);
   systemLogs: {message: string, timestamp: Date, type: 'system'|'start'|'success'|'error'|'iteration'|'result'|'info', duration?: number}[] = [];
   private _lastLogTime: number = 0;
 
@@ -493,6 +499,31 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     const duration = this._lastLogTime > 0 ? now - this._lastLogTime : undefined;
     this.systemLogs.push({message, timestamp: new Date(), type, duration});
     this._lastLogTime = now;
+  }
+
+  onDrawerResizeStart(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDrawerResizing = true;
+    this._drawerResizeStartY = event.clientY;
+    this._drawerResizeStartHeight = this.drawerHeight;
+    document.addEventListener('mousemove', this._boundDrawerResizeMove);
+    document.addEventListener('mouseup', this._boundDrawerResizeEnd);
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+  }
+
+  onDrawerResizeMove(event: MouseEvent) {
+    const delta = this._drawerResizeStartY - event.clientY;
+    this.drawerHeight = Math.max(200, Math.min(window.innerHeight - 100, this._drawerResizeStartHeight + delta));
+  }
+
+  onDrawerResizeEnd() {
+    this.isDrawerResizing = false;
+    document.removeEventListener('mousemove', this._boundDrawerResizeMove);
+    document.removeEventListener('mouseup', this._boundDrawerResizeEnd);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   }
 
   async loadInitialHardwareInfo() {

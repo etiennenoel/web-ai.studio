@@ -1029,13 +1029,25 @@
   </div>
 
   <!-- GLOBAL BOTTOM EXECUTION DRAWER -->
-  <div 
-    class="fixed bottom-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 ease-in-out z-50 flex flex-col"
+  <div
+    class="fixed bottom-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_-15px_50px_-12px_rgba(0,0,0,0.5)] z-50 flex flex-col"
+    [class.transition-all]="!isDrawerResizing"
+    [class.duration-300]="!isDrawerResizing"
+    [class.ease-in-out]="!isDrawerResizing"
     [style.left.px]="sidebarWidth"
-    [ngClass]="isDrawerOpen ? 'h-[350px]' : 'h-16 overflow-hidden'"
+    [style.height.px]="isDrawerOpen ? drawerHeight : 64"
+    [class.overflow-hidden]="!isDrawerOpen"
   >
+    <!-- Resize Handle -->
+    @if (isDrawerOpen) {
+      <div
+        class="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize z-10 group hover:bg-indigo-500/20 active:bg-indigo-500/30 transition-colors"
+        (mousedown)="onDrawerResizeStart($event)">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-indigo-400 transition-colors mt-px"></div>
+      </div>
+    }
     <!-- Drawer Header -->
-    <div 
+    <div
       class="h-16 px-6 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shrink-0"
       (click)="isDrawerOpen = !isDrawerOpen"
     >
