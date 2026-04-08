@@ -128,8 +128,8 @@
       </div>
       
       <!-- Action Area -->
-      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-6 z-10 relative">
-        <button 
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-6 z-10 relative space-y-2">
+        <button
           (click)="handleRunClick()"
           [disabled]="isTestingRunning && axonTestSuiteExecutor.results.status === TestStatus.Executing"
           class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2 text-sm"
@@ -140,6 +140,12 @@
              <i class="bi bi-play-fill"></i> Run Cortex Test
           }
         </button>
+        @if (!isExtensionInstalled) {
+          <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
+             class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30 dark:hover:bg-amber-500/20 transition-colors">
+            <i class="bi bi-puzzle"></i> Install WebAI Extension
+          </a>
+        }
       </div>
     </div>
   </aside>
@@ -265,6 +271,20 @@
         
         <button (click)="saveReportToUrl()" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-lg transition-colors bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm uppercase tracking-wider"><i class="bi bi-share text-xs"></i> Share</button>
       </div></header>
+
+    <!-- Extension Warning Banner -->
+    @if (!isExtensionInstalled) {
+      <div class="px-8 py-2.5 bg-amber-50 dark:bg-amber-500/10 border-b border-amber-200 dark:border-amber-500/20 flex items-center justify-between gap-4 shrink-0">
+        <div class="flex items-center gap-2 text-xs font-medium text-amber-800 dark:text-amber-300">
+          <i class="bi bi-exclamation-triangle-fill text-amber-500"></i>
+          <span>The <strong>WebAI Extension</strong> is required to run benchmarks and access hardware information.</span>
+        </div>
+        <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors shadow-sm shrink-0">
+          <i class="bi bi-download"></i> Install Extension
+        </a>
+      </div>
+    }
 
     <!-- Scrollable Body -->
     <main class="flex-1 overflow-y-auto px-8 pb-32 custom-scrollbar">
@@ -1259,6 +1279,44 @@
             </div>
           </div>
         }
+      </div>
+    </div>
+  }
+
+  <!-- Extension Required Modal -->
+  @if (showExtensionModal) {
+    <div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="showExtensionModal = false">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md mx-4 p-6" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="bi bi-puzzle text-amber-500"></i> Extension Required
+          </h3>
+          <button (click)="showExtensionModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg">
+            <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
+            <div class="text-sm text-amber-800 dark:text-amber-300">
+              The <strong>WebAI Extension</strong> is required to run Cortex benchmarks. It provides access to Chrome's built-in AI APIs and hardware information.
+            </div>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 space-y-2">
+            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">1.</span> Install the extension from the Chrome Web Store</div>
+            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">2.</span> Reload this page after installation</div>
+            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">3.</span> Click "Run Cortex Test" to start benchmarking</div>
+          </div>
+          <div class="flex items-center gap-3 pt-2">
+            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
+               class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md">
+              <i class="bi bi-download"></i> Install Extension
+            </a>
+            <button (click)="reloadPage()" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors">
+              <i class="bi bi-arrow-clockwise"></i> Reload Page
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   }

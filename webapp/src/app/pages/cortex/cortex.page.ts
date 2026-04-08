@@ -478,6 +478,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleRunClick() {
+    if (!this.isExtensionInstalled) {
+      this.showExtensionModal = true;
+      return;
+    }
     if (!this.isTestingRunning) {
       this.isDrawerOpen = true;
       this.start();
@@ -486,6 +490,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   toggleExecution(event: Event) {
     event.stopPropagation();
+    if (!this.isExtensionInstalled) {
+      this.showExtensionModal = true;
+      return;
+    }
     if (this.isTestingRunning && this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
       this.stop();
       this.addLog('Execution paused', 'system');
@@ -499,6 +507,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     const duration = this._lastLogTime > 0 ? now - this._lastLogTime : undefined;
     this.systemLogs.push({message, timestamp: new Date(), type, duration});
     this._lastLogTime = now;
+  }
+
+  reloadPage() {
+    window.location.reload();
   }
 
   onDrawerResizeStart(event: MouseEvent) {
