@@ -210,29 +210,260 @@
               </div>
             </div>
 
-            <!-- High-Level Average Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-               <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md shadow-indigo-200 dark:shadow-none p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-100 mb-1">Total Tests Selected</div>
-                  <div class="text-3xl font-bold">{{ selectedTestIds.size }}</div>
+            <!-- Global Level Cards & Metrics -->
+            @let coldSummaryResults = getGlobalSummaryResults('cold');
+            @let warmSummaryResults = getGlobalSummaryResults('warm');
+            @let passedStats = getGlobalPassedAndFailed();
+            @let totalTestsRan = passedStats.passed + passedStats.failed;
+            @let successRate = totalTestsRan > 0 ? (passedStats.passed / totalTestsRan) * 100 : 0;
+            
+            <div class="grid grid-cols-1 gap-6 mb-8">
+               <!-- High-Level Stats Strip -->
+               <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                 <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md p-5 flex flex-col justify-center dark:shadow-none">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-100 mb-1">Total Tests Selected</div>
+                    <div class="text-3xl font-bold">{{ selectedTestIds.size }}</div>
+                 </div>
+                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg TTFT (Warm)</div>
+                    <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ warmSummaryResults?.averageTimeToFirstToken ? (warmSummaryResults?.averageTimeToFirstToken | number:'1.0-0') : '--' }} ms</div>
+                 </div>
+                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg Total Time (Warm)</div>
+                    <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ warmSummaryResults?.averageTotalResponseTime ? (warmSummaryResults?.averageTotalResponseTime | number:'1.0-0') : '--' }} ms</div>
+                 </div>
+                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Overall Success Rate</div>
+                    <div class="text-2xl font-bold" [ngClass]="successRate > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'">{{ totalTestsRan > 0 ? (successRate | number:'1.0-1') + '%' : '--' }}</div>
+                 </div>
                </div>
-               
-               @let stats = getGlobalSummaryResults('warm');
-               @let passedStats = getGlobalPassedAndFailed();
-               @let totalTestsRan = passedStats.passed + passedStats.failed;
-               @let successRate = totalTestsRan > 0 ? (passedStats.passed / totalTestsRan) * 100 : 0;
 
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg TTFT (Warm)</div>
-                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ stats?.averageTimeToFirstToken ? (stats?.averageTimeToFirstToken | number:'1.0-0') : '--' }} ms</div>
+               <!-- Metric: Avg TTFT -->
+               @let ttftColdLocal = coldSummaryResults?.averageTimeToFirstToken;
+               @let ttftWarmLocal = warmSummaryResults?.averageTimeToFirstToken;
+               @let allTtft = getGlobalAllValues('ttft', ttftColdLocal, ttftWarmLocal);
+               @let maxTtft = getMaxArray(allTtft);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-stopwatch text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Time To First Token</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftColdLocal, maxTtft) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ ttftWarmLocal ? (ttftWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftWarmLocal, maxTtft) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineTtft = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTimeToFirstToken || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(baselineTtft, allTtft, 'ttft')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineTtft, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(baselineTtft, allTtft, 'ttft')">{{ baselineTtft ? (baselineTtft | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTtft, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(baselineTtft, allTtft, 'ttft')" [style.width]="getPercentage(baselineTtft, maxTtft) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Global Avg Total Time (Warm)</div>
-                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ stats?.averageTotalResponseTime ? (stats?.averageTotalResponseTime | number:'1.0-0') : '--' }} ms</div>
+
+               <!-- Metric: Avg Total Time -->
+               @let totalColdLocal = coldSummaryResults?.averageTotalResponseTime;
+               @let totalWarmLocal = warmSummaryResults?.averageTotalResponseTime;
+               @let allTotal = getGlobalAllValues('total', totalColdLocal, totalWarmLocal);
+               @let maxTotal = getMaxArray(allTotal);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-activity text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Total Execution Time</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(totalColdLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')" [style.width]="getPercentage(totalColdLocal, maxTotal) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ totalWarmLocal ? (totalWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(totalWarmLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')" [style.width]="getPercentage(totalWarmLocal, maxTotal) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineTotal = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTotalResponseTime || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-500]="!isWinner(baselineTotal, allTotal, 'total')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineTotal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-800]="!isWinner(baselineTotal, allTotal, 'total')">{{ baselineTotal ? (baselineTotal | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTotal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(baselineTotal, allTotal, 'total')" [style.width]="getPercentage(baselineTotal, maxTotal) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Overall Success Rate</div>
-                  <div class="text-2xl font-bold" [ngClass]="successRate > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'">{{ totalTestsRan > 0 ? (successRate | number:'1.0-1') + '%' : '--' }}</div>
+
+               <!-- Metric: Avg Output Speed -->
+               @let speedColdLocal = coldSummaryResults?.averageTokenPerSecond;
+               @let speedWarmLocal = warmSummaryResults?.averageTokenPerSecond;
+               @let allSpeed = getGlobalAllValues('speed', speedColdLocal, speedWarmLocal);
+               @let maxSpeed = getMaxArray(allSpeed);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-speedometer2 text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Global Avg Output Speed</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal, allSpeed, 'speed')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedColdLocal, allSpeed, 'speed')">{{ speedColdLocal ? (speedColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedColdLocal, allSpeed, 'speed')" [style.width]="getPercentage(speedColdLocal, maxSpeed) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal, allSpeed, 'speed')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedWarmLocal, allSpeed, 'speed')">{{ speedWarmLocal ? (speedWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedWarmLocal, allSpeed, 'speed')" [style.width]="getPercentage(speedWarmLocal, maxSpeed) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineSpeed = comparisonService.getGlobalSummaryResults(baseline.data, selectedTestIds)?.averageTokenPerSecond || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(baselineSpeed, allSpeed, 'speed')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineSpeed, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineSpeed, allSpeed, 'speed')">{{ baselineSpeed ? (baselineSpeed | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(baselineSpeed, allSpeed, 'speed')" [style.width]="getPercentage(baselineSpeed, maxSpeed) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
             </div>
 
@@ -255,27 +486,243 @@
               </div>
             </div>
 
-            <!-- API Level Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-               <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md shadow-indigo-200 dark:shadow-none p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-100 mb-1">Scenarios Selected</div>
-                  <div class="text-3xl font-bold">{{ getSelectedTestsCountForApi(activeApiId) }} / {{ getTests(activeApiId).length }}</div>
+            <!-- API Level Cards & Metrics -->
+            @let coldSummaryResults = getSummaryResults(activeApiId, 'cold');
+            @let warmSummaryResults = getSummaryResults(activeApiId, 'warm');
+            
+            <div class="grid grid-cols-1 gap-6 mb-8">
+               <!-- Scenarios Selected Hero -->
+               <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl border border-transparent shadow-md p-6 flex flex-col justify-center dark:shadow-none">
+                  <div class="text-xs font-bold uppercase tracking-widest text-indigo-100 mb-2">Scenarios Selected</div>
+                  <div class="text-4xl font-bold">{{ getSelectedTestsCountForApi(activeApiId) }} / {{ getTests(activeApiId).length }}</div>
                </div>
-               
-               @let apiStats = getSummaryResults(activeApiId, 'warm');
-               @let passedStats = getGlobalPassedAndFailed();
 
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Avg TTFT (Warm)</div>
-                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTimeToFirstToken ? (apiStats?.averageTimeToFirstToken | number:'1.0-0') : '--' }} ms</div>
+               <!-- Metric: Avg TTFT -->
+               @let ttftColdLocal = coldSummaryResults?.averageTimeToFirstToken;
+               @let ttftWarmLocal = warmSummaryResults?.averageTimeToFirstToken;
+               @let allTtft = getTestAllValues(activeApiId, 'ttft', ttftColdLocal, ttftWarmLocal);
+               @let maxTtft = getMaxArray(allTtft);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-stopwatch text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Time To First Token</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftColdLocal, allTtft, 'ttft')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(ttftColdLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftColdLocal, allTtft, 'ttft')">{{ ttftColdLocal ? (ttftColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(ttftColdLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftColdLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftColdLocal, maxTtft) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(ttftWarmLocal, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.text-slate-700]="!isWinner(ttftWarmLocal, allTtft, 'ttft')">{{ ttftWarmLocal ? (ttftWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(ttftWarmLocal, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(ttftWarmLocal, allTtft, 'ttft')" [style.width]="getPercentage(ttftWarmLocal, maxTtft) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineTtft = comparisonService.getSummaryResults(baseline.data, activeApiId, selectedTestIds)?.averageTimeToFirstToken || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-500]="!isWinner(baselineTtft, allTtft, 'ttft')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineTtft, allTtft, 'ttft')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTtft, allTtft, 'ttft')" [class.text-slate-800]="!isWinner(baselineTtft, allTtft, 'ttft')">{{ baselineTtft ? (baselineTtft | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTtft, allTtft, 'ttft')" [class.bg-slate-300]="!isWinner(baselineTtft, allTtft, 'ttft')" [style.width]="getPercentage(baselineTtft, maxTtft) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Avg Total Time (Warm)</div>
-                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTotalResponseTime ? (apiStats?.averageTotalResponseTime | number:'1.0-0') : '--' }} ms</div>
+
+               <!-- Metric: Avg Total Time -->
+               @let totalColdLocal = coldSummaryResults?.averageTotalResponseTime;
+               @let totalWarmLocal = warmSummaryResults?.averageTotalResponseTime;
+               @let allTotal = getTestAllValues(activeApiId, 'total', totalColdLocal, totalWarmLocal);
+               @let maxTotal = getMaxArray(allTotal);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-activity text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Total Execution Time</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalColdLocal, allTotal, 'total')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(totalColdLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(totalColdLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalColdLocal, allTotal, 'total')">{{ totalColdLocal ? (totalColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(totalColdLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalColdLocal, allTotal, 'total')" [style.width]="getPercentage(totalColdLocal, maxTotal) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-500]="!isWinner(totalWarmLocal, allTotal, 'total')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(totalWarmLocal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(totalWarmLocal, allTotal, 'total')" [class.text-slate-700]="!isWinner(totalWarmLocal, allTotal, 'total')">{{ totalWarmLocal ? (totalWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(totalWarmLocal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(totalWarmLocal, allTotal, 'total')" [style.width]="getPercentage(totalWarmLocal, maxTotal) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineTotal = comparisonService.getSummaryResults(baseline.data, activeApiId, selectedTestIds)?.averageTotalResponseTime || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-500]="!isWinner(baselineTotal, allTotal, 'total')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineTotal, allTotal, 'total')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineTotal, allTotal, 'total')" [class.text-slate-800]="!isWinner(baselineTotal, allTotal, 'total')">{{ baselineTotal ? (baselineTotal | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">ms</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineTotal, allTotal, 'total')" [class.bg-slate-300]="!isWinner(baselineTotal, allTotal, 'total')" [style.width]="getPercentage(baselineTotal, maxTotal) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
-               <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-center">
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Output Speed (Warm)</div>
-                  <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">{{ apiStats?.averageTokenPerSecond ? (apiStats?.averageTokenPerSecond | number:'1.0-0') : '--' }} <span class="text-sm font-medium">t/s</span></div>
+
+               <!-- Metric: Avg Output Speed -->
+               @let speedColdLocal = coldSummaryResults?.averageTokenPerSecond;
+               @let speedWarmLocal = warmSummaryResults?.averageTokenPerSecond;
+               @let allSpeed = getTestAllValues(activeApiId, 'speed', speedColdLocal, speedWarmLocal);
+               @let maxSpeed = getMaxArray(allSpeed);
+
+               <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col dark:bg-slate-900 dark:border-slate-700">
+                 <div class="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                   <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center dark:bg-slate-900 dark:border-slate-700">
+                     <i class="bi bi-speedometer2 text-lg text-slate-600 dark:text-slate-400"></i>
+                   </div>
+                   <h3 class="text-lg font-bold text-slate-800 tracking-tight mb-0 dark:text-slate-200">Avg Output Speed</h3>
+                 </div>
+                 <div class="flex flex-col gap-2 flex-1 justify-end">
+                   <!-- COLD -->
+                   <div class="flex flex-col gap-1.5 mt-2">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedColdLocal, allSpeed, 'speed')">
+                          Local {{ getComputeUnit() }} - Cold 
+                          @if (isWinner(speedColdLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-blue-700 dark:text-blue-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-blue-700]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedColdLocal, allSpeed, 'speed')">{{ speedColdLocal ? (speedColdLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-blue-500]="isWinner(speedColdLocal, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedColdLocal, allSpeed, 'speed')" [style.width]="getPercentage(speedColdLocal, maxSpeed) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- WARM -->
+                   <div class="flex flex-col gap-1.5 mt-3">
+                     <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(speedWarmLocal, allSpeed, 'speed')">
+                          Local {{ getComputeUnit() }} - Warm 
+                          @if (isWinner(speedWarmLocal, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline ml-1 text-orange-700 dark:text-orange-400"></i>}
+                        </span>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm tabular-nums font-bold" [class.text-orange-700]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.text-slate-700]="!isWinner(speedWarmLocal, allSpeed, 'speed')">{{ speedWarmLocal ? (speedWarmLocal | number:'1.0-0') : '—' }}</span>
+                          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                        </div>
+                     </div>
+                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" [class.bg-orange-500]="isWinner(speedWarmLocal, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(speedWarmLocal, allSpeed, 'speed')" [style.width]="getPercentage(speedWarmLocal, maxSpeed) + '%'"></div>
+                     </div>
+                   </div>
+                   <!-- Baselines -->
+                   @for (baseline of comparisonService.baselines; track baseline.id) {
+                     @let baselineSpeed = comparisonService.getSummaryResults(baseline.data, activeApiId, selectedTestIds)?.averageTokenPerSecond || 0;
+                     @let baselineDetails = getBaselineDetails(baseline.id);
+                     <div class="flex flex-col gap-1.5 mt-3">
+                       <div class="flex items-center justify-between gap-2">
+                          <div class="flex items-center flex-wrap gap-2 flex-1 min-w-0">
+                            <span class="text-[11px] font-bold uppercase tracking-wider whitespace-nowrap" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-500]="!isWinner(baselineSpeed, allSpeed, 'speed')">
+                              {{ baseline.name }}
+                            </span>
+                            @if (baselineDetails?.executionType) {
+                              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getExecutionTypeColorClass(baselineDetails?.executionType)">
+                                <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
+                              </span>
+                            }
+                            @if (isWinner(baselineSpeed, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                          </div>
+                          <div class="flex items-baseline gap-1 flex-shrink-0">
+                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineSpeed, allSpeed, 'speed')">{{ baselineSpeed ? (baselineSpeed | number:'1.0-0') : 'N/A' }}</span>
+                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                          </div>
+                       </div>
+                       <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
+                          <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(baselineSpeed, allSpeed, 'speed')" [style.width]="getPercentage(baselineSpeed, maxSpeed) + '%'"></div>
+                       </div>
+                     </div>
+                   }
+                 </div>
                </div>
             </div>
 
@@ -371,6 +818,18 @@
                                {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageInputTokensPerSecond ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageInputTokensPerSecond | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">t/s</span>
                             </div>
                           </div>
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Avg Input Tokens</div>
+                            <div class="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
+                               {{ activeTest.results.averageInputTokens ? (activeTest.results.averageInputTokens | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">t</span>
+                            </div>
+                          </div>
+                          <div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Chars Speed</div>
+                            <div class="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
+                               {{ getSummaryResults(scen.api, activeTest.results.startType)?.averageCharactersPerSecond ? (getSummaryResults(scen.api, activeTest.results.startType)?.averageCharactersPerSecond | number:'1.0-0') : '--' }} <span class="text-[10px] text-slate-500">c/s</span>
+                            </div>
+                          </div>
                         </div>
                         
                         <div class="px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shrink-0">
@@ -440,24 +899,75 @@
                             <span class="text-indigo-500 font-bold animate-pulse flex items-center gap-1"><i class="bi bi-arrow-repeat animate-spin"></i> RUNNING</span>
                           }
                         </div>
-                        <div class="flex-1 p-6 bg-white dark:bg-slate-950 overflow-y-auto custom-scrollbar shadow-inner text-sm text-slate-800 dark:text-slate-300 space-y-4">
-                           @for(iteration of activeTest.results.testIterationResults; track $index) {
-                              <div class="border border-slate-100 dark:border-slate-800 rounded-lg p-3">
-                                 <div class="text-[10px] font-bold uppercase text-slate-400 mb-2 flex justify-between">
-                                    <span>Iteration {{ $index + 1 }}</span>
-                                    <span [ngClass]="iteration.status === TestStatus.Success ? 'text-emerald-500' : 'text-rose-500'">{{ iteration.status }}</span>
-                                 </div>
-                                 @if (iteration.output) {
-                                   <div class="font-mono text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-100 dark:border-slate-800">{{ unescapeOutput(iteration.output) }}</div>
-                                 }
-                              </div>
-                           }
-                           @if (activeTest.results.status === TestStatus.Error || activeTest.results.status === TestStatus.Fail) {
-                              <div class="font-mono text-xs text-rose-500 mt-2 whitespace-pre-wrap p-2 border border-rose-200 bg-rose-50 rounded dark:bg-rose-950/30 dark:border-rose-800/50">Execution failed or encountered an error.</div>
-                           }
-                           @if(activeTest.results.testIterationResults.length === 0 && activeTest.results.status !== TestStatus.Error && activeTest.results.status !== TestStatus.Fail) {
-                              <div class="text-slate-400 text-xs italic">Waiting for iteration results...</div>
-                           }
+                        <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-950">
+                          <div class="bg-white border-b border-slate-200 dark:bg-slate-900 dark:border-slate-700">
+                            <table class="w-full text-left">
+                              <thead class="bg-slate-50 border-b border-slate-100 dark:bg-slate-900 dark:border-slate-800 sticky top-0 z-10">
+                                <tr class="text-[9px] font-bold text-slate-400 uppercase tracking-wider dark:text-slate-500">
+                                  <th class="px-3 py-2 w-10">#</th>
+                                  <th class="px-3 py-2 text-right">TTFT</th>
+                                  <th class="px-3 py-2 text-right">Total</th>
+                                  <th class="px-3 py-2 text-right">In T/s</th>
+                                  <th class="px-3 py-2 text-right">Out T/s</th>
+                                  <th class="px-3 py-2 text-right">Char/s</th>
+                                  <th class="px-3 py-2 text-center">Output</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
+                                @for (iter of activeTest.results.testIterationResults; track $index) {
+                                  <tr class="text-xs hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50" [class.bg-amber-50]="iter.status === TestStatus.Executing">
+                                    <td class="px-3 py-1.5 text-slate-400 font-mono dark:text-slate-500">
+                                      @if (iter.status === TestStatus.Success) {
+                                        <i class="bi bi-check-circle-fill text-emerald-500"></i>
+                                      } @else if (iter.status === TestStatus.Error || iter.status === TestStatus.Fail) {
+                                        <i class="bi bi-x-circle-fill text-rose-500"></i>
+                                      } @else {
+                                        {{ $index + 1 }}
+                                      }
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.timeToFirstToken != null ? (iter.timeToFirstToken | number:'1.0-0') : "—" }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-slate-700 dark:text-slate-300">{{ iter.totalResponseTime != null ? (iter.totalResponseTime | number:'1.0-0') : "—" }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
+                                      {{ iter.inputTokensPerSecond != null && iter.inputTokensPerSecond > 0 ? (iter.inputTokensPerSecond | number:'1.0-0') : (iter.inputTokensPerSecond === -1 ? 'N/A' : '—') }}
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
+                                      {{ iter.tokensPerSecond != null && iter.tokensPerSecond > 0 ? (iter.tokensPerSecond | number:'1.0-0') : (iter.tokensPerSecond === -1 ? 'N/A' : '—') }}
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-emerald-600 dark:text-emerald-400">
+                                      {{ iter.charactersPerSecond != null && iter.charactersPerSecond > 0 ? (iter.charactersPerSecond | number:'1.0-0') : (iter.charactersPerSecond === -1 ? 'N/A' : '—') }}
+                                    </td>
+                                    <td class="px-3 py-1.5 text-center">
+                                      <button class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-30 disabled:hover:bg-transparent font-medium border border-transparent hover:border-indigo-200 text-[10px] dark:text-indigo-400 dark:hover:bg-indigo-900/30" 
+                                              title="Toggle Output"
+                                              [disabled]="!iter.output"
+                                              (click)="$event.stopPropagation(); toggleOutput(activeTest.id, $index)">
+                                        @if (!viewData[activeTest.id].expandedOutputs?.[$index]) {
+                                          <i class="bi bi-file-text"></i> View
+                                        } @else {
+                                          <i class="bi bi-chevron-up"></i> Hide
+                                        }
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  @if (viewData[activeTest.id].expandedOutputs?.[$index] && iter.output) {
+                                    <tr class="bg-slate-900 border-b border-slate-200 dark:bg-slate-950 dark:border-slate-700">
+                                      <td colspan="7" class="p-4 !text-left">
+                                        <div class="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto custom-scrollbar leading-relaxed dark:text-slate-600">
+                                          {{ unescapeOutput(iter.output) }}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  }
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                          @if (activeTest.results.status === TestStatus.Error || activeTest.results.status === TestStatus.Fail) {
+                             <div class="m-4 font-mono text-xs text-rose-500 whitespace-pre-wrap p-3 border border-rose-200 bg-rose-50 rounded dark:bg-rose-950/30 dark:border-rose-800/50">Execution failed or encountered an error.</div>
+                          }
+                          @if(activeTest.results.testIterationResults.length === 0 && activeTest.results.status !== TestStatus.Error && activeTest.results.status !== TestStatus.Fail) {
+                             <div class="m-6 text-slate-400 text-xs italic text-center">Waiting for iteration results...</div>
+                          }
                         </div>
                       </div>
                     </div>
