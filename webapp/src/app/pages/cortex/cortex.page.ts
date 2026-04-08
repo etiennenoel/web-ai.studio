@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, OnInit, PLATFORM_ID, OnDestroy} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, PLATFORM_ID, OnDestroy, HostListener} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {AxonTestSuiteExecutor} from './axon/axon-test-suite.executor';
 import {TestStatus} from '../../enums/test-status.enum';
@@ -11,6 +11,7 @@ import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
 import {ComparisonDataService} from './services/comparison-data.service';
+import {GlobalFilterService} from './services/global-filter.service';
 
 @Component({
   selector: 'page-cortex',
@@ -37,9 +38,64 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   generatedShareUrl: string | null = null;
   showShareModal = false;
   showExtensionModal = false;
+  skipExtensionCheck = false;
   showAboutModal = false;
   showBaselineDropdown = false;
+  baselineSearchQuery: string = '';
   isUrlCopied = false;
+
+  // New Design State
+  activeView: 'overview' | 'test-lab' | 'api' = 'overview';
+  activeScenarioId: string | null = null;
+  activeTestIdInLab: string | null = null;
+  activeApiId: BuiltInAiApi | null = null;
+  isDrawerOpen: boolean = false;
+  drawerHeight: number = 350;
+  isDrawerResizing: boolean = false;
+  private _drawerResizeStartY: number = 0;
+  private _drawerResizeStartHeight: number = 0;
+  private _boundDrawerResizeMove = this.onDrawerResizeMove.bind(this);
+  private _boundDrawerResizeEnd = this.onDrawerResizeEnd.bind(this);
+  systemLogs: {message: string, timestamp: Date, type: 'system'|'start'|'success'|'error'|'iteration'|'result'|'info', duration?: number}[] = [];
+  private _lastLogTime: number = 0;
+
+  sidebarWidth: number = 340;
+  isResizing: boolean = false;
+
+  // Table sort state
+  tableSortColumn: 'name' | 'ttft' | 'total' | 'inputTokens' | 'inputSpeed' | 'outputSpeed' = 'name';
+  tableSortDirection: 'asc' | 'desc' = 'asc';
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizing) return;
+    this.sidebarWidth = Math.max(260, Math.min(600, event.clientX));
+  }
+
+  @HostListener('window:mouseup')
+  onMouseUp() {
+    this.isResizing = false;
+    document.body.style.userSelect = '';
+  }
+
+  startResizing(event: MouseEvent) {
+    this.isResizing = true;
+    document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+    event.preventDefault();
+  }
+
+  get filteredBaselines() {
+    if (!this.baselineSearchQuery) {
+      return this.comparisonService.availableBaselinesIndex;
+    }
+    const query = this.baselineSearchQuery.toLowerCase();
+    return this.comparisonService.availableBaselinesIndex.filter(b => 
+      (b.name && b.name.toLowerCase().includes(query)) ||
+      (b.os && b.os.toLowerCase().includes(query)) ||
+      (b.cpu && b.cpu.toLowerCase().includes(query)) ||
+      (b.executionType && b.executionType.toLowerCase().includes(query))
+    );
+  }
 
   viewData: { [id in (AxonTestId | "pretests")]: {iterationsCollapsed?:boolean, expandedOutputs?: {[key: number]: boolean}} } = {
     [AxonTestId.LanguageDetectorShortStringColdStart]: {},
@@ -74,8 +130,53 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private readonly platformId: Object,
-
+    public filterService: GlobalFilterService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event?: any) {
+    this.filterService.activeDropdown = null;
+  }
+
+  getFilterIcon(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'CPU') return 'bi-cpu';
+      if (value === 'GPU') return 'bi-gpu-card';
+      if (value === 'NPU') return 'bi-motherboard';
+      if (value === 'Cloud') return 'bi-cloud';
+      return 'bi-pc-horizontal';
+    }
+    if (filterType === 'engine') return 'bi-gear-fill';
+    if (filterType === 'variant') return 'bi-box-seam';
+    if (filterType === 'api') return 'bi-plugin';
+    return 'bi-tag';
+  }
+  
+  getFilterBadgeClass(filterType: string, value: string): string {
+    if (filterType === 'compute') {
+      if (value === 'GPU') return this.getBadgeClass('purple');
+      if (value === 'CPU') return this.getBadgeClass('default');
+      if (value === 'Cloud') return this.getBadgeClass('cloud');
+      return this.getBadgeClass('emerald');
+    }
+    if (filterType === 'engine') return this.getBadgeClass('default');
+    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
+    return this.getBadgeClass('default');
+  }
+
+  getBadgeClass(variant: string): string {
+    const variants: { [key: string]: string } = {
+      default: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+      current: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30',
+      purple: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+      emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30',
+      cloud: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
+    };
+    if (variant === 'Cloud') return variants['cloud'];
+    return variants[variant] || variants['default'];
+  }
 
   triggerImport() {
     const fileInput = document.getElementById('cortex-report-upload') as HTMLInputElement;
@@ -107,7 +208,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     if (data && data.results) {
       this.axonTestSuiteExecutor.results = data.results;
       this.hardwareInfo = data.hardware;
-      this.comparisonService.loadBaselineData(this.hardwareInfo);
+      
       this.importedTimestamp = data.timestamp;
       this.importedUserAgent = data.userAgent;
       
@@ -244,9 +345,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.comparisonService.loadBaselineData(this.hardwareInfo);
+    this.skipExtensionCheck = localStorage.getItem('cortex_skip_extension_check') === 'true';
 
-    this.route.queryParamMap.subscribe(params => {      const reportParam = params.get('report');
+    
+
+    this.route.queryParamMap.subscribe(params => {      
+      const reportParam = params.get('report');
       if (reportParam) {
         // If we have a report, prioritize loading it and don't overwrite with default test selections
         this.loadReportFromUrl(reportParam);
@@ -260,6 +364,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         this.selectedTestIds = new Set(this.axonTestSuiteExecutor.testsSuite);
       }
     });
+
+    // Re-render when global filters change so sorted baselines stay correct
+    this.filterService.filtersChanged.subscribe(() => {
+      this.cdr.markForCheck();
+    });
+
   }
 
   ngOnDestroy() {}
@@ -289,10 +399,163 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // --- New Methods for Scenarios & Sidebar ---
+
+  setActiveView(view: 'overview' | 'test-lab' | 'api') {
+    this.activeView = view;
+  }
+
+  setActiveApi(api: BuiltInAiApi) {
+    this.activeApiId = api;
+    this.activeView = 'api';
+  }
+
+  setActiveScenario(id: string) {
+    this.activeScenarioId = id;
+    const scen = this.getScenarioById(id);
+    if (scen && scen.tests.length > 0) {
+       this.activeTestIdInLab = scen.tests[0].id;
+    }
+    this.activeView = 'test-lab';
+  }
+
+  itemDisplay(api: ItemInterface): string {
+    return api.label || (api.id as string);
+  }
+
+  getScenarios(api: BuiltInAiApi) {
+    const tests = this.getTests(api);
+    const scenariosMap = new Map<string, any>();
+
+    for (const test of tests) {
+      let baseName = test.id.replace('ColdStart', '').replace('WarmStart', '');
+      baseName = baseName.replace(/([A-Z])/g, ' $1').trim();
+
+      if (!scenariosMap.has(baseName)) {
+        scenariosMap.set(baseName, {
+          id: baseName,
+          name: baseName,
+          api: api,
+          tests: []
+        });
+      }
+      scenariosMap.get(baseName).tests.push(test);
+    }
+    return Array.from(scenariosMap.values());
+  }
+
+  getScenarioById(id: string | null) {
+    if (!id) return null;
+    for (const api of this.builtInAiApis) {
+      const scenarios = this.getScenarios(this.getBuiltInAiAPIFromItemInterface(api));
+      const scen = scenarios.find(s => s.id === id);
+      if (scen) return scen;
+    }
+    return null;
+  }
+
+  getScenarioStatusIcon(scen: any): string {
+    if (scen.tests.some((t: any) => t.results.status === TestStatus.Error || t.results.status === TestStatus.Fail)) {
+       return 'bi-x-circle-fill text-rose-500';
+    }
+    if (scen.tests.some((t: any) => t.results.status === TestStatus.Executing)) {
+       return 'bi-arrow-repeat animate-spin text-indigo-500';
+    }
+    if (scen.tests.every((t: any) => t.results.status === TestStatus.Success || t.results.status === TestStatus.Skipped)) {
+       if (scen.tests.some((t: any) => t.results.status === TestStatus.Success)) {
+          return 'bi-check-circle-fill text-emerald-500';
+       }
+    }
+    return 'bi-circle text-slate-400';
+  }
+
+  getTestStatusIcon(status: TestStatus): string {
+    switch (status) {
+      case TestStatus.Success: return 'bi-check-circle-fill text-emerald-500';
+      case TestStatus.Executing: return 'bi-arrow-repeat animate-spin text-indigo-500';
+      case TestStatus.Error:
+      case TestStatus.Fail: return 'bi-x-circle-fill text-rose-500';
+      case TestStatus.Skipped: return 'bi-slash-circle text-slate-400';
+      default: return 'bi-circle text-slate-400';
+    }
+  }
+
+  handleRunClick() {
+    if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
+      this.showExtensionModal = true;
+      return;
+    }
+    if (!this.isTestingRunning) {
+      this.isDrawerOpen = true;
+      this.start();
+    }
+  }
+
+  toggleExecution(event: Event) {
+    event.stopPropagation();
+    if (this.isTestingRunning && this.axonTestSuiteExecutor.results.status === TestStatus.Executing) {
+      this.stop();
+      this.addLog('Execution paused', 'system');
+    } else {
+      if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
+        this.showExtensionModal = true;
+        return;
+      }
+      this.start();
+    }
+  }
+
+  addLog(message: string, type: 'system'|'start'|'success'|'error'|'iteration'|'result'|'info' = 'system') {
+    const now = Date.now();
+    const duration = this._lastLogTime > 0 ? now - this._lastLogTime : undefined;
+    this.systemLogs.push({message, timestamp: new Date(), type, duration});
+    this._lastLogTime = now;
+  }
+
+  reloadPage() {
+    window.location.reload();
+  }
+
+  toggleSkipExtensionCheck() {
+    this.skipExtensionCheck = !this.skipExtensionCheck;
+    localStorage.setItem('cortex_skip_extension_check', String(this.skipExtensionCheck));
+  }
+
+  runWithoutExtension() {
+    this.showExtensionModal = false;
+    this.isDrawerOpen = true;
+    this.start();
+  }
+
+  onDrawerResizeStart(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDrawerResizing = true;
+    this._drawerResizeStartY = event.clientY;
+    this._drawerResizeStartHeight = this.drawerHeight;
+    document.addEventListener('mousemove', this._boundDrawerResizeMove);
+    document.addEventListener('mouseup', this._boundDrawerResizeEnd);
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+  }
+
+  onDrawerResizeMove(event: MouseEvent) {
+    const delta = this._drawerResizeStartY - event.clientY;
+    this.drawerHeight = Math.max(200, Math.min(window.innerHeight - 100, this._drawerResizeStartHeight + delta));
+  }
+
+  onDrawerResizeEnd() {
+    this.isDrawerResizing = false;
+    document.removeEventListener('mousemove', this._boundDrawerResizeMove);
+    document.removeEventListener('mouseup', this._boundDrawerResizeEnd);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+
   async loadInitialHardwareInfo() {
       try {
         this.hardwareInfo = await (window as any).webai.getHardwareInformation();
-        this.comparisonService.loadBaselineData(this.hardwareInfo);
+        
       } catch (e) {
         console.error("Failed to get hardware info", e);
       }
@@ -387,7 +650,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
   }
 
-  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
+  getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineValues(testId, metric)];
   }
 
@@ -400,33 +663,69 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return Math.max(2, (val / max) * 100);
   }
 
-  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed'): number[] {
+  getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
-      const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds);
+      const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds, true);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
       if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
       if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
+      if (metric === 'inputTokens') return res.averageInputTokens || 0;
       return 0;
     });
   }
 
-  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed'): number[] {
+  getAllBaselineValues(testId: string | number, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
-      const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds);
+      const res = this.comparisonService.getSummaryResults(b.data, testId, this.selectedTestIds, true);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
       if (metric === 'speed') return res.averageTokenPerSecond || 0;
       if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
       if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
+      if (metric === 'inputTokens') return res.averageInputTokens || 0;
       return 0;
     });
   }
 
-  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'|'inputSpeed'|'charSpeed'): boolean {
+  toggleTableSort(column: 'name' | 'ttft' | 'total' | 'inputTokens' | 'inputSpeed' | 'outputSpeed') {
+    if (this.tableSortColumn === column) {
+      this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.tableSortColumn = column;
+      this.tableSortDirection = 'asc';
+    }
+  }
+
+  getSortedBaselines(apiId: any, selectedTestIds: Set<string>) {
+    const baselines = [...this.comparisonService.baselines];
+    const col = this.tableSortColumn;
+    const dir = this.tableSortDirection === 'asc' ? 1 : -1;
+
+    return baselines.sort((a, b) => {
+      if (col === 'name') {
+        return dir * a.name.localeCompare(b.name);
+      }
+      const aSummary = this.comparisonService.getSummaryResults(a.data, apiId, selectedTestIds, true);
+      const bSummary = this.comparisonService.getSummaryResults(b.data, apiId, selectedTestIds, true);
+      let aVal = 0, bVal = 0;
+      if (col === 'ttft') { aVal = aSummary?.averageTimeToFirstToken || 0; bVal = bSummary?.averageTimeToFirstToken || 0; }
+      else if (col === 'total') { aVal = aSummary?.averageTotalResponseTime || 0; bVal = bSummary?.averageTotalResponseTime || 0; }
+      else if (col === 'inputTokens') { aVal = aSummary?.averageInputTokens || 0; bVal = bSummary?.averageInputTokens || 0; }
+      else if (col === 'inputSpeed') { aVal = aSummary?.averageInputTokensPerSecond || 0; bVal = bSummary?.averageInputTokensPerSecond || 0; }
+      else if (col === 'outputSpeed') { aVal = aSummary?.averageTokenPerSecond || 0; bVal = bSummary?.averageTokenPerSecond || 0; }
+      // Push zeros to the end
+      if (aVal <= 0 && bVal > 0) return 1;
+      if (bVal <= 0 && aVal > 0) return -1;
+      if (aVal <= 0 && bVal <= 0) return 0;
+      return dir * (aVal - bVal);
+    });
+  }
+
+  isWinner(currentVal: number | null | undefined, allValues: (number | null | undefined)[], metric: 'ttft'|'total'|'speed'|'inputSpeed'|'charSpeed'|'inputTokens'): boolean {
     const val = currentVal || 0;
     if (val <= 0) return false;
 
@@ -480,9 +779,9 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   toggleBaseline(filename: string, name: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
-      this.comparisonService.addBaseline(filename, name);
+      
     } else {
-      this.comparisonService.removeBaseline(filename);
+      
     }
   }
 
@@ -571,6 +870,27 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return tests.length > 0 && tests.every(t => this.selectedTestIds.has(t.id));
   }
 
+
+  isScenarioSelected(scen: any): boolean {
+    return scen.tests.every((t: any) => this.selectedTestIds.has(t.id));
+  }
+
+  isScenarioPartiallySelected(scen: any): boolean {
+    const selectedCount = scen.tests.filter((t: any) => this.selectedTestIds.has(t.id)).length;
+    return selectedCount > 0 && selectedCount < scen.tests.length;
+  }
+
+  toggleScenarioSelection(scen: any, event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (isChecked) {
+      scen.tests.forEach((t: any) => this.selectedTestIds.add(t.id));
+    } else {
+      scen.tests.forEach((t: any) => this.selectedTestIds.delete(t.id));
+    }
+  }
+
+
+
   isCategoryPartiallySelected(api: BuiltInAiApi): boolean {
     const tests = this.getTests(api);
     if (tests.length === 0) return false;
@@ -603,23 +923,97 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   async start() {
     // Clear explicit collapse overrides so dynamic opening works based on execution status
     this.apiCollapsedState = {};
-    
+
     // Explicitly open the setup details pane so users can watch the status
     this.viewData.pretests.iterationsCollapsed = false;
 
     this.axonTestSuiteExecutor.isStopped = false;
     this.axonTestSuiteExecutor.resetAbortController();
+
+    this.systemLogs = [];
+    this._lastLogTime = 0;
+    this.addLog(`Preparing test environment for ${this.selectedTestIds.size} tests...`, 'system');
+
     await this.axonTestSuiteExecutor.setup(this.selectedTestIds);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
 
     this.viewData.pretests.iterationsCollapsed = true;
 
+    this.addLog('Environment ready. Starting test suite execution...', 'system');
+
+    // Start execution observer for rich logging
+    const executionStartTime = Date.now();
+    const trackedTests = new Set<string>();
+    const trackedIterations = new Map<string, number>();
+
+    const observer = setInterval(() => {
+      if (!this.isTestingRunning || this.axonTestSuiteExecutor.results.status !== TestStatus.Executing) {
+        clearInterval(observer);
+        return;
+      }
+
+      const testsToRun = this.axonTestSuiteExecutor.testsSuite.filter(id => this.selectedTestIds.has(id));
+      for (const testId of testsToRun) {
+        const test = this.axonTestSuiteExecutor.testIdMap[testId];
+        const testKey = test.id;
+
+        // Log when a test starts executing
+        if (test.results.status === TestStatus.Executing && !trackedTests.has(testKey)) {
+          trackedTests.add(testKey);
+          trackedIterations.set(testKey, 0);
+          this.addLog(`${test.results.api} — ${test.id} (${test.results.startType})`, 'start');
+        }
+
+        // Log iteration progress
+        if (trackedTests.has(testKey)) {
+          const lastTracked = trackedIterations.get(testKey) || 0;
+          for (let i = lastTracked; i < test.results.testIterationResults.length; i++) {
+            const iter = test.results.testIterationResults[i];
+            if (iter.status === TestStatus.Executing && i === lastTracked) {
+              this.addLog(`  Iteration ${i + 1}/${test.results.numberOfIterations}`, 'iteration');
+              trackedIterations.set(testKey, i + 1);
+            }
+            if (iter.status === TestStatus.Success && i < (trackedIterations.get(testKey) || 0)) {
+              const ttft = iter.timeToFirstToken != null ? `TTFT: ${Math.round(iter.timeToFirstToken)}ms` : '';
+              const total = iter.totalResponseTime != null ? `Total: ${Math.round(iter.totalResponseTime)}ms` : '';
+              const speed = iter.tokensPerSecond != null && iter.tokensPerSecond > 0 ? `${Math.round(iter.tokensPerSecond)} t/s` : '';
+              const parts = [ttft, total, speed].filter(Boolean).join(' · ');
+              this.addLog(`  ✓ Iteration ${i + 1} complete — ${parts}`, 'result');
+            }
+            if (iter.status === TestStatus.Error || iter.status === TestStatus.Fail) {
+              this.addLog(`  ✗ Iteration ${i + 1} failed`, 'error');
+            }
+          }
+        }
+
+        // Log when a test completes
+        if ((test.results.status === TestStatus.Success || test.results.status === TestStatus.Error || test.results.status === TestStatus.Skipped) && trackedTests.has(testKey)) {
+          trackedTests.delete(testKey);
+          if (test.results.status === TestStatus.Success) {
+            const avgTtft = test.results.averageTimeToFirstToken ? `Avg TTFT: ${Math.round(test.results.averageTimeToFirstToken)}ms` : '';
+            const avgTotal = test.results.averageTotalResponseTime ? `Avg Total: ${Math.round(test.results.averageTotalResponseTime)}ms` : '';
+            const avgSpeed = test.results.averageTokensPerSecond && test.results.averageTokensPerSecond > 0 ? `Avg Speed: ${Math.round(test.results.averageTokensPerSecond)} t/s` : '';
+            const parts = [avgTtft, avgTotal, avgSpeed].filter(Boolean).join(' · ');
+            this.addLog(`✓ ${test.id} complete${parts ? ' — ' + parts : ''}`, 'success');
+          } else if (test.results.status === TestStatus.Skipped) {
+            this.addLog(`⊘ ${test.id} skipped (API unavailable)`, 'info');
+          } else {
+            this.addLog(`✗ ${test.id} failed`, 'error');
+          }
+        }
+      }
+    }, 250);
+
     // Once everything passes, we can start the tests.
     await this.axonTestSuiteExecutor.start(this.selectedTestIds);
+    clearInterval(observer);
 
     if (this.axonTestSuiteExecutor.isStopped) return;
-    
+
+    const totalTime = ((Date.now() - executionStartTime) / 1000).toFixed(1);
+    const stats = this.getGlobalPassedAndFailed();
+    this.addLog(`Execution complete — ${stats.passed} passed, ${stats.failed} failed in ${totalTime}s`, 'success');
     await this.generateReport();
   }
   
@@ -642,10 +1036,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return this.axonTestSuiteExecutor.forceSetup(testId);
   }
 
-  getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
+  getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm", ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
     const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
     const items = results.filter(value => {
-      return value.api === builtInAIApi && value.startType === startType && this.selectedTestIds.has(value.id);
+      return value.api === builtInAIApi && value.startType === startType && (ignoreSelection || this.selectedTestIds.has(value.id));
     }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
 
     if (items.length === 0) return undefined;
@@ -670,6 +1064,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         averageCharactersPerSecond: calcAvg('charactersPerSecond'),
         averageTimeToFirstToken: calcAvg('timeToFirstToken'),
         averageTotalResponseTime: calcAvg('totalResponseTime'),
+        averageInputTokens: calcAvg('totalNumberOfInputTokens'),
         medianTimeToFirstToken: calcMed('timeToFirstToken'),
         medianTotalResponseTime: calcMed('totalResponseTime'),
         medianTokenPerSecond: calcMed('tokensPerSecond'),
@@ -706,6 +1101,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
         averageCharactersPerSecond: calcAvg('charactersPerSecond'),
         averageTimeToFirstToken: calcAvg('timeToFirstToken'),
         averageTotalResponseTime: calcAvg('totalResponseTime'),
+        averageInputTokens: calcAvg('totalNumberOfInputTokens'),
         medianTimeToFirstToken: calcMed('timeToFirstToken'),
         medianTotalResponseTime: calcMed('totalResponseTime'),
         medianTokenPerSecond: calcMed('tokensPerSecond'),
@@ -903,6 +1299,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   unescapeOutput(output: string): string {
+    if (!output) return output;
     return output.replace(/\\\\/g, '\\') // 1. Unescape backslashes
       .replace(/\\"/g, '"')   // 2. Unescape double quotes
       .replace(/\\'/g, "'")   // 3. Unescape single quotes

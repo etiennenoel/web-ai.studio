@@ -4,6 +4,7 @@ export interface AxonSummaryResultsInterface {
   averageCharactersPerSecond?: number;
   averageTimeToFirstToken?: number;
   averageTotalResponseTime?: number;
+  averageInputTokens?: number;
   medianTokenPerSecond?: number;
   medianInputTokensPerSecond?: number;
   medianCharactersPerSecond?: number;

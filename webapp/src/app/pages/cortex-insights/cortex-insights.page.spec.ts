@@ -45,7 +45,7 @@ describe('CortexInsightsPage', () => {
     fixture.detectChanges(); // triggers ngOnInit
     expect(component).toBeTruthy();
     expect(titleService.setTitle).toHaveBeenCalledWith('Cortex Insights - Web AI Studio');
-    expect(metaService.updateTag).toHaveBeenCalledWith({ name: 'description', content: 'Historical Performance Profiler for Web AI Studio' });
+    expect(metaService.updateTag).toHaveBeenCalledWith({ name: 'description', content: 'Historical performance profiler and leaderboard for Chrome WebAI Cortex benchmark suites.' });
 
     // Expecting the index.json request
     const req = httpMock.expectOne('/data/baselines/index.json');
@@ -123,21 +123,21 @@ describe('CortexInsightsPage', () => {
     expect(component.leaderboard.length).toBe(2);
 
     // Filter by HW 1
-    component.selectedHardwares = ['HW 1'];
+    component.filterService.selectedHardwares = ['HW 1'];
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].hw).toBe('HW 1');
 
     // Reset and Filter by api2
-    component.selectedHardwares = ['HW 1', 'HW 2'];
-    component.selectedApis = ['api2'];
+    component.filterService.selectedHardwares = ['HW 1', 'HW 2'];
+    component.filterService.selectedApis = ['api2'];
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].apis).toEqual(['api2']);
-    
+
     // Search query
-    component.selectedApis = ['api1', 'api2'];
-    component.searchQuery = 'hw 2';
+    component.filterService.selectedApis = ['api1', 'api2'];
+    component.filterService.searchQuery = 'hw 2';
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].hw).toBe('HW 2');
@@ -258,17 +258,17 @@ describe('CortexInsightsPage', () => {
       } as any
     } as any;
 
-    component.hardwareOptions = ['HW 1', 'HW 2'];
-    component.apiOptions = ['api1'];
+    component.filterService.hardwareOptions = ['HW 1', 'HW 2'];
+    component.filterService.apiOptions = ['api1'];
 
     component.syncFromUrl();
 
     expect(component.activeMetric).toBe('ttft');
     expect(component.tableSortColumn).toBe('hw');
     expect(component.tableSortDirection).toBe('asc');
-    expect(component.searchQuery).toBe('test search');
-    expect(component.selectedHardwares).toEqual(['HW 1']);
-    expect(component.selectedApis).toEqual([]);
+    expect(component.filterService.searchQuery).toBe('test search');
+    expect(component.filterService.selectedHardwares).toEqual(['HW 1']);
+    expect(component.filterService.selectedApis).toEqual([]);
   });
 
   it('should sync to URL', () => {
@@ -278,16 +278,16 @@ describe('CortexInsightsPage', () => {
     component.activeMetric = 'ttft';
     component.tableSortColumn = 'hw';
     component.tableSortDirection = 'asc';
-    component.searchQuery = ' test search ';
+    component.filterService.searchQuery = ' test search ';
 
-    component.hardwareOptions = ['HW 1', 'HW 2'];
-    component.selectedHardwares = ['HW 1']; // 1 selected
-    
-    component.apiOptions = ['api1', 'api2'];
-    component.selectedApis = []; // none selected
+    component.filterService.hardwareOptions = ['HW 1', 'HW 2'];
+    component.filterService.selectedHardwares = ['HW 1']; // 1 selected
 
-    component.computeOptions = ['CPU'];
-    component.selectedComputes = ['CPU']; // all selected
+    component.filterService.apiOptions = ['api1', 'api2'];
+    component.filterService.selectedApis = []; // none selected
+
+    component.filterService.computeOptions = ['CPU'];
+    component.filterService.selectedComputes = ['CPU']; // all selected
 
     component.syncToUrl();
 
@@ -305,6 +305,99 @@ describe('CortexInsightsPage', () => {
       replaceUrl: true,
       queryParamsHandling: 'merge'
     });
+  });
+
+  describe('field derivation', () => {
+    it('should derive hw from name when hw field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-litertlm', name: 'Apple M4 (LiteRT-LM)', executionType: 'GPU', model: 'Nano V3 4B' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-litertlm.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 10, timeToFirstToken: 100, charactersPerSecond: 50, totalResponseTime: 500 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].hw).toBe('Apple M4 (LiteRT-LM)');
+    }));
+
+    it('should use explicit hw field when present', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test', name: 'Display Name', hw: 'Custom HW', executionType: 'GPU', model: 'M1' }
+      ]);
+      httpMock.expectOne('/data/baselines/test.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 5, timeToFirstToken: 50, charactersPerSecond: 20, totalResponseTime: 200 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].hw).toBe('Custom HW');
+    }));
+
+    it('should derive compute from executionType when compute field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-gpu', name: 'Test GPU', executionType: 'GPU', model: 'M1' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-gpu.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].compute).toBe('GPU');
+    }));
+
+    it('should derive engine from filename when engine field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: '2026-04-05-apple-m1-litertlm', name: 'Apple M1 (LiteRT-LM)', executionType: 'GPU', model: 'M1' },
+        { filename: '2026-04-05-apple-m1-llminferenceengine', name: 'Apple M1 (LLM IE)', executionType: 'GPU', model: 'M1' },
+        { filename: '2026-04-03_gemini_flash', name: 'Gemini Flash', executionType: 'Cloud', model: 'Flash' }
+      ]);
+      httpMock.expectOne('/data/baselines/2026-04-05-apple-m1-litertlm.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/2026-04-05-apple-m1-llminferenceengine.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/2026-04-03_gemini_flash.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-05-apple-m1-litertlm')!.engine).toBe('LITERT-LM');
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-05-apple-m1-llminferenceengine')!.engine).toBe('LLM IE');
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-03_gemini_flash')!.engine).toBe('Gemini API');
+    }));
+
+    it('should never produce Unknown for hw, compute, or engine', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'bare-minimum', name: 'Bare Config' }
+      ]);
+      httpMock.expectOne('/data/baselines/bare-minimum.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      const b = component.rawBaselines[0];
+      expect(b.hw).not.toBe('Unknown');
+      expect(b.compute).not.toBe('Unknown');
+      expect(b.engine).not.toBe('Unknown');
+    }));
+
+    it('should set filter options without Unknown for derived fields', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-litertlm', name: 'Apple M4', executionType: 'GPU', model: 'Nano V3 4B' },
+        { filename: 'test-cloud', name: 'Gemini Flash', executionType: 'Cloud', model: 'Gemini 3.1 Flash' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-litertlm.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 10, timeToFirstToken: 100, charactersPerSecond: 50, totalResponseTime: 500 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/test-cloud.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 5, timeToFirstToken: 50, charactersPerSecond: 20, totalResponseTime: 200 }] }] }
+      });
+      tick();
+      expect(component.filterService.hardwareOptions).not.toContain('Unknown');
+      expect(component.filterService.computeOptions).not.toContain('Unknown');
+      expect(component.filterService.engineOptions).not.toContain('Unknown');
+    }));
   });
 
   it('should return correct badge class', () => {

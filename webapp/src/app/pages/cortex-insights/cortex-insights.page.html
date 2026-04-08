@@ -1,6 +1,7 @@
-<div class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 selection:bg-indigo-500/30 selection:text-indigo-200 pb-32">
+<div [ngClass]="embedded ? 'pb-8 bg-transparent' : 'min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 selection:bg-indigo-500/30 selection:text-indigo-200 pb-32'">
   
   <!-- HEADER -->
+  @if (!embedded) {
   <header class="border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between">
       <div class="flex items-center gap-4">
@@ -19,208 +20,54 @@
       </div>
     </div>
   </header>
-
-  <!-- SMART FILTER BAR -->
-  <div class="relative z-50 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
-    <div class="max-w-[1600px] mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex flex-wrap items-center gap-3 shrink-0">
-        <i class="bi bi-funnel text-slate-500 dark:text-slate-500"></i>
-        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Filters</span>
-        <div class="w-px h-4 bg-slate-100 dark:bg-slate-800 mx-1"></div>
-        
-        <!-- Hardware Filter -->
-
-        <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('hardware', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedHardwares.length > 0 && selectedHardwares.length < hardwareOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Hardware:</span>
-            <span [ngClass]="selectedHardwares.length > 0 && selectedHardwares.length < hardwareOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedHardwares.length === hardwareOptions.length ? 'All' : (selectedHardwares.length === 0 ? 'None' : (selectedHardwares.length === 1 ? selectedHardwares[0] : selectedHardwares.length + ' Selected')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
-          </button>
-          @if (activeDropdown === 'hardware') {
-            <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50 dark:bg-slate-900 dark:border-slate-800">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-xs px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="onDropdownSearch('hardware', $event)" [value]="dropdownSearch['hardware']">
-              </div>
-              <div class="max-h-60 overflow-y-auto py-1">
-                @for (opt of getFilteredOptions('hardware'); track opt) {
-                  <label class="w-full flex items-center px-4 py-2 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="isFilterSelected('hardware', opt)" [class.text-slate-700]="!isFilterSelected('hardware', opt)" [class.dark:text-indigo-400]="isFilterSelected('hardware', opt)" [class.dark:text-slate-300]="!isFilterSelected('hardware', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800" [checked]="isFilterSelected('hardware', opt)" (change)="selectFilter('hardware', opt, $event)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        <!-- Compute Filter -->
-
-        <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('compute', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedComputes.length > 0 && selectedComputes.length < computeOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Compute:</span>
-            <span [ngClass]="selectedComputes.length > 0 && selectedComputes.length < computeOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ selectedComputes.length === computeOptions.length ? 'All' : (selectedComputes.length === 0 ? 'None' : (selectedComputes.length === 1 ? selectedComputes[0] : selectedComputes.length + ' Selected')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
-          </button>
-          @if (activeDropdown === 'compute') {
-            <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50 dark:bg-slate-900 dark:border-slate-800">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-xs px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="onDropdownSearch('compute', $event)" [value]="dropdownSearch['compute']">
-              </div>
-              <div class="max-h-60 overflow-y-auto py-1">
-                @for (opt of getFilteredOptions('compute'); track opt) {
-                  <label class="w-full flex items-center px-4 py-2 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="isFilterSelected('compute', opt)" [class.text-slate-700]="!isFilterSelected('compute', opt)" [class.dark:text-indigo-400]="isFilterSelected('compute', opt)" [class.dark:text-slate-300]="!isFilterSelected('compute', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800" [checked]="isFilterSelected('compute', opt)" (change)="selectFilter('compute', opt, $event)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        <!-- Engine Filter -->
-
-        <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('engine', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedEngines.length > 0 && selectedEngines.length < engineOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Engine:</span>
-            <div [ngClass]="selectedEngines.length > 0 && selectedEngines.length < engineOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
-              @if (selectedEngines.length === engineOptions.length) {
-                All
-              } @else if (selectedEngines.length === 0) {
-                None
-              } @else {
-                @for (val of selectedEngines; track val) {
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', val)">
-                    <i class="bi" [ngClass]="getFilterIcon('engine', val)"></i> {{ val }}
-                  </span>
-                }
-              }
-            </div>
-            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
-          </button>
-          @if (activeDropdown === 'engine') {
-            <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50 dark:bg-slate-900 dark:border-slate-800">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-xs px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="onDropdownSearch('engine', $event)" [value]="dropdownSearch['engine']">
-              </div>
-              <div class="max-h-60 overflow-y-auto py-1">
-                @for (opt of getFilteredOptions('engine'); track opt) {
-                  <label class="w-full flex items-center px-4 py-2 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="isFilterSelected('engine', opt)" [class.text-slate-700]="!isFilterSelected('engine', opt)" [class.dark:text-indigo-400]="isFilterSelected('engine', opt)" [class.dark:text-slate-300]="!isFilterSelected('engine', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800" [checked]="isFilterSelected('engine', opt)" (change)="selectFilter('engine', opt, $event)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        <!-- Variant Filter -->
-
-        <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('variant', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedVariants.length > 0 && selectedVariants.length < variantOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Variant:</span>
-            <div [ngClass]="selectedVariants.length > 0 && selectedVariants.length < variantOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
-              @if (selectedVariants.length === variantOptions.length) {
-                All
-              } @else if (selectedVariants.length === 0) {
-                None
-              } @else {
-                @for (val of selectedVariants; track val) {
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('variant', val)">
-                    <i class="bi" [ngClass]="getFilterIcon('variant', val)"></i> {{ val }}
-                  </span>
-                }
-              }
-            </div>
-            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
-          </button>
-          @if (activeDropdown === 'variant') {
-            <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50 dark:bg-slate-900 dark:border-slate-800">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-xs px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="onDropdownSearch('variant', $event)" [value]="dropdownSearch['variant']">
-              </div>
-              <div class="max-h-60 overflow-y-auto py-1">
-                @for (opt of getFilteredOptions('variant'); track opt) {
-                  <label class="w-full flex items-center px-4 py-2 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="isFilterSelected('variant', opt)" [class.text-slate-700]="!isFilterSelected('variant', opt)" [class.dark:text-indigo-400]="isFilterSelected('variant', opt)" [class.dark:text-slate-300]="!isFilterSelected('variant', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800" [checked]="isFilterSelected('variant', opt)" (change)="selectFilter('variant', opt, $event)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        <!-- API Filter -->
-
-        <div class="relative filter-dropdown">
-          <button (click)="toggleDropdown('api', $event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" [ngClass]="selectedApis.length > 0 && selectedApis.length < apiOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">API:</span>
-            <div [ngClass]="selectedApis.length > 0 && selectedApis.length < apiOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'" class="flex items-center gap-1.5 flex-wrap">
-              @if (selectedApis.length === apiOptions.length) {
-                All
-              } @else if (selectedApis.length === 0) {
-                None
-              } @else {
-                @for (val of selectedApis; track val) {
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('api', val)">
-                    <i class="bi" [ngClass]="getFilterIcon('api', val)"></i> {{ val }}
-                  </span>
-                }
-              }
-            </div>
-            <i class="bi bi-chevron-down opacity-50 ml-1"></i>
-          </button>
-          @if (activeDropdown === 'api') {
-            <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50 dark:bg-slate-900 dark:border-slate-800">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-xs px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="onDropdownSearch('api', $event)" [value]="dropdownSearch['api']">
-              </div>
-              <div class="max-h-60 overflow-y-auto py-1">
-                @for (opt of getFilteredOptions('api'); track opt) {
-                  <label class="w-full flex items-center px-4 py-2 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="isFilterSelected('api', opt)" [class.text-slate-700]="!isFilterSelected('api', opt)" [class.dark:text-indigo-400]="isFilterSelected('api', opt)" [class.dark:text-slate-300]="!isFilterSelected('api', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800" [checked]="isFilterSelected('api', opt)" (change)="selectFilter('api', opt, $event)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-            </div>
-    </div>
-  </div>
+  }
 
   <main class="max-w-[1600px] mx-auto px-6 py-8 flex flex-col gap-6">
     
     <!-- TOP ROW: KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
         <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
-          <i class="bi bi-speedometer2"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg Speed</span>
+          <i class="bi bi-speedometer2"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Avg Output Token/s</span>
         </div>
         <div class="flex items-baseline gap-1 relative z-10">
           <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgSpeed | number:'1.0-0' }}</span>
           <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">t/s</span>
-          <span class="text-xs font-semibold text-slate-400 dark:text-slate-600 mx-1">/</span>
-          <span class="text-2xl font-bold text-slate-500 dark:text-slate-400 tracking-tight">{{ fleetAvgCharSpeed | number:'1.0-0' }}</span>
-          <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">c/s</span>
         </div>
-        <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
-          <i class="bi bi-graph-up-arrow"></i> +12% vs previous
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+        <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
+          <i class="bi bi-fonts"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Avg Output Characters/s</span>
+        </div>
+        <div class="flex items-baseline gap-1 relative z-10">
+          <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgCharSpeed | number:'1.0-0' }}</span>
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">c/s</span>
         </div>
       </div>
 
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
         <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
-          <i class="bi bi-stopwatch"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Fleet Avg TTFT</span>
+          <i class="bi bi-box-arrow-in-right"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Avg Input Tokens/s</span>
+        </div>
+        <div class="flex items-baseline gap-1 relative z-10">
+          <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgInputSpeed | number:'1.0-0' }}</span>
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">t/s</span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+        <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 mb-3 relative z-10">
+          <i class="bi bi-stopwatch"></i> <span class="text-[10px] font-bold uppercase tracking-widest">Avg TTFT</span>
         </div>
         <div class="flex items-baseline gap-1 relative z-10">
           <span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{{ fleetAvgTtft | number:'1.0-0' }}</span>
           <span class="text-xs font-semibold text-slate-500 dark:text-slate-500">ms</span>
-        </div>
-        <div class="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 relative z-10">
-          <i class="bi bi-graph-down-arrow"></i> -8% vs previous
         </div>
       </div>
 
@@ -233,15 +80,38 @@
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/30">
         <div class="flex items-center gap-3">
           <i class="bi bi-hdd-network text-indigo-400 text-xl"></i>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Configuration Leaderboard</h2>
-          <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold ml-2">Showing {{ leaderboard.length }} Configs</span>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Benchmarks</h2>
+          <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold ml-2">{{ leaderboard.length }} / {{ rawBaselines.length }}</span>
         </div>
         <div class="flex items-center gap-3">
+          <!-- API Filter (leaderboard-scoped) -->
+          <div class="relative filter-dropdown">
+            <button (click)="filterService.toggleDropdown('api', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedApis.length > 0 && filterService.selectedApis.length < filterService.apiOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+              <span class="opacity-60">API:</span>
+              <span class="truncate max-w-[200px]" [ngClass]="filterService.selectedApis.length > 0 && filterService.selectedApis.length < filterService.apiOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ filterService.selectedApis.length === filterService.apiOptions.length ? 'All' : (filterService.selectedApis.length === 0 ? 'None' : filterService.selectedApis.filter(a => a !== 'All').join(', ')) }}</span>
+              <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
+            </button>
+            @if (filterService.activeDropdown === 'api') {
+              <div class="absolute top-full right-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
+                <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
+                  <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('api', $event)" [value]="filterService.dropdownSearch['api'] || ''">
+                </div>
+                <div class="max-h-48 overflow-y-auto py-1">
+                  @for (opt of filterService.getFilteredOptions('api'); track opt) {
+                    <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="filterService.isFilterSelected('api', opt)" [class.text-slate-700]="!filterService.isFilterSelected('api', opt)" [class.dark:text-indigo-400]="filterService.isFilterSelected('api', opt)" [class.dark:text-slate-300]="!filterService.isFilterSelected('api', opt)">
+                      <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3" [checked]="filterService.isFilterSelected('api', opt)" (change)="filterService.selectFilter('api', opt, $event.target.checked)">
+                      {{ opt }}
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+          </div>
           <div class="relative">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-500"></i>
-            <input 
-              type="text" 
-              placeholder="Search hardware or model..." 
+            <input
+              type="text"
+              placeholder="Search hardware or model..."
               [value]="searchQuery"
               (input)="onSearch($event)"
               class="w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white rounded-lg pl-9 pr-4 py-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-400 dark:text-slate-600"
