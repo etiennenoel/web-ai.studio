@@ -56,13 +56,13 @@ export class ComparisonDataService {
   }
 
   
-  _allBaselines: { id: string, name: string, data: any, os?: string, cpu?: string, ram?: number, model?: string, executionType?: string, hw?: string, compute?: string, engine?: string }[] = [];
+  _allBaselines: { id: string, name: string, data: any, os?: string, cpu?: string, ram?: number, model?: string, executionType?: string, hw: string, compute: string, engine: string }[] = [];
 
   get baselines() {
     return this._allBaselines.filter(b => {
-      if (!this.filterService.selectedHardwares.includes(b.hw || 'Unknown')) return false;
-      if (!this.filterService.selectedComputes.includes(b.compute || 'Unknown')) return false;
-      if (!this.filterService.selectedEngines.includes(b.engine || 'Unknown')) return false;
+      if (!this.filterService.selectedHardwares.includes(b.hw)) return false;
+      if (!this.filterService.selectedComputes.includes(b.compute)) return false;
+      if (!this.filterService.selectedEngines.includes(b.engine)) return false;
       if (!this.filterService.selectedVariants.includes(b.model || 'Unknown')) return false;
       
       if (this.filterService.searchQuery) {
@@ -88,11 +88,21 @@ export class ComparisonDataService {
             let fetches = 0;
             data.forEach(idx => {
                this.http.get(`/data/baselines/${idx.filename}.json`).subscribe(jsonData => {
-                   this._allBaselines.push({ id: idx.filename, name: idx.name, data: jsonData, os: idx.os, cpu: idx.cpu, ram: idx.ram, model: idx.model, executionType: idx.executionType, hw: idx.hw || "Unknown", compute: idx.compute || "Unknown", engine: idx.engine || "Unknown" });
-                   
-                   hwSet.add(idx.hw || "Unknown");
-                   computeSet.add(idx.compute || "Unknown");
-                   engineSet.add(idx.engine || "Unknown");
+                   let engine = idx.engine || 'Gemini API';
+                   if (!idx.engine) {
+                     const fn = idx.filename.toLowerCase();
+                     if (fn.includes('llminferenceengine')) engine = 'LLM IE';
+                     else if (fn.includes('litertlm')) engine = 'LITERT-LM';
+                   }
+
+                   const hw = idx.hw || idx.name;
+                   const compute = idx.compute || idx.executionType || 'CPU';
+
+                   this._allBaselines.push({ id: idx.filename, name: idx.name, data: jsonData, os: idx.os, cpu: idx.cpu, ram: idx.ram, model: idx.model, executionType: idx.executionType, hw, compute, engine });
+
+                   hwSet.add(hw);
+                   computeSet.add(compute);
+                   engineSet.add(engine);
                    variantSet.add(idx.model || "Unknown");
                    if ((jsonData as any).results && (jsonData as any).results.testsResults) {
                      (jsonData as any).results.testsResults.forEach((t: any) => {
