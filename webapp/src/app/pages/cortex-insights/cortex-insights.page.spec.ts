@@ -307,6 +307,99 @@ describe('CortexInsightsPage', () => {
     });
   });
 
+  describe('field derivation', () => {
+    it('should derive hw from name when hw field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-litertlm', name: 'Apple M4 (LiteRT-LM)', executionType: 'GPU', model: 'Nano V3 4B' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-litertlm.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 10, timeToFirstToken: 100, charactersPerSecond: 50, totalResponseTime: 500 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].hw).toBe('Apple M4 (LiteRT-LM)');
+    }));
+
+    it('should use explicit hw field when present', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test', name: 'Display Name', hw: 'Custom HW', executionType: 'GPU', model: 'M1' }
+      ]);
+      httpMock.expectOne('/data/baselines/test.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 5, timeToFirstToken: 50, charactersPerSecond: 20, totalResponseTime: 200 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].hw).toBe('Custom HW');
+    }));
+
+    it('should derive compute from executionType when compute field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-gpu', name: 'Test GPU', executionType: 'GPU', model: 'M1' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-gpu.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines[0].compute).toBe('GPU');
+    }));
+
+    it('should derive engine from filename when engine field is missing', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: '2026-04-05-apple-m1-litertlm', name: 'Apple M1 (LiteRT-LM)', executionType: 'GPU', model: 'M1' },
+        { filename: '2026-04-05-apple-m1-llminferenceengine', name: 'Apple M1 (LLM IE)', executionType: 'GPU', model: 'M1' },
+        { filename: '2026-04-03_gemini_flash', name: 'Gemini Flash', executionType: 'Cloud', model: 'Flash' }
+      ]);
+      httpMock.expectOne('/data/baselines/2026-04-05-apple-m1-litertlm.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/2026-04-05-apple-m1-llminferenceengine.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/2026-04-03_gemini_flash.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-05-apple-m1-litertlm')!.engine).toBe('LITERT-LM');
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-05-apple-m1-llminferenceengine')!.engine).toBe('LLM IE');
+      expect(component.rawBaselines.find(b => b.filename === '2026-04-03_gemini_flash')!.engine).toBe('Gemini API');
+    }));
+
+    it('should never produce Unknown for hw, compute, or engine', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'bare-minimum', name: 'Bare Config' }
+      ]);
+      httpMock.expectOne('/data/baselines/bare-minimum.json').flush({
+        results: { testsResults: [{ api: 'p', testIterationResults: [{ status: 'Success', tokensPerSecond: 1, timeToFirstToken: 10, charactersPerSecond: 5, totalResponseTime: 100 }] }] }
+      });
+      tick();
+      const b = component.rawBaselines[0];
+      expect(b.hw).not.toBe('Unknown');
+      expect(b.compute).not.toBe('Unknown');
+      expect(b.engine).not.toBe('Unknown');
+    }));
+
+    it('should set filter options without Unknown for derived fields', fakeAsync(() => {
+      fixture.detectChanges();
+      httpMock.expectOne('/data/baselines/index.json').flush([
+        { filename: 'test-litertlm', name: 'Apple M4', executionType: 'GPU', model: 'Nano V3 4B' },
+        { filename: 'test-cloud', name: 'Gemini Flash', executionType: 'Cloud', model: 'Gemini 3.1 Flash' }
+      ]);
+      httpMock.expectOne('/data/baselines/test-litertlm.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 10, timeToFirstToken: 100, charactersPerSecond: 50, totalResponseTime: 500 }] }] }
+      });
+      httpMock.expectOne('/data/baselines/test-cloud.json').flush({
+        results: { testsResults: [{ api: 'translator', testIterationResults: [{ status: 'Success', tokensPerSecond: 5, timeToFirstToken: 50, charactersPerSecond: 20, totalResponseTime: 200 }] }] }
+      });
+      tick();
+      expect(component.filterService.hardwareOptions).not.toContain('Unknown');
+      expect(component.filterService.computeOptions).not.toContain('Unknown');
+      expect(component.filterService.engineOptions).not.toContain('Unknown');
+    }));
+  });
+
   it('should return correct badge class', () => {
     expect(component.getBadgeClass('current')).toContain('bg-indigo-100');
     expect(component.getBadgeClass('purple')).toContain('bg-purple-100');

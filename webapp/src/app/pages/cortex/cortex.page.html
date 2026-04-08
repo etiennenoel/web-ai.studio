@@ -614,16 +614,22 @@
                                 <i class="bi" [ngClass]="getExecutionTypeIcon(baselineDetails?.executionType)"></i> {{ baselineDetails?.executionType }}
                               </span>
                             }
-                            @if (isWinner(baselineSpeed, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
+                            @if (baselineSpeed > 0 && isWinner(baselineSpeed, allSpeed, 'speed')) {<i class="bi bi-trophy-fill inline text-slate-700 dark:text-slate-300"></i>}
                           </div>
                           <div class="flex items-baseline gap-1 flex-shrink-0">
-                            <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineSpeed, allSpeed, 'speed')">{{ baselineSpeed ? (baselineSpeed | number:'1.0-0') : 'N/A' }}</span>
-                            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                            @if (baselineSpeed > 0) {
+                              <span class="text-sm tabular-nums font-bold" [class.text-slate-700]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.text-slate-800]="!isWinner(baselineSpeed, allSpeed, 'speed')">{{ baselineSpeed | number:'1.0-0' }}</span>
+                              <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">t/s</span>
+                            } @else {
+                              <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
+                            }
                           </div>
                        </div>
+                       @if (baselineSpeed > 0) {
                        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                           <div class="h-full rounded-full transition-all duration-500" [class.bg-slate-500]="isWinner(baselineSpeed, allSpeed, 'speed')" [class.bg-slate-300]="!isWinner(baselineSpeed, allSpeed, 'speed')" [style.width]="getPercentage(baselineSpeed, maxSpeed) + '%'"></div>
                        </div>
+                       }
                      </div>
                    }
                  </div>
