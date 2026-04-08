@@ -181,9 +181,9 @@ export class CortexInsightsPage implements OnInit {
 
                 resolve({
                   filename: item.filename,
-                  hw: item.name,
-                  compute: item.executionType || 'CPU',
-                  engine: engine,
+                  hw: item.hw || item.name,
+                  compute: item.compute || item.executionType || 'CPU',
+                  engine: item.engine || engine,
                   model: item.model || 'Unknown',
                   tests
                 });

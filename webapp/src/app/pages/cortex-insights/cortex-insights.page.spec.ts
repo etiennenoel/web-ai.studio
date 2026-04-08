@@ -45,7 +45,7 @@ describe('CortexInsightsPage', () => {
     fixture.detectChanges(); // triggers ngOnInit
     expect(component).toBeTruthy();
     expect(titleService.setTitle).toHaveBeenCalledWith('Cortex Insights - Web AI Studio');
-    expect(metaService.updateTag).toHaveBeenCalledWith({ name: 'description', content: 'Historical Performance Profiler for Web AI Studio' });
+    expect(metaService.updateTag).toHaveBeenCalledWith({ name: 'description', content: 'Historical performance profiler and leaderboard for Chrome WebAI Cortex benchmark suites.' });
 
     // Expecting the index.json request
     const req = httpMock.expectOne('/data/baselines/index.json');
@@ -123,21 +123,21 @@ describe('CortexInsightsPage', () => {
     expect(component.leaderboard.length).toBe(2);
 
     // Filter by HW 1
-    component.selectedHardwares = ['HW 1'];
+    component.filterService.selectedHardwares = ['HW 1'];
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].hw).toBe('HW 1');
 
     // Reset and Filter by api2
-    component.selectedHardwares = ['HW 1', 'HW 2'];
-    component.selectedApis = ['api2'];
+    component.filterService.selectedHardwares = ['HW 1', 'HW 2'];
+    component.filterService.selectedApis = ['api2'];
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].apis).toEqual(['api2']);
-    
+
     // Search query
-    component.selectedApis = ['api1', 'api2'];
-    component.searchQuery = 'hw 2';
+    component.filterService.selectedApis = ['api1', 'api2'];
+    component.filterService.searchQuery = 'hw 2';
     component.applyFilters();
     expect(component.leaderboard.length).toBe(1);
     expect(component.leaderboard[0].hw).toBe('HW 2');
@@ -258,17 +258,17 @@ describe('CortexInsightsPage', () => {
       } as any
     } as any;
 
-    component.hardwareOptions = ['HW 1', 'HW 2'];
-    component.apiOptions = ['api1'];
+    component.filterService.hardwareOptions = ['HW 1', 'HW 2'];
+    component.filterService.apiOptions = ['api1'];
 
     component.syncFromUrl();
 
     expect(component.activeMetric).toBe('ttft');
     expect(component.tableSortColumn).toBe('hw');
     expect(component.tableSortDirection).toBe('asc');
-    expect(component.searchQuery).toBe('test search');
-    expect(component.selectedHardwares).toEqual(['HW 1']);
-    expect(component.selectedApis).toEqual([]);
+    expect(component.filterService.searchQuery).toBe('test search');
+    expect(component.filterService.selectedHardwares).toEqual(['HW 1']);
+    expect(component.filterService.selectedApis).toEqual([]);
   });
 
   it('should sync to URL', () => {
@@ -278,16 +278,16 @@ describe('CortexInsightsPage', () => {
     component.activeMetric = 'ttft';
     component.tableSortColumn = 'hw';
     component.tableSortDirection = 'asc';
-    component.searchQuery = ' test search ';
+    component.filterService.searchQuery = ' test search ';
 
-    component.hardwareOptions = ['HW 1', 'HW 2'];
-    component.selectedHardwares = ['HW 1']; // 1 selected
-    
-    component.apiOptions = ['api1', 'api2'];
-    component.selectedApis = []; // none selected
+    component.filterService.hardwareOptions = ['HW 1', 'HW 2'];
+    component.filterService.selectedHardwares = ['HW 1']; // 1 selected
 
-    component.computeOptions = ['CPU'];
-    component.selectedComputes = ['CPU']; // all selected
+    component.filterService.apiOptions = ['api1', 'api2'];
+    component.filterService.selectedApis = []; // none selected
+
+    component.filterService.computeOptions = ['CPU'];
+    component.filterService.selectedComputes = ['CPU']; // all selected
 
     component.syncToUrl();
 

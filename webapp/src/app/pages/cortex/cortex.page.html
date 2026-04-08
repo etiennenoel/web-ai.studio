@@ -223,7 +223,7 @@
             <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
           </button>
           @if (filterService.activeDropdown === 'hardware') {
-            <div class="absolute top-full right-0 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800">
+            <div class="absolute top-full right-0 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
               <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                 <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('hardware', $event)" [value]="filterService.dropdownSearch['hardware'] || ''">
               </div>
@@ -247,7 +247,7 @@
             <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
           </button>
           @if (filterService.activeDropdown === 'compute') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800">
+            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
               <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                 <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('compute', $event)" [value]="filterService.dropdownSearch['compute'] || ''">
               </div>
@@ -271,7 +271,7 @@
             <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
           </button>
           @if (filterService.activeDropdown === 'engine') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800">
+            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
               <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                 <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('engine', $event)" [value]="filterService.dropdownSearch['engine'] || ''">
               </div>
@@ -295,7 +295,7 @@
             <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
           </button>
           @if (filterService.activeDropdown === 'variant') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800">
+            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
               <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                 <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('variant', $event)" [value]="filterService.dropdownSearch['variant'] || ''">
               </div>
@@ -319,7 +319,7 @@
             <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
           </button>
           @if (filterService.activeDropdown === 'api') {
-            <div class="absolute top-full right-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800">
+            <div class="absolute top-full right-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
               <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                 <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('api', $event)" [value]="filterService.dropdownSearch['api'] || ''">
               </div>
@@ -1024,6 +1024,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Share Modal -->
+  @if (showShareModal) {
+    <div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="closeShareModal()">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg mx-4 p-6" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="bi bi-share text-indigo-500"></i> Share Report
+          </h3>
+          <button (click)="closeShareModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        @if (isGeneratingUrl) {
+          <div class="flex items-center justify-center gap-3 py-8 text-slate-500 dark:text-slate-400">
+            <i class="bi bi-arrow-repeat animate-spin text-indigo-500 text-xl"></i>
+            <span class="text-sm font-medium">Generating shareable URL...</span>
+          </div>
+        } @else if (generatedShareUrl) {
+          <div class="space-y-4">
+            <p class="text-xs text-slate-500 dark:text-slate-400">Copy the URL below to share your benchmark results. The report data is compressed and embedded in the URL.</p>
+            <div class="flex items-center gap-2">
+              <input type="text" readonly [value]="generatedShareUrl" class="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono select-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button (click)="copyShareUrl()" class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-lg transition-all" [ngClass]="isUrlCopied ? 'bg-emerald-500 text-white' : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md'">
+                <i class="bi" [ngClass]="isUrlCopied ? 'bi-check-lg' : 'bi-clipboard'"></i>
+                {{ isUrlCopied ? 'Copied!' : 'Copy' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
 
   <!-- Shared File Input for Imports -->
   <input type="file" id="cortex-report-upload" class="hidden" accept=".json" (change)="onFileSelected($event)">

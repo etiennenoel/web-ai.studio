@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { CortexPage } from './cortex.page';
 import { AxonTestSuiteExecutor } from './axon/axon-test-suite.executor';
 import { ComparisonDataService } from './services/comparison-data.service';
+import { GlobalFilterService } from './services/global-filter.service';
 import { AxonTestId } from './axon/enums/axon-test-id.enum';
 import { TestStatus } from '../../enums/test-status.enum';
 
@@ -26,13 +27,12 @@ describe('CortexPage', () => {
     };
 
     mockComparisonService = {
-      loadBaselineData: jasmine.createSpy('loadBaselineData'),
       baselines: [],
+      _allBaselines: [],
       availableBaselinesIndex: [],
-      addBaseline: jasmine.createSpy('addBaseline'),
-      removeBaseline: jasmine.createSpy('removeBaseline'),
       getGlobalSummaryResults: jasmine.createSpy('getGlobalSummaryResults'),
-      getSummaryResults: jasmine.createSpy('getSummaryResults')
+      getSummaryResults: jasmine.createSpy('getSummaryResults'),
+      loadAvailableBaselinesIndex: jasmine.createSpy('loadAvailableBaselinesIndex')
     };
 
     mockRouter = {
@@ -43,6 +43,7 @@ describe('CortexPage', () => {
       declarations: [CortexPage],
       imports: [RouterTestingModule],
       providers: [
+        GlobalFilterService,
         { provide: AxonTestSuiteExecutor, useValue: mockAxonTestSuiteExecutor },
         { provide: ComparisonDataService, useValue: mockComparisonService },
         { provide: Router, useValue: mockRouter },
@@ -105,7 +106,6 @@ describe('CortexPage', () => {
       expect(component.importedUserAgent).toEqual(mockData.userAgent);
       expect(component.selectedTestIds.has(mockTestId)).toBeTrue();
       expect(component.isImportedReport).toBeTrue();
-      expect(mockComparisonService.loadBaselineData).toHaveBeenCalledWith(mockData.hardware);
       expect(component.axonTestSuiteExecutor.testIdMap[mockTestId].results).toEqual(mockData.results.testsResults[0] as any);
     });
 
@@ -446,6 +446,82 @@ describe('CortexPage', () => {
       component.viewData[mockTestId].expandedOutputs = { 0: false };
       test.results.status = TestStatus.Executing;
       expect(component.isTestCollapsed(test)).toBeFalse();
+    });
+  });
+
+  describe('Share Modal', () => {
+    it('should open share modal when saveReportToUrl is called', fakeAsync(() => {
+      const OriginalCompressionStream = (window as any).CompressionStream;
+      (window as any).CompressionStream = class {
+        writable = {};
+        readable = {};
+      };
+
+      const OriginalResponse = window.Response;
+      (window as any).Response = class {
+        constructor(stream: any) {}
+        arrayBuffer() {
+          return Promise.resolve(new ArrayBuffer(8));
+        }
+      };
+
+      const originalBlob = window.Blob;
+      (window as any).Blob = class extends originalBlob {
+        override stream() {
+          return {
+            pipeThrough: () => ({})
+          } as any;
+        }
+      }
+
+      component.saveReportToUrl();
+      tick();
+
+      expect(component.showShareModal).toBeTrue();
+
+      (window as any).CompressionStream = OriginalCompressionStream;
+      (window as any).Response = OriginalResponse;
+      (window as any).Blob = originalBlob;
+    }));
+
+    it('should close share modal and reset state', () => {
+      component.showShareModal = true;
+      component.isUrlCopied = true;
+      component.generatedShareUrl = 'http://test.com';
+
+      component.closeShareModal();
+
+      expect(component.showShareModal).toBeFalse();
+      expect(component.isUrlCopied).toBeFalse();
+    });
+
+    it('should copy URL to clipboard', async () => {
+      component.generatedShareUrl = 'http://test.com/share';
+
+      const writeTextSpy = spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+
+      await component.copyShareUrl();
+
+      expect(writeTextSpy).toHaveBeenCalledWith('http://test.com/share');
+      expect(component.isUrlCopied).toBeTrue();
+    });
+  });
+
+  describe('Filter State', () => {
+    it('should reflect correct filter service state for all selected', () => {
+      component.filterService.hardwareOptions = ['All', 'HW1', 'HW2'];
+      component.filterService.selectedHardwares = ['All', 'HW1', 'HW2'];
+
+      // When all selected, length should equal options length
+      expect(component.filterService.selectedHardwares.length).toBe(component.filterService.hardwareOptions.length);
+    });
+
+    it('should reflect partial selection correctly', () => {
+      component.filterService.hardwareOptions = ['All', 'HW1', 'HW2'];
+      component.filterService.selectedHardwares = ['HW1'];
+
+      expect(component.filterService.selectedHardwares.length).toBeLessThan(component.filterService.hardwareOptions.length);
+      expect(component.filterService.selectedHardwares.length).toBeGreaterThan(0);
     });
   });
 

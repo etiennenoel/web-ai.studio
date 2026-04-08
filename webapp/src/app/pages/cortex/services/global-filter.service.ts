@@ -23,18 +23,39 @@ export class GlobalFilterService {
   filtersChanged = new Subject<void>();
 
   setOptions(hw: string[], compute: string[], engine: string[], variant: string[], api: string[]) {
-    this.hardwareOptions = ['All', ...hw];
-    this.computeOptions = ['All', ...compute];
-    this.engineOptions = ['All', ...engine];
-    this.variantOptions = ['All', ...variant];
-    this.apiOptions = ['All', ...api];
+    const mergeOptions = (existing: string[], incoming: string[]): string[] => {
+      const set = new Set(existing.filter(o => o !== 'All'));
+      incoming.forEach(o => set.add(o));
+      return ['All', ...Array.from(set).sort()];
+    };
 
-    if (this.selectedHardwares.length === 0) this.selectedHardwares = [...this.hardwareOptions];
-    if (this.selectedComputes.length === 0) this.selectedComputes = [...this.computeOptions];
-    if (this.selectedEngines.length === 0) this.selectedEngines = [...this.engineOptions];
-    if (this.selectedVariants.length === 0) this.selectedVariants = [...this.variantOptions];
-    if (this.selectedApis.length === 0) this.selectedApis = [...this.apiOptions];
-    
+    const syncSelections = (selected: string[], oldOptions: string[], newOptions: string[]): string[] => {
+      const wasAllSelected = selected.length === 0 || selected.length >= oldOptions.length;
+      if (wasAllSelected) {
+        return [...newOptions];
+      }
+      // Keep existing selections, add any new options that weren't in old options
+      return selected.filter(s => newOptions.includes(s));
+    };
+
+    const oldHw = this.hardwareOptions;
+    const oldCompute = this.computeOptions;
+    const oldEngine = this.engineOptions;
+    const oldVariant = this.variantOptions;
+    const oldApi = this.apiOptions;
+
+    this.hardwareOptions = mergeOptions(this.hardwareOptions, hw);
+    this.computeOptions = mergeOptions(this.computeOptions, compute);
+    this.engineOptions = mergeOptions(this.engineOptions, engine);
+    this.variantOptions = mergeOptions(this.variantOptions, variant);
+    this.apiOptions = mergeOptions(this.apiOptions, api);
+
+    this.selectedHardwares = syncSelections(this.selectedHardwares, oldHw, this.hardwareOptions);
+    this.selectedComputes = syncSelections(this.selectedComputes, oldCompute, this.computeOptions);
+    this.selectedEngines = syncSelections(this.selectedEngines, oldEngine, this.engineOptions);
+    this.selectedVariants = syncSelections(this.selectedVariants, oldVariant, this.variantOptions);
+    this.selectedApis = syncSelections(this.selectedApis, oldApi, this.apiOptions);
+
     this.filtersChanged.next();
   }
 
