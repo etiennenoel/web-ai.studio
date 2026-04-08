@@ -357,6 +357,7 @@ export class CortexInsightsPage implements OnInit {
 
     if (newLeaderboard.length > 0) {
       this.fleetAvgSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.speed)));
+      this.fleetAvgInputSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.inputSpeed).filter(v => v > 0)));
       this.fleetAvgCharSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.charSpeed)));
       this.fleetAvgTtft = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.ttft)));
 
@@ -374,6 +375,7 @@ export class CortexInsightsPage implements OnInit {
       this.minTotal = Math.min(...newLeaderboard.map(r => r.total));
     } else {
       this.fleetAvgSpeed = 0;
+      this.fleetAvgInputSpeed = 0;
       this.fleetAvgCharSpeed = 0;
       this.fleetAvgTtft = 0;
       this.topConfig = null;

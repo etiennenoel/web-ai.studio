@@ -142,6 +142,7 @@ getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestId
       averageCharactersPerSecond: calcAvg('charactersPerSecond'),
       averageTimeToFirstToken: calcAvg('timeToFirstToken'),
       averageTotalResponseTime: calcAvg('totalResponseTime'),
+      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
     };
   }
 
@@ -167,5 +168,6 @@ getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestId
       averageCharactersPerSecond: calcAvg('charactersPerSecond'),
       averageTimeToFirstToken: calcAvg('timeToFirstToken'),
       averageTotalResponseTime: calcAvg('totalResponseTime'),
+      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
     };
   }}
