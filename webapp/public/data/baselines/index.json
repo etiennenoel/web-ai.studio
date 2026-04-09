@@ -118,7 +118,7 @@
     "os": "Windows",
     "cpu": "Intel Core i7-13800H",
     "ram": 64,
-    "model": "Nano V3 4B",
+    "model": "Nano V3 2B",
     "executionType": "GPU"
   },
   {
@@ -127,8 +127,8 @@
     "os": "Windows",
     "cpu": "AMD EPYC",
     "ram": 240,
-    "model": "Nano V3 4B",
-    "executionType": "GPU"
+    "model": "Nano V3 2B",
+    "executionType": "CPU"
   },
   {
     "filename": "2026-04-07-windows-amd-epyc-240gb-llminferenceengine",
@@ -137,6 +137,6 @@
     "cpu": "AMD EPYC",
     "ram": 240,
     "model": "Nano V3 4B",
-    "executionType": "GPU"
+    "executionType": "CPU"
   }
 ]
