@@ -38,6 +38,10 @@ interface RawBaseline {
   compute: string;
   engine: string;
   model: string;
+  os?: string;
+  cpu?: string;
+  ram?: number;
+  executionType?: string;
   tests: RawTestResult[];
 }
 
@@ -108,6 +112,12 @@ export class CortexInsightsPage implements OnInit {
   chartPointsFleetCircles: {x: string, y: string}[] = [];
   chartPointsTopCircles: {x: string, y: string}[] = [];
   chartPolygonFleet: string = "";
+
+  // Right panel state
+  isPanelOpen: boolean = false;
+  selectedLeaderboardEntry: LeaderboardEntry | null = null;
+  selectedBaseline: RawBaseline | null = null;
+  selectedBaselineFullData: any = null;
 
   constructor(
     private titleService: Title,
@@ -185,6 +195,10 @@ export class CortexInsightsPage implements OnInit {
                   compute: item.compute || item.executionType || 'CPU',
                   engine: item.engine || engine,
                   model: item.model || 'Unknown',
+                  os: item.os,
+                  cpu: item.cpu,
+                  ram: item.ram,
+                  executionType: item.executionType,
                   tests
                 });
               },
@@ -513,5 +527,72 @@ export class CortexInsightsPage implements OnInit {
     if (ratio <= 0.5) return '#eab308'; // yellow-500
     if (ratio <= 0.75) return '#f97316'; // orange-500
     return '#f43f5e'; // rose-500
+  }
+
+  getRank(row: LeaderboardEntry, metric: 'speed' | 'inputSpeed' | 'ttft' | 'total'): number {
+    const lowerIsBetter = metric === 'ttft' || metric === 'total';
+    const sorted = [...this.leaderboard].sort((a, b) =>
+      lowerIsBetter ? a[metric] - b[metric] : b[metric] - a[metric]
+    );
+    return sorted.findIndex(r => r.filename === row.filename) + 1;
+  }
+
+  getRankSuffix(rank: number): string {
+    if (rank % 100 >= 11 && rank % 100 <= 13) return 'th';
+    switch (rank % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
+  openPanel(row: LeaderboardEntry) {
+    this.selectedLeaderboardEntry = row;
+    this.selectedBaseline = this.rawBaselines.find(b => b.filename === row.filename) || null;
+    this.selectedBaselineFullData = null;
+    this.isPanelOpen = true;
+
+    if (row.filename !== 'local') {
+      this.http.get<any>(`/data/baselines/${row.filename}.json`).subscribe({
+        next: (data) => this.selectedBaselineFullData = data,
+        error: () => this.selectedBaselineFullData = null
+      });
+    }
+  }
+
+  closePanel() {
+    this.isPanelOpen = false;
+    this.selectedLeaderboardEntry = null;
+    this.selectedBaseline = null;
+    this.selectedBaselineFullData = null;
+  }
+
+  formatBytes(bytes: number): string {
+    if (!bytes) return 'N/A';
+    const gb = bytes / (1024 * 1024 * 1024);
+    return gb >= 1 ? `${Math.round(gb)} GB` : `${Math.round(gb * 1024)} MB`;
+  }
+
+  extractChromeVersion(userAgent: string): string {
+    if (!userAgent) return 'N/A';
+    const match = userAgent.match(/Chrome\/(\d+)/);
+    return match ? `Chrome ${match[1]}` : 'N/A';
+  }
+
+  formatTimestamp(timestamp: string): string {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  getOsIcon(os?: string): string {
+    if (!os) return 'bi-pc-horizontal';
+    const lower = os.toLowerCase();
+    if (lower.includes('mac')) return 'bi-apple';
+    if (lower.includes('windows')) return 'bi-windows';
+    if (lower.includes('linux')) return 'bi-ubuntu';
+    if (lower.includes('cloud')) return 'bi-cloud';
+    return 'bi-pc-horizontal';
   }
 }
