@@ -1,8 +1,7 @@
 import {Injectable, Inject, PLATFORM_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AxonSummaryResultsInterface} from '../axon/interfaces/axon-summary-results.interface';
-import {MathematicalCalculations} from '../axon/util/mathematical-calculations';
-import {TestStatus} from '../../../enums/test-status.enum';
+import {SummaryResultsCalculator} from '../axon/util/summary-results.calculator';
 import { isPlatformBrowser } from '@angular/common';
 import { GlobalFilterService } from './global-filter.service';
 
@@ -120,54 +119,20 @@ export class ComparisonDataService {
     });
   }
 getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData?.results?.testsResults) return undefined;
 
-    const results = reportData.results.testsResults;
-    const items = results.filter((value: any) => {
-      return value.api === builtInAIApi && (ignoreSelection || selectedTestIds.has(value.id));
-    }).map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
-
-    if (items.length === 0) return undefined;
-
-    const calcAvg = (key: string) => {
-      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some((item: any) => item[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-      averageTokenPerSecond: calcAvg('tokensPerSecond'),
-      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-      averageTotalResponseTime: calcAvg('totalResponseTime'),
-      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-    };
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { api: builtInAIApi, selectedTestIds, ignoreSelection }
+    );
   }
 
   getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData?.results?.testsResults) return undefined;
 
-    const results = reportData.results.testsResults;
-    const items = results.filter((value: any) => ignoreSelection || selectedTestIds.has(value.id))
-      .map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
-
-    if (items.length === 0) return undefined;
-
-    const calcAvg = (key: string) => {
-      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some((item: any) => item[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-      averageTokenPerSecond: calcAvg('tokensPerSecond'),
-      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-      averageTotalResponseTime: calcAvg('totalResponseTime'),
-      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-    };
-  }}
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { selectedTestIds, ignoreSelection }
+    );
+  }
+}
