@@ -274,7 +274,7 @@
 
                 <!-- Action -->
                 <td class="px-4 py-4 align-middle text-center">
-                  <button class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white flex items-center justify-center transition-colors mx-auto">
+                  <button (click)="openPanel(row)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white flex items-center justify-center transition-colors mx-auto">
                     <i class="bi bi-chevron-right"></i>
                   </button>
                 </td>
@@ -286,4 +286,313 @@
     </div>
 
   </main>
+
+  <!-- RIGHT PANEL OVERLAY -->
+  @if (isPanelOpen && selectedLeaderboardEntry) {
+    @let entry = selectedLeaderboardEntry;
+    @let baseline = selectedBaseline;
+    @let fullData = selectedBaselineFullData;
+    @let hw = fullData?.hardware;
+
+    <!-- Backdrop -->
+    <div class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm transition-opacity" (click)="closePanel()"></div>
+
+    <!-- Panel -->
+    <div class="fixed top-0 right-0 bottom-0 z-[101] w-full sm:w-[480px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl overflow-y-auto">
+
+      <!-- Panel Header -->
+      <div class="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+              <i class="bi bi-cpu text-white text-base"></i>
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">{{ entry.hw }}</h2>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('compute', entry.compute)">
+                  <i class="bi" [ngClass]="getFilterIcon('compute', entry.compute)"></i> {{ entry.compute }}
+                </span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', entry.engine)">
+                  <i class="bi" [ngClass]="getFilterIcon('engine', entry.engine)"></i> {{ entry.engine }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button (click)="closePanel()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center transition-colors flex-shrink-0">
+            <i class="bi bi-x-lg text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="px-6 py-5 space-y-6">
+
+        <!-- Identity Card -->
+        <section>
+          <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">System Information</h3>
+          <div class="grid grid-cols-2 gap-3">
+            @if (baseline?.os) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi text-xs" [ngClass]="getOsIcon(baseline?.os)"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">OS</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.os }}</span>
+              </div>
+            }
+            @if (baseline?.cpu) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-cpu text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">CPU</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.cpu }}</span>
+              </div>
+            }
+            @if (baseline?.ram) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-memory text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">RAM</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.ram }} GB</span>
+              </div>
+            }
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-seam text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Model</span>
+              </div>
+              <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ entry.model }}</span>
+            </div>
+            @if (fullData?.timestamp) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-calendar3 text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Date</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ formatTimestamp(fullData.timestamp) }}</span>
+              </div>
+            }
+            @if (fullData?.userAgent) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-globe text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Browser</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ extractChromeVersion(fullData.userAgent) }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Overall Performance -->
+        <section>
+          <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Overall Performance</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-speedometer2 text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Output t/s</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.speed > 0 ? (entry.speed | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.speed > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-arrow-in-right text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Input t/s</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.inputSpeed > 0 ? (entry.inputSpeed | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.inputSpeed > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-stopwatch text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg TTFT</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.ttft | number:'1.0-0' }}</span>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500">ms</span>
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-clock-history text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Total</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.total | number:'1.0-0' }}</span>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500">ms</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Per-API Breakdown -->
+        @if (baseline && baseline.tests.length > 0) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Per-API Breakdown</h3>
+            <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">API</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">Out t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">In t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">TTFT</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                  @for (test of baseline.tests; track test.api) {
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td class="px-3 py-2.5">
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">{{ test.api }}</span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.speed > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.speed > 0 ? (test.speed | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="(test.inputSpeed ?? 0) > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ (test.inputSpeed ?? 0) > 0 ? (test.inputSpeed! | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-200">
+                          {{ test.ttft | number:'1.0-0' }}
+                          <span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-200">
+                          {{ test.total | number:'1.0-0' }}
+                          <span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        <!-- Hardware Details -->
+        @if (hw) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Hardware Details</h3>
+            <div class="space-y-2">
+              @if (hw.cpu?.archName) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Architecture</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.cpu.archName }}</span>
+                </div>
+              }
+              @if (hw.cpu?.numOfProcessors) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">CPU Cores</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.cpu.numOfProcessors }}</span>
+                </div>
+              }
+              @if (hw.memory?.capacity) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Total Memory</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ formatBytes(hw.memory.capacity) }}</span>
+                </div>
+              }
+              @if (hw.memory?.availableCapacity) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Available Memory</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ formatBytes(hw.memory.availableCapacity) }}</span>
+                </div>
+              }
+              @if (hw.navigator?.deviceMemory) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Device Memory (JS)</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.navigator.deviceMemory }} GB</span>
+                </div>
+              }
+              @if (hw.webgpu?.vendor) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">WebGPU Vendor</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.webgpu.vendor }}</span>
+                </div>
+              }
+              @if (hw.webgpu?.architecture) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">WebGPU Architecture</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.webgpu.architecture }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Per-API Cold/Warm Summary -->
+        @if (fullData?.results?.summary) {
+          <section class="pb-6">
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Cold vs Warm Breakdown</h3>
+            <div class="space-y-3">
+              @for (apiEntry of fullData.results.summary | keyvalue; track apiEntry.key) {
+                @let apiSummary = apiEntry.value;
+                @let hasColdData = apiSummary.cold && (apiSummary.cold.averageTokenPerSecond > 0 || apiSummary.cold.averageTimeToFirstToken > 0);
+                @let hasWarmData = apiSummary.warm && (apiSummary.warm.averageTokenPerSecond > 0 || apiSummary.warm.averageTimeToFirstToken > 0);
+                @if (hasColdData || hasWarmData) {
+                  <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                    <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                      <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{{ apiEntry.key }}</span>
+                    </div>
+                    <div class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                      @if (hasColdData) {
+                        <div class="px-3 py-2 flex items-center justify-between">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30">
+                            <i class="bi bi-snow"></i> Cold
+                          </span>
+                          <div class="flex items-center gap-4 text-xs">
+                            @if (apiSummary.cold.averageTokenPerSecond > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.cold.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span></span>
+                            }
+                            @if (apiSummary.cold.averageTimeToFirstToken > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.cold.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">ms ttft</span></span>
+                            }
+                          </div>
+                        </div>
+                      }
+                      @if (hasWarmData) {
+                        <div class="px-3 py-2 flex items-center justify-between">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30">
+                            <i class="bi bi-fire"></i> Warm
+                          </span>
+                          <div class="flex items-center gap-4 text-xs">
+                            @if (apiSummary.warm.averageTokenPerSecond > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.warm.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span></span>
+                            }
+                            @if (apiSummary.warm.averageTimeToFirstToken > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.warm.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">ms ttft</span></span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+      </div>
+    </div>
+  }
 </div>
