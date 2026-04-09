@@ -72,7 +72,7 @@ describe('CortexPage', () => {
       }
     } as any;
     
-    component.isExtensionInstalled = false;
+    component.hardwareService.isExtensionInstalled = false;
     fixture.detectChanges();
   });
 
@@ -101,7 +101,7 @@ describe('CortexPage', () => {
       component.loadReport(mockData);
 
       expect(component.axonTestSuiteExecutor.results.status).toEqual(TestStatus.Success);
-      expect(component.hardwareInfo).toEqual(mockData.hardware);
+      expect(component.hardwareService.hardwareInfo).toEqual(mockData.hardware);
       expect(component.importedTimestamp).toEqual(mockData.timestamp);
       expect(component.importedUserAgent).toEqual(mockData.userAgent);
       expect(component.selectedTestIds.has(mockTestId)).toBeTrue();
@@ -272,49 +272,49 @@ describe('CortexPage', () => {
 
   describe('Hardware Information Formatting', () => {
     it('should format compute unit', () => {
-      component.hardwareInfo = { cpu: { modelName: 'Test CPU', numOfProcessors: 4 } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Test CPU', numOfProcessors: 4 } };
       fixture.detectChanges();
-      expect(component.getComputeUnit()).toBe('Test CPU (4-Core)');
-      
-      component.hardwareInfo = { cpu: { modelName: 'Test CPU' } };
-      fixture.detectChanges();
-      expect(component.getComputeUnit()).toBe('Test CPU');
+      expect(component.hardwareService.getComputeUnit()).toBe('Test CPU (4-Core)');
 
-      component.hardwareInfo = null;
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Test CPU' } };
       fixture.detectChanges();
-      expect(component.getComputeUnit()).toBe('Extension Required');
+      expect(component.hardwareService.getComputeUnit()).toBe('Test CPU');
+
+      component.hardwareService.hardwareInfo = null;
+      fixture.detectChanges();
+      expect(component.hardwareService.getComputeUnit()).toBe('Extension Required');
     });
 
     it('should determine NPU info', () => {
-      component.hardwareInfo = { cpu: { modelName: 'Apple M1' } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Apple M1' } };
       fixture.detectChanges();
-      expect(component.getNpuInfo()).toBe('Apple Neural Engine');
+      expect(component.hardwareService.getNpuInfo()).toBe('Apple Neural Engine');
 
-      component.hardwareInfo = { cpu: { modelName: 'Snapdragon X' } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Snapdragon X' } };
       fixture.detectChanges();
-      expect(component.getNpuInfo()).toBe('Qualcomm Hexagon');
+      expect(component.hardwareService.getNpuInfo()).toBe('Qualcomm Hexagon');
 
-      component.hardwareInfo = { cpu: { modelName: 'Intel Core' } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Intel Core' } };
       fixture.detectChanges();
-      expect(component.getNpuInfo()).toBe('Intel NPU (if available)');
+      expect(component.hardwareService.getNpuInfo()).toBe('Intel NPU (if available)');
 
-      component.hardwareInfo = { cpu: { modelName: 'AMD Ryzen' } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'AMD Ryzen' } };
       fixture.detectChanges();
-      expect(component.getNpuInfo()).toBe('AMD Ryzen AI (if available)');
+      expect(component.hardwareService.getNpuInfo()).toBe('AMD Ryzen AI (if available)');
 
-      component.hardwareInfo = { cpu: { modelName: 'Generic CPU' } };
+      component.hardwareService.hardwareInfo = { cpu: { modelName: 'Generic CPU' } };
       fixture.detectChanges();
-      expect(component.getNpuInfo()).toBe('Unknown or None');
+      expect(component.hardwareService.getNpuInfo()).toBe('Unknown or None');
     });
 
     it('should format memory info', () => {
-      component.hardwareInfo = { memory: { capacity: 17179869184 } }; // 16GB
+      component.hardwareService.hardwareInfo = { memory: { capacity: 17179869184 } }; // 16GB
       fixture.detectChanges();
-      expect(component.getMemoryInfo()).toBe('16 GB RAM');
+      expect(component.hardwareService.getMemoryInfo()).toBe('16 GB RAM');
 
-      component.hardwareInfo = null;
+      component.hardwareService.hardwareInfo = null;
       fixture.detectChanges();
-      expect(component.getMemoryInfo()).toBe('Extension Required');
+      expect(component.hardwareService.getMemoryInfo()).toBe('Extension Required');
     });
 
     it('should format OS profile', () => {
@@ -322,36 +322,36 @@ describe('CortexPage', () => {
       // We will spy on the methods if they call external, but here we can mock by redefining on the component instance if possible, or use spyOnProperty.
       const userAgentSpy = spyOnProperty(window.navigator, 'userAgent', 'get');
       const userAgentDataSpy = (window.navigator as any).userAgentData !== undefined ? spyOnProperty(window.navigator as any, 'userAgentData', 'get') : null;
-      
+
       if (userAgentDataSpy) userAgentDataSpy.and.returnValue(undefined);
-      
+
       userAgentSpy.and.returnValue('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
-      expect(component.getOsProfile()).toBe('macOS 10.15.7');
+      expect(component.hardwareService.getOsProfile()).toBe('macOS 10.15.7');
 
       userAgentSpy.and.returnValue('Windows NT 10.0');
-      expect(component.getOsProfile()).toBe('Windows 10/11');
+      expect(component.hardwareService.getOsProfile()).toBe('Windows 10/11');
 
       userAgentSpy.and.returnValue('Linux');
-      expect(component.getOsProfile()).toBe('Linux');
+      expect(component.hardwareService.getOsProfile()).toBe('Linux');
 
       userAgentSpy.and.returnValue('Android');
-      expect(component.getOsProfile()).toBe('Android');
+      expect(component.hardwareService.getOsProfile()).toBe('Android');
 
       userAgentSpy.and.returnValue('iPhone');
-      expect(component.getOsProfile()).toBe('iOS / iPadOS');
+      expect(component.hardwareService.getOsProfile()).toBe('iOS / iPadOS');
     });
 
     it('should format Browser info', () => {
       const userAgentSpy = spyOnProperty(window.navigator, 'userAgent', 'get');
       const userAgentDataSpy = (window.navigator as any).userAgentData !== undefined ? spyOnProperty(window.navigator as any, 'userAgentData', 'get') : null;
-      
+
       if (userAgentDataSpy) userAgentDataSpy.and.returnValue(undefined);
 
       userAgentSpy.and.returnValue('Chrome/100.0.0.0');
-      expect(component.getBrowserInfo()).toBe('Chrome 100.0.0.0');
+      expect(component.hardwareService.getBrowserInfo()).toBe('Chrome 100.0.0.0');
 
       userAgentSpy.and.returnValue('Edg/100.0.0.0');
-      expect(component.getBrowserInfo()).toBe('Edge 100.0.0.0');
+      expect(component.hardwareService.getBrowserInfo()).toBe('Edge 100.0.0.0');
     });
   });
 
@@ -529,14 +529,14 @@ describe('CortexPage', () => {
     afterEach(() => {
       (window as any).webai = undefined;
     });
-    
+
     it('should check for extension installation', fakeAsync(() => {
-      spyOn(component, 'loadInitialHardwareInfo');
-      
+      spyOn(component.hardwareService, 'loadFromExtension');
+
       (window as any).webai = undefined;
-      
+
       component.ngAfterViewInit();
-      expect(component.isExtensionInstalled).toBeFalse();
+      expect(component.hardwareService.isExtensionInstalled).toBeFalse();
 
       // Simulate extension loading
       setTimeout(() => {
@@ -544,8 +544,8 @@ describe('CortexPage', () => {
       }, 100);
 
       tick(150);
-      expect(component.isExtensionInstalled).toBeTrue();
-      expect(component.loadInitialHardwareInfo).toHaveBeenCalled();
+      expect(component.hardwareService.isExtensionInstalled).toBeTrue();
+      expect(component.hardwareService.loadFromExtension).toHaveBeenCalled();
     }));
   });
 });
