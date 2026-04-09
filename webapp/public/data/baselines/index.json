@@ -120,5 +120,23 @@
     "ram": 64,
     "model": "Nano V3 4B",
     "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-07-windows-amd-epyc-240gb-litertlm",
+    "name": "AMD EPYC (LiteRT-LM)",
+    "os": "Windows",
+    "cpu": "AMD EPYC",
+    "ram": 240,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-07-windows-amd-epyc-240gb-llminferenceengine",
+    "name": "AMD EPYC (LLM IE)",
+    "os": "Windows",
+    "cpu": "AMD EPYC",
+    "ram": 240,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
   }
 ]
