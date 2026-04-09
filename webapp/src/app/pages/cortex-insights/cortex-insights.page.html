@@ -74,10 +74,10 @@
     </div>
 
     <!-- BOTTOM ROW: The Leaderboard Matrix -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg overflow-hidden flex flex-col">
-      
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg flex flex-col">
+
       <!-- Table Header Controls -->
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/30">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/30 rounded-t-2xl relative z-10">
         <div class="flex items-center gap-3">
           <i class="bi bi-hdd-network text-indigo-400 text-xl"></i>
           <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Benchmarks</h2>
@@ -121,11 +121,10 @@
       </div>
 
       <!-- The Data Matrix -->
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto overflow-y-hidden rounded-b-2xl">
         <table class="w-full text-left border-collapse min-w-[1000px]">
           <thead>
             <tr class="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
-              <th class="px-6 py-3 w-16 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-center">Rank</th>
               <th class="px-4 py-3 w-80 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('hw')">
                 <div class="flex items-center justify-start gap-1.5">
                   <span>Hardware & Config</span>
@@ -164,18 +163,7 @@
               @let speedWidth = (row.speed / maxSpeed) * 100;
               @let isCurrent = row.isCurrent;
 
-              <tr class="group transition-colors" [ngClass]="isCurrent ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'">
-                <!-- Rank -->
-                <td class="px-6 py-4 text-center align-middle">
-                  <div class="w-6 h-6 mx-auto rounded flex items-center justify-center text-xs font-bold"
-                       [ngClass]="idx === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
-                                  idx === 1 ? 'bg-slate-300/20 text-slate-300 border border-slate-400/30' : 
-                                  idx === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 
-                                  'text-slate-500 dark:text-slate-500'">
-                    {{ idx + 1 }}
-                  </div>
-                </td>
-
+              <tr class="group transition-colors cursor-pointer" [ngClass]="isCurrent ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'" (click)="openPanel(row)">
                 <!-- Hardware Config -->
                 <td class="px-4 py-4 align-middle">
                   <div class="flex flex-col gap-1.5">
@@ -294,9 +282,6 @@
     @let fullData = selectedBaselineFullData;
     @let hw = fullData?.hardware;
 
-    <!-- Backdrop -->
-    <div class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm transition-opacity" (click)="closePanel()"></div>
-
     <!-- Panel -->
     <div class="fixed top-0 right-0 bottom-0 z-[101] w-full sm:w-[480px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl overflow-y-auto">
 
@@ -390,10 +375,19 @@
         <section>
           <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Overall Performance</h3>
           <div class="grid grid-cols-2 gap-3">
+            @let speedRank = getRank(entry, 'speed');
+            @let inputSpeedRank = getRank(entry, 'inputSpeed');
+            @let ttftRank = getRank(entry, 'ttft');
+            @let totalRank = getRank(entry, 'total');
+            @let total_count = leaderboard.length;
+
             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
-              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
-                <i class="bi bi-speedometer2 text-xs"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Output t/s</span>
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-speedometer2 text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Output t/s</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="speedRank === 1 ? 'text-emerald-500' : speedRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ speedRank }}{{ getRankSuffix(speedRank) }} / {{ total_count }}</span>
               </div>
               <div class="flex items-baseline gap-1">
                 <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.speed > 0 ? (entry.speed | number:'1.0-0') : 'N/A' }}</span>
@@ -403,9 +397,12 @@
               </div>
             </div>
             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
-              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
-                <i class="bi bi-box-arrow-in-right text-xs"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Input t/s</span>
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-box-arrow-in-right text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Input t/s</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="inputSpeedRank === 1 ? 'text-emerald-500' : inputSpeedRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ inputSpeedRank }}{{ getRankSuffix(inputSpeedRank) }} / {{ total_count }}</span>
               </div>
               <div class="flex items-baseline gap-1">
                 <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.inputSpeed > 0 ? (entry.inputSpeed | number:'1.0-0') : 'N/A' }}</span>
@@ -415,9 +412,12 @@
               </div>
             </div>
             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
-              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
-                <i class="bi bi-stopwatch text-xs"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Avg TTFT</span>
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-stopwatch text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Avg TTFT</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="ttftRank === 1 ? 'text-emerald-500' : ttftRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ ttftRank }}{{ getRankSuffix(ttftRank) }} / {{ total_count }}</span>
               </div>
               <div class="flex items-baseline gap-1">
                 <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.ttft | number:'1.0-0' }}</span>
@@ -425,9 +425,12 @@
               </div>
             </div>
             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
-              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
-                <i class="bi bi-clock-history text-xs"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Total</span>
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-clock-history text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Avg Total</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="totalRank === 1 ? 'text-emerald-500' : totalRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ totalRank }}{{ getRankSuffix(totalRank) }} / {{ total_count }}</span>
               </div>
               <div class="flex items-baseline gap-1">
                 <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.total | number:'1.0-0' }}</span>

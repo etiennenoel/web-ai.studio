@@ -529,6 +529,24 @@ export class CortexInsightsPage implements OnInit {
     return '#f43f5e'; // rose-500
   }
 
+  getRank(row: LeaderboardEntry, metric: 'speed' | 'inputSpeed' | 'ttft' | 'total'): number {
+    const lowerIsBetter = metric === 'ttft' || metric === 'total';
+    const sorted = [...this.leaderboard].sort((a, b) =>
+      lowerIsBetter ? a[metric] - b[metric] : b[metric] - a[metric]
+    );
+    return sorted.findIndex(r => r.filename === row.filename) + 1;
+  }
+
+  getRankSuffix(rank: number): string {
+    if (rank % 100 >= 11 && rank % 100 <= 13) return 'th';
+    switch (rank % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
   openPanel(row: LeaderboardEntry) {
     this.selectedLeaderboardEntry = row;
     this.selectedBaseline = this.rawBaselines.find(b => b.filename === row.filename) || null;
