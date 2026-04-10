@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { CortexInsightsPage } from './cortex-insights.page';
+import { CortexFilterDropdownComponent } from '../cortex/components/filter-dropdown/filter-dropdown.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +19,7 @@ describe('CortexInsightsPage', () => {
     const metaSpy = jasmine.createSpyObj('Meta', ['updateTag']);
 
     await TestBed.configureTestingModule({
-      declarations: [CortexInsightsPage],
+      declarations: [CortexInsightsPage, CortexFilterDropdownComponent],
       imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [
         { provide: Title, useValue: titleSpy },
