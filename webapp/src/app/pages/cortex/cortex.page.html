@@ -172,9 +172,11 @@
        
       <div class="flex flex-wrap items-center gap-2 shrink-0">
         <app-cortex-filter-dropdown filterType="hardware" label="HW:" dropdownWidth="w-56"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="os" label="OS:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="ram" label="RAM:"></app-cortex-filter-dropdown>
         <app-cortex-filter-dropdown filterType="compute" label="Compute:"></app-cortex-filter-dropdown>
         <app-cortex-filter-dropdown filterType="engine" label="Engine:"></app-cortex-filter-dropdown>
-        <app-cortex-filter-dropdown filterType="variant" label="Variant:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="variant" label="Model:"></app-cortex-filter-dropdown>
 
         <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1"></div>
         
@@ -416,7 +418,7 @@
                               <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getExecutionTypeColorClass(bDetails?.executionType)">{{ bDetails?.executionType }}</span>
                             }
                             @if (baseline.engine) {
-                              <span class="px-1 py-px rounded text-[8px] font-bold uppercase border bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">{{ baseline.engine }}</span>
+                              <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getEngineColorClass(baseline.engine)">{{ baseline.engine }}</span>
                             }
                           </div>
                         </td>
@@ -878,7 +880,7 @@
                                     <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getExecutionTypeColorClass(bDetails?.executionType)">{{ bDetails?.executionType }}</span>
                                   }
                                   @if (baseline.engine) {
-                                    <span class="px-1 py-px rounded text-[8px] font-bold uppercase border bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">{{ baseline.engine }}</span>
+                                    <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getEngineColorClass(baseline.engine)">{{ baseline.engine }}</span>
                                   }
                                 </div>
                               </td>

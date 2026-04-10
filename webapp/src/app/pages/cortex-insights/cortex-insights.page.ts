@@ -5,11 +5,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
 import { GlobalFilterService } from '../cortex/services/global-filter.service';
+import { CortexUiHelpers } from '../cortex/util/cortex-ui.helpers';
 
 export interface LeaderboardEntry {
   id: number;
   filename: string;
   hw: string;
+  os: string;
+  ram: number;
   compute: string;
   engine: string;
   model: string;
@@ -79,32 +82,26 @@ export class CortexInsightsPage implements OnInit {
   minTtft = 0;
   minTotal = 0;
 
-  // Filters
-  hardwareOptions: string[] = ['All'];
-  computeOptions: string[] = ['All'];
-  engineOptions: string[] = ['All'];
-  variantOptions: string[] = ['All'];
-  apiOptions: string[] = ['All'];
-
-  selectedHardwares: string[] = [];
-  selectedComputes: string[] = [];
-  selectedEngines: string[] = [];
-  selectedVariants: string[] = [];
-  selectedApis: string[] = [];
-
-  activeDropdown: string | null = null;
   searchQuery: string = '';
 
-  dropdownSearch: { [key: string]: string } = {
-    hardware: '',
-    compute: '',
-    engine: '',
-    variant: '',
-    api: ''
-  };
-
-  tableSortColumn: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' = 'speed';
+  tableSortColumn: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' | 'os' | 'ram' | 'compute' | 'engine' | 'model' = 'speed';
   tableSortDirection: 'asc' | 'desc' = 'desc';
+
+  // Column visibility
+  allColumns = [
+    { key: 'hw', label: 'Hardware' },
+    { key: 'os', label: 'OS' },
+    { key: 'ram', label: 'RAM' },
+    { key: 'compute', label: 'Compute' },
+    { key: 'engine', label: 'Engine' },
+    { key: 'model', label: 'Model' },
+    { key: 'speed', label: 'Output Tokens/s' },
+    { key: 'inputSpeed', label: 'Input Tokens/s' },
+    { key: 'ttft', label: 'Avg TTFT' },
+    { key: 'total', label: 'Avg Total' },
+  ];
+  visibleColumns: Set<string> = new Set(['hw', 'os', 'ram', 'compute', 'engine', 'model', 'speed', 'inputSpeed', 'ttft', 'total']);
+  columnsDropdownOpen = false;
 
   // Chart data
   chartPointsFleet: string = "";
@@ -142,7 +139,10 @@ export class CortexInsightsPage implements OnInit {
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.filter-dropdown')) {
-      this.activeDropdown = null;
+      this.filterService.activeDropdown = null;
+    }
+    if (!target.closest('.columns-dropdown')) {
+      this.columnsDropdownOpen = false;
     }
   }
 
@@ -191,7 +191,7 @@ export class CortexInsightsPage implements OnInit {
 
                 resolve({
                   filename: item.filename,
-                  hw: item.hw || item.name,
+                  hw: item.hw || item.cpu || item.name,
                   compute: item.compute || item.executionType || 'CPU',
                   engine: item.engine || engine,
                   model: item.model || 'Unknown',
@@ -233,7 +233,14 @@ export class CortexInsightsPage implements OnInit {
       return vals.filter(v => options.includes(v)); // safely only include valid options
     };
 
+    if (params.has('columns')) {
+      const cols = params.get('columns')!.split(',').filter(c => this.allColumns.some(ac => ac.key === c));
+      this.visibleColumns = new Set(cols);
+    }
+
     if (params.has('hardware')) this.filterService.selectedHardwares = parseArray('hardware', this.filterService.hardwareOptions);
+    if (params.has('os')) this.filterService.selectedOs = parseArray('os', this.filterService.osOptions);
+    if (params.has('ram')) this.filterService.selectedRam = parseArray('ram', this.filterService.ramOptions);
     if (params.has('compute')) this.filterService.selectedComputes = parseArray('compute', this.filterService.computeOptions);
     if (params.has('engine')) this.filterService.selectedEngines = parseArray('engine', this.filterService.engineOptions);
     if (params.has('variant')) this.filterService.selectedVariants = parseArray('variant', this.filterService.variantOptions);
@@ -254,7 +261,12 @@ export class CortexInsightsPage implements OnInit {
       else queryParams[key] = selected;
     };
 
+    // Always explicitly persist visible columns in the URL
+    queryParams['columns'] = Array.from(this.visibleColumns).join(',');
+
     syncArray('hardware', this.filterService.selectedHardwares, this.filterService.hardwareOptions);
+    syncArray('os', this.filterService.selectedOs, this.filterService.osOptions);
+    syncArray('ram', this.filterService.selectedRam, this.filterService.ramOptions);
     syncArray('compute', this.filterService.selectedComputes, this.filterService.computeOptions);
     syncArray('engine', this.filterService.selectedEngines, this.filterService.engineOptions);
     syncArray('variant', this.filterService.selectedVariants, this.filterService.variantOptions);
@@ -274,12 +286,16 @@ export class CortexInsightsPage implements OnInit {
     const engineSet = new Set<string>();
     const variantSet = new Set<string>();
     const apiSet = new Set<string>();
+    const osSet = new Set<string>();
+    const ramSet = new Set<string>();
 
     this.rawBaselines.forEach(b => {
       hwSet.add(b.hw);
       computeSet.add(b.compute);
       engineSet.add(b.engine);
       variantSet.add(b.model);
+      if (b.os) osSet.add(b.os);
+      if (b.ram) ramSet.add(b.ram + ' GB');
       b.tests.forEach(t => apiSet.add(t.api));
     });
 
@@ -288,7 +304,9 @@ export class CortexInsightsPage implements OnInit {
       Array.from(computeSet).sort(),
       Array.from(engineSet).sort(),
       Array.from(variantSet).sort(),
-      Array.from(apiSet).sort()
+      Array.from(apiSet).sort(),
+      Array.from(osSet).sort(),
+      Array.from(ramSet).sort((a, b) => parseInt(a) - parseInt(b))
     );
   }
 
@@ -303,12 +321,14 @@ export class CortexInsightsPage implements OnInit {
       if (!this.filterService.selectedComputes.includes(b.compute)) return false;
       if (!this.filterService.selectedEngines.includes(b.engine)) return false;
       if (!this.filterService.selectedVariants.includes(b.model)) return false;
-      
+      if (b.os && !this.filterService.selectedOs.includes(b.os)) return false;
+      if (b.ram && !this.filterService.selectedRam.includes(b.ram + ' GB')) return false;
+
       if (this.filterService.searchQuery) {
         const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
         if (!searchTarget.includes(this.filterService.searchQuery)) return false;
       }
-      
+
       return true;
     });
 
@@ -330,6 +350,8 @@ export class CortexInsightsPage implements OnInit {
         id: idCounter++,
         filename: b.filename,
         hw: b.hw,
+        os: b.os || '',
+        ram: b.ram || 0,
         compute: b.compute,
         engine: b.engine,
         model: b.model,
@@ -461,12 +483,12 @@ export class CortexInsightsPage implements OnInit {
     this.applyFilters();
   }
 
-  setTableSort(column: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw') {
+  setTableSort(column: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' | 'os' | 'ram' | 'compute' | 'engine' | 'model') {
     if (this.tableSortColumn === column) {
       this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.tableSortColumn = column;
-      this.tableSortDirection = (column === 'ttft' || column === 'total' || column === 'hw') ? 'asc' : 'desc';
+      this.tableSortDirection = (column === 'ttft' || column === 'total' || column === 'hw' || column === 'os' || column === 'compute' || column === 'engine' || column === 'model') ? 'asc' : 'desc';
     }
     this.applyFilters();
   }
@@ -493,8 +515,8 @@ export class CortexInsightsPage implements OnInit {
       if (value === 'Cloud') return this.getBadgeClass('cloud');
       return this.getBadgeClass('emerald');
     }
-    if (filterType === 'engine') return this.getBadgeClass('default');
-    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'engine') return CortexUiHelpers.getEngineColorClass(value);
+    if (filterType === 'variant') return CortexUiHelpers.getVariantColorClass(value);
     if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
     return this.getBadgeClass('default');
   }
@@ -584,6 +606,47 @@ export class CortexInsightsPage implements OnInit {
     if (!timestamp) return 'N/A';
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  exportCsv(): void {
+    const headers = ['Hardware', 'OS', 'RAM (GB)', 'Compute', 'Engine', 'Model', 'Output Tokens/s', 'Input Tokens/s', 'Avg TTFT (ms)', 'Avg Total (ms)'];
+    const escape = (v: string) => v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
+    const rows = this.leaderboard.map(r => [
+      escape(r.hw), escape(r.os || 'N/A'), r.ram > 0 ? r.ram.toString() : 'N/A', escape(r.compute), escape(r.engine), escape(r.model),
+      r.speed > 0 ? r.speed.toFixed(1) : 'N/A',
+      r.inputSpeed > 0 ? r.inputSpeed.toFixed(1) : 'N/A',
+      r.ttft > 0 ? r.ttft.toFixed(0) : 'N/A',
+      r.total > 0 ? r.total.toFixed(0) : 'N/A',
+    ].join(','));
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `${today}-cortex-insights.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  isColumnVisible(key: string): boolean {
+    return this.visibleColumns.has(key);
+  }
+
+  toggleColumn(key: string, checked: boolean): void {
+    if (checked) {
+      this.visibleColumns.add(key);
+    } else {
+      this.visibleColumns.delete(key);
+    }
+    this.syncToUrl();
+  }
+
+  toggleColumnsDropdown(event: Event): void {
+    event.stopPropagation();
+    this.columnsDropdownOpen = !this.columnsDropdownOpen;
+    this.filterService.activeDropdown = null;
   }
 
   getOsIcon(os?: string): string {

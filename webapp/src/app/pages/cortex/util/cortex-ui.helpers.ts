@@ -105,8 +105,8 @@ export class CortexUiHelpers {
       if (value === 'Cloud') return this.getBadgeClass('cloud');
       return this.getBadgeClass('emerald');
     }
-    if (filterType === 'engine') return this.getBadgeClass('default');
-    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'engine') return this.getEngineColorClass(value);
+    if (filterType === 'variant') return this.getVariantColorClass(value);
     if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
     return this.getBadgeClass('default');
   }
@@ -121,6 +121,31 @@ export class CortexUiHelpers {
       case 'NPU': return 'bi-motherboard';
       case 'CLOUD': return 'bi-cloud';
       default: return 'bi-gear';
+    }
+  }
+
+  /** Returns Tailwind color classes for a model variant badge */
+  static getVariantColorClass(variant?: string): string {
+    switch (variant?.toUpperCase()) {
+      case 'NANO V3 4B': return 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800/50';
+      case 'NANO V3 2B': return 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:border-sky-800/50';
+      case 'GEMINI 3.1 FLASH': return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800/50';
+      case 'GEMINI 3.1 FLASH LITE': return 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800/50';
+      case 'GEMMA3 4B': return 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800/50';
+      case 'GEMMA3N 4B': return 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-400 dark:border-fuchsia-800/50';
+      case 'GEMMA4 2B': return 'bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/30 dark:text-lime-400 dark:border-lime-800/50';
+      default: return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    }
+  }
+
+  /** Returns Tailwind color classes for an engine badge */
+  static getEngineColorClass(engine?: string): string {
+    switch (engine?.toUpperCase()) {
+      case 'LLM IE': return 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50';
+      case 'LITERT-LM': return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50';
+      case 'LM STUDIO': return 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-400 dark:border-teal-800/50';
+      case 'GEMINI API': return 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-400 dark:border-cyan-800/50';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
     }
   }
 

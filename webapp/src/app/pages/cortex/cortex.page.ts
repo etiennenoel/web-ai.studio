@@ -1082,4 +1082,5 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getExecutionTypeIcon(type?: string): string { return CortexUiHelpers.getExecutionTypeIcon(type); }
   getExecutionTypeColorClass(type?: string): string { return CortexUiHelpers.getExecutionTypeColorClass(type); }
+  getEngineColorClass(engine?: string): string { return CortexUiHelpers.getEngineColorClass(engine); }
 }

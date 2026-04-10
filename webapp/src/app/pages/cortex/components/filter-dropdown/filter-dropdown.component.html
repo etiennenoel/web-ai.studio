@@ -27,7 +27,14 @@
               class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3"
               [checked]="filterService.isFilterSelected(filterType, opt)"
               (change)="filterService.selectFilter(filterType, opt, $event.target.checked)">
-            {{ opt }}
+            @if (filterType === 'engine' || filterType === 'variant' || filterType === 'compute') {
+              <span class="inline-flex items-center gap-1 px-1.5 py-px rounded text-[8px] font-bold uppercase tracking-wider border" [ngClass]="getOptionColorClass(opt)">
+                @if (filterType === 'compute') { <i class="bi" [ngClass]="getComputeIcon(opt)"></i> }
+                {{ opt }}
+              </span>
+            } @else {
+              {{ opt }}
+            }
           </label>
         }
       </div>
