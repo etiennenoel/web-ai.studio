@@ -140,11 +140,62 @@
     "executionType": "CPU"
   },
   {
-    "filename": "2026-07-09-apple-m1-max-64gb-lmstudio",
-    "name": "Apple M1 Max (LM Studio)",
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma3-4b",
+    "name": "Apple M1 Max (LM Studio - Gemma3 4B)",
     "os": "macOS",
     "cpu": "Apple M1 Max",
     "ram": 64,
+    "model": "Gemma3 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma3n-4b",
+    "name": "Apple M1 Max (LM Studio - Gemma3n 4B)",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Gemma3n 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma3-4b",
+    "name": "Apple M3 Ultra (LM Studio - Gemma3 4B)",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma3 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma3n-4b",
+    "name": "Apple M3 Ultra (LM Studio - Gemma3n 4B)",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma3n 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma4-2b",
+    "name": "Apple M1 Max (LM Studio - Gemma4 2B)",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Gemma4 2B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma4-2b",
+    "name": "Apple M3 Ultra (LM Studio - Gemma4 2B)",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma4 2B",
     "engine": "LM Studio",
     "executionType": "GPU"
   }
