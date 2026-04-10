@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { GlobalFilterService } from '../../services/global-filter.service';
+import { CortexUiHelpers } from '../../util/cortex-ui.helpers';
 
 /**
  * Reusable filter dropdown for the Cortex benchmark toolbar.
@@ -35,6 +36,8 @@ export class CortexFilterDropdownComponent {
   get selected(): string[] {
     switch (this.filterType) {
       case 'hardware': return this.filterService.selectedHardwares;
+      case 'os': return this.filterService.selectedOs;
+      case 'ram': return this.filterService.selectedRam;
       case 'compute': return this.filterService.selectedComputes;
       case 'engine': return this.filterService.selectedEngines;
       case 'variant': return this.filterService.selectedVariants;
@@ -46,6 +49,8 @@ export class CortexFilterDropdownComponent {
   get options(): string[] {
     switch (this.filterType) {
       case 'hardware': return this.filterService.hardwareOptions;
+      case 'os': return this.filterService.osOptions;
+      case 'ram': return this.filterService.ramOptions;
       case 'compute': return this.filterService.computeOptions;
       case 'engine': return this.filterService.engineOptions;
       case 'variant': return this.filterService.variantOptions;
@@ -56,6 +61,16 @@ export class CortexFilterDropdownComponent {
   /** Whether this filter has a non-default selection (for active styling) */
   get isFiltered(): boolean {
     return this.selected.length > 0 && this.selected.length < this.options.length;
+  }
+
+  /** Returns a color class for a filter option based on filter type */
+  getOptionColorClass(value: string): string {
+    return CortexUiHelpers.getFilterBadgeClass(this.filterType, value);
+  }
+
+  /** Returns an icon class for compute type options */
+  getComputeIcon(value: string): string {
+    return CortexUiHelpers.getFilterIcon('compute', value);
   }
 
   /** Human-readable summary of the current selection */
