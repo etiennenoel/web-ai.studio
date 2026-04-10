@@ -138,5 +138,14 @@
     "ram": 240,
     "model": "Nano V3 4B",
     "executionType": "CPU"
+  },
+  {
+    "filename": "2026-07-09-apple-m1-max-64gb-lmstudio",
+    "name": "Apple M1 Max (LM Studio)",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "engine": "LM Studio",
+    "executionType": "GPU"
   }
 ]

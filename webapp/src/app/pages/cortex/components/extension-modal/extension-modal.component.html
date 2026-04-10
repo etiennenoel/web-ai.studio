@@ -1,0 +1,43 @@
+<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="close.emit()">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md mx-4 p-6" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="bi bi-puzzle text-amber-500"></i> Extension Required
+      </h3>
+      <button (click)="close.emit()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <div class="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg">
+        <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
+        <div class="text-sm text-amber-800 dark:text-amber-300">
+          The <strong>WebAI Extension</strong> is required to run Cortex benchmarks. It provides access to Chrome's built-in AI APIs and hardware information.
+        </div>
+      </div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 space-y-2">
+        <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">1.</span> Install the extension from the Chrome Web Store</div>
+        <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">2.</span> Reload this page after installation</div>
+        <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">3.</span> Click "Run Cortex Test" to start benchmarking</div>
+      </div>
+      <div class="flex items-center gap-3 pt-2">
+        <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
+           class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md">
+          <i class="bi bi-download"></i> Install Extension
+        </a>
+        <button (click)="reload.emit()" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors">
+          <i class="bi bi-arrow-clockwise"></i> Reload Page
+        </button>
+      </div>
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-3">
+        <button (click)="runWithout.emit()" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <i class="bi bi-play-fill"></i> Run without extension
+        </button>
+        <label class="flex items-center gap-2 cursor-pointer justify-center">
+          <input type="checkbox" [checked]="skipExtensionCheck" (change)="toggleSkip.emit()" class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 dark:bg-slate-800 dark:border-slate-600">
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">Don't ask again</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

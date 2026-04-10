@@ -7,76 +7,7 @@ declare const LanguageModel: any;
 
 @Component({
   selector: 'app-write-javascript-demo',
-  template: `
-    <app-demo-layout 
-      [title]="demo.title" 
-      [description]="demo.description" 
-      [icon]="demo.icon" 
-      [category]="demo.category" 
-      [onDeviceReason]="demo.onDeviceReason" 
-      [codeSnippet]="dynamicCodeSnippet"
-      [ttft]="ttft"
-      [totalTime]="totalTime">
-      <div demo-ui>
-        
-        <div class="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row min-h-[500px] overflow-hidden">
-          
-          <!-- Requirements Input -->
-          <div class="flex-1 flex flex-col relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50">
-            <div class="px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center bg-[#ffffff] dark:bg-[#161616]">
-              <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                <i class="bi bi-list-check text-indigo-500"></i> Requirements
-              </span>
-            </div>
-            <textarea class="w-full flex-grow bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none text-lg p-5 pb-24 leading-relaxed font-mono" 
-                      [(ngModel)]="sourceText" 
-                      placeholder="Describe the function or script you need..."></textarea>
-            
-            <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-slate-50 via-slate-50 dark:from-zinc-900/50 dark:via-zinc-900/50 to-transparent pt-10">
-              @if (state === 'Inferencing') {
-                <button class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
-                        (click)="onCancelGenerate()">
-                  <i class="bi bi-stop-fill text-lg"></i> Stop Generation
-                </button>
-              } @else {
-                <button class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none" 
-                        (click)="generateCode()"
-                        [disabled]="!sourceText.trim()">
-                  <i class="bi bi-code-slash text-lg"></i> Generate JavaScript
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Code Output -->
-          <div class="flex-[1.5] flex flex-col relative bg-[#1e1e1e]">
-            <div class="px-5 py-3 border-b border-zinc-800 bg-zinc-900 flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <i class="bi bi-filetype-js text-yellow-400 text-xl"></i>
-                <span class="text-sm font-medium text-zinc-300 font-mono">output.js</span>
-              </div>
-              @if (state === 'Inferencing') {
-                <app-latency-loader></app-latency-loader>
-              }
-            </div>
-            
-            <div class="flex-grow overflow-hidden relative">
-              @if (generatedCode || state === 'Inferencing') {
-                <!-- We use app-code-editor to display the generated code -->
-                <app-code-editor [code]="generatedCode" [language]="'javascript'"></app-code-editor>
-              } @else {
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50">
-                  <i class="bi bi-code-square text-5xl mb-4 text-zinc-500"></i>
-                  <p class="text-zinc-400 text-lg">The generated code will appear here.</p>
-                </div>
-              }
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </app-demo-layout>
-  `,
+  templateUrl: './write-javascript-demo.component.html',
   standalone: false,
   host: { class: 'block h-full' }
 })

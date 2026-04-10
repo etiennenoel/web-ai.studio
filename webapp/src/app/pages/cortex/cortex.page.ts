@@ -6,12 +6,15 @@ import {BuiltInAiApi} from '../../enums/built-in-ai-api.enum';
 import {AxonTestId} from './axon/enums/axon-test-id.enum';
 import {AxonTestInterface} from './axon/interfaces/axon-test.interface';
 import {AxonSummaryResultsInterface} from './axon/interfaces/axon-summary-results.interface';
-import {MathematicalCalculations} from './axon/util/mathematical-calculations';
+import {SummaryResultsCalculator} from './axon/util/summary-results.calculator';
 import {EnumUtils} from '../../core/utils/enum.utils';
 import {ItemInterface} from '../../core/interfaces/item.interface';
 import { isPlatformServer } from '@angular/common';
 import {ComparisonDataService} from './services/comparison-data.service';
 import {GlobalFilterService} from './services/global-filter.service';
+import {HardwareInfoService} from './services/hardware-info.service';
+import {ReportService} from './services/report.service';
+import {CortexUiHelpers} from './util/cortex-ui.helpers';
 
 @Component({
   selector: 'page-cortex',
@@ -26,9 +29,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
   selectedImageUrl: string | null = null;
-  isExtensionInstalled: boolean = true; // By default we don't show it.
-  
-  hardwareInfo: any = null;
 
   isImportedReport = false;
   importedTimestamp: string | null = null;
@@ -131,7 +131,9 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     @Inject(PLATFORM_ID) private readonly platformId: Object,
     public filterService: GlobalFilterService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public readonly hardwareService: HardwareInfoService,
+    private readonly reportService: ReportService
   ) {}
 
   @HostListener('document:click', ['$event'])
@@ -139,44 +141,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     this.filterService.activeDropdown = null;
   }
 
-  getFilterIcon(filterType: string, value: string): string {
-    if (filterType === 'compute') {
-      if (value === 'CPU') return 'bi-cpu';
-      if (value === 'GPU') return 'bi-gpu-card';
-      if (value === 'NPU') return 'bi-motherboard';
-      if (value === 'Cloud') return 'bi-cloud';
-      return 'bi-pc-horizontal';
-    }
-    if (filterType === 'engine') return 'bi-gear-fill';
-    if (filterType === 'variant') return 'bi-box-seam';
-    if (filterType === 'api') return 'bi-plugin';
-    return 'bi-tag';
-  }
-  
-  getFilterBadgeClass(filterType: string, value: string): string {
-    if (filterType === 'compute') {
-      if (value === 'GPU') return this.getBadgeClass('purple');
-      if (value === 'CPU') return this.getBadgeClass('default');
-      if (value === 'Cloud') return this.getBadgeClass('cloud');
-      return this.getBadgeClass('emerald');
-    }
-    if (filterType === 'engine') return this.getBadgeClass('default');
-    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
-    if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
-    return this.getBadgeClass('default');
-  }
-
-  getBadgeClass(variant: string): string {
-    const variants: { [key: string]: string } = {
-      default: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-      current: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30',
-      purple: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
-      emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30',
-      cloud: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
-    };
-    if (variant === 'Cloud') return variants['cloud'];
-    return variants[variant] || variants['default'];
-  }
+  // UI helper methods delegate to CortexUiHelpers static class so templates can call them.
+  // When sub-components are extracted (Phase 2), they'll import CortexUiHelpers directly.
+  readonly uiHelpers = CortexUiHelpers;
+  getFilterIcon(filterType: string, value: string): string { return CortexUiHelpers.getFilterIcon(filterType, value); }
+  getFilterBadgeClass(filterType: string, value: string): string { return CortexUiHelpers.getFilterBadgeClass(filterType, value); }
+  getBadgeClass(variant: string): string { return CortexUiHelpers.getBadgeClass(variant); }
 
   triggerImport() {
     const fileInput = document.getElementById('cortex-report-upload') as HTMLInputElement;
@@ -185,20 +155,16 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onFileSelected(event: any) {
+  async onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target?.result as string);
-          this.loadReport(data);
-        } catch (error) {
-          console.error("Failed to parse JSON", error);
-          alert("Invalid JSON file");
-        }
-      };
-      reader.readAsText(file);
+      try {
+        const data = await this.reportService.parseUploadedFile(file);
+        this.loadReport(data);
+      } catch (error) {
+        console.error('Failed to parse JSON', error);
+        alert('Invalid JSON file');
+      }
     }
     // Clear input so same file can be selected again
     event.target.value = '';
@@ -207,7 +173,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   loadReport(data: any) {
     if (data && data.results) {
       this.axonTestSuiteExecutor.results = data.results;
-      this.hardwareInfo = data.hardware;
+      this.hardwareService.hardwareInfo = data.hardware;
       
       this.importedTimestamp = data.timestamp;
       this.importedUserAgent = data.userAgent;
@@ -235,46 +201,22 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     this.showShareModal = true;
     this.generatedShareUrl = null;
 
-    let hwInfo = this.hardwareInfo;
-    if (!hwInfo && this.isExtensionInstalled) {
-      try {
-        hwInfo = await (window as any).webai.getHardwareInformation();
-      } catch (e) {
-        console.error("Failed to get hardware info", e);
-      }
+    if (!this.hardwareService.hardwareInfo && this.hardwareService.isExtensionInstalled) {
+      await this.hardwareService.loadFromExtension();
     }
 
     const reportData = {
       timestamp: this.importedTimestamp || new Date().toISOString(),
       userAgent: this.importedUserAgent || navigator.userAgent,
-      hardware: hwInfo,
+      hardware: this.hardwareService.hardwareInfo,
       results: this.axonTestSuiteExecutor.results
     };
 
     try {
-      const jsonString = JSON.stringify(reportData);
-      
-      // Use Compression API to shrink the payload significantly before base64 encoding
-      const stream = new Blob([jsonString]).stream();
-      const compressedStream = stream.pipeThrough(new CompressionStream('deflate-raw'));
-      const compressedResponse = new Response(compressedStream);
-      const buffer = await compressedResponse.arrayBuffer();
-      
-      // Convert buffer to base64url string
-      const bytes = new Uint8Array(buffer);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64 = btoa(binary);
-      // Make it URL safe
-      const base64url = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-      
+      const base64url = await this.reportService.compressToBase64Url(reportData);
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('report', base64url);
-      
       this.generatedShareUrl = currentUrl.toString();
-      
     } catch (e) {
       console.error('Failed to compress and save report to URL', e);
       alert('Report is too large to save in URL.');
@@ -305,31 +247,11 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   async loadReportFromUrl(base64url: string) {
     try {
-      // Revert URL safe characters
-      let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-      // Add padding if needed
-      while (base64.length % 4) {
-        base64 += '=';
-      }
-      
-      const binary = atob(base64);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      
-      // Decompress
-      const stream = new Blob([bytes]).stream();
-      const decompressedStream = stream.pipeThrough(new DecompressionStream('deflate-raw'));
-      const decompressedResponse = new Response(decompressedStream);
-      const jsonString = await decompressedResponse.text();
-      
-      const data = JSON.parse(jsonString);
+      const data = await this.reportService.decompressFromBase64Url(base64url);
       this.loadReport(data);
     } catch (e) {
       console.error('Failed to load report from URL', e);
       alert('Failed to load report from URL. The link might be broken or expired.');
-      // Remove the broken report parameter
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.delete('report');
       window.history.replaceState({}, '', currentUrl.toString());
@@ -379,24 +301,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const checkExtension = () => {
-      this.isExtensionInstalled = typeof window !== 'undefined' && typeof (window as any).webai !== 'undefined';
-      if (this.isExtensionInstalled && !this.hardwareInfo) {
-        this.loadInitialHardwareInfo();
-      }
-    };
-
-    checkExtension();
-    if (!this.isExtensionInstalled) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        checkExtension();
-        if (this.isExtensionInstalled || attempts > 20) {
-          clearInterval(interval);
-        }
-      }, 50);
-    }
+    this.hardwareService.detectExtension();
   }
 
   // --- New Methods for Scenarios & Sidebar ---
@@ -454,34 +359,11 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return null;
   }
 
-  getScenarioStatusIcon(scen: any): string {
-    if (scen.tests.some((t: any) => t.results.status === TestStatus.Error || t.results.status === TestStatus.Fail)) {
-       return 'bi-x-circle-fill text-rose-500';
-    }
-    if (scen.tests.some((t: any) => t.results.status === TestStatus.Executing)) {
-       return 'bi-arrow-repeat animate-spin text-indigo-500';
-    }
-    if (scen.tests.every((t: any) => t.results.status === TestStatus.Success || t.results.status === TestStatus.Skipped)) {
-       if (scen.tests.some((t: any) => t.results.status === TestStatus.Success)) {
-          return 'bi-check-circle-fill text-emerald-500';
-       }
-    }
-    return 'bi-circle text-slate-400';
-  }
-
-  getTestStatusIcon(status: TestStatus): string {
-    switch (status) {
-      case TestStatus.Success: return 'bi-check-circle-fill text-emerald-500';
-      case TestStatus.Executing: return 'bi-arrow-repeat animate-spin text-indigo-500';
-      case TestStatus.Error:
-      case TestStatus.Fail: return 'bi-x-circle-fill text-rose-500';
-      case TestStatus.Skipped: return 'bi-slash-circle text-slate-400';
-      default: return 'bi-circle text-slate-400';
-    }
-  }
+  getScenarioStatusIcon(scen: any): string { return CortexUiHelpers.getScenarioStatusIcon(scen.tests); }
+  getTestStatusIcon(status: TestStatus): string { return CortexUiHelpers.getTestStatusIcon(status); }
 
   handleRunClick() {
-    if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
+    if (!this.hardwareService.isExtensionInstalled && !this.skipExtensionCheck) {
       this.showExtensionModal = true;
       return;
     }
@@ -497,7 +379,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       this.stop();
       this.addLog('Execution paused', 'system');
     } else {
-      if (!this.isExtensionInstalled && !this.skipExtensionCheck) {
+      if (!this.hardwareService.isExtensionInstalled && !this.skipExtensionCheck) {
         this.showExtensionModal = true;
         return;
       }
@@ -552,102 +434,16 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     document.body.style.userSelect = '';
   }
 
-  async loadInitialHardwareInfo() {
-      try {
-        this.hardwareInfo = await (window as any).webai.getHardwareInformation();
-        
-      } catch (e) {
-        console.error("Failed to get hardware info", e);
-      }
-  }
-
-  getComputeUnit(): string {
-    if (this.hardwareInfo?.cpu?.modelName) {
-      const cores = this.hardwareInfo.cpu.numOfProcessors;
-      return cores ? `${this.hardwareInfo.cpu.modelName} (${cores}-Core)` : this.hardwareInfo.cpu.modelName;
-    }
-    return 'Extension Required';
-  }
-
-  getNpuInfo(): string {
-    const cpu = this.getComputeUnit();
-    if (cpu.includes('Apple M')) {
-      return 'Apple Neural Engine';
-    }
-    if (cpu.includes('Snapdragon')) {
-      return 'Qualcomm Hexagon';
-    }
-    if (cpu.includes('Intel')) {
-      return 'Intel NPU (if available)';
-    }
-    if (cpu.includes('AMD')) {
-      return 'AMD Ryzen AI (if available)';
-    }
-    return 'Unknown or None';
-  }
-
-  getMemoryInfo(): string {
-    if (this.hardwareInfo?.memory?.capacity) {
-      const gb = Math.round(this.hardwareInfo.memory.capacity / (1024 * 1024 * 1024));
-      return `${gb} GB RAM`;
-    }
-    return 'Extension Required';
-  }
-
-  getOsProfile(): string {
-    if (typeof navigator !== 'undefined') {
-       const uaData = (navigator as any).userAgentData;
-       if (uaData && uaData.platform) {
-         return uaData.platform;
-       }
-       
-       const ua = navigator.userAgent;
-       if (ua.includes('Mac OS X')) {
-          const match = ua.match(/Mac OS X (\d+[_.]\d+[_.]?\d*)/);
-          return match ? `macOS ${match[1].replace(/_/g, '.')}` : 'macOS';
-       } else if (ua.includes('Windows NT 10.0')) {
-          return 'Windows 10/11';
-       } else if (ua.includes('Linux')) {
-          return 'Linux';
-       } else if (ua.includes('Android')) {
-          return 'Android';
-       } else if (ua.includes('iPhone') || ua.includes('iPad')) {
-          return 'iOS / iPadOS';
-       }
-    }
-    return 'Unknown OS';
-  }
-
-  getBrowserInfo(): string {
-    if (typeof navigator !== 'undefined') {
-       const uaData = (navigator as any).userAgentData;
-       if (uaData && uaData.brands) {
-         const brand = uaData.brands.find((b: any) => !b.brand.includes('Not') && !b.brand.includes('Chromium'));
-         if (brand) {
-           return `${brand.brand} ${brand.version}`;
-         }
-       }
-       const ua = navigator.userAgent;
-       const match = ua.match(/(Chrome|Edg|Safari|Firefox)\/(\d+([\.\d]+)?)/);
-       if (match) {
-         let name = match[1];
-         if (name === 'Edg') name = 'Edge';
-         return `${name} ${match[2]}`;
-       }
-    }
-    return 'Unknown Browser';
-  }
-
-  get isHardwareOptimal(): boolean {
-    const cpu = this.getComputeUnit();
-    const mem = this.getMemoryInfo();
-    return cpu.includes('Apple M') || cpu.includes('Snapdragon') || mem.includes('32 GB') || mem.includes('64 GB');
-  }
+  // Hardware info is now delegated to HardwareInfoService (injected as hardwareService)
 
   getMaxArray(values: number[]): number { return values.length > 0 ? Math.max(...values) : 0; }
   
   getGlobalAllValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
+  }
+
+  getTestSpecificAllValues(testId: string, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens', localVal?: number|null): number[] {
+    return [localVal||0, ...this.getAllBaselineValuesForTest(testId, metric)];
   }
 
   getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens', coldVal?: number|null, warmVal?: number|null): number[] {
@@ -666,6 +462,20 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds, true);
+      if (!res) return 0;
+      if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
+      if (metric === 'total') return res.averageTotalResponseTime || 0;
+      if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
+      if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
+      if (metric === 'inputTokens') return res.averageInputTokens || 0;
+      return 0;
+    });
+  }
+
+  getAllBaselineValuesForTest(testId: string, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
+    return this.comparisonService.baselines.map(b => {
+      const res = this.comparisonService.getTestSpecificSummaryResults(b.data, testId);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
@@ -698,6 +508,30 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       this.tableSortColumn = column;
       this.tableSortDirection = 'asc';
     }
+  }
+
+  getSortedBaselinesForTest(testId: string) {
+    const baselines = [...this.comparisonService.baselines];
+    const col = this.tableSortColumn;
+    const dir = this.tableSortDirection === 'asc' ? 1 : -1;
+
+    return baselines.sort((a, b) => {
+      if (col === 'name') {
+        return dir * a.name.localeCompare(b.name);
+      }
+      const aSummary = this.comparisonService.getTestSpecificSummaryResults(a.data, testId);
+      const bSummary = this.comparisonService.getTestSpecificSummaryResults(b.data, testId);
+      let aVal = 0, bVal = 0;
+      if (col === 'ttft') { aVal = aSummary?.averageTimeToFirstToken || 0; bVal = bSummary?.averageTimeToFirstToken || 0; }
+      else if (col === 'total') { aVal = aSummary?.averageTotalResponseTime || 0; bVal = bSummary?.averageTotalResponseTime || 0; }
+      else if (col === 'inputTokens') { aVal = aSummary?.averageInputTokens || 0; bVal = bSummary?.averageInputTokens || 0; }
+      else if (col === 'inputSpeed') { aVal = aSummary?.averageInputTokensPerSecond || 0; bVal = bSummary?.averageInputTokensPerSecond || 0; }
+      else if (col === 'outputSpeed') { aVal = aSummary?.averageTokenPerSecond || 0; bVal = bSummary?.averageTokenPerSecond || 0; }
+      if (aVal <= 0 && bVal > 0) return 1;
+      if (bVal <= 0 && aVal > 0) return -1;
+      if (aVal <= 0 && bVal <= 0) return 0;
+      return dir * (aVal - bVal);
+    });
   }
 
   getSortedBaselines(apiId: any, selectedTestIds: Set<string>) {
@@ -769,7 +603,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   triggerDownloadResults() {
-    if (!this.isExtensionInstalled) {
+    if (!this.hardwareService.isExtensionInstalled) {
       this.showExtensionModal = true;
     } else {
       this.downloadResults();
@@ -807,31 +641,18 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async downloadResults() {
-    let hardwareInfo = null;
-    if (this.isExtensionInstalled) {
-      try {
-        hardwareInfo = await (window as any).webai.getHardwareInformation();
-      } catch (e) {
-        console.error("Failed to get hardware info", e);
-      }
+    if (this.hardwareService.isExtensionInstalled) {
+      await this.hardwareService.loadFromExtension();
     }
 
     const data = {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      hardware: hardwareInfo,
+      hardware: this.hardwareService.hardwareInfo,
       results: this.axonTestSuiteExecutor.results
     };
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cortex-benchmark-results-${new Date().getTime()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    this.reportService.downloadAsJsonFile(data);
   }
 
   toggleTestSelection(testId: string, event?: Event) {
@@ -1018,14 +839,9 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   }
   
   async generateReport() {
-    if (this.isExtensionInstalled) {
-      try {
-        this.hardwareInfo = await (window as any).webai.getHardwareInformation();
-      } catch (e) {
-        console.error("Failed to get hardware info", e);
-      }
+    if (this.hardwareService.isExtensionInstalled) {
+      await this.hardwareService.loadFromExtension();
     }
-    
   }
   
   getTestById(id: string): AxonTestInterface | undefined {
@@ -1038,76 +854,29 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
 
   getSummaryResults(builtInAIApi: string | number, startType: "cold" | "warm", ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
     const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
-    const items = results.filter(value => {
-      return value.api === builtInAIApi && value.startType === startType && (ignoreSelection || this.selectedTestIds.has(value.id));
-    }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
+    return SummaryResultsCalculator.fromTestResults(
+      results,
+      { api: builtInAIApi, startType, selectedTestIds: this.selectedTestIds, ignoreSelection },
+      true // includeMedians — local results show both averages and medians
+    );
+  }
 
-    if (items.length === 0) return undefined;
-
-    const calcAvg = (key: string) => {
-      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some(item => (item as any)[key] === -1)) return -1;
-      return 0;
-    };
-
-    const calcMed = (key: string) => {
-      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
-      if (items.some(item => (item as any)[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-        averageTokenPerSecond: calcAvg('tokensPerSecond'),
-        averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-        averageTotalResponseTime: calcAvg('totalResponseTime'),
-        averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-        medianTimeToFirstToken: calcMed('timeToFirstToken'),
-        medianTotalResponseTime: calcMed('totalResponseTime'),
-        medianTokenPerSecond: calcMed('tokensPerSecond'),
-        medianInputTokensPerSecond: calcMed('inputTokensPerSecond'),
-        medianCharactersPerSecond: calcMed('charactersPerSecond')
-    };
+  getTestSpecificSummaryResults(testId: string): AxonSummaryResultsInterface | undefined {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    return SummaryResultsCalculator.fromTestResults(
+      results,
+      { testId, ignoreSelection: true },
+      true
+    );
   }
 
   getGlobalSummaryResults(startType: "cold" | "warm"): AxonSummaryResultsInterface | undefined {
     const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
-    const items = results.filter(value => {
-      return value.startType === startType;
-    }).map(item => item.testIterationResults).flat(1).filter(item => item.status === TestStatus.Success);
-
-    if (items.length === 0) return undefined;
-
-    const calcAvg = (key: string) => {
-      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some(item => (item as any)[key] === -1)) return -1;
-      return 0;
-    };
-
-    const calcMed = (key: string) => {
-      const validVals = items.map(item => (item as any)[key]).filter(v => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateMedian(validVals);
-      if (items.some(item => (item as any)[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-        averageTokenPerSecond: calcAvg('tokensPerSecond'),
-        averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-        averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-        averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-        averageTotalResponseTime: calcAvg('totalResponseTime'),
-        averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-        medianTimeToFirstToken: calcMed('timeToFirstToken'),
-        medianTotalResponseTime: calcMed('totalResponseTime'),
-        medianTokenPerSecond: calcMed('tokensPerSecond'),
-        medianInputTokensPerSecond: calcMed('inputTokensPerSecond'),
-        medianCharactersPerSecond: calcMed('charactersPerSecond')
-    };
+    return SummaryResultsCalculator.fromTestResults(
+      results,
+      { startType, ignoreSelection: true },
+      true
+    );
   }
 
   getGlobalPassedAndFailed(): { passed: number, failed: number } {
@@ -1264,21 +1033,7 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     this.viewData[testId].expandedOutputs![index] = !this.viewData[testId].expandedOutputs![index];
   }
 
-  getIconForApi(api: BuiltInAiApi): string {
-    switch (api) {
-      case BuiltInAiApi.LanguageDetector: return 'bi-search';
-      case BuiltInAiApi.Translator: return 'bi-translate';
-      case BuiltInAiApi.Summarizer: return 'bi-card-text';
-      case BuiltInAiApi.PromptWithImage: return 'bi-image';
-      case BuiltInAiApi.Prompt:
-      case BuiltInAiApi.PromptWithAudio:
-        return 'bi-chat-text';
-      case BuiltInAiApi.Proofreader: return 'bi-spellcheck';
-      case BuiltInAiApi.Rewriter: return 'bi-pencil-square';
-      case BuiltInAiApi.Writer: return 'bi-pen';
-      default: return 'bi-cpu';
-    }
-  }
+  getIconForApi(api: BuiltInAiApi): string { return CortexUiHelpers.getIconForApi(api); }
 
   isTestCollapsed(test: AxonTestInterface): boolean {
     if (this.viewData[test.id].iterationsCollapsed !== undefined) {
@@ -1325,23 +1080,6 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return this.comparisonService.availableBaselinesIndex.find(b => b.filename === id);
   }
 
-  getExecutionTypeIcon(type?: string): string {
-    switch(type?.toUpperCase()) {
-      case 'CPU': return 'bi-cpu';
-      case 'GPU': return 'bi-gpu-card';
-      case 'NPU': return 'bi-motherboard';
-      case 'CLOUD': return 'bi-cloud';
-      default: return 'bi-gear';
-    }
-  }
-
-  getExecutionTypeColorClass(type?: string): string {
-    switch(type?.toUpperCase()) {
-      case 'CPU': return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
-      case 'GPU': return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800/50';
-      case 'NPU': return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50';
-      case 'CLOUD': return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50';
-      default: return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
-    }
-  }
+  getExecutionTypeIcon(type?: string): string { return CortexUiHelpers.getExecutionTypeIcon(type); }
+  getExecutionTypeColorClass(type?: string): string { return CortexUiHelpers.getExecutionTypeColorClass(type); }
 }
