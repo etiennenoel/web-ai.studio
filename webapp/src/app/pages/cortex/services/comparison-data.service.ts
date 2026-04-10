@@ -127,6 +127,15 @@ getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestId
     );
   }
 
+  getTestSpecificSummaryResults(reportData: any, testId: string): AxonSummaryResultsInterface | undefined {
+    if (!reportData?.results?.testsResults) return undefined;
+
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { testId, ignoreSelection: true }
+    );
+  }
+
   getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
     if (!reportData?.results?.testsResults) return undefined;
 

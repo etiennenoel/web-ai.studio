@@ -749,22 +749,22 @@
               <!-- Benchmark Comparison Table -->
               @let activeTestForBenchmark = getTestById(activeTestIdInLab || scen.tests[0].id);
               @if (activeTestForBenchmark) {
-                  @let testLocalSummary = getSummaryResults(scen.api, activeTestForBenchmark.results.startType, true);
+                  @let testLocalSummary = getTestSpecificSummaryResults(activeTestForBenchmark.id);
                   @let testLocalTtft = testLocalSummary?.averageTimeToFirstToken;
                   @let testLocalTotal = testLocalSummary?.averageTotalResponseTime;
                   @let testLocalInTok = testLocalSummary?.averageInputTokens;
                   @let testLocalInSpeed = testLocalSummary?.averageInputTokensPerSecond;
                   @let testLocalOutSpeed = testLocalSummary?.averageTokenPerSecond;
 
-                  @let testAllTtft = getTestAllValues(scen.api, 'ttft', testLocalTtft, null);
+                  @let testAllTtft = getTestSpecificAllValues(activeTestForBenchmark.id, 'ttft', testLocalTtft);
                   @let testMaxTtft = getMaxArray(testAllTtft);
-                  @let testAllTotal = getTestAllValues(scen.api, 'total', testLocalTotal, null);
+                  @let testAllTotal = getTestSpecificAllValues(activeTestForBenchmark.id, 'total', testLocalTotal);
                   @let testMaxTotal = getMaxArray(testAllTotal);
-                  @let testAllInTok = getTestAllValues(scen.api, 'inputTokens', testLocalInTok, null);
+                  @let testAllInTok = getTestSpecificAllValues(activeTestForBenchmark.id, 'inputTokens', testLocalInTok);
                   @let testMaxInTok = getMaxArray(testAllInTok);
-                  @let testAllInSpeed = getTestAllValues(scen.api, 'inputSpeed', testLocalInSpeed, null);
+                  @let testAllInSpeed = getTestSpecificAllValues(activeTestForBenchmark.id, 'inputSpeed', testLocalInSpeed);
                   @let testMaxInSpeed = getMaxArray(testAllInSpeed);
-                  @let testAllOutSpeed = getTestAllValues(scen.api, 'speed', testLocalOutSpeed, null);
+                  @let testAllOutSpeed = getTestSpecificAllValues(activeTestForBenchmark.id, 'speed', testLocalOutSpeed);
                   @let testMaxOutSpeed = getMaxArray(testAllOutSpeed);
 
                   <div class="mt-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -862,8 +862,8 @@
                           </tr>
 
                           <!-- Baseline Rows -->
-                          @for (baseline of getSortedBaselines(scen.api, selectedTestIds); track baseline.id) {
-                            @let bSummary = comparisonService.getSummaryResults(baseline.data, scen.api, selectedTestIds, true);
+                          @for (baseline of getSortedBaselinesForTest(activeTestForBenchmark.id); track baseline.id) {
+                            @let bSummary = comparisonService.getTestSpecificSummaryResults(baseline.data, activeTestForBenchmark.id);
                             @let bTtft = bSummary?.averageTimeToFirstToken || 0;
                             @let bTotal = bSummary?.averageTotalResponseTime || 0;
                             @let bInTok = bSummary?.averageInputTokens || 0;

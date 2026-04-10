@@ -442,6 +442,10 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineGlobalValues(metric)];
   }
 
+  getTestSpecificAllValues(testId: string, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens', localVal?: number|null): number[] {
+    return [localVal||0, ...this.getAllBaselineValuesForTest(testId, metric)];
+  }
+
   getTestAllValues(testId: any, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens', coldVal?: number|null, warmVal?: number|null): number[] {
     return [coldVal||0, warmVal||0, ...this.getAllBaselineValues(testId, metric)];
   }
@@ -458,6 +462,20 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   getAllBaselineGlobalValues(metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
     return this.comparisonService.baselines.map(b => {
       const res = this.comparisonService.getGlobalSummaryResults(b.data, this.selectedTestIds, true);
+      if (!res) return 0;
+      if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
+      if (metric === 'total') return res.averageTotalResponseTime || 0;
+      if (metric === 'speed') return res.averageTokenPerSecond || 0;
+      if (metric === 'inputSpeed') return res.averageInputTokensPerSecond || 0;
+      if (metric === 'charSpeed') return res.averageCharactersPerSecond || 0;
+      if (metric === 'inputTokens') return res.averageInputTokens || 0;
+      return 0;
+    });
+  }
+
+  getAllBaselineValuesForTest(testId: string, metric: 'ttft' | 'total' | 'speed' | 'inputSpeed' | 'charSpeed' | 'inputTokens'): number[] {
+    return this.comparisonService.baselines.map(b => {
+      const res = this.comparisonService.getTestSpecificSummaryResults(b.data, testId);
       if (!res) return 0;
       if (metric === 'ttft') return res.averageTimeToFirstToken || 0;
       if (metric === 'total') return res.averageTotalResponseTime || 0;
@@ -490,6 +508,30 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       this.tableSortColumn = column;
       this.tableSortDirection = 'asc';
     }
+  }
+
+  getSortedBaselinesForTest(testId: string) {
+    const baselines = [...this.comparisonService.baselines];
+    const col = this.tableSortColumn;
+    const dir = this.tableSortDirection === 'asc' ? 1 : -1;
+
+    return baselines.sort((a, b) => {
+      if (col === 'name') {
+        return dir * a.name.localeCompare(b.name);
+      }
+      const aSummary = this.comparisonService.getTestSpecificSummaryResults(a.data, testId);
+      const bSummary = this.comparisonService.getTestSpecificSummaryResults(b.data, testId);
+      let aVal = 0, bVal = 0;
+      if (col === 'ttft') { aVal = aSummary?.averageTimeToFirstToken || 0; bVal = bSummary?.averageTimeToFirstToken || 0; }
+      else if (col === 'total') { aVal = aSummary?.averageTotalResponseTime || 0; bVal = bSummary?.averageTotalResponseTime || 0; }
+      else if (col === 'inputTokens') { aVal = aSummary?.averageInputTokens || 0; bVal = bSummary?.averageInputTokens || 0; }
+      else if (col === 'inputSpeed') { aVal = aSummary?.averageInputTokensPerSecond || 0; bVal = bSummary?.averageInputTokensPerSecond || 0; }
+      else if (col === 'outputSpeed') { aVal = aSummary?.averageTokenPerSecond || 0; bVal = bSummary?.averageTokenPerSecond || 0; }
+      if (aVal <= 0 && bVal > 0) return 1;
+      if (bVal <= 0 && aVal > 0) return -1;
+      if (aVal <= 0 && bVal <= 0) return 0;
+      return dir * (aVal - bVal);
+    });
   }
 
   getSortedBaselines(apiId: any, selectedTestIds: Set<string>) {
@@ -816,6 +858,15 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
       results,
       { api: builtInAIApi, startType, selectedTestIds: this.selectedTestIds, ignoreSelection },
       true // includeMedians — local results show both averages and medians
+    );
+  }
+
+  getTestSpecificSummaryResults(testId: string): AxonSummaryResultsInterface | undefined {
+    const results = this.axonTestSuiteExecutor?.results?.testsResults || [];
+    return SummaryResultsCalculator.fromTestResults(
+      results,
+      { testId, ignoreSelection: true },
+      true
     );
   }
 

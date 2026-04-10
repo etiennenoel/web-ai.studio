@@ -71,21 +71,55 @@ export class OpenAiProviderClient implements ProviderClient {
     } else if (Array.isArray(rawArg)) {
       for (const msg of rawArg) {
         const role = msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : msg.role;
-        let contentStr = '';
         if (typeof msg.content === 'string') {
-          contentStr = msg.content;
+          messages.push({ role, content: msg.content });
         } else if (Array.isArray(msg.content)) {
-          contentStr = msg.content.map((c: any) => c.text || c.value || JSON.stringify(c)).join('\n');
+          const content = this.buildContentParts(msg.content);
+          messages.push({ role, content });
         } else {
-          contentStr = JSON.stringify(msg.content);
+          messages.push({ role, content: JSON.stringify(msg.content) });
         }
-        messages.push({ role, content: contentStr });
       }
     } else if (typeof rawArg === 'object') {
       messages.push({ role: 'user', content: JSON.stringify(rawArg) });
     }
 
     return messages;
+  }
+
+  /**
+   * Converts Chrome AI content items into OpenAI's multimodal content format.
+   * Handles text, image (via image_url), and audio (via input_audio).
+   */
+  private buildContentParts(contentItems: any[]): any[] {
+    return contentItems.map((item: any) => {
+      if (item.type === 'text') {
+        return { type: 'text', text: item.value || '' };
+      }
+
+      if (item.type === 'image' && item.value?.dataUrl) {
+        return {
+          type: 'image_url',
+          image_url: { url: item.value.dataUrl },
+        };
+      }
+
+      if (item.type === 'audio' && item.value?.dataUrl) {
+        const dataUrl: string = item.value.dataUrl;
+        const splitDataUrl = dataUrl.split(',');
+        if (splitDataUrl.length === 2) {
+          const mimeMatch = splitDataUrl[0].match(/:(.*?);/);
+          const format = mimeMatch ? mimeMatch[1].split('/')[1] : 'wav';
+          return {
+            type: 'input_audio',
+            input_audio: { data: splitDataUrl[1], format },
+          };
+        }
+      }
+
+      // Fallback: treat as text
+      return { type: 'text', text: JSON.stringify(item) };
+    });
   }
 
   /**

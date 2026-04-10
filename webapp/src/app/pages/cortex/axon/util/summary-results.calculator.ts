@@ -77,6 +77,7 @@ export class SummaryResultsCalculator {
     testResults: { api?: string; startType?: string; id?: string; testIterationResults?: AxonTestIterationResultInterface[] }[],
     filters: {
       api?: string | number;
+      testId?: string;
       startType?: 'cold' | 'warm';
       selectedTestIds?: Set<string>;
       ignoreSelection?: boolean;
@@ -87,6 +88,7 @@ export class SummaryResultsCalculator {
 
     const iterations = testResults
       .filter(result => {
+        if (filters.testId !== undefined && result.id !== filters.testId) return false;
         if (filters.api !== undefined && result.api !== filters.api) return false;
         if (filters.startType !== undefined && result.startType !== filters.startType) return false;
         if (!filters.ignoreSelection && filters.selectedTestIds && result.id) {
