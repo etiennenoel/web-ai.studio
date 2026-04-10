@@ -434,7 +434,7 @@ describe('CortexInsightsPage', () => {
     expect(component.chartPointsTop).toBe('');
 
     component.topConfig = {
-      id: 1, filename: 'test', hw: 'test', compute: 'test', engine: 'test', model: 'test',
+      id: 1, filename: 'test', hw: 'test', os: '', ram: 0, compute: 'test', engine: 'test', model: 'test',
       apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, isCurrent: false, trend: 'best'
     };
     component.activeMetric = 'speed';
