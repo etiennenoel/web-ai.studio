@@ -54,8 +54,8 @@ export class AppUpdateService {
 
   private checkOnTabFocus() {
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        this.checkThrottled();
+      if (document.visibilityState === 'visible' && !this.updateAvailable) {
+        this.swUpdate.checkForUpdate();
       }
     });
   }
