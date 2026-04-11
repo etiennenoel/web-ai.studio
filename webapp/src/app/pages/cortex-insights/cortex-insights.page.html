@@ -23,7 +23,7 @@
   }
 
   <main class="max-w-[1600px] mx-auto px-6 py-8 flex flex-col gap-6">
-    
+
     <!-- TOP ROW: KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -83,13 +83,7 @@
           <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Benchmarks</h2>
           <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold ml-2">{{ leaderboard.length }} / {{ rawBaselines.length }}</span>
         </div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <app-cortex-filter-dropdown filterType="hardware" label="HW:" dropdownWidth="w-56"></app-cortex-filter-dropdown>
-          <app-cortex-filter-dropdown filterType="os" label="OS:"></app-cortex-filter-dropdown>
-          <app-cortex-filter-dropdown filterType="ram" label="RAM:"></app-cortex-filter-dropdown>
-          <app-cortex-filter-dropdown filterType="compute" label="Compute:"></app-cortex-filter-dropdown>
-          <app-cortex-filter-dropdown filterType="engine" label="Engine:"></app-cortex-filter-dropdown>
-          <app-cortex-filter-dropdown filterType="variant" label="Model:"></app-cortex-filter-dropdown>
+        <div class="flex items-center gap-3">
           <!-- API Filter (leaderboard-scoped) -->
           <div class="relative filter-dropdown">
             <button (click)="filterService.toggleDropdown('api', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedApis.length > 0 && filterService.selectedApis.length < filterService.apiOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
@@ -148,7 +142,7 @@
             class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             title="Export to CSV">
             <i class="bi bi-download"></i>
-            <span>CSV</span>
+            <span>Export (.csv)</span>
           </button>
           <div class="relative">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-500"></i>
