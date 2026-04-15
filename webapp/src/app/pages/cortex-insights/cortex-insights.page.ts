@@ -22,6 +22,8 @@ export interface LeaderboardEntry {
   inputSpeed: number;
   charSpeed: number;
   total: number;
+  avgInputTokens: number;
+  avgOutputTokens: number;
   isCurrent: boolean;
   trend: 'best' | 'worst' | 'flat';
 }
@@ -33,6 +35,8 @@ interface RawTestResult {
   inputSpeed?: number;
   charSpeed?: number;
   total: number;
+  avgInputTokens?: number;
+  avgOutputTokens?: number;
 }
 
 interface RawBaseline {
@@ -115,6 +119,8 @@ export class CortexInsightsPage implements OnInit {
   selectedLeaderboardEntry: LeaderboardEntry | null = null;
   selectedBaseline: RawBaseline | null = null;
   selectedBaselineFullData: any = null;
+  panelWidth: number = 480;
+  private isResizing = false;
 
   constructor(
     private titleService: Title,
@@ -172,6 +178,8 @@ export class CortexInsightsPage implements OnInit {
                     const tokensPerSecs = iterations.map((i: any) => i.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
                     const inputTokensPerSecs = iterations.map((i: any) => i.inputTokensPerSecond ?? 0).filter((v: number) => v !== -1);
                     const charsPerSecs = iterations.map((i: any) => i.charactersPerSecond ?? 0);
+                    const inputTokenCounts = iterations.map((i: any) => i.totalNumberOfInputTokens ?? 0).filter((v: number) => v > 0);
+                    const outputTokenCounts = iterations.map((i: any) => i.totalNumberOfOutputTokens ?? 0).filter((v: number) => v > 0 && v !== -1);
                     tests.push({
                       api,
                       ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
@@ -179,6 +187,8 @@ export class CortexInsightsPage implements OnInit {
                       inputSpeed: inputTokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(inputTokensPerSecs) : 0,
                       charSpeed: MathematicalCalculations.calculateAverage(charsPerSecs),
                       total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
+                      avgInputTokens: inputTokenCounts.length > 0 ? MathematicalCalculations.calculateAverage(inputTokenCounts) : undefined,
+                      avgOutputTokens: outputTokenCounts.length > 0 ? MathematicalCalculations.calculateAverage(outputTokenCounts) : undefined,
                     });
                   }
                 });
@@ -345,6 +355,10 @@ export class CortexInsightsPage implements OnInit {
       const inputSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.inputSpeed ?? 0).filter(v => v !== -1)));
       const charSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.charSpeed ?? 0)));
       const total = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.total)));
+      const inputTokenVals = testsToUse.map(t => t.avgInputTokens ?? 0).filter(v => v > 0);
+      const outputTokenVals = testsToUse.map(t => t.avgOutputTokens ?? 0).filter(v => v > 0);
+      const avgInputTokens = inputTokenVals.length > 0 ? Math.round(MathematicalCalculations.calculateAverage(inputTokenVals)) : 0;
+      const avgOutputTokens = outputTokenVals.length > 0 ? Math.round(MathematicalCalculations.calculateAverage(outputTokenVals)) : 0;
 
       newLeaderboard.push({
         id: idCounter++,
@@ -361,6 +375,8 @@ export class CortexInsightsPage implements OnInit {
         inputSpeed: inputSpeed || 0,
         charSpeed,
         total,
+        avgInputTokens,
+        avgOutputTokens,
         isCurrent: b.filename === 'local',
         trend: 'flat'
       });
@@ -581,6 +597,27 @@ export class CortexInsightsPage implements OnInit {
         error: () => this.selectedBaselineFullData = null
       });
     }
+  }
+
+  startResize(event: MouseEvent) {
+    this.isResizing = true;
+    event.preventDefault();
+    const onMouseMove = (e: MouseEvent) => {
+      if (!this.isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      this.panelWidth = Math.max(360, Math.min(newWidth, window.innerWidth * 0.8));
+    };
+    const onMouseUp = () => {
+      this.isResizing = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 
   closePanel() {

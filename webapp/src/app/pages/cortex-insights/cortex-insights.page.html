@@ -406,7 +406,9 @@
     @let hw = fullData?.hardware;
 
     <!-- Panel -->
-    <div class="fixed top-0 right-0 bottom-0 z-[101] w-full sm:w-[480px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl overflow-y-auto">
+    <div class="fixed top-0 right-0 bottom-0 z-[101] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl overflow-y-auto" [style.width.px]="panelWidth">
+      <!-- Resize handle -->
+      <div class="absolute top-0 left-0 bottom-0 w-1.5 cursor-col-resize hover:bg-indigo-500/30 active:bg-indigo-500/50 transition-colors z-20" (mousedown)="startResize($event)"></div>
 
       <!-- Panel Header -->
       <div class="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 py-4">
@@ -560,6 +562,30 @@
                 <span class="text-[9px] text-slate-400 dark:text-slate-500">ms</span>
               </div>
             </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-arrow-in-down text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Input Tokens</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.avgInputTokens > 0 ? (entry.avgInputTokens | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.avgInputTokens > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">tokens</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-arrow-up text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Output Tokens</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.avgOutputTokens > 0 ? (entry.avgOutputTokens | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.avgOutputTokens > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">tokens</span>
+                }
+              </div>
+            </div>
           </div>
         </section>
 
@@ -567,15 +593,17 @@
         @if (baseline && baseline.tests.length > 0) {
           <section>
             <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Per-API Breakdown</h3>
-            <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-              <table class="w-full text-left">
+            <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
+              <table class="w-full text-left min-w-[520px]">
                 <thead>
                   <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">API</th>
-                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">Out t/s</th>
-                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">In t/s</th>
-                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">TTFT</th>
-                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right">Total</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest sticky left-0 bg-slate-50 dark:bg-slate-800/50">API</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Avg In</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Avg Out</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Out t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">In t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">TTFT</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Total</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800/50">
@@ -583,6 +611,16 @@
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                       <td class="px-3 py-2.5">
                         <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">{{ test.api }}</span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.avgInputTokens ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.avgInputTokens ? (test.avgInputTokens | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.avgOutputTokens ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.avgOutputTokens ? (test.avgOutputTokens | number:'1.0-0') : 'N/A' }}
+                        </span>
                       </td>
                       <td class="px-3 py-2.5 text-right">
                         <span class="text-xs font-bold tabular-nums" [ngClass]="test.speed > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
