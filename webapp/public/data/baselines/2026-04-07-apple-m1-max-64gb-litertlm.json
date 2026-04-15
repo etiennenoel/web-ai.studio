@@ -391,9 +391,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 157,
             "totalNumberOfOutputCharacters": 821,
-            "tokensPerSecond": 19.644398843863804,
+            "tokensPerSecond": 28.26842399035671,
             "inputTokensPerSecond": 255.92650315814564,
-            "charactersPerSecond": 102.72644236186103,
+            "charactersPerSecond": 147.82405156740674,
             "inputLength": 2098
           },
           {
@@ -405,9 +405,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 157,
             "totalNumberOfOutputCharacters": 821,
-            "tokensPerSecond": 27.68275910710605,
+            "tokensPerSecond": 31.194738619890416,
             "inputTokensPerSecond": 977.2905246671888,
-            "charactersPerSecond": 144.76143456645903,
+            "charactersPerSecond": 163.12662679573268,
             "inputLength": 2098
           },
           {
@@ -419,9 +419,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 157,
             "totalNumberOfOutputCharacters": 821,
-            "tokensPerSecond": 25.644376204635442,
+            "tokensPerSecond": 29.520156438034743,
             "inputTokensPerSecond": 776.3125155504126,
-            "charactersPerSecond": 134.10212015290253,
+            "charactersPerSecond": 154.36973525876766,
             "inputLength": 2098
           }
         ],
@@ -429,16 +429,16 @@
         "apiAvailability": "available",
         "inputContextSize": 9216,
         "averageTotalResponseTime": 6595.233333331843,
-        "averageTokensPerSecond": 24.3238447185351,
-        "medianTokensPerSecond": 25.644376204635442,
+        "averageTokensPerSecond": 29.66110634942729,
+        "medianTokensPerSecond": 29.520156438034743,
         "averageInputTokensPerSecond": 669.8431811252491,
         "medianInputTokensPerSecond": 776.3125155504126,
-        "averageCharactersPerSecond": 127.19666569374085,
+        "averageCharactersPerSecond": 155.1068045406357,
         "averageTimeToFirstToken": 1293.5,
         "averageInputTokens": 624,
         "medianInputTokens": 624,
         "medianTotalResponseTime": 6122.199999999255,
-        "medianCharactersPerSecond": 134.10212015290253,
+        "medianCharactersPerSecond": 154.36973525876766,
         "medianTimeToFirstToken": 803.8000000007451
       },
       {
@@ -457,9 +457,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 157,
             "totalNumberOfOutputCharacters": 821,
-            "tokensPerSecond": 28.02020310184688,
+            "tokensPerSecond": 31.43772527032439,
             "inputTokensPerSecond": 1024.4623214553824,
-            "charactersPerSecond": 146.52603023322476,
+            "charactersPerSecond": 164.3972767320785,
             "inputLength": 2098
           },
           {
@@ -471,9 +471,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 148,
             "totalNumberOfOutputCharacters": 747,
-            "tokensPerSecond": 27.68528564480141,
+            "tokensPerSecond": 27.98154730392434,
             "inputTokensPerSecond": 11024.73498276753,
-            "charactersPerSecond": 139.73586740990982,
+            "charactersPerSecond": 141.2311880812938,
             "inputLength": 2098
           },
           {
@@ -485,9 +485,9 @@
             "totalNumberOfInputTokens": 624,
             "totalNumberOfOutputTokens": 177,
             "totalNumberOfOutputCharacters": 912,
-            "tokensPerSecond": 30.148185998978025,
+            "tokensPerSecond": 30.52776819592963,
             "inputTokensPerSecond": 8547.945205479453,
-            "charactersPerSecond": 155.3398058252427,
+            "charactersPerSecond": 157.29561917902726,
             "inputLength": 2098
           }
         ],
@@ -495,16 +495,16 @@
         "apiAvailability": "available",
         "inputContextSize": 9216,
         "averageTotalResponseTime": 5606.633333334078,
-        "averageTokensPerSecond": 28.61789158187544,
-        "medianTokensPerSecond": 28.02020310184688,
+        "averageTokensPerSecond": 29.982346923392786,
+        "medianTokensPerSecond": 30.52776819592963,
         "averageInputTokensPerSecond": 6865.714169900789,
         "medianInputTokensPerSecond": 8547.945205479453,
-        "averageCharactersPerSecond": 147.20056782279244,
+        "averageCharactersPerSecond": 154.3080279974665,
         "averageTimeToFirstToken": 246.23333333308497,
         "averageInputTokens": 624,
         "medianInputTokens": 624,
         "medianTotalResponseTime": 5603.10000000149,
-        "medianCharactersPerSecond": 146.52603023322476,
+        "medianCharactersPerSecond": 157.29561917902726,
         "medianTimeToFirstToken": 73
       },
       {
@@ -523,9 +523,9 @@
             "totalNumberOfInputTokens": 285,
             "totalNumberOfOutputTokens": 209,
             "totalNumberOfOutputCharacters": 1239,
-            "tokensPerSecond": 31.569089481005232,
+            "tokensPerSecond": 34.96094076714644,
             "inputTokensPerSecond": 443.71788883647736,
-            "charactersPerSecond": 187.1488127606004,
+            "charactersPerSecond": 207.25648617461454,
             "inputLength": 1375
           },
           {
@@ -537,9 +537,9 @@
             "totalNumberOfInputTokens": 285,
             "totalNumberOfOutputTokens": 209,
             "totalNumberOfOutputCharacters": 1239,
-            "tokensPerSecond": 32.52715784232086,
+            "tokensPerSecond": 35.34166427110376,
             "inputTokensPerSecond": 556.9669728364569,
-            "charactersPerSecond": 192.8284620413184,
+            "charactersPerSecond": 209.5135025449644,
             "inputLength": 1375
           },
           {
@@ -551,25 +551,25 @@
             "totalNumberOfInputTokens": 285,
             "totalNumberOfOutputTokens": 209,
             "totalNumberOfOutputCharacters": 1239,
-            "tokensPerSecond": 32.23120103632224,
+            "tokensPerSecond": 35.17452623783598,
             "inputTokensPerSecond": 525.2488020626931,
-            "charactersPerSecond": 191.0739621244175,
+            "charactersPerSecond": 208.52266989798457,
             "inputLength": 1375
           }
         ],
         "input": "Analyze the following scenario and provide a structured response.\n\nCore Task:\n\nRead the following two short, contradictory passages about the future of artificial intelligence.\n\nPassage A: \"AI promises a utopian future, a new renaissance where human potential is unbound, solving age-old problems of disease, scarcity, and labor.\"\n\nPassage B: \"The unchecked rise of AI is an existential gamble, a path toward technological servitude where human autonomy is rendered obsolete by superior, unfeeling logic.\"\n\nYour task is to write a concise synthesis of these two viewpoints. First, identify the core logical fallacy present in both passages (e.g., strawman, false dilemma, appeal to emotion, etc.) and briefly justify your choice. Then, explain how a decentralized, federated learning model might mitigate the risks described in Passage B while still failing to guarantee the utopia of Passage A.\n\nFormatting Requirements:\n\nThe entire response must be under 250 words.\n\nThe tone must be formal, critical, and slightly detached.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Philosophical & Technical Synthesis\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
         "apiAvailability": "available",
         "averageTotalResponseTime": 6510.066666666418,
-        "averageTokensPerSecond": 32.10914945321611,
-        "medianTokensPerSecond": 32.23120103632224,
+        "averageTokensPerSecond": 35.15904375869539,
+        "medianTokensPerSecond": 35.17452623783598,
         "averageInputTokensPerSecond": 508.64455457854245,
         "medianInputTokensPerSecond": 525.2488020626931,
-        "averageCharactersPerSecond": 190.35041230877877,
+        "averageCharactersPerSecond": 208.43088620585448,
         "averageTimeToFirstToken": 565.53333333383,
         "averageInputTokens": 285,
         "medianInputTokens": 285,
         "medianTotalResponseTime": 6484.400000002235,
-        "medianCharactersPerSecond": 191.0739621244175,
+        "medianCharactersPerSecond": 208.52266989798457,
         "medianTimeToFirstToken": 542.6000000014901
       },
       {
@@ -588,9 +588,9 @@
             "totalNumberOfInputTokens": 179,
             "totalNumberOfOutputTokens": 103,
             "totalNumberOfOutputCharacters": 482,
-            "tokensPerSecond": 30.407699347556267,
+            "tokensPerSecond": 35.30056892178138,
             "inputTokensPerSecond": 381.2566560170394,
-            "charactersPerSecond": 142.29622413128274,
+            "charactersPerSecond": 165.19295359513228,
             "inputLength": 784
           },
           {
@@ -602,9 +602,9 @@
             "totalNumberOfInputTokens": 179,
             "totalNumberOfOutputTokens": 103,
             "totalNumberOfOutputCharacters": 482,
-            "tokensPerSecond": 31.39478176053908,
+            "tokensPerSecond": 35.80864970103371,
             "inputTokensPerSecond": 442.6310583556148,
-            "charactersPerSecond": 146.91538649106639,
+            "charactersPerSecond": 167.5705743291092,
             "inputLength": 784
           },
           {
@@ -616,25 +616,25 @@
             "totalNumberOfInputTokens": 179,
             "totalNumberOfOutputTokens": 103,
             "totalNumberOfOutputCharacters": 482,
-            "tokensPerSecond": 30.599209767967203,
+            "tokensPerSecond": 35.04474158754305,
             "inputTokensPerSecond": 419.2037470725995,
-            "charactersPerSecond": 143.1924185258271,
+            "charactersPerSecond": 163.99578102131795,
             "inputLength": 784
           }
         ],
         "input": "Provide a structured response to the following creative and factual challenge.\n\nCore Tasks:\n\nDefinition: Briefly (in two sentences or less) define the \"Trolley Problem\" in ethics.\n\nCreation: Write a 4-line poem in an AABB rhyme scheme from the perspective of a self-driving car's algorithm having to compute a real-time solution to it.\n\nFormatting Requirements:\n\nThe entire response must be under 150 words.\n\nThe tone should be concise and thoughtful.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Ethical Computation\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
         "apiAvailability": "available",
         "averageTotalResponseTime": 3344.7333333343267,
-        "averageTokensPerSecond": 30.800563625354187,
-        "medianTokensPerSecond": 30.599209767967203,
+        "averageTokensPerSecond": 35.38465340345272,
+        "medianTokensPerSecond": 35.30056892178138,
         "averageInputTokensPerSecond": 414.36382048175125,
         "medianInputTokensPerSecond": 419.2037470725995,
-        "averageCharactersPerSecond": 144.1346763827254,
+        "averageCharactersPerSecond": 165.5864363151865,
         "averageTimeToFirstToken": 433.6333333340784,
         "averageInputTokens": 179,
         "medianInputTokens": 179,
         "medianTotalResponseTime": 3366.10000000149,
-        "medianCharactersPerSecond": 143.1924185258271,
+        "medianCharactersPerSecond": 165.19295359513228,
         "medianTimeToFirstToken": 427
       },
       {
@@ -653,9 +653,9 @@
             "totalNumberOfInputTokens": 172,
             "totalNumberOfOutputTokens": 256,
             "totalNumberOfOutputCharacters": 1103,
-            "tokensPerSecond": 33.12586534854285,
+            "tokensPerSecond": 35.126234906695935,
             "inputTokensPerSecond": 390.8202681228665,
-            "charactersPerSecond": 142.72589640407332,
+            "charactersPerSecond": 151.34467618002193,
             "inputLength": 829
           },
           {
@@ -667,9 +667,9 @@
             "totalNumberOfInputTokens": 172,
             "totalNumberOfOutputTokens": 256,
             "totalNumberOfOutputCharacters": 1103,
-            "tokensPerSecond": 33.22000467156637,
+            "tokensPerSecond": 35.41732958868129,
             "inputTokensPerSecond": 359.75737293621444,
-            "charactersPerSecond": 143.13150450288165,
+            "charactersPerSecond": 152.59888490748227,
             "inputLength": 829
           },
           {
@@ -681,25 +681,25 @@
             "totalNumberOfInputTokens": 172,
             "totalNumberOfOutputTokens": 256,
             "totalNumberOfOutputCharacters": 1103,
-            "tokensPerSecond": 33.50434509475121,
+            "tokensPerSecond": 35.508703793605655,
             "inputTokensPerSecond": 398.7943426842172,
-            "charactersPerSecond": 144.3566118730882,
+            "charactersPerSecond": 152.99257923573063,
             "inputLength": 829
           }
         ],
         "input": "Provide a structured response to the following technical challenge.\n\nCore Tasks:\n\nCode Generation: Generate a short, commented code snippet in JavaScript (no more than 10 lines) that correctly demonstrates a Promise.race().\n\nExplanation: Immediately after the code, explain a clear, real-world scenario where this specific function would be more useful than Promise.all().\n\nFormatting Requirements:\n\nThe code must be valid and commented.\n\nThe tone should be professional and instructional.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Asynchronous Demonstration\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
         "apiAvailability": "available",
         "averageTotalResponseTime": 7691.699999999255,
-        "averageTokensPerSecond": 33.283405038286816,
-        "medianTokensPerSecond": 33.22000467156637,
+        "averageTokensPerSecond": 35.35075609632762,
+        "medianTokensPerSecond": 35.41732958868129,
         "averageInputTokensPerSecond": 383.1239945810994,
         "medianInputTokensPerSecond": 390.8202681228665,
-        "averageCharactersPerSecond": 143.40467092668106,
+        "averageCharactersPerSecond": 152.31204677441164,
         "averageTimeToFirstToken": 449.83333333209157,
         "averageInputTokens": 172,
         "medianInputTokens": 172,
         "medianTotalResponseTime": 7706.199999999255,
-        "medianCharactersPerSecond": 143.13150450288165,
+        "medianCharactersPerSecond": 152.59888490748227,
         "medianTimeToFirstToken": 440.0999999977648
       },
       {
@@ -718,9 +718,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 7,
             "totalNumberOfOutputCharacters": 32,
-            "tokensPerSecond": 4.405840886201358,
+            "tokensPerSecond": 36.93931398416886,
             "inputTokensPerSecond": 194.3829057384801,
-            "charactersPerSecond": 20.140986908349067,
+            "charactersPerSecond": 168.86543535620052,
             "inputLength": 45
           },
           {
@@ -732,9 +732,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 7,
             "totalNumberOfOutputCharacters": 32,
-            "tokensPerSecond": 7.892659826374745,
+            "tokensPerSecond": 36.8227248820742,
             "inputTokensPerSecond": 390.35591274355505,
-            "charactersPerSecond": 36.080730634855975,
+            "charactersPerSecond": 168.33245660376775,
             "inputLength": 45
           },
           {
@@ -746,9 +746,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 7,
             "totalNumberOfOutputCharacters": 32,
-            "tokensPerSecond": 8.0747491059891,
+            "tokensPerSecond": 36.439354502580436,
             "inputTokensPerSecond": 403.08239478319456,
-            "charactersPerSecond": 36.91313877023589,
+            "charactersPerSecond": 166.57990629751055,
             "inputLength": 45
           }
         ],
@@ -756,16 +756,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "data:image/png;base64,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",
         "averageTotalResponseTime": 1114.2000000004966,
-        "averageTokensPerSecond": 6.791083272855069,
-        "medianTokensPerSecond": 7.892659826374745,
+        "averageTokensPerSecond": 36.73379778960783,
+        "medianTokensPerSecond": 36.8227248820742,
         "averageInputTokensPerSecond": 329.2737377550766,
         "medianInputTokensPerSecond": 390.35591274355505,
-        "averageCharactersPerSecond": 31.044952104480313,
+        "averageCharactersPerSecond": 167.92593275249294,
         "averageTimeToFirstToken": 923.6333333340784,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 886.8999999985099,
-        "medianCharactersPerSecond": 36.080730634855975,
+        "medianCharactersPerSecond": 168.33245660376775,
         "medianTimeToFirstToken": 696.8000000007451
       },
       {
@@ -784,9 +784,9 @@
             "totalNumberOfInputTokens": 278,
             "totalNumberOfOutputTokens": 62,
             "totalNumberOfOutputCharacters": 314,
-            "tokensPerSecond": 25.510204081648297,
+            "tokensPerSecond": 35.939945510374145,
             "inputTokensPerSecond": 394.1585141091375,
-            "charactersPerSecond": 129.19684002641233,
+            "charactersPerSecond": 182.01843371383035,
             "inputLength": 40
           },
           {
@@ -798,9 +798,9 @@
             "totalNumberOfInputTokens": 278,
             "totalNumberOfOutputTokens": 62,
             "totalNumberOfOutputCharacters": 314,
-            "tokensPerSecond": 25.97076194863681,
+            "tokensPerSecond": 36.34658224878234,
             "inputTokensPerSecond": 407.9236977256053,
-            "charactersPerSecond": 131.52934277212836,
+            "charactersPerSecond": 184.0778520341557,
             "inputLength": 40
           },
           {
@@ -812,9 +812,9 @@
             "totalNumberOfInputTokens": 278,
             "totalNumberOfOutputTokens": 62,
             "totalNumberOfOutputCharacters": 314,
-            "tokensPerSecond": 25.980556486733963,
+            "tokensPerSecond": 36.344451609073666,
             "inputTokensPerSecond": 408.5231447465099,
-            "charactersPerSecond": 131.5789473682978,
+            "charactersPerSecond": 184.067061374986,
             "inputLength": 40
           }
         ],
@@ -822,16 +822,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/Disgusted_Homelander.jpg",
         "averageTotalResponseTime": 2401.3666666671634,
-        "averageTokensPerSecond": 25.82050750567302,
-        "medianTokensPerSecond": 25.97076194863681,
+        "averageTokensPerSecond": 36.21032645607672,
+        "medianTokensPerSecond": 36.344451609073666,
         "averageInputTokensPerSecond": 403.5351188604175,
         "medianInputTokensPerSecond": 407.9236977256053,
-        "averageCharactersPerSecond": 130.7683767222795,
+        "averageCharactersPerSecond": 183.38778237432402,
         "averageTimeToFirstToken": 689.0999999990066,
         "averageInputTokens": 278,
         "medianInputTokens": 278,
         "medianTotalResponseTime": 2387.300000000745,
-        "medianCharactersPerSecond": 131.52934277212836,
+        "medianCharactersPerSecond": 184.067061374986,
         "medianTimeToFirstToken": 681.5
       },
       {
@@ -850,9 +850,9 @@
             "totalNumberOfInputTokens": 271,
             "totalNumberOfOutputTokens": 296,
             "totalNumberOfOutputCharacters": 1317,
-            "tokensPerSecond": 27.937179099971765,
+            "tokensPerSecond": 29.867613819830126,
             "inputTokensPerSecond": 395.7359813079807,
-            "charactersPerSecond": 124.30157052250951,
+            "charactersPerSecond": 132.89070067809553,
             "inputLength": 55
           },
           {
@@ -864,9 +864,9 @@
             "totalNumberOfInputTokens": 271,
             "totalNumberOfOutputTokens": 296,
             "totalNumberOfOutputCharacters": 1317,
-            "tokensPerSecond": 26.458337057764933,
+            "tokensPerSecond": 28.40881825074418,
             "inputTokensPerSecond": 352.81864340683325,
-            "charactersPerSecond": 117.7217226522852,
+            "charactersPerSecond": 126.40004606834488,
             "inputLength": 55
           },
           {
@@ -878,9 +878,9 @@
             "totalNumberOfInputTokens": 271,
             "totalNumberOfOutputTokens": 296,
             "totalNumberOfOutputCharacters": 1317,
-            "tokensPerSecond": 32.13549017479101,
+            "tokensPerSecond": 34.81042431085073,
             "inputTokensPerSecond": 382.8765187902158,
-            "charactersPerSecond": 142.98121810878297,
+            "charactersPerSecond": 154.88286762631895,
             "inputLength": 55
           }
         ],
@@ -888,16 +888,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/Wikipedia_meme_vector_version.svg",
         "averageTotalResponseTime": 10331.199999999255,
-        "averageTokensPerSecond": 28.843668777509237,
-        "medianTokensPerSecond": 27.937179099971765,
+        "averageTokensPerSecond": 31.02895212714168,
+        "medianTokensPerSecond": 29.867613819830126,
         "averageInputTokensPerSecond": 377.1437145016766,
         "medianInputTokensPerSecond": 382.8765187902158,
-        "averageCharactersPerSecond": 128.3348370945259,
+        "averageCharactersPerSecond": 138.05787145758646,
         "averageTimeToFirstToken": 720.2333333330849,
         "averageInputTokens": 271,
         "medianInputTokens": 271,
         "medianTotalResponseTime": 10595.199999999255,
-        "medianCharactersPerSecond": 124.30157052250951,
+        "medianCharactersPerSecond": 132.89070067809553,
         "medianTimeToFirstToken": 707.8000000007451
       },
       {
@@ -916,9 +916,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 17,
-            "tokensPerSecond": 8.390043814679082,
+            "tokensPerSecond": 28.708133971291865,
             "inputTokensPerSecond": 358.2718651215318,
-            "charactersPerSecond": 15.847860538838264,
+            "charactersPerSecond": 54.22647527910686,
             "inputLength": 62
           },
           {
@@ -930,9 +930,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 17,
-            "tokensPerSecond": 9.47169017049785,
+            "tokensPerSecond": 34.377387318465956,
             "inputTokensPerSecond": 395.11911679341773,
-            "charactersPerSecond": 17.890970322051494,
+            "charactersPerSecond": 64.93506493488015,
             "inputLength": 62
           },
           {
@@ -944,9 +944,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 17,
-            "tokensPerSecond": 9.227929867725956,
+            "tokensPerSecond": 36.33427533317348,
             "inputTokensPerSecond": 373.831775700169,
-            "charactersPerSecond": 17.430534194593474,
+            "charactersPerSecond": 68.63140896266103,
             "inputLength": 62
           }
         ],
@@ -954,16 +954,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAADICAYAAADGFbfiAAAQAElEQVR4AeydBbAsR8FG+z7s4Vq4vOBOcIcEqwABCnfqBffCIWiCuzvBKYK7QyC4Q4h7Xtzd/c/ZP32rb2+vz+7M7JxU+vVMe5+ena917roL/U8CEpCABCQwBYF1wf8kIAEJSEACUxBQQKaAZhQJVELARCTQcgIKSMsb0OJLQAISqIuAAlIXefOVgAQk0HICLRaQlpO3+BKQgARaTkABaXkDWnwJSEACdRFQQOoib74SaDEBiy4BCCggUNBIQAISkMDEBBSQiZEZQQISkIAEIKCAQGHRxvwkIAEJLAEBBWQJGtEqSEACEqiDgAJSB3XzlIAE6iJgvhUSUEAqhGlSEpCABLpEQAHpUmtbVwlIQAIVElBAKoTZhaSsowQkIIFIQAGJJLQlIAEJSGAiAgrIRLgMLAEJSKAuAs3LVwFpXptYIglIQAKtIKCAtKKZLKQEJCCB5hFQQJrXJpZoPgRMVQISqJiAAlIxUJOTgAQk0BUCCkhXWtp6SkACEqiYwNgCUnG+JicBCUhAAi0noIC0vAEtvgQkIIG6CCggdZE3XwmMTcCAEmgmAQWkme1iqSQgAQk0noAC0vgmsoASkIAEmkmgCwLSTPKWSgISkEDLCSggLW9Aiy8BCUigLgIKSF3kzVcCXSBgHZeagAKy1M1r5SQgAQnMj4ACMj+2piwBCUhgqQkoII1uXgsnAQlIoLkEFJDmto0lk4AEJNBoAgpIo5vHwklAAnURMN/RBBSQ0YwMIQEJSEACBQIKSAGKThKQgAQkMJqAAjKakSGmIWAcCUhg6QkoIEvfxFZQAhKQwHwIKCDz4WqqEpCABOoisLB8FZCFoTYjCUhAAstFQAFZrva0NhKQgAQWRkABWRhqM2oLAcspAQmMR0ABGY+ToSQgAQlIICOggGRAvJWABCQggfEIVC8g4+VrKAlIQAISaDkBBaTlDWjxJSABCdRFQAGpi7z5SqB6AqYogYUSUEAWitvMJCABCSwPAQVkedrSmkhAAhJYKAEFJMHtpQQkIAEJjE9AARmflSElIAEJSCAhoIAkMLyUgATqImC+bSSggLSx1SyzBCQggQYQUEAa0AgWQQISkEAbCSggbWy1/jLrIgEJSGDhBBSQhSM3QwlIQALLQUABWY52tBYSkEBdBDqcrwLS4ca36hKQgARmIaCAzELPuBKQgAQ6TEAB6XDjN6PqlkICEmgrAQWkrS1nuSUgAQnUTEABqbkBzF4CEpBAXQRmzVcBmZWg8SUgAQl0lIAC0tGGt9oSkIAEZiWggMxK0PjdJWDNJdBxAgpIxx8Aqy8BCUhgWgIKyLTkjCcBCUig4wRqFJCOk7f6EpCABFpOQAFpeQNafAlIQAJ1EVBA6iJvvhKokYBZS6AKAgpIFRRNQwISkEAHCSggHWx0qywBCUigCgIKyDQUjSMBCUhAAkEB8SGQQAMIPOYxjwlbb731qvnIRz7SgFJZBAkMJ9AZATn88MPDpk2bVs2JJ544nIy+EpiCwMEHH7z6jG266Hk79dRTx0rl+9//fvjpT3+6anbZZZex4nUwkFVuEIFKBeT8888P//3vf1fN//73v7Gruuuuu67GI41zzz137LjjBLz+9a8fNttss1Xzqle9apxoCwuDwFHv3JxzzjlDy3DSSSet4ZbHL93vtttuQ9Os0nPvvfcOvBzf//73h5e//OXh7W9/e/jSl74Ufve734UzzjijyqxqT+v4448PGzZsWH3GeN4++MEP1l6uugqAeObPH6I6bnn233//8J3vfCd87GMfC6973evCa17zmvCJT3yiJ7KHHnroWMlccMEFYc899ww77rhj+PCHPxxe//rXh1e84hXhAx/4QC/tRf4WxipwywJVKiBHHXVUuNOd7rRqNt988zDqBRh53eEOd1iNRxr77bdf9OqE/bznPW9N/WGA+cMf/jC0/j/60Y+K8Yg7yNz+9rcfmmYVngceeGB44hOfGG51q1sFpmde/epX937Ab3rTm8I222wTHvCAB4TLX/7yYePGjeHPf/5zGPUf9UR4ovnVr341Kor+CyZw2mmnhR//+Me9l/3d7na3cKUrXanv2XzZy142tFS88HnB3+QmNwk3u9nNwuMf//jw0pe+NLznPe8J73vf+8KLX/zi3jTfDW94w/CCF7wgHHLIIQPTe8c73hGucpWrhNvc5jbhKU95Sq8D8653vSt86EMfCnQgSZvfwkMe8pDwpz/9aWA6egwmsG6w1+Q+17rWtfoiHXvssX1uucPpp5+eO4XrXOc6fW7L6nDWWWf1elWl+u20004l56ndFhGRXicvgG9961sjs/vyl7/c+0GPCogAITzRMJIZFUf/xRJgVPnIRz6y97L/5z//OVXmCAgveDogoxL49Kc/HW5729sGRiqlsLvvvntgFFTyS91+/etfh/ve97498UvdvR5NoFIBueQlLxlufOMbr8n16KOPXnNfujnhhBP6nK961av2uS2rwz/+8Y+BVfvZz3420K+JHvxgH/e4xzWxaI0uE9N7L3zhC0M0D3zgAxtd3qYUjuftUY96VCXToYjfAQcc0JSqtaIclQoINabniR3NNAJy61vfOkbvhP3b3/52YD1ZGxrG8LKXvWy44hWvuMaUEkvDsB5UClOF2y9/+ctQ6j0++tGPDh//+Md75rnPfW7oWhuPYstaCfP70TztaU8bFWXp/XlmGXl+7WtfC3//+9/DDjvsEB760If21Zs1jlEjdeIh0qx9vPa1rx34/P3iF7/oS786h+VLqXIBYeEwxcS6SHpfus5HIHkapTinnHJKOPLII8OFF15Y8p7YjbTOPvvsieNVEWHUKGPnnXcemA3zuLCIhnrkgZk3jv7Y4y5A5umMc19as2Ezxfe+973wohe9qGc+85nPBKYXWNdos5AwPdu0jQD8Ho444ohQmhYep/1mCbOystKLzsv6ve99b/jrX//aNyPRCzDin7ve9a7hi1/8YqDjRDpPfepTA2sqz3rWswK/lXe+8519KTBtmjs+9rGPDT/4wQ9601jEQ6RZX3n3u98d9thjj0BnJ48z7dRbnk5X7isXkA0bNqxhF19oPNjbb799ePOb37xq4gub3StppEEC8o1vfCMwPXKDG9wgXPnKVw7Xve51e/Z97nOfQK9i0q25/Pi33XbbcItb3KKX1vr16wNpsVuD8qZlmtc1dc8fWkQhzY852vS+ydf5rhZ6kSxU5mVeWVkJj3jEIwLiwg869WfjxVZbbRVY3Ixm3333TYOEP/7xj2v8Y7hcbJkejH7R/s9//rMmLRbko1+0DzrooDVh4g3i+4xnPCPwDF7zmtfsbQTg/AZbcGOYUfZhhx1WLHvMG5uX3ah0oj+/IxaHicfv4nrXu164whWu0HuuefmWRD3GrdJ+2MMe1ts0w8uakcM97nGPXjkmyYNpcNps48aNgdF1KS51yt0RhNyNdwXTW7DI/biH181vfnMuV804Hd7VwF5Uf5CQ3REp1ygg/Gi222678La3vW3VxEbPRyD5FAvCwI6eJz/5yeG73/1uIK2YB3Og7OKhp3LLW94y/PznP49eQ222CTNNwMsrfTmRFkPdZz7zmb0fw9BEKvD8/e9/vyYV6s6OkdSRnS2LErQ032muEYw0Hu3zl7/8JXVac80L46Y3vekat/POO6/XO0Q4owkhrAnDTfRL7fTZIMwxxxwTUn+uccMvGkQB99SwPTr6Rxuxu8td7hK++tWvrnkGEQ9EZNxnj1FgmlfpOhfiWIbc3meffcK97nWv3vZU0oF3DMNz/fWvfz3c//73D295y1sCXMMc/1u3bl241KUuFeb9X2l0haBPmu+ZZ57Zm8VI49GZTO+9Hk5g3XDvyX1vdKMbrYkUBSSKRer573//u3d73HHH9ez4TypC7FCiJzPOjh5eDPSC8pdyTDe1eQlwPiF1S6/ZLsrWwdRtHte/+c1v1iS75ZZb9obrqSP14jxF6tbU61wMKCejCeavGfFx30bDc8hOHdpiUPmf/vSnD/Kai/umTZsCnaZ8RFXK7K1vfWugU1Tya5tbaUTFbqxx68HUGB1R1uVSwSU+o2JszXgEKhcQetBp1hyQ477Uo2JhDD+mcbCjYQger1lUpCcV77Hp5fJjZW6fsw64pYZ945P0tvIyx7TYd86LI97Pw2Z0kaZLb5KpubxMbJFMwzX1+sEPfnBf0fiRPuc5zwnXvva1wytf+crAxoC+QIkDPVl288EgmsR79TL6pTZTOKsBKrz49re/3ZtLLyXJ81hyH+S2/qKp0rTMXA8KO8z9DW94Q9GbdSWm13JPOk1/+9vfcudW3bPuxDR4XujSc5eG+cpXvtI7l8LZFJ5DprfyNRCmzR70oAel0byOBAbYlQsIL780r7gjp/TSYB6bsDwU2NFEAaGnwIGf6I7ND4NdFzwQnFBl/SB/oMiLoTvhhxnSYg85Uxikmb8IePFxEnZYGrP4kXc+5XL3u9+9l2S+jZN5+p5Hw/9hAZVDgqViwpO5fQ6NMiphurAUjhcs2ylpl2jyuWpGA9EvtefVg+QkfV5WFnVZr2G6q+Sfh4/3iGNaZq6j37g2QpA/4zzPjFQZ7fPbYdSRp8f0bFumQ/OyU246IvkokPWf+M7I48R7pr14/jDRLdq0xyc/+cnwhS98ITppj0mgcgG59KUvHdIeFY3N4SAWxvIyMbLgx5dPYUURKm1vZSdPmj691Te+8Y2BH0+aPjtA0vvSNdNUcdsxJ6Y/+9nP9gWL02x9HhU4lEYVt7vd7Xop3/ve9+7Z8Z8f/vCHC1mTifnNYrPj6uEPf/jQJOj9sWGBFxqfwBkauGZP5srplKTF4Hn71Kc+1Zvz5xlkZDWqF5zGn/WaHWx5GuxuS+fwOfWP0KbhEB52aaVubbnmZDm/g7S8dCxGnW5Pw5eur371q4dLXOISJS/dRhCoXEDIL58H53MDiAV+udlll1162/WiO6OAuPui9DmTy1zmMuGb3/xmz7ArC8N8Jp8siGlg0xPDHmTIJ//Bc5AoDz9N7zBPY9A9i56pH+VhURm3OBLhOpqSCEe/JtlMI/3kJz/pbXgo7cBKy8qONz5Jkbo17bq0M4fpjnzBeJttthlQ9Oqd898Tz3NJtDlzk+ceZwVy9ybf07lDENMyIuJsXGDEmrpPes0sBp8SYvfjvKesJy1b08PPRUAYEqYVT3va9KzZWhf9//WvfwVGKfGeRcF4zQ6TeB1tPqr2pCc9KWDYlRVN/oNiSirGKdl3vvOdQ3xZR//LXe5yfQeMEL/oX6XNGk1+aImeLD8ITCnf0oisyjJVnRbfwKKDsPPOOwd2vA1K/3Of+1wYZyF4UPx5u8eNIGk+jFjTe67TZ5f7eZq99tprTfIIdS5oBCiVk+lB/NpiWH/iBZ+WF8FkWjd/16Rh0mveFzxjvG8Y/TLliAClYeiIMqpM3bweTmAuApKfBUlflBwIuuc977laKnrV6TpAGrc0AlmNOOIC6XCGeQAADgxJREFUUWLOdFCw/OGJ4Vhki9fYfJ4bu2rD1Fg+H8uDzS4yTGkuH2GpuhzzTm9lZSWwjZQFXLZrv+QlLylmyXeNih4NcMzX6ChS6WwBUyH4LcLkI+M47ZvnfY1rXCN3GvoBwr7ANTvwzD/hCU9YUwrEg04pa2lrPIbc8GmkO97xjoGOI+c/mHJEhPP3ANudmz6lOqSaC/eai4DkW3nTLbg0ICdNY03pXcRr7FRALm5cnCs3+cs7ZsCiaLzGLv0AcZ/VTDOaYP6aMzGz5l1XfH7EH/3oR4uLlaNGjPMsM2t0w9LPOxWEZQSJnRoWatP7eV4zTZimz1pieh+vOXMSr6M9r2c6pl+VzRdy6Uzl6TH1y3skd5/0/mpXu1rvzwuk8XgvxJ2jqbvXZQJzEZD0HEeeLb2A0tbbGC49EFSaEmBKhM9gjDKsgaysrMRk++zSMJ4RSz7q2WyzzfriVuFAz2qadEp74KdJp844TCfk+efcc/8q7zlEmqaXbyNP/bgufRk6HwEQbpEvnrjZgnwxpecZ99JUaL5GSbimGaab8g0AlJGde6X1QfymMaUpsBKzadLuQpy5CEi6SyqHyK4JFryxcz/u07ilMHy2ge/7DzMITyku6UfDmkne62XnFj2QGAY7FTTuqzD0CuMW5pgea0PsSMpN9I92fvAwujfFZts126tpp0FlYtGTaYhB/iX3fL2KbaqlcLkb61q5W77rr3RGKY1TEpB85Ex4dp9hL8Kku63Ij4VxFoO5Tg0bTtJ7rksvTdyLpgZHppa22GKLvpwRD85J9XnM4MDXBfLobRmh5eWu434uAjJoTzY9ivgiKD0gAEjjbr755jitMewDZy59jePFN5x0ZrcG4sF6wsXOAy3+OlmciuCFt9122/WFzX+ofQGmcOCHkEfjm1yckcgNwpKG5TtD6T115jxJalJ/rlkPSv3n2cMibQ5y0svlJZv39pki5LMzuVCn62KUOTf5SJAOQOkDenm80jQoW0HjPDcv3vw8RZ4G00V5OrysU8GgLItcgOXrDHk5+Yt9PA/Rnc0LrD3Fe2zqkU8x416FQZjT54xr/shUmvbJJ5/c+/sd+EWTTr/xDTLeDfnzwRkNyh7j5HbeoWCETyeTw8Cc2E/LEK9Zm2UtJN5Hm2c3XmsPJzAXAWEbLo2dZ50+9IOGoekIhAX3fAGN/fgbNmzonWhm9w6feubAFB9Y44QpuzV4KTAdleef3/Mi4WFFSBA35lbzMPl3qXL/ae5Lo4hBL9D8ZCx1w8R8OejIX26LpiS6rEFFf+x5vUBimbDZGEHbcS6IdmSrLt8zo3fHTjrCpIaDhel9fp0LCP5MhcLt2c9+doiGTRn4RZN2SKIb7U4ng9ES8aP7MBtRzP352iv54sdGgdy/dM9ohzi5ycPyjORh+FshMRwnqal/vMdGMKgPHSF4b7nlljivMXzOvLRba02gKW/40i3PV2rSZ5VkKWPqzzWdJvww7ISiw8N1avgMC2EHmXwLNR0VZhgQVZ4d/tgdzyHc2LmJuHDoNc2DazpssZPLvWY4gbkICFnS0NipSR94PkqX+sXrXHh44KNftOmd8NCxx51PmrBzgl4k7jHMuDajAU6y0qPM4/DQ5uXJwwy/L/tyRiL1YQsmC3qpW7xG2OJ1tPkRxus22LBllxVCVmojOg2IzbC6lBZTCc/Ggs9//vMhGkYmuEfDwj2dhHgfbV5sPFull1UMk9qcOk/v4zX5MmVXqlcMk9rs6iNObtIwXCPAeZh0hMPBN/5yH2FTQwdr++23D/BO3bnm9zePDhFpN93QzjyHCBRnxxCXUpn5dFLJXbcygbkJSGmelQX0WAy+1xOvo82LJFd/3OiNYcdwVdicRaEXOigt/PghDvKf1p3F1/wll3+2JE27NFIbZ3ouTWOR15P2blkL4aOWgwQ0lp3eIm0W7yexmR4cFn6clyqjW056D0uHPykwzL9qv/vd7369v5sxTrr0rHl5ctZonPBdDMM02SRbg7vIKK/zQgUknVtEKPJvJqX+aUF5wXKokKkmXjipX37Ni4aeWjpdlofhniEtn+GmV8Z9auixMjKpWrTIg14QdmpKo4zoz3kDfvzxHjsdgdATxW0SM4rhJGnlYflDQIywSjut0rCUAYGmRz5oNJqG5xqhYQ2IE8NsBS+NDnmuCJsa9v3T60zduCY+30DiCwDcp6bElREvU4aUPQ3LNVMlJQHJ08nviTuL2bhxY2DHYf6MxDQpK1NaPDNM/Ub3edjT1i2NV2q/ccqax+N3TccBe1R82pURaT4NNiqe/qH6vwcSofLQsg6RmvRBIdxOO+0UUn8OB+FeMuym4Vs47GBiwYwXPAuEO+64Y+BMBdt6mUbgBfP85z8/MHWRppPmwzW9SQSLA32cNGZ6hYU3FgIpB3P1afyqrjmdTf6p4bPSw9JnP3wanvrH8Kz9pH7jXMMwxq/aZs2DT2rQLnxDiu258KSteInTbixqsnWWj2Dm7TSsPCsrK4EOAm3FWgcc8voOEi7WX1jAJX8+xMk2UdqdtQJewnk6TCuWysK6B2dx+GAh62+0DfPtfPqfuuTp8J22NB3Kn4eZ5D5NK16z0YNycA6F5xnWiDicqTNTvPkLNsat0qbzMEldYljKF8vBd62i+yR2/m0wdk/ylwvhwbNGe7PGyXMJH94ZPJtsOuBdwDpJLIP2+ATmNgIZvwiTh6TnyHY+Po/BC4PFQhbF6K1PnloITE/Qq91qq63CIk8TT1PWNsVZv359QKS32GKL3qdMeInTbiziTzrVVUW9ORBI/qybMZ067XQOHSGmYBFvev511KXEg04WPW5+F4g4nFdWVkpBO+XG9CjtzYYU3hfw4Z3Bs8mGn07BqLiyrRSQihmMlRx/uZAh8ayGHvBYGS4o0MB6bbttmKSuTavXgvC1Nht65pO076CwzDS0FoIFn5mAAjImQobDvGxnNewaGjPLhQRb1notBF6LM+GLDrM+y8RnHavFGCz6jAQUkBkBGl0CEpBAxQRak5wCMmZTcU6Bxe5ZDQueY2a5kGDLWq+FwGtxJiwaz/osE581hRZjsOgzElBAxgS4ww47BD5dMavZeuutx8xxMcGWtV6LodfeXNhCP+uzTHx2NbWXgiWflYACMitB4zeOgAWSgAQWQ0ABWQxnc5GABCSwdAQUkKVrUiskAQlIYDEE+gVkMfmaiwQkIAEJtJyAAtLyBrT4EpCABOoioIDURd58JdBPQBcJtIqAAtKq5rKwEpCABJpDQAFpTltYEglIQAKtIrBUAtIq8hZWAhKQQMsJKCAtb0CLLwEJSKAuAgpIXeTNVwJLRcDKdJGAAtLFVrfOEpCABCogoIBUANEkJCABCXSRgALSjFa3FBKQgARaR0ABaV2TWWAJSEACzSCggDSjHSyFBCRQFwHznZqAAjI1OiNKQAIS6DYBBaTb7W/tJSABCUxNQAGZGp0R/5+A/0pAAl0loIB0teWttwQkIIEZCSggMwI0ugQkIIG6CNSdrwJSdwuYvwQkIIGWElBAWtpwFlsCEpBA3QQUkLpbwPzrI2DOEpDATAQUkJnwGVkCEpBAdwkoIN1te2suAQlIYCYCMwjITPkaWQISkIAEWk5AAWl5A1p8CUhAAnURUEDqIm++EpiBgFEl0AQCCkgTWsEySEACEmghAQWkhY1mkSUgAQk0gUA3BaQJ5C2DBCQggZYTUEBa3oAWXwISkEBdBBSQusibrwS6ScBaLxEBBWSJGtOqSEACElgkAQVkkbTNSwISkMASEVBAWtaYFlcCEpBAUwgoIE1pCcshAQlIoGUEFJCWNZjFlYAE6iJgvjkBBSQn4r0EJCABCYxFQAEZC5OBJCABCUggJ6CA5ES8nxcB05WABJaMgAKyZA1qdSQgAQksioACsijS5iMBCUigLgJzylcBmRNYk5WABCSw7AQUkGVvYesnAQlIYE4EFJA5gTXZZSJgXSQggRIBBaRERTcJSEACEhhJQAEZicgAEpCABCRQIrAIASnlq5sEJCABCbScgALS8ga0+BKQgATqIqCA1EXefCWwCALmIYE5ElBA5gjXpCUgAQksMwEFZJlb17pJQAISmCMBBWQoXD0lIAEJSGAQAQVkEBndJSABCUhgKAEFZCgePSUggboImG/zCSggzW8jSygBCUigkQQUkEY2i4WSgAQk0HwCCkjz22i6EhpLAhKQwJwJKCBzBmzyEpCABJaVgAKyrC1rvSQggboIdCZfBaQzTW1FJSABCVRLQAGplqepSUACEugMAQWkM03dnopaUglIoB0EFJB2tJOllIAEJNA4AgpI45rEAklAAhKoi8Bk+Sogk/EytAQkIAEJXExAAbkYhJYEJCABCUxGQAGZjJehJTCMgH4S6BQBBaRTzW1lJSABCVRHQAGpjqUpSUACEugUgUYJSKfIW1kJSEACLSeggLS8AS2+BCQggboIKCB1kTdfCTSKgIWRwOQEFJDJmRlDAhKQgAQuIqCAXATB/yUgAQlIYHICCsjkzEoxdJOABCTQOQIKSOea3ApLQAISqIaAAlINR1ORgATqImC+tRFQQGpDb8YSkIAE2k1AAWl3+1l6CUhAArURUEBqQ9+UjC2HBCQggekIKCDTcTOWBCQggc4TUEA6/wgIQAISqItA2/NVQNregpZfAhKQQE0EFJCawJutBCQggbYTUEDa3oJdLr91l4AEaiWggNSK38wlIAEJtJeAAtLetrPkEpCABOoi0MtXAelh8B8JSEACEpiUgAIyKTHDS0ACEpBAj4AC0sPgPxJYLAFzk8AyEPg/AAAA//+Kvx6BAAAABklEQVQDAMpq5VCisH2nAAAAAElFTkSuQmCC",
         "averageTotalResponseTime": 999.3999999997517,
-        "averageTokensPerSecond": 9.029887950967629,
-        "medianTokensPerSecond": 9.227929867725956,
+        "averageTokensPerSecond": 33.13993220764377,
+        "medianTokensPerSecond": 34.377387318465956,
         "averageInputTokensPerSecond": 375.7409192050395,
         "medianInputTokensPerSecond": 373.831775700169,
-        "averageCharactersPerSecond": 17.056455018494407,
+        "averageCharactersPerSecond": 62.59764972554934,
         "averageTimeToFirstToken": 725.0666666664183,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 975.3000000007451,
-        "medianCharactersPerSecond": 17.430534194593474,
+        "medianCharactersPerSecond": 64.93506493488015,
         "medianTimeToFirstToken": 727.6000000014901
       },
       {
@@ -982,9 +982,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 80,
             "totalNumberOfOutputCharacters": 371,
-            "tokensPerSecond": 26.312327325332586,
+            "tokensPerSecond": 34.54231433506045,
             "inputTokensPerSecond": 375.48315847482155,
-            "charactersPerSecond": 122.02341797122986,
+            "charactersPerSecond": 160.18998272884284,
             "inputLength": 53
           },
           {
@@ -996,9 +996,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 80,
             "totalNumberOfOutputCharacters": 371,
-            "tokensPerSecond": 26.23897143233268,
+            "tokensPerSecond": 35.010940919037196,
             "inputTokensPerSecond": 356.06754810908575,
-            "charactersPerSecond": 121.6832300174428,
+            "charactersPerSecond": 162.363238512035,
             "inputLength": 53
           },
           {
@@ -1010,9 +1010,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 80,
             "totalNumberOfOutputCharacters": 371,
-            "tokensPerSecond": 26.66044589596423,
+            "tokensPerSecond": 34.75389895306129,
             "inputTokensPerSecond": 389.2386949051374,
-            "charactersPerSecond": 123.63781784253412,
+            "charactersPerSecond": 161.17120639482175,
             "inputLength": 53
           }
         ],
@@ -1020,16 +1020,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_letters/a01-058.png",
         "averageTotalResponseTime": 3030,
-        "averageTokensPerSecond": 26.403914884543166,
-        "medianTokensPerSecond": 26.312327325332586,
+        "averageTokensPerSecond": 34.76905140238631,
+        "medianTokensPerSecond": 34.75389895306129,
         "averageInputTokensPerSecond": 373.5964671630149,
         "medianInputTokensPerSecond": 375.48315847482155,
-        "averageCharactersPerSecond": 122.44815527706892,
+        "averageCharactersPerSecond": 161.24147587856655,
         "averageTimeToFirstToken": 729.03333333383,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 3040.400000002235,
-        "medianCharactersPerSecond": 122.02341797122986,
+        "medianCharactersPerSecond": 161.17120639482175,
         "medianTimeToFirstToken": 724.4000000022352
       },
       {
@@ -1048,9 +1048,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 83,
             "totalNumberOfOutputCharacters": 366,
-            "tokensPerSecond": 25.709329698933935,
+            "tokensPerSecond": 34.02197081491886,
             "inputTokensPerSecond": 344.82758620657086,
-            "charactersPerSecond": 113.3688514434918,
+            "charactersPerSecond": 150.02459419590724,
             "inputLength": 53
           },
           {
@@ -1062,9 +1062,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 83,
             "totalNumberOfOutputCharacters": 366,
-            "tokensPerSecond": 26.58722531875176,
+            "tokensPerSecond": 35.04031747373079,
             "inputTokensPerSecond": 361.17381489949184,
-            "charactersPerSecond": 117.2400538152186,
+            "charactersPerSecond": 154.51513488416225,
             "inputLength": 53
           },
           {
@@ -1076,9 +1076,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 83,
             "totalNumberOfOutputCharacters": 366,
-            "tokensPerSecond": 26.503177188115004,
+            "tokensPerSecond": 34.50426106838495,
             "inputTokensPerSecond": 374.55246488609066,
-            "charactersPerSecond": 116.8694319379529,
+            "charactersPerSecond": 152.15131989191437,
             "inputLength": 53
           }
         ],
@@ -1086,16 +1086,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_letters/a01-072x.png",
         "averageTotalResponseTime": 3160.6333333315947,
-        "averageTokensPerSecond": 26.266577401933564,
-        "medianTokensPerSecond": 26.503177188115004,
+        "averageTokensPerSecond": 34.52218311901154,
+        "medianTokensPerSecond": 34.50426106838495,
         "averageInputTokensPerSecond": 360.1846219973845,
         "medianInputTokensPerSecond": 361.17381489949184,
-        "averageCharactersPerSecond": 115.82611239888779,
+        "averageCharactersPerSecond": 152.23034965732793,
         "averageTimeToFirstToken": 756.0333333325883,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 3131.699999999255,
-        "medianCharactersPerSecond": 116.8694319379529,
+        "medianCharactersPerSecond": 152.15131989191437,
         "medianTimeToFirstToken": 753.0999999977648
       },
       {
@@ -1114,9 +1114,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 89,
             "totalNumberOfOutputCharacters": 450,
-            "tokensPerSecond": 26.255236297120906,
+            "tokensPerSecond": 34.33641975308642,
             "inputTokensPerSecond": 340.9375783401178,
-            "charactersPerSecond": 132.75119476072368,
+            "charactersPerSecond": 173.61111111111111,
             "inputLength": 53
           },
           {
@@ -1128,9 +1128,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 89,
             "totalNumberOfOutputCharacters": 450,
-            "tokensPerSecond": 27.424275105530942,
+            "tokensPerSecond": 34.9705304518664,
             "inputTokensPerSecond": 388.40496929845864,
-            "charactersPerSecond": 138.66206514032498,
+            "charactersPerSecond": 176.81728880157172,
             "inputLength": 53
           },
           {
@@ -1142,9 +1142,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 89,
             "totalNumberOfOutputCharacters": 450,
-            "tokensPerSecond": 26.596539461488863,
+            "tokensPerSecond": 34.873241644115836,
             "inputTokensPerSecond": 342.48300176310147,
-            "charactersPerSecond": 134.47688491764032,
+            "charactersPerSecond": 176.3253790994621,
             "inputLength": 53
           }
         ],
@@ -1152,16 +1152,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_letters/a01-128.png",
         "averageTotalResponseTime": 3327.1333333340785,
-        "averageTokensPerSecond": 26.75868362138024,
-        "medianTokensPerSecond": 26.596539461488863,
+        "averageTokensPerSecond": 34.726730616356214,
+        "medianTokensPerSecond": 34.873241644115836,
         "averageInputTokensPerSecond": 357.27518313389265,
         "medianInputTokensPerSecond": 342.48300176310147,
-        "averageCharactersPerSecond": 135.296714939563,
+        "averageCharactersPerSecond": 175.58459300404832,
         "averageTimeToFirstToken": 764.1000000002483,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 3346.300000000745,
-        "medianCharactersPerSecond": 134.47688491764032,
+        "medianCharactersPerSecond": 176.3253790994621,
         "medianTimeToFirstToken": 794.1999999992549
       },
       {
@@ -1180,9 +1180,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 2,
             "totalNumberOfOutputCharacters": 7,
-            "tokensPerSecond": 2.5703637064595424,
+            "tokensPerSecond": 37.80718336324186,
             "inputTokensPerSecond": 375.06894649790326,
-            "charactersPerSecond": 8.996272972608397,
+            "charactersPerSecond": 132.32514177134652,
             "inputLength": 53
           },
           {
@@ -1194,9 +1194,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 2,
             "totalNumberOfOutputCharacters": 7,
-            "tokensPerSecond": 2.5345330122996645,
+            "tokensPerSecond": 32.57328990307065,
             "inputTokensPerSecond": 373.78040401302525,
-            "charactersPerSecond": 8.870865543048826,
+            "charactersPerSecond": 114.00651466074729,
             "inputLength": 53
           },
           {
@@ -1208,9 +1208,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 2,
             "totalNumberOfOutputCharacters": 7,
-            "tokensPerSecond": 2.5786487880301157,
+            "tokensPerSecond": 37.523452157073976,
             "inputTokensPerSecond": 376.5748304024913,
-            "charactersPerSecond": 9.025270758105405,
+            "charactersPerSecond": 131.33208254975892,
             "inputLength": 53
           }
         ],
@@ -1218,16 +1218,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0099.jpg",
         "averageTotalResponseTime": 780.9333333335817,
-        "averageTokensPerSecond": 2.561181835596441,
-        "medianTokensPerSecond": 2.5703637064595424,
+        "averageTokensPerSecond": 35.96797514112883,
+        "medianTokensPerSecond": 37.523452157073976,
         "averageInputTokensPerSecond": 375.14139363780663,
         "medianInputTokensPerSecond": 375.06894649790326,
-        "averageCharactersPerSecond": 8.964136424587544,
+        "averageCharactersPerSecond": 125.8879129939509,
         "averageTimeToFirstToken": 725.0666666664183,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 778.1000000014901,
-        "medianCharactersPerSecond": 8.996272972608397,
+        "medianCharactersPerSecond": 131.33208254975892,
         "medianTimeToFirstToken": 725.1999999992549
       },
       {
@@ -1246,9 +1246,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 4,
             "totalNumberOfOutputCharacters": 9,
-            "tokensPerSecond": 5,
+            "tokensPerSecond": 34.752389227434215,
             "inputTokensPerSecond": 397.13826835904854,
-            "charactersPerSecond": 11.25,
+            "charactersPerSecond": 78.19287576172698,
             "inputLength": 53
           },
           {
@@ -1260,9 +1260,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 4,
             "totalNumberOfOutputCharacters": 9,
-            "tokensPerSecond": 4.759638267479012,
+            "tokensPerSecond": 36.79852805786874,
             "inputTokensPerSecond": 371.7370507042189,
-            "charactersPerSecond": 10.709186101827777,
+            "charactersPerSecond": 82.79668813020466,
             "inputLength": 53
           },
           {
@@ -1274,9 +1274,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 4,
             "totalNumberOfOutputCharacters": 9,
-            "tokensPerSecond": 4.683292354517061,
+            "tokensPerSecond": 35.026269702505225,
             "inputTokensPerSecond": 367.6172455726156,
-            "charactersPerSecond": 10.537407797663386,
+            "charactersPerSecond": 78.80910683063675,
             "inputLength": 53
           }
         ],
@@ -1284,16 +1284,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0300.jpg",
         "averageTotalResponseTime": 831.5000000012418,
-        "averageTokensPerSecond": 4.814310207332024,
-        "medianTokensPerSecond": 4.759638267479012,
+        "averageTokensPerSecond": 35.525728995936056,
+        "medianTokensPerSecond": 35.026269702505225,
         "averageInputTokensPerSecond": 378.83085487862763,
         "medianInputTokensPerSecond": 371.7370507042189,
-        "averageCharactersPerSecond": 10.832197966497054,
+        "averageCharactersPerSecond": 79.93289024085614,
         "averageTimeToFirstToken": 718.8333333345751,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 840.4000000022352,
-        "medianCharactersPerSecond": 10.709186101827777,
+        "medianCharactersPerSecond": 78.80910683063675,
         "medianTimeToFirstToken": 731.6999999992549
       },
       {
@@ -1312,9 +1312,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 19,
-            "tokensPerSecond": 9.50972104819756,
+            "tokensPerSecond": 36.63003663014771,
             "inputTokensPerSecond": 388.18324532651525,
-            "charactersPerSecond": 20.076077768417072,
+            "charactersPerSecond": 77.33007733031182,
             "inputLength": 53
           },
           {
@@ -1326,9 +1326,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 19,
-            "tokensPerSecond": 9.356481962796488,
+            "tokensPerSecond": 32.46753246761973,
             "inputTokensPerSecond": 397.25427194434934,
-            "charactersPerSecond": 19.752573032570364,
+            "charactersPerSecond": 68.54256854275278,
             "inputLength": 53
           },
           {
@@ -1340,9 +1340,9 @@
             "totalNumberOfInputTokens": 272,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 19,
-            "tokensPerSecond": 8.922375334562714,
+            "tokensPerSecond": 37.06754530466385,
             "inputTokensPerSecond": 355.13774644105786,
-            "charactersPerSecond": 18.83612570629906,
+            "charactersPerSecond": 78.25370675429035,
             "inputLength": 53
           }
         ],
@@ -1350,16 +1350,16 @@
         "apiAvailability": "available",
         "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0958.jpg",
         "averageTotalResponseTime": 972.3333333333334,
-        "averageTokensPerSecond": 9.262859448518922,
-        "medianTokensPerSecond": 9.356481962796488,
+        "averageTokensPerSecond": 35.38837146747709,
+        "medianTokensPerSecond": 36.63003663014771,
         "averageInputTokensPerSecond": 380.19175457064085,
         "medianInputTokensPerSecond": 388.18324532651525,
-        "averageCharactersPerSecond": 19.55492550242883,
+        "averageCharactersPerSecond": 74.70878420911832,
         "averageTimeToFirstToken": 717.1000000002483,
         "averageInputTokens": 272,
         "medianInputTokens": 272,
         "medianTotalResponseTime": 961.8999999985099,
-        "medianCharactersPerSecond": 19.752573032570364,
+        "medianCharactersPerSecond": 77.33007733031182,
         "medianTimeToFirstToken": 700.6999999992549
       },
       {
@@ -1378,9 +1378,9 @@
             "totalNumberOfInputTokens": 81,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 45,
-            "tokensPerSecond": 5.988820867710632,
+            "tokensPerSecond": 35.97122302115427,
             "inputTokensPerSecond": 64.66549576891629,
-            "charactersPerSecond": 29.94410433855316,
+            "charactersPerSecond": 179.85611510577135,
             "inputLength": 37
           },
           {
@@ -1392,9 +1392,9 @@
             "totalNumberOfInputTokens": 81,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 45,
-            "tokensPerSecond": 10.795250089970065,
+            "tokensPerSecond": 37.02180172802448,
             "inputTokensPerSecond": 137.14866237689745,
-            "charactersPerSecond": 53.976250449850326,
+            "charactersPerSecond": 185.10900864012237,
             "inputLength": 37
           },
           {
@@ -1406,9 +1406,9 @@
             "totalNumberOfInputTokens": 81,
             "totalNumberOfOutputTokens": 9,
             "totalNumberOfOutputCharacters": 45,
-            "tokensPerSecond": 11.030763573937179,
+            "tokensPerSecond": 36.23188405764499,
             "inputTokensPerSecond": 142.73127753303964,
-            "charactersPerSecond": 55.153817869685895,
+            "charactersPerSecond": 181.15942028822496,
             "inputLength": 37
           }
         ],
@@ -1417,16 +1417,16 @@
         "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-119.mp3",
         "inputAudioDuration": 10.476,
         "averageTotalResponseTime": 1050.800000000745,
-        "averageTokensPerSecond": 9.271611510539293,
-        "medianTokensPerSecond": 10.795250089970065,
+        "averageTokensPerSecond": 36.408302935607914,
+        "medianTokensPerSecond": 36.23188405764499,
         "averageInputTokensPerSecond": 114.84847855961779,
         "medianInputTokensPerSecond": 137.14866237689745,
-        "averageCharactersPerSecond": 46.35805755269646,
+        "averageCharactersPerSecond": 182.04151467803956,
         "averageTimeToFirstToken": 803.5666666664183,
         "averageInputTokens": 81,
         "medianInputTokens": 81,
         "medianTotalResponseTime": 833.6999999992549,
-        "medianCharactersPerSecond": 53.976250449850326,
+        "medianCharactersPerSecond": 181.15942028822496,
         "medianTimeToFirstToken": 590.6000000014901
       },
       {
@@ -1445,9 +1445,9 @@
             "totalNumberOfInputTokens": 126,
             "totalNumberOfOutputTokens": 73,
             "totalNumberOfOutputCharacters": 280,
-            "tokensPerSecond": 27.94579281828218,
+            "tokensPerSecond": 35.357938583719516,
             "inputTokensPerSecond": 230.09495982406344,
-            "charactersPerSecond": 107.18934231669877,
+            "charactersPerSecond": 135.61949045810226,
             "inputLength": 37
           },
           {
@@ -1459,9 +1459,9 @@
             "totalNumberOfInputTokens": 126,
             "totalNumberOfOutputTokens": 73,
             "totalNumberOfOutputCharacters": 280,
-            "tokensPerSecond": 26.846131215033832,
+            "tokensPerSecond": 34.072345390898484,
             "inputTokensPerSecond": 218.48448066472838,
-            "charactersPerSecond": 102.97146219465031,
+            "charactersPerSecond": 130.68844807467912,
             "inputLength": 37
           },
           {
@@ -1473,9 +1473,9 @@
             "totalNumberOfInputTokens": 126,
             "totalNumberOfOutputTokens": 73,
             "totalNumberOfOutputCharacters": 280,
-            "tokensPerSecond": 27.864722497892682,
+            "tokensPerSecond": 35.079288803459875,
             "inputTokensPerSecond": 233.85300668119112,
-            "charactersPerSecond": 106.87838766315001,
+            "charactersPerSecond": 134.55069678039405,
             "inputLength": 37
           }
         ],
@@ -1484,16 +1484,16 @@
         "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-4167.mp3",
         "inputAudioDuration": 17.748,
         "averageTotalResponseTime": 2650.400000002235,
-        "averageTokensPerSecond": 27.5522155104029,
-        "medianTokensPerSecond": 27.864722497892682,
+        "averageTokensPerSecond": 34.83652425935929,
+        "medianTokensPerSecond": 35.079288803459875,
         "averageInputTokensPerSecond": 227.4774823899943,
         "medianInputTokensPerSecond": 230.09495982406344,
-        "averageCharactersPerSecond": 105.67973072483302,
+        "averageCharactersPerSecond": 133.6195451043918,
         "averageTimeToFirstToken": 554.3666666684052,
         "averageInputTokens": 126,
         "medianInputTokens": 126,
         "medianTotalResponseTime": 2619.800000000745,
-        "medianCharactersPerSecond": 106.87838766315001,
+        "medianCharactersPerSecond": 134.55069678039405,
         "medianTimeToFirstToken": 547.6000000014901
       },
       {
@@ -1512,9 +1512,9 @@
             "totalNumberOfInputTokens": 76,
             "totalNumberOfOutputTokens": 25,
             "totalNumberOfOutputCharacters": 113,
-            "tokensPerSecond": 20.30374401038323,
+            "tokensPerSecond": 36.18468664069173,
             "inputTokensPerSecond": 140.63656550645013,
-            "charactersPerSecond": 91.77292292693221,
+            "charactersPerSecond": 163.55478361592662,
             "inputLength": 37
           },
           {
@@ -1526,9 +1526,9 @@
             "totalNumberOfInputTokens": 76,
             "totalNumberOfOutputTokens": 25,
             "totalNumberOfOutputCharacters": 113,
-            "tokensPerSecond": 19.352840997047206,
+            "tokensPerSecond": 33.218176986545636,
             "inputTokensPerSecond": 140.9495548953634,
-            "charactersPerSecond": 87.47484130665337,
+            "charactersPerSecond": 150.14615997918628,
             "inputLength": 37
           },
           {
@@ -1540,9 +1540,9 @@
             "totalNumberOfInputTokens": 76,
             "totalNumberOfOutputTokens": 25,
             "totalNumberOfOutputCharacters": 113,
-            "tokensPerSecond": 19.408431022469824,
+            "tokensPerSecond": 33.99510470499137,
             "inputTokensPerSecond": 137.50678487443903,
-            "charactersPerSecond": 87.7261082215636,
+            "charactersPerSecond": 153.657873266561,
             "inputLength": 37
           }
         ],
@@ -1551,16 +1551,16 @@
         "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-46.mp3",
         "inputAudioDuration": 9.756,
         "averageTotalResponseTime": 1270.3999999997516,
-        "averageTokensPerSecond": 19.68833867663342,
-        "medianTokensPerSecond": 19.408431022469824,
+        "averageTokensPerSecond": 34.46598944407625,
+        "medianTokensPerSecond": 33.99510470499137,
         "averageInputTokensPerSecond": 139.6976350920842,
         "medianInputTokensPerSecond": 140.63656550645013,
-        "averageCharactersPerSecond": 88.99129081838306,
+        "averageCharactersPerSecond": 155.78627228722465,
         "averageTimeToFirstToken": 544.1000000014901,
         "averageInputTokens": 76,
         "medianInputTokens": 76,
         "medianTotalResponseTime": 1288.0999999977648,
-        "medianCharactersPerSecond": 87.7261082215636,
+        "medianCharactersPerSecond": 153.657873266561,
         "medianTimeToFirstToken": 540.4000000022352
       },
       {
@@ -1579,9 +1579,9 @@
             "totalNumberOfInputTokens": 129,
             "totalNumberOfOutputTokens": 50,
             "totalNumberOfOutputCharacters": 232,
-            "tokensPerSecond": 24.43195699975568,
+            "tokensPerSecond": 33.854695646320295,
             "inputTokensPerSecond": 226.4747191005311,
-            "charactersPerSecond": 113.36428047886636,
+            "charactersPerSecond": 157.08578779892616,
             "inputLength": 37
           },
           {
@@ -1593,9 +1593,9 @@
             "totalNumberOfInputTokens": 129,
             "totalNumberOfOutputTokens": 50,
             "totalNumberOfOutputCharacters": 232,
-            "tokensPerSecond": 24.571232001590552,
+            "tokensPerSecond": 34.097108565228325,
             "inputTokensPerSecond": 226.91292875989447,
-            "charactersPerSecond": 114.01051648738016,
+            "charactersPerSecond": 158.21058374265942,
             "inputLength": 37
           },
           {
@@ -1607,9 +1607,9 @@
             "totalNumberOfInputTokens": 129,
             "totalNumberOfOutputTokens": 50,
             "totalNumberOfOutputCharacters": 232,
-            "tokensPerSecond": 24.981264051961027,
+            "tokensPerSecond": 35.97381106558285,
             "inputTokensPerSecond": 210.92217135331217,
-            "charactersPerSecond": 115.91306520109917,
+            "charactersPerSecond": 166.9184833443044,
             "inputLength": 37
           }
         ],
@@ -1618,16 +1618,16 @@
         "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-5670.mp3",
         "inputAudioDuration": 18.252,
         "averageTotalResponseTime": 2027.6333333328366,
-        "averageTokensPerSecond": 24.661484351102416,
-        "medianTokensPerSecond": 24.571232001590552,
+        "averageTokensPerSecond": 34.64187175904382,
+        "medianTokensPerSecond": 34.097108565228325,
         "averageInputTokensPerSecond": 221.43660640457924,
         "medianInputTokensPerSecond": 226.4747191005311,
-        "averageCharactersPerSecond": 114.42928738911523,
+        "averageCharactersPerSecond": 160.73828496196333,
         "averageTimeToFirstToken": 583.2333333343267,
         "averageInputTokens": 129,
         "medianInputTokens": 129,
         "medianTotalResponseTime": 2034.8999999985099,
-        "medianCharactersPerSecond": 114.01051648738016,
+        "medianCharactersPerSecond": 158.21058374265942,
         "medianTimeToFirstToken": 569.6000000014901
       }
     ],
