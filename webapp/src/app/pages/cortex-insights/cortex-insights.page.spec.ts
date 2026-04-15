@@ -436,7 +436,7 @@ describe('CortexInsightsPage', () => {
 
     component.topConfig = {
       id: 1, filename: 'test', hw: 'test', os: '', ram: 0, compute: 'test', engine: 'test', model: 'test',
-      apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, isCurrent: false, trend: 'best'
+      apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, avgInputTokens: 0, avgOutputTokens: 0, isCurrent: false, trend: 'best'
     };
     component.activeMetric = 'speed';
     component.fleetAvgSpeed = 100;
