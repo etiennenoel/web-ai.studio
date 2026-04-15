@@ -110,6 +110,7 @@ export class CortexInsightsPage implements OnInit {
   selectedBaselineFullData: any = null;
   panelWidth: number = 480;
   private isResizing = false;
+  expandedTests = new Set<string>();
 
   constructor(
     private titleService: Title,
@@ -579,6 +580,19 @@ export class CortexInsightsPage implements OnInit {
     this.selectedLeaderboardEntry = null;
     this.selectedBaseline = null;
     this.selectedBaselineFullData = null;
+    this.expandedTests.clear();
+  }
+
+  toggleTestExpansion(testId: string) {
+    if (this.expandedTests.has(testId)) {
+      this.expandedTests.delete(testId);
+    } else {
+      this.expandedTests.add(testId);
+    }
+  }
+
+  getSuccessIterations(iterations: any[]): any[] {
+    return (iterations || []).filter((i: any) => i.status === 'Success');
   }
 
   formatBytes(bytes: number): string {

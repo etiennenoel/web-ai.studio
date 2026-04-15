@@ -406,11 +406,11 @@
     @let hw = fullData?.hardware;
 
     <!-- Panel -->
-    <div class="fixed top-0 right-0 bottom-0 z-[101]" [style.width.px]="panelWidth">
-      <!-- Resize handle - outside scrollable area so it covers full height -->
-      <div class="absolute top-0 left-0 bottom-0 w-1.5 cursor-col-resize hover:bg-indigo-500/30 active:bg-indigo-500/50 transition-colors z-20" (mousedown)="startResize($event)"></div>
+    <div class="fixed top-0 right-0 bottom-0 z-[101] flex" [style.width.px]="panelWidth">
+      <!-- Resize handle - flex child so it's never covered by the scrollable area -->
+      <div class="w-2 flex-shrink-0 cursor-col-resize hover:bg-indigo-500/30 active:bg-indigo-500/50 transition-colors" (mousedown)="startResize($event)"></div>
       <!-- Scrollable content -->
-      <div class="h-full overflow-y-auto bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
+      <div class="flex-1 min-w-0 overflow-y-auto bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
 
       <!-- Panel Header -->
       <div class="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 py-4">
@@ -650,6 +650,92 @@
                   }
                 </tbody>
               </table>
+            </div>
+          </section>
+        }
+
+        <!-- Per-Test Raw Results -->
+        @if (selectedBaselineFullData?.results?.testsResults) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Per-Test Results</h3>
+            <div class="space-y-2">
+              @for (testResult of selectedBaselineFullData.results.testsResults; track testResult.id) {
+                @let successIterations = getSuccessIterations(testResult.testIterationResults);
+                <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <!-- Test header (clickable to expand) -->
+                  <button class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-left" (click)="toggleTestExpansion(testResult.id)">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <i class="bi text-xs transition-transform" [ngClass]="expandedTests.has(testResult.id) ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                      <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider truncate">{{ testResult.api }}</span>
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider"
+                            [ngClass]="testResult.startType === 'cold' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'">
+                        {{ testResult.startType }}
+                      </span>
+                    </div>
+                    <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500 flex-shrink-0 ml-2">{{ successIterations.length }}/{{ testResult.numberOfIterations }} pass</span>
+                  </button>
+                  <!-- Expanded iteration details -->
+                  @if (expandedTests.has(testResult.id)) {
+                    <div class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                      @for (iter of testResult.testIterationResults; track $index; let i = $index) {
+                        <div class="px-3 py-2 text-[10px]" [ngClass]="iter.status === 'Success' ? '' : 'opacity-50'">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="font-bold text-slate-600 dark:text-slate-400">Iteration {{ i + 1 }}</span>
+                            <span class="font-bold px-1.5 py-0.5 rounded"
+                                  [ngClass]="iter.status === 'Success' ? 'text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-500/20' : 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-500/20'">
+                              {{ iter.status }}
+                            </span>
+                          </div>
+                          @if (iter.status === 'Success') {
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">TTFT</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.timeToFirstToken | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Total</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalResponseTime | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Creation</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.creationTime | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out t/s</span>
+                                <span class="font-bold tabular-nums" [ngClass]="iter.tokensPerSecond > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                                  {{ iter.tokensPerSecond > 0 ? (iter.tokensPerSecond | number:'1.1-1') : (iter.tokensPerSecond === -1 ? 'N/A' : '0') }}
+                                </span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">In t/s</span>
+                                <span class="font-bold tabular-nums" [ngClass]="iter.inputTokensPerSecond > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                                  {{ iter.inputTokensPerSecond > 0 ? (iter.inputTokensPerSecond | number:'1.1-1') : (iter.inputTokensPerSecond === -1 ? 'N/A' : '0') }}
+                                </span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Chars/s</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.charactersPerSecond | number:'1.1-1' }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">In Tokens</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfInputTokens ?? 0 }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out Tokens</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfOutputTokens ?? 0 }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out Chars</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfOutputCharacters ?? 0 }}</span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </section>
         }
