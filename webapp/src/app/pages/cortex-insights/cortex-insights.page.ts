@@ -3,9 +3,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
 import { GlobalFilterService } from '../cortex/services/global-filter.service';
 import { CortexUiHelpers } from '../cortex/util/cortex-ui.helpers';
+import { InsightsCalculator, TestMetrics } from './util/insights-calculator';
 
 export interface LeaderboardEntry {
   id: number;
@@ -28,17 +28,6 @@ export interface LeaderboardEntry {
   trend: 'best' | 'worst' | 'flat';
 }
 
-interface RawTestResult {
-  api: string;
-  ttft: number;
-  speed: number;
-  inputSpeed?: number;
-  charSpeed?: number;
-  total: number;
-  avgInputTokens?: number;
-  avgOutputTokens?: number;
-}
-
 interface RawBaseline {
   filename: string;
   hw: string;
@@ -49,7 +38,7 @@ interface RawBaseline {
   cpu?: string;
   ram?: number;
   executionType?: string;
-  tests: RawTestResult[];
+  tests: TestMetrics[];
 }
 
 @Component({
@@ -162,36 +151,8 @@ export class CortexInsightsPage implements OnInit {
             this.http.get<any>(`/data/baselines/${item.filename}.json`).subscribe({
               next: (data) => {
                 if (!data?.results?.testsResults) { resolve(null); return; }
-                
-                const tests: RawTestResult[] = [];
-                const apiGroups = new Map<string, any[]>();
 
-                data.results.testsResults.forEach((testResult: any) => {
-                  const api = testResult.api;
-                  if (!apiGroups.has(api)) apiGroups.set(api, []);
-                  const iterations = (testResult.testIterationResults || []).filter((i: any) => i.status === 'Success');
-                  apiGroups.get(api)!.push(...iterations);
-                });
-
-                apiGroups.forEach((iterations, api) => {
-                  if (iterations.length > 0) {
-                    const tokensPerSecs = iterations.map((i: any) => i.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
-                    const inputTokensPerSecs = iterations.map((i: any) => i.inputTokensPerSecond ?? 0).filter((v: number) => v !== -1);
-                    const charsPerSecs = iterations.map((i: any) => i.charactersPerSecond ?? 0);
-                    const inputTokenCounts = iterations.map((i: any) => i.totalNumberOfInputTokens ?? 0).filter((v: number) => v > 0);
-                    const outputTokenCounts = iterations.map((i: any) => i.totalNumberOfOutputTokens ?? 0).filter((v: number) => v > 0 && v !== -1);
-                    tests.push({
-                      api,
-                      ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
-                      speed: tokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(tokensPerSecs) : 0,
-                      inputSpeed: inputTokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(inputTokensPerSecs) : 0,
-                      charSpeed: MathematicalCalculations.calculateAverage(charsPerSecs),
-                      total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
-                      avgInputTokens: inputTokenCounts.length > 0 ? MathematicalCalculations.calculateAverage(inputTokenCounts) : undefined,
-                      avgOutputTokens: outputTokenCounts.length > 0 ? MathematicalCalculations.calculateAverage(outputTokenCounts) : undefined,
-                    });
-                  }
-                });
+                const tests: TestMetrics[] = InsightsCalculator.computeTestMetrics(data.results.testsResults);
 
                 if (tests.length === 0) { resolve(null); return; }
 
@@ -350,15 +311,7 @@ export class CortexInsightsPage implements OnInit {
       
       if (testsToUse.length === 0) return;
 
-      const ttft = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.ttft)));
-      const speed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.speed).filter(v => v !== -1)));
-      const inputSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.inputSpeed ?? 0).filter(v => v !== -1)));
-      const charSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.charSpeed ?? 0)));
-      const total = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.total)));
-      const inputTokenVals = testsToUse.map(t => t.avgInputTokens ?? 0).filter(v => v > 0);
-      const outputTokenVals = testsToUse.map(t => t.avgOutputTokens ?? 0).filter(v => v > 0);
-      const avgInputTokens = inputTokenVals.length > 0 ? Math.round(MathematicalCalculations.calculateAverage(inputTokenVals)) : 0;
-      const avgOutputTokens = outputTokenVals.length > 0 ? Math.round(MathematicalCalculations.calculateAverage(outputTokenVals)) : 0;
+      const agg = InsightsCalculator.aggregateTestMetrics(testsToUse);
 
       newLeaderboard.push({
         id: idCounter++,
@@ -370,13 +323,13 @@ export class CortexInsightsPage implements OnInit {
         engine: b.engine,
         model: b.model,
         apis: testsToUse.map(t => t.api),
-        ttft,
-        speed: speed || 0,
-        inputSpeed: inputSpeed || 0,
-        charSpeed,
-        total,
-        avgInputTokens,
-        avgOutputTokens,
+        ttft: agg.ttft,
+        speed: agg.speed,
+        inputSpeed: agg.inputSpeed,
+        charSpeed: agg.charSpeed,
+        total: agg.total,
+        avgInputTokens: agg.avgInputTokens,
+        avgOutputTokens: agg.avgOutputTokens,
         isCurrent: b.filename === 'local',
         trend: 'flat'
       });
@@ -408,10 +361,11 @@ export class CortexInsightsPage implements OnInit {
     this.leaderboard = newLeaderboard;
 
     if (newLeaderboard.length > 0) {
-      this.fleetAvgSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.speed)));
-      this.fleetAvgInputSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.inputSpeed).filter(v => v > 0)));
-      this.fleetAvgCharSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.charSpeed)));
-      this.fleetAvgTtft = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.ttft)));
+      const fleet = InsightsCalculator.computeFleetMetrics(newLeaderboard);
+      this.fleetAvgSpeed = fleet.avgSpeed;
+      this.fleetAvgInputSpeed = fleet.avgInputSpeed;
+      this.fleetAvgCharSpeed = fleet.avgCharSpeed;
+      this.fleetAvgTtft = fleet.avgTtft;
 
       this.topConfig = newLeaderboard[0];
       this.topSpeed = Math.round(newLeaderboard[0].speed);
