@@ -106,9 +106,10 @@ export class PromptImageDescribeColdStartAxonTest implements AxonTestInterface {
         iterationResult.totalNumberOfInputTokens = inputTokens;
         iterationResult.totalNumberOfOutputTokens = chunkCount;
         iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
-        iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
+        const generationTime = (iterationResult.totalResponseTime || 0) - (iterationResult.timeToFirstToken || 0);
+        iterationResult.tokensPerSecond = generationTime > 0 ? iterationResult.totalNumberOfOutputTokens / (generationTime / 1000) : 0;
       iterationResult.inputTokensPerSecond = (iterationResult.timeToFirstToken && iterationResult.totalNumberOfInputTokens) ? iterationResult.totalNumberOfInputTokens / (iterationResult.timeToFirstToken / 1000) : -1;
-        iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+        iterationResult.charactersPerSecond = generationTime > 0 ? iterationResult.totalNumberOfOutputCharacters / (generationTime / 1000) : 0;
         iterationResult.inputLength = this.results.input?.length || 0;
 
         // Validation for red circle
