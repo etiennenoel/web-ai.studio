@@ -198,5 +198,23 @@
     "model": "Gemma4 2B",
     "engine": "LM Studio",
     "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-15-windows-intel(r)-core(tm)-ultra-9-285h-31gb-llminferenceengine",
+    "name": "Intel(R) Core(TM) Ultra 9 285H (LLM IE)",
+    "os": "Windows",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "ram": 31,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-15-windows-intel(r)-core(tm)-ultra-9-285h-31gb-litertlm",
+    "name": "Intel(R) Core(TM) Ultra 9 285H (LiteRT-LM)",
+    "os": "Windows",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "ram": 31,
+    "model": "Nano V3 4B",
+    "executionType": "GPU"
   }
 ]
