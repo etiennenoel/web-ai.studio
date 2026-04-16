@@ -105,18 +105,18 @@
   },
   {
     "filename": "2026-04-08-windows-i7-13800h-64gb-litertlm",
-    "name": "Intel Core i7-13800H (LiteRT-LM)",
+    "name": "Intel Core i7-13800H - Nvidia RTX 4000 (LiteRT-LM)",
     "os": "Windows",
-    "cpu": "Intel Core i7-13800H",
+    "cpu": "Intel Core i7-13800H - Nvidia RTX 4000",
     "ram": 64,
     "model": "Nano V3 4B",
     "executionType": "GPU"
   },
   {
     "filename": "2026-04-08-windows-i7-13800h-64gb-llminferenceengine",
-    "name": "Intel Core i7-13800H (LLM IE)",
+    "name": "Intel Core i7-13800H - Nvidia RTX 4000 (LLM IE)",
     "os": "Windows",
-    "cpu": "Intel Core i7-13800H",
+    "cpu": "Intel Core i7-13800H - Nvidia RTX 4000",
     "ram": 64,
     "model": "Nano V3 4B",
     "executionType": "GPU"
