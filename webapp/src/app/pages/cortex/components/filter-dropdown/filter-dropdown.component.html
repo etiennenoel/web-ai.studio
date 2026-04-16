@@ -30,10 +30,10 @@
             @if (filterType === 'engine' || filterType === 'variant' || filterType === 'compute') {
               <span class="inline-flex items-center gap-1 px-1.5 py-px rounded text-[8px] font-bold uppercase tracking-wider border" [ngClass]="getOptionColorClass(opt)">
                 @if (filterType === 'compute') { <i class="bi" [ngClass]="getComputeIcon(opt)"></i> }
-                {{ opt }}
+                {{ getDisplayLabel(opt) }}
               </span>
             } @else {
-              {{ opt }}
+              {{ getDisplayLabel(opt) }}
             }
           </label>
         }

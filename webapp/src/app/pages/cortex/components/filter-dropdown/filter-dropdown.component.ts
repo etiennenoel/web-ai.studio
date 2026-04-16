@@ -32,6 +32,9 @@ export class CortexFilterDropdownComponent {
 
   constructor(public filterService: GlobalFilterService) {}
 
+  /** Optional transform for display labels (e.g. 'cold' -> 'Cold Start') */
+  @Input() labelTransform?: (value: string) => string;
+
   /** Returns the selected array for this filter type */
   get selected(): string[] {
     switch (this.filterType) {
@@ -41,6 +44,8 @@ export class CortexFilterDropdownComponent {
       case 'compute': return this.filterService.selectedComputes;
       case 'engine': return this.filterService.selectedEngines;
       case 'variant': return this.filterService.selectedVariants;
+      case 'startType': return this.filterService.selectedStartTypes;
+      case 'chromeVersion': return this.filterService.selectedChromeVersions;
       default: return [];
     }
   }
@@ -54,8 +59,16 @@ export class CortexFilterDropdownComponent {
       case 'compute': return this.filterService.computeOptions;
       case 'engine': return this.filterService.engineOptions;
       case 'variant': return this.filterService.variantOptions;
+      case 'startType': return this.filterService.startTypeOptions;
+      case 'chromeVersion': return this.filterService.chromeVersionOptions;
       default: return [];
     }
+  }
+
+  /** Returns display label for a given option */
+  getDisplayLabel(opt: string): string {
+    if (this.labelTransform) return this.labelTransform(opt);
+    return opt;
   }
 
   /** Whether this filter has a non-default selection (for active styling) */

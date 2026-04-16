@@ -38,6 +38,7 @@ interface RawBaseline {
   cpu?: string;
   ram?: number;
   executionType?: string;
+  chromeVersion?: string;
   tests: TestMetrics[];
 }
 
@@ -161,6 +162,8 @@ export class CortexInsightsPage implements OnInit {
                 if (item.filename.toLowerCase().includes('llminferenceengine')) engine = 'LLM IE';
                 else if (item.filename.toLowerCase().includes('litertlm')) engine = 'LITERT-LM';
 
+                const chromeVersion = this.extractChromeVersion(data.userAgent || '');
+
                 resolve({
                   filename: item.filename,
                   hw: item.hw || item.cpu || item.name,
@@ -171,6 +174,7 @@ export class CortexInsightsPage implements OnInit {
                   cpu: item.cpu,
                   ram: item.ram,
                   executionType: item.executionType,
+                  chromeVersion: chromeVersion !== 'N/A' ? chromeVersion : undefined,
                   tests
                 });
               },
@@ -217,6 +221,8 @@ export class CortexInsightsPage implements OnInit {
     if (params.has('engine')) this.filterService.selectedEngines = parseArray('engine', this.filterService.engineOptions);
     if (params.has('variant')) this.filterService.selectedVariants = parseArray('variant', this.filterService.variantOptions);
     if (params.has('api')) this.filterService.selectedApis = parseArray('api', this.filterService.apiOptions);
+    if (params.has('startType')) this.filterService.selectedStartTypes = parseArray('startType', this.filterService.startTypeOptions);
+    if (params.has('chromeVersion')) this.filterService.selectedChromeVersions = parseArray('chromeVersion', this.filterService.chromeVersionOptions);
   }
 
   syncToUrl() {
@@ -243,6 +249,8 @@ export class CortexInsightsPage implements OnInit {
     syncArray('engine', this.filterService.selectedEngines, this.filterService.engineOptions);
     syncArray('variant', this.filterService.selectedVariants, this.filterService.variantOptions);
     syncArray('api', this.filterService.selectedApis, this.filterService.apiOptions);
+    syncArray('startType', this.filterService.selectedStartTypes, this.filterService.startTypeOptions);
+    syncArray('chromeVersion', this.filterService.selectedChromeVersions, this.filterService.chromeVersionOptions);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -260,6 +268,8 @@ export class CortexInsightsPage implements OnInit {
     const apiSet = new Set<string>();
     const osSet = new Set<string>();
     const ramSet = new Set<string>();
+    const startTypeSet = new Set<string>();
+    const chromeVersionSet = new Set<string>();
 
     this.rawBaselines.forEach(b => {
       hwSet.add(b.hw);
@@ -268,7 +278,11 @@ export class CortexInsightsPage implements OnInit {
       variantSet.add(b.model);
       if (b.os) osSet.add(b.os);
       if (b.ram) ramSet.add(b.ram + ' GB');
-      b.tests.forEach(t => apiSet.add(t.api));
+      if (b.chromeVersion) chromeVersionSet.add(b.chromeVersion);
+      b.tests.forEach(t => {
+        apiSet.add(t.api);
+        if (t.startType) startTypeSet.add(t.startType);
+      });
     });
 
     this.filterService.setOptions(
@@ -278,7 +292,9 @@ export class CortexInsightsPage implements OnInit {
       Array.from(variantSet).sort(),
       Array.from(apiSet).sort(),
       Array.from(osSet).sort(),
-      Array.from(ramSet).sort((a, b) => parseInt(a) - parseInt(b))
+      Array.from(ramSet).sort((a, b) => parseInt(a) - parseInt(b)),
+      Array.from(startTypeSet).sort(),
+      Array.from(chromeVersionSet).sort()
     );
   }
 
@@ -295,6 +311,7 @@ export class CortexInsightsPage implements OnInit {
       if (!this.filterService.selectedVariants.includes(b.model)) return false;
       if (b.os && !this.filterService.selectedOs.includes(b.os)) return false;
       if (b.ram && !this.filterService.selectedRam.includes(b.ram + ' GB')) return false;
+      if (b.chromeVersion && !this.filterService.selectedChromeVersions.includes(b.chromeVersion)) return false;
 
       if (this.filterService.searchQuery) {
         const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
@@ -309,7 +326,13 @@ export class CortexInsightsPage implements OnInit {
 
     filtered.forEach(b => {
       let testsToUse = b.tests.filter(t => this.filterService.selectedApis.includes(t.api));
-      
+
+      // Filter by start type
+      testsToUse = testsToUse.filter(t => {
+        if (!t.startType) return true; // Tests without startType always pass
+        return this.filterService.selectedStartTypes.includes(t.startType);
+      });
+
       if (testsToUse.length === 0) return;
 
       const agg = InsightsCalculator.aggregateTestMetrics(testsToUse);
@@ -653,6 +676,12 @@ export class CortexInsightsPage implements OnInit {
     this.columnsDropdownOpen = !this.columnsDropdownOpen;
     this.filterService.activeDropdown = null;
   }
+
+  startTypeLabel = (value: string): string => {
+    if (value === 'cold') return 'Cold Start';
+    if (value === 'warm') return 'Warm Start';
+    return value;
+  };
 
   getOsIcon(os?: string): string {
     if (!os) return 'bi-pc-horizontal';

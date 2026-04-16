@@ -30,6 +30,12 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
   apiCollapsedState: { [key: string]: boolean | undefined } = {};
   selectedImageUrl: string | null = null;
 
+  startTypeLabel = (value: string): string => {
+    if (value === 'cold') return 'Cold Start';
+    if (value === 'warm') return 'Warm Start';
+    return value;
+  };
+
   isImportedReport = false;
   importedTimestamp: string | null = null;
   importedUserAgent: string | null = null;
