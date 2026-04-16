@@ -119,7 +119,7 @@ describe('InsightsCalculator', () => {
       expect(results[0].inputSpeed).toBe(100);
     });
 
-    it('should group iterations by API', () => {
+    it('should group iterations by API when no startType', () => {
       const results = InsightsCalculator.computeTestMetrics([
         {
           api: 'Prompt API',
@@ -141,6 +141,60 @@ describe('InsightsCalculator', () => {
       expect(promptApi.speed).toBe(20); // (10 + 30) / 2
       expect(translator.speed).toBe(0);
       expect(translator.charSpeed).toBe(200);
+    });
+
+    it('should group iterations by API + startType', () => {
+      const results = InsightsCalculator.computeTestMetrics([
+        {
+          api: 'Prompt API',
+          startType: 'cold',
+          testIterationResults: [makeIteration({ tokensPerSecond: 10 })],
+        },
+        {
+          api: 'Prompt API',
+          startType: 'warm',
+          testIterationResults: [makeIteration({ tokensPerSecond: 30 })],
+        },
+      ]);
+
+      expect(results.length).toBe(2);
+      const cold = results.find(r => r.startType === 'cold')!;
+      const warm = results.find(r => r.startType === 'warm')!;
+      expect(cold.api).toBe('Prompt API');
+      expect(cold.speed).toBe(10);
+      expect(warm.api).toBe('Prompt API');
+      expect(warm.speed).toBe(30);
+    });
+
+    it('should merge iterations with same API + startType', () => {
+      const results = InsightsCalculator.computeTestMetrics([
+        {
+          api: 'Prompt API',
+          startType: 'cold',
+          testIterationResults: [makeIteration({ tokensPerSecond: 10 })],
+        },
+        {
+          api: 'Prompt API',
+          startType: 'cold',
+          testIterationResults: [makeIteration({ tokensPerSecond: 30 })],
+        },
+      ]);
+
+      expect(results.length).toBe(1);
+      expect(results[0].startType).toBe('cold');
+      expect(results[0].speed).toBe(20); // (10 + 30) / 2
+    });
+
+    it('should preserve startType on TestMetrics', () => {
+      const results = InsightsCalculator.computeTestMetrics([
+        {
+          api: 'Summarizer',
+          startType: 'warm',
+          testIterationResults: [makeIteration()],
+        },
+      ]);
+
+      expect(results[0].startType).toBe('warm');
     });
 
     it('should return empty array for empty input', () => {

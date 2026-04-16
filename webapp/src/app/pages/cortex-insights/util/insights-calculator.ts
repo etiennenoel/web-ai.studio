@@ -13,6 +13,7 @@ export interface IterationData {
 
 export interface TestMetrics {
   api: string;
+  startType?: string;
   ttft: number;
   speed: number;
   inputSpeed: number;
@@ -53,21 +54,23 @@ export class InsightsCalculator {
 
   /**
    * Computes per-API test metrics from raw iteration data.
-   * Groups iterations by API and calculates averages for each API.
+   * Groups iterations by API + startType and calculates averages for each group.
    */
-  static computeTestMetrics(testsResults: { api: string; testIterationResults: IterationData[] }[]): TestMetrics[] {
-    const apiGroups = new Map<string, IterationData[]>();
+  static computeTestMetrics(testsResults: { api: string; startType?: string; testIterationResults: IterationData[] }[]): TestMetrics[] {
+    const groups = new Map<string, { api: string; startType?: string; iterations: IterationData[] }>();
 
     for (const testResult of testsResults) {
       const api = testResult.api;
-      if (!apiGroups.has(api)) apiGroups.set(api, []);
+      const startType = testResult.startType;
+      const key = startType ? `${api}::${startType}` : api;
+      if (!groups.has(key)) groups.set(key, { api, startType, iterations: [] });
       const iterations = (testResult.testIterationResults || []).filter(i => i.status === 'Success');
-      apiGroups.get(api)!.push(...iterations);
+      groups.get(key)!.iterations.push(...iterations);
     }
 
     const results: TestMetrics[] = [];
 
-    apiGroups.forEach((iterations, api) => {
+    groups.forEach(({ api, startType, iterations }) => {
       if (iterations.length === 0) return;
 
       const tokensPerSecs = InsightsCalculator.extractPositiveValues(iterations, 'tokensPerSecond');
@@ -78,6 +81,7 @@ export class InsightsCalculator {
 
       results.push({
         api,
+        startType,
         ttft: MathematicalCalculations.calculateAverage(
           iterations.map(i => i.timeToFirstToken ?? 0)
         ),

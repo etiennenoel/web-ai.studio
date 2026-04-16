@@ -6,6 +6,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { PLATFORM_ID } from '@angular/core';
+import { AxonTestSuiteExecutor } from '../cortex/axon/axon-test-suite.executor';
+import { HardwareInfoService } from '../cortex/services/hardware-info.service';
+import { TestStatus } from '../../enums/test-status.enum';
 
 describe('CortexInsightsPage', () => {
   let component: CortexInsightsPage;
@@ -24,7 +27,9 @@ describe('CortexInsightsPage', () => {
       providers: [
         { provide: Title, useValue: titleSpy },
         { provide: Meta, useValue: metaSpy },
-        { provide: PLATFORM_ID, useValue: 'browser' }
+        { provide: PLATFORM_ID, useValue: 'browser' },
+        { provide: AxonTestSuiteExecutor, useValue: { results: { status: TestStatus.Idle, testsResults: [] } } },
+        { provide: HardwareInfoService, useValue: { hardwareInfo: null, isExtensionInstalled: false, getOsProfile: () => 'Unknown' } }
       ]
     }).compileComponents();
 

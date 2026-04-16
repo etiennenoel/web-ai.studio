@@ -250,16 +250,16 @@
               @let speedWidth = (row.speed / maxSpeed) * 100;
               @let isCurrent = row.isCurrent;
 
-              <tr class="group transition-colors cursor-pointer" [ngClass]="isCurrent ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'" (click)="openPanel(row)">
+              <tr class="group transition-colors cursor-pointer" [ngClass]="isCurrent ? 'bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100/80 dark:hover:bg-blue-900/30 border-l-2 border-l-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'" (click)="openPanel(row)">
                 <!-- Hardware -->
                 @if (isColumnVisible('hw')) {
                 <td class="px-4 py-4 align-middle">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold tracking-tight whitespace-nowrap" [ngClass]="isCurrent ? 'text-indigo-400' : 'text-slate-800 dark:text-slate-200'">
+                    <span class="text-sm font-bold tracking-tight whitespace-nowrap" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : 'text-slate-800 dark:text-slate-200'">
                       {{ row.hw }}
                     </span>
                     @if (isCurrent) {
-                      <span class="px-1.5 py-0.5 rounded bg-indigo-500 text-slate-900 dark:text-white text-[9px] font-bold uppercase tracking-widest">You</span>
+                      <span class="px-1.5 py-0.5 rounded bg-blue-500 text-white text-[9px] font-bold uppercase tracking-widest">You</span>
                     }
                   </div>
                 </td>
@@ -267,23 +267,23 @@
                 <!-- OS -->
                 @if (isColumnVisible('os')) {
                 <td class="px-3 py-4 align-middle">
-                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{{ row.os || 'N/A' }}</span>
+                  <span class="text-xs font-semibold whitespace-nowrap" [ngClass]="isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'">{{ row.os || 'N/A' }}</span>
                 </td>
                 }
                 <!-- RAM -->
                 @if (isColumnVisible('ram')) {
                 <td class="px-3 py-4 align-middle text-right">
                   @if (row.ram > 0) {
-                    <span class="text-xs font-semibold tabular-nums text-slate-700 dark:text-slate-300">{{ row.ram }}</span><span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">GB</span>
+                    <span class="text-xs font-semibold tabular-nums" [ngClass]="isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'">{{ row.ram }}</span><span class="text-[9px] ml-0.5" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">GB</span>
                   } @else {
-                    <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">N/A</span>
+                    <span class="text-xs font-semibold" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">N/A</span>
                   }
                 </td>
                 }
                 <!-- Compute -->
                 @if (isColumnVisible('compute')) {
                 <td class="px-3 py-4 align-middle">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="getFilterBadgeClass('compute', row.compute)">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('compute', row.compute)">
                     <i class="bi" [ngClass]="getFilterIcon('compute', row.compute)"></i> {{ row.compute }}
                   </span>
                 </td>
@@ -291,7 +291,7 @@
                 <!-- Engine -->
                 @if (isColumnVisible('engine')) {
                 <td class="px-3 py-4 align-middle">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="getFilterBadgeClass('engine', row.engine)">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('engine', row.engine)">
                     <i class="bi" [ngClass]="getFilterIcon('engine', row.engine)"></i> {{ row.engine }}
                   </span>
                 </td>
@@ -299,7 +299,7 @@
                 <!-- Model Variant -->
                 @if (isColumnVisible('model')) {
                 <td class="px-3 py-4 align-middle">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="getFilterBadgeClass('variant', row.model)">{{ row.model }}</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('variant', row.model)">{{ row.model }}</span>
                 </td>
                 }
 
@@ -309,14 +309,14 @@
                   <div class="flex flex-col items-end gap-1.5">
                     @if (row.speed > 0) {
                       <div class="flex items-center gap-2">
-                        @if (row.speed === maxSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                        @if (row.speed === minSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.speed === maxSpeed && maxSpeed !== minSpeed ? 'text-emerald-400' : (row.speed === minSpeed && maxSpeed !== minSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        @if (!isCurrent && row.speed === maxSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                        @if (!isCurrent && row.speed === minSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                        <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.speed === maxSpeed && maxSpeed !== minSpeed ? 'text-emerald-400' : (row.speed === minSpeed && maxSpeed !== minSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                           {{ row.speed | number:'1.0-0' }}
                         </span>
                       </div>
-                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
+                      <div class="w-24 h-1 rounded-full overflow-hidden flex justify-end" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                        <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
                       </div>
                     } @else {
                       <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
@@ -331,17 +331,17 @@
                   <div class="flex flex-col items-end gap-1.5">
                     @if (row.inputSpeed > 0) {
                       <div class="flex items-center gap-2">
-                        @if (row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                        @if (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-emerald-400' : (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        @if (!isCurrent && row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                        @if (!isCurrent && row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                        <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-emerald-400' : (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                           {{ row.inputSpeed | number:'1.0-0' }}
                         </span>
                       </div>
-                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.inputSpeed, minInputSpeed, maxInputSpeed)" [style.width]="speedWidth + '%'"></div>
+                      <div class="w-24 h-1 rounded-full overflow-hidden flex justify-end" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                        <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getSpeedColor(row.inputSpeed, minInputSpeed, maxInputSpeed)" [style.width]="speedWidth + '%'"></div>
                       </div>
                     } @else {
-                      <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
+                      <span class="text-sm font-semibold" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">N/A</span>
                     }
                   </div>
                 </td>
@@ -352,14 +352,14 @@
                 <td class="px-4 py-4 align-middle text-right pr-8">
                   <div class="flex flex-col items-end gap-1.5">
                     <div class="flex items-center gap-2">
-                      @if (row.ttft === minTtft && maxTtft !== minTtft) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
-                      @if (row.ttft === maxTtft && maxTtft !== minTtft) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
-                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.ttft === minTtft && maxTtft !== minTtft ? 'text-emerald-400' : (row.ttft === maxTtft && maxTtft !== minTtft ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                      @if (!isCurrent && row.ttft === minTtft && maxTtft !== minTtft) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (!isCurrent && row.ttft === maxTtft && maxTtft !== minTtft) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.ttft === minTtft && maxTtft !== minTtft ? 'text-emerald-400' : (row.ttft === maxTtft && maxTtft !== minTtft ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                         {{ row.ttft | number:'1.0-0' }}
                       </span>
                     </div>
-                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
-                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.ttft, minTtft, maxTtft)" [style.width]="(row.ttft / maxTtft) * 100 + '%'"></div>
+                    <div class="w-32 h-1 rounded-full overflow-hidden flex justify-start" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getTimeColor(row.ttft, minTtft, maxTtft)" [style.width]="(row.ttft / maxTtft) * 100 + '%'"></div>
                     </div>
                   </div>
                 </td>
@@ -370,14 +370,14 @@
                 <td class="px-4 py-4 align-middle text-right pr-8">
                   <div class="flex flex-col items-end gap-1.5">
                     <div class="flex items-center gap-2">
-                      @if (row.total === minTotal && maxTotal !== minTotal) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
-                      @if (row.total === maxTotal && maxTotal !== minTotal) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
-                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.total === minTotal && maxTotal !== minTotal ? 'text-emerald-400' : (row.total === maxTotal && maxTotal !== minTotal ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                      @if (!isCurrent && row.total === minTotal && maxTotal !== minTotal) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (!isCurrent && row.total === maxTotal && maxTotal !== minTotal) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.total === minTotal && maxTotal !== minTotal ? 'text-emerald-400' : (row.total === maxTotal && maxTotal !== minTotal ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                         {{ row.total | number:'1.0-0' }}
                       </span>
                     </div>
-                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
-                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.total, minTotal, maxTotal)" [style.width]="(row.total / maxTotal) * 100 + '%'"></div>
+                    <div class="w-32 h-1 rounded-full overflow-hidden flex justify-start" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getTimeColor(row.total, minTotal, maxTotal)" [style.width]="(row.total / maxTotal) * 100 + '%'"></div>
                     </div>
                   </div>
                 </td>
@@ -385,7 +385,7 @@
 
                 <!-- Action -->
                 <td class="px-4 py-4 align-middle text-center">
-                  <button (click)="openPanel(row)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white flex items-center justify-center transition-colors mx-auto">
+                  <button (click)="openPanel(row)" class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors mx-auto" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white'">
                     <i class="bi bi-chevron-right"></i>
                   </button>
                 </td>
