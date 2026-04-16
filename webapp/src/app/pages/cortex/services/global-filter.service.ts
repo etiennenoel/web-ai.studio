@@ -4,17 +4,25 @@ import { Subject } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class GlobalFilterService {
   hardwareOptions: string[] = ['All'];
+  osOptions: string[] = ['All'];
+  ramOptions: string[] = ['All'];
   computeOptions: string[] = ['All'];
   engineOptions: string[] = ['All'];
   variantOptions: string[] = ['All'];
   apiOptions: string[] = ['All'];
+  startTypeOptions: string[] = ['All'];
+  chromeVersionOptions: string[] = ['All'];
 
   selectedHardwares: string[] = [];
+  selectedOs: string[] = [];
+  selectedRam: string[] = [];
   selectedComputes: string[] = [];
   selectedEngines: string[] = [];
   selectedVariants: string[] = [];
   selectedApis: string[] = [];
-  
+  selectedStartTypes: string[] = [];
+  selectedChromeVersions: string[] = [];
+
   searchQuery: string = '';
 
   activeDropdown: string | null = null;
@@ -22,7 +30,7 @@ export class GlobalFilterService {
 
   filtersChanged = new Subject<void>();
 
-  setOptions(hw: string[], compute: string[], engine: string[], variant: string[], api: string[]) {
+  setOptions(hw: string[], compute: string[], engine: string[], variant: string[], api: string[], os?: string[], ram?: string[], startType?: string[], chromeVersion?: string[]) {
     const mergeOptions = (existing: string[], incoming: string[]): string[] => {
       const set = new Set(existing.filter(o => o !== 'All'));
       incoming.forEach(o => set.add(o));
@@ -34,71 +42,107 @@ export class GlobalFilterService {
       if (wasAllSelected) {
         return [...newOptions];
       }
-      // Keep existing selections, add any new options that weren't in old options
       return selected.filter(s => newOptions.includes(s));
     };
 
     const oldHw = this.hardwareOptions;
+    const oldOs = this.osOptions;
+    const oldRam = this.ramOptions;
     const oldCompute = this.computeOptions;
     const oldEngine = this.engineOptions;
     const oldVariant = this.variantOptions;
     const oldApi = this.apiOptions;
+    const oldStartType = this.startTypeOptions;
+    const oldChromeVersion = this.chromeVersionOptions;
 
     this.hardwareOptions = mergeOptions(this.hardwareOptions, hw);
+    if (os) this.osOptions = mergeOptions(this.osOptions, os);
+    if (ram) this.ramOptions = mergeOptions(this.ramOptions, ram);
     this.computeOptions = mergeOptions(this.computeOptions, compute);
     this.engineOptions = mergeOptions(this.engineOptions, engine);
     this.variantOptions = mergeOptions(this.variantOptions, variant);
     this.apiOptions = mergeOptions(this.apiOptions, api);
+    if (startType) this.startTypeOptions = mergeOptions(this.startTypeOptions, startType);
+    if (chromeVersion) this.chromeVersionOptions = mergeOptions(this.chromeVersionOptions, chromeVersion);
 
     this.selectedHardwares = syncSelections(this.selectedHardwares, oldHw, this.hardwareOptions);
+    this.selectedOs = syncSelections(this.selectedOs, oldOs, this.osOptions);
+    this.selectedRam = syncSelections(this.selectedRam, oldRam, this.ramOptions);
     this.selectedComputes = syncSelections(this.selectedComputes, oldCompute, this.computeOptions);
     this.selectedEngines = syncSelections(this.selectedEngines, oldEngine, this.engineOptions);
     this.selectedVariants = syncSelections(this.selectedVariants, oldVariant, this.variantOptions);
     this.selectedApis = syncSelections(this.selectedApis, oldApi, this.apiOptions);
+    this.selectedStartTypes = syncSelections(this.selectedStartTypes, oldStartType, this.startTypeOptions);
+    this.selectedChromeVersions = syncSelections(this.selectedChromeVersions, oldChromeVersion, this.chromeVersionOptions);
 
     this.filtersChanged.next();
   }
 
+  private getOptionsForType(filterType: string): string[] {
+    switch (filterType) {
+      case 'hardware': return this.hardwareOptions;
+      case 'os': return this.osOptions;
+      case 'ram': return this.ramOptions;
+      case 'compute': return this.computeOptions;
+      case 'engine': return this.engineOptions;
+      case 'variant': return this.variantOptions;
+      case 'api': return this.apiOptions;
+      case 'startType': return this.startTypeOptions;
+      case 'chromeVersion': return this.chromeVersionOptions;
+      default: return [];
+    }
+  }
+
+  private getSelectedForType(filterType: string): string[] {
+    switch (filterType) {
+      case 'hardware': return this.selectedHardwares;
+      case 'os': return this.selectedOs;
+      case 'ram': return this.selectedRam;
+      case 'compute': return this.selectedComputes;
+      case 'engine': return this.selectedEngines;
+      case 'variant': return this.selectedVariants;
+      case 'api': return this.selectedApis;
+      case 'startType': return this.selectedStartTypes;
+      case 'chromeVersion': return this.selectedChromeVersions;
+      default: return [];
+    }
+  }
+
+  private setSelectedForType(filterType: string, value: string[]): void {
+    switch (filterType) {
+      case 'hardware': this.selectedHardwares = value; break;
+      case 'os': this.selectedOs = value; break;
+      case 'ram': this.selectedRam = value; break;
+      case 'compute': this.selectedComputes = value; break;
+      case 'engine': this.selectedEngines = value; break;
+      case 'variant': this.selectedVariants = value; break;
+      case 'api': this.selectedApis = value; break;
+      case 'startType': this.selectedStartTypes = value; break;
+      case 'chromeVersion': this.selectedChromeVersions = value; break;
+    }
+  }
+
   isFilterSelected(filterType: string, value: string): boolean {
-    if (filterType === 'hardware') return this.selectedHardwares.includes(value);
-    if (filterType === 'compute') return this.selectedComputes.includes(value);
-    if (filterType === 'engine') return this.selectedEngines.includes(value);
-    if (filterType === 'variant') return this.selectedVariants.includes(value);
-    if (filterType === 'api') return this.selectedApis.includes(value);
-    return false;
+    return this.getSelectedForType(filterType).includes(value);
   }
 
   selectFilter(filterType: string, value: string, isChecked: boolean) {
-    const toggle = (arr: string[], val: string, checked: boolean) => {
-      let options: string[] = [];
-      if (filterType === 'hardware') options = this.hardwareOptions;
-      if (filterType === 'compute') options = this.computeOptions;
-      if (filterType === 'engine') options = this.engineOptions;
-      if (filterType === 'variant') options = this.variantOptions;
-      if (filterType === 'api') options = this.apiOptions;
+    const arr = this.getSelectedForType(filterType);
+    const options = this.getOptionsForType(filterType);
 
-      if (val === 'All') {
-        if (checked) {
-          return [...options];
-        }
-        return [];
+    if (value === 'All') {
+      this.setSelectedForType(filterType, isChecked ? [...options] : []);
+    } else {
+      if (!isChecked) {
+        this.setSelectedForType(filterType, arr.filter(item => item !== value && item !== 'All'));
       } else {
-        if (!checked) {
-          return arr.filter(item => item !== val && item !== 'All');
-        }
-        const newArr = [...arr, val];
+        const newArr = [...arr, value];
         if (newArr.length === options.length - 1 && !newArr.includes('All')) {
           newArr.push('All');
         }
-        return newArr;
+        this.setSelectedForType(filterType, newArr);
       }
-    };
-
-    if (filterType === 'hardware') this.selectedHardwares = toggle(this.selectedHardwares, value, isChecked);
-    if (filterType === 'compute') this.selectedComputes = toggle(this.selectedComputes, value, isChecked);
-    if (filterType === 'engine') this.selectedEngines = toggle(this.selectedEngines, value, isChecked);
-    if (filterType === 'variant') this.selectedVariants = toggle(this.selectedVariants, value, isChecked);
-    if (filterType === 'api') this.selectedApis = toggle(this.selectedApis, value, isChecked);
+    }
 
     this.filtersChanged.next();
   }
@@ -118,13 +162,7 @@ export class GlobalFilterService {
   }
 
   getFilteredOptions(filterType: string): string[] {
-    let options: string[] = [];
-    if (filterType === 'hardware') options = this.hardwareOptions;
-    if (filterType === 'compute') options = this.computeOptions;
-    if (filterType === 'engine') options = this.engineOptions;
-    if (filterType === 'variant') options = this.variantOptions;
-    if (filterType === 'api') options = this.apiOptions;
-
+    const options = this.getOptionsForType(filterType);
     const term = this.dropdownSearch[filterType];
     if (!term) return options;
     return options.filter(opt => opt.toLowerCase().includes(term));

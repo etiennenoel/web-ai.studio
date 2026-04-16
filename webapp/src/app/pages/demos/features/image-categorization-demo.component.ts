@@ -7,75 +7,7 @@ declare const LanguageModel: any;
 
 @Component({
   selector: 'app-image-categorization-demo',
-  template: `
-    <app-demo-layout 
-      [title]="demo.title" 
-      [description]="demo.description" 
-      [icon]="demo.icon" 
-      [category]="demo.category" 
-      [onDeviceReason]="demo.onDeviceReason" 
-      [codeSnippet]="dynamicCodeSnippet"
-      [ttft]="ttft"
-      [totalTime]="totalTime">
-      <div demo-ui>
-        
-        <div class="bg-slate-100 dark:bg-[#121212] rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-800 p-6 min-h-[500px]">
-          
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Local Photo Library</h3>
-            <button class="px-4 py-2 bg-[#ffffff] hover:bg-slate-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl shadow-sm transition-colors border border-slate-200 dark:border-zinc-700"
-                    (click)="fileInput.click()">
-              <i class="bi bi-plus-lg mr-1"></i> Add Photo
-            </button>
-            <input #fileInput type="file" class="hidden" accept="image/*" multiple (change)="onFilesSelected($event)">
-          </div>
-
-          @if (images.length === 0) {
-            <div class="h-[300px] border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-colors"
-                 [ngClass]="{'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20': isDragging}"
-                 (dragover)="onDragOver($event)"
-                 (dragleave)="onDragLeave($event)"
-                 (drop)="onDrop($event)">
-              <i class="bi bi-images text-5xl text-slate-300 dark:text-zinc-600 mb-4"></i>
-              <p class="text-slate-500 dark:text-slate-400 font-medium mb-2">Drag and drop photos here to categorize them</p>
-              <p class="text-xs text-slate-400 dark:text-slate-500">Processing happens entirely on your device.</p>
-            </div>
-          } @else {
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              @for (img of images; track img.id) {
-                <div class="relative group bg-[#ffffff] dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-700 aspect-square">
-                  <img [src]="img.url" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  
-                  <!-- Overlay gradient for text readability -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
-                  
-                  <div class="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between">
-                    @if (img.status === 'processing') {
-                      <div class="px-2 py-1 bg-[#ffffff]/20 backdrop-blur-md rounded-md flex items-center gap-2">
-                        <div class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span class="text-xs font-medium text-white shadow-sm">Scanning...</span>
-                      </div>
-                    } @else if (img.status === 'done') {
-                      <span class="px-2.5 py-1 bg-[#ffffff]/90 dark:bg-black/70 backdrop-blur-md text-slate-900 dark:text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
-                        {{ img.category }}
-                      </span>
-                    } @else {
-                      <span class="text-xs text-red-400 font-medium bg-black/50 px-2 py-1 rounded">Failed</span>
-                    }
-                    
-                    <button class="w-8 h-8 rounded-full bg-black/50 hover:bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border-none cursor-pointer"
-                            (click)="removeImage(img.id)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    </app-demo-layout>
-  `,
+  templateUrl: './image-categorization-demo.component.html',
   standalone: false,
   host: { class: 'block h-full' }
 })

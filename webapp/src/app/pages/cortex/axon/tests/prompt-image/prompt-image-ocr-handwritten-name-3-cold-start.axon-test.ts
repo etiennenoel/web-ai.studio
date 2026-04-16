@@ -107,9 +107,16 @@ export class PromptImageOcrHandwrittenName3ColdStartAxonTest implements AxonTest
         iterationResult.totalNumberOfInputTokens = inputTokens;
         iterationResult.totalNumberOfOutputTokens = chunkCount;
         iterationResult.totalNumberOfOutputCharacters = iterationResult.output.length;
-        iterationResult.tokensPerSecond = iterationResult.totalNumberOfOutputTokens / (iterationResult.totalResponseTime / 1000);
-      iterationResult.inputTokensPerSecond = (iterationResult.timeToFirstToken && iterationResult.totalNumberOfInputTokens) ? iterationResult.totalNumberOfInputTokens / (iterationResult.timeToFirstToken / 1000) : -1;
-        iterationResult.charactersPerSecond = iterationResult.totalNumberOfOutputCharacters / (iterationResult.totalResponseTime / 1000);
+        const generationTime = (iterationResult.totalResponseTime || 0) - (iterationResult.timeToFirstToken || 0);
+        if (chunkCount <= 1) {
+          iterationResult.tokensPerSecond = -1;
+          iterationResult.charactersPerSecond = (iterationResult.totalResponseTime || 0) > 0 ? iterationResult.totalNumberOfOutputCharacters / ((iterationResult.totalResponseTime || 0) / 1000) : 0;
+        } else {
+          const effectiveTime = generationTime > 0 ? generationTime : (iterationResult.totalResponseTime || 0);
+          iterationResult.tokensPerSecond = effectiveTime > 0 ? iterationResult.totalNumberOfOutputTokens / (effectiveTime / 1000) : 0;
+          iterationResult.charactersPerSecond = effectiveTime > 0 ? iterationResult.totalNumberOfOutputCharacters / (effectiveTime / 1000) : 0;
+        }
+        iterationResult.inputTokensPerSecond = (iterationResult.timeToFirstToken && iterationResult.totalNumberOfInputTokens) ? iterationResult.totalNumberOfInputTokens / (iterationResult.timeToFirstToken / 1000) : -1;
         iterationResult.inputLength = this.results.input?.length || 0;
 
         const normalizedOutput = output.toLowerCase().replace(/[^a-z0-9]/g, '');

@@ -1,15 +1,21 @@
-import { Component, OnInit, HostListener, Inject, PLATFORM_ID, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID, Input } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { MathematicalCalculations } from '../cortex/axon/util/mathematical-calculations';
 import { GlobalFilterService } from '../cortex/services/global-filter.service';
+import { CortexUiHelpers } from '../cortex/util/cortex-ui.helpers';
+import { InsightsCalculator, TestMetrics } from './util/insights-calculator';
+import { AxonTestSuiteExecutor } from '../cortex/axon/axon-test-suite.executor';
+import { HardwareInfoService } from '../cortex/services/hardware-info.service';
+import { TestStatus } from '../../enums/test-status.enum';
 
 export interface LeaderboardEntry {
   id: number;
   filename: string;
   hw: string;
+  os: string;
+  ram: number;
   compute: string;
   engine: string;
   model: string;
@@ -19,17 +25,10 @@ export interface LeaderboardEntry {
   inputSpeed: number;
   charSpeed: number;
   total: number;
+  avgInputTokens: number;
+  avgOutputTokens: number;
   isCurrent: boolean;
   trend: 'best' | 'worst' | 'flat';
-}
-
-interface RawTestResult {
-  api: string;
-  ttft: number;
-  speed: number;
-  inputSpeed?: number;
-  charSpeed?: number;
-  total: number;
 }
 
 interface RawBaseline {
@@ -38,7 +37,12 @@ interface RawBaseline {
   compute: string;
   engine: string;
   model: string;
-  tests: RawTestResult[];
+  os?: string;
+  cpu?: string;
+  ram?: number;
+  executionType?: string;
+  chromeVersion?: string;
+  tests: TestMetrics[];
 }
 
 @Component({
@@ -46,9 +50,9 @@ interface RawBaseline {
   templateUrl: './cortex-insights.page.html',
   standalone: false
 })
-export class CortexInsightsPage implements OnInit {
+export class CortexInsightsPage implements OnInit, OnDestroy {
   @Input() embedded: boolean = false;
-  
+
   activeMetric: string = 'speed';
   
   dates = ["Feb 12", "Feb 28", "Mar 15", "Apr 02", "Apr 18 (Now)"];
@@ -75,32 +79,26 @@ export class CortexInsightsPage implements OnInit {
   minTtft = 0;
   minTotal = 0;
 
-  // Filters
-  hardwareOptions: string[] = ['All'];
-  computeOptions: string[] = ['All'];
-  engineOptions: string[] = ['All'];
-  variantOptions: string[] = ['All'];
-  apiOptions: string[] = ['All'];
-
-  selectedHardwares: string[] = [];
-  selectedComputes: string[] = [];
-  selectedEngines: string[] = [];
-  selectedVariants: string[] = [];
-  selectedApis: string[] = [];
-
-  activeDropdown: string | null = null;
   searchQuery: string = '';
 
-  dropdownSearch: { [key: string]: string } = {
-    hardware: '',
-    compute: '',
-    engine: '',
-    variant: '',
-    api: ''
-  };
-
-  tableSortColumn: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' = 'speed';
+  tableSortColumn: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' | 'os' | 'ram' | 'compute' | 'engine' | 'model' = 'speed';
   tableSortDirection: 'asc' | 'desc' = 'desc';
+
+  // Column visibility
+  allColumns = [
+    { key: 'hw', label: 'Hardware' },
+    { key: 'os', label: 'OS' },
+    { key: 'ram', label: 'RAM' },
+    { key: 'compute', label: 'Compute' },
+    { key: 'engine', label: 'Engine' },
+    { key: 'model', label: 'Model' },
+    { key: 'speed', label: 'Output Tokens/s' },
+    { key: 'inputSpeed', label: 'Input Tokens/s' },
+    { key: 'ttft', label: 'Avg TTFT' },
+    { key: 'total', label: 'Avg Total' },
+  ];
+  visibleColumns: Set<string> = new Set(['hw', 'os', 'ram', 'compute', 'engine', 'model', 'speed', 'inputSpeed', 'ttft', 'total']);
+  columnsDropdownOpen = false;
 
   // Chart data
   chartPointsFleet: string = "";
@@ -109,6 +107,18 @@ export class CortexInsightsPage implements OnInit {
   chartPointsTopCircles: {x: string, y: string}[] = [];
   chartPolygonFleet: string = "";
 
+  // Right panel state
+  isPanelOpen: boolean = false;
+  selectedLeaderboardEntry: LeaderboardEntry | null = null;
+  selectedBaseline: RawBaseline | null = null;
+  selectedBaselineFullData: any = null;
+  panelWidth: number = 480;
+  private isResizing = false;
+  expandedTests = new Set<string>();
+  private localResultsPollInterval: any = null;
+  private lastKnownExecutorStatus: TestStatus = TestStatus.Idle;
+  private lastKnownSuccessCount: number = 0;
+
   constructor(
     private titleService: Title,
     private metaService: Meta,
@@ -116,7 +126,9 @@ export class CortexInsightsPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    public filterService: GlobalFilterService
+    public filterService: GlobalFilterService,
+    private axonExecutor: AxonTestSuiteExecutor,
+    private hardwareService: HardwareInfoService
   ) {}
 
   ngOnInit() {
@@ -126,13 +138,38 @@ export class CortexInsightsPage implements OnInit {
     this.filterService.filtersChanged.subscribe(() => {
       this.applyFilters();
     });
+
+    // Poll executor status to refresh leaderboard when local benchmark results change
+    if (isPlatformBrowser(this.platformId)) {
+      this.localResultsPollInterval = setInterval(() => {
+        const status = this.axonExecutor.results?.status ?? TestStatus.Idle;
+        const successCount = this.axonExecutor.results?.testsResults?.filter(
+          r => r.status === TestStatus.Success
+        ).length ?? 0;
+
+        if (status !== this.lastKnownExecutorStatus || successCount !== this.lastKnownSuccessCount) {
+          this.lastKnownExecutorStatus = status;
+          this.lastKnownSuccessCount = successCount;
+          this.applyFilters();
+        }
+      }, 1000);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.localResultsPollInterval) {
+      clearInterval(this.localResultsPollInterval);
+    }
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.filter-dropdown')) {
-      this.activeDropdown = null;
+      this.filterService.activeDropdown = null;
+    }
+    if (!target.closest('.columns-dropdown')) {
+      this.columnsDropdownOpen = false;
     }
   }
 
@@ -146,32 +183,8 @@ export class CortexInsightsPage implements OnInit {
             this.http.get<any>(`/data/baselines/${item.filename}.json`).subscribe({
               next: (data) => {
                 if (!data?.results?.testsResults) { resolve(null); return; }
-                
-                const tests: RawTestResult[] = [];
-                const apiGroups = new Map<string, any[]>();
 
-                data.results.testsResults.forEach((testResult: any) => {
-                  const api = testResult.api;
-                  if (!apiGroups.has(api)) apiGroups.set(api, []);
-                  const iterations = (testResult.testIterationResults || []).filter((i: any) => i.status === 'Success');
-                  apiGroups.get(api)!.push(...iterations);
-                });
-
-                apiGroups.forEach((iterations, api) => {
-                  if (iterations.length > 0) {
-                    const tokensPerSecs = iterations.map((i: any) => i.tokensPerSecond ?? 0).filter((v: number) => v !== -1);
-                    const inputTokensPerSecs = iterations.map((i: any) => i.inputTokensPerSecond ?? 0).filter((v: number) => v !== -1);
-                    const charsPerSecs = iterations.map((i: any) => i.charactersPerSecond ?? 0);
-                    tests.push({
-                      api,
-                      ttft: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.timeToFirstToken ?? 0)),
-                      speed: tokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(tokensPerSecs) : 0,
-                      inputSpeed: inputTokensPerSecs.length > 0 ? MathematicalCalculations.calculateAverage(inputTokensPerSecs) : 0,
-                      charSpeed: MathematicalCalculations.calculateAverage(charsPerSecs),
-                      total: MathematicalCalculations.calculateAverage(iterations.map((i: any) => i.totalResponseTime ?? 0)),
-                    });
-                  }
-                });
+                const tests: TestMetrics[] = InsightsCalculator.computeTestMetrics(data.results.testsResults);
 
                 if (tests.length === 0) { resolve(null); return; }
 
@@ -179,12 +192,19 @@ export class CortexInsightsPage implements OnInit {
                 if (item.filename.toLowerCase().includes('llminferenceengine')) engine = 'LLM IE';
                 else if (item.filename.toLowerCase().includes('litertlm')) engine = 'LITERT-LM';
 
+                const chromeVersion = this.extractChromeVersion(data.userAgent || '');
+
                 resolve({
                   filename: item.filename,
-                  hw: item.hw || item.name,
+                  hw: item.hw || item.cpu || item.name,
                   compute: item.compute || item.executionType || 'CPU',
                   engine: item.engine || engine,
                   model: item.model || 'Unknown',
+                  os: item.os,
+                  cpu: item.cpu,
+                  ram: item.ram,
+                  executionType: item.executionType,
+                  chromeVersion: chromeVersion !== 'N/A' ? chromeVersion : undefined,
                   tests
                 });
               },
@@ -204,6 +224,34 @@ export class CortexInsightsPage implements OnInit {
     });
   }
 
+  private getLocalBaseline(): RawBaseline | null {
+    const results = this.axonExecutor.results;
+    if (!results?.testsResults || results.status === TestStatus.Idle) return null;
+
+    const successResults = results.testsResults.filter(r => r.status === TestStatus.Success);
+    if (successResults.length === 0) return null;
+
+    const tests = InsightsCalculator.computeTestMetrics(successResults);
+    if (tests.length === 0) return null;
+
+    const hwInfo = this.hardwareService.hardwareInfo;
+    const cpuName = hwInfo?.cpu?.modelName || 'My Machine';
+    const ramGb = hwInfo?.memory?.capacity ? Math.round(hwInfo.memory.capacity / (1024 * 1024 * 1024)) : undefined;
+    const chromeVersion = this.extractChromeVersion(navigator.userAgent || '');
+
+    return {
+      filename: 'local',
+      hw: cpuName,
+      compute: 'GPU',
+      engine: 'Local Run',
+      model: 'Current',
+      os: this.hardwareService.getOsProfile(),
+      ram: ramGb,
+      chromeVersion: chromeVersion !== 'N/A' ? chromeVersion : undefined,
+      tests,
+    };
+  }
+
   syncFromUrl() {
     const params = this.route.snapshot.queryParamMap;
     
@@ -219,11 +267,20 @@ export class CortexInsightsPage implements OnInit {
       return vals.filter(v => options.includes(v)); // safely only include valid options
     };
 
+    if (params.has('columns')) {
+      const cols = params.get('columns')!.split(',').filter(c => this.allColumns.some(ac => ac.key === c));
+      this.visibleColumns = new Set(cols);
+    }
+
     if (params.has('hardware')) this.filterService.selectedHardwares = parseArray('hardware', this.filterService.hardwareOptions);
+    if (params.has('os')) this.filterService.selectedOs = parseArray('os', this.filterService.osOptions);
+    if (params.has('ram')) this.filterService.selectedRam = parseArray('ram', this.filterService.ramOptions);
     if (params.has('compute')) this.filterService.selectedComputes = parseArray('compute', this.filterService.computeOptions);
     if (params.has('engine')) this.filterService.selectedEngines = parseArray('engine', this.filterService.engineOptions);
     if (params.has('variant')) this.filterService.selectedVariants = parseArray('variant', this.filterService.variantOptions);
     if (params.has('api')) this.filterService.selectedApis = parseArray('api', this.filterService.apiOptions);
+    if (params.has('startType')) this.filterService.selectedStartTypes = parseArray('startType', this.filterService.startTypeOptions);
+    if (params.has('chromeVersion')) this.filterService.selectedChromeVersions = parseArray('chromeVersion', this.filterService.chromeVersionOptions);
   }
 
   syncToUrl() {
@@ -240,11 +297,18 @@ export class CortexInsightsPage implements OnInit {
       else queryParams[key] = selected;
     };
 
+    // Always explicitly persist visible columns in the URL
+    queryParams['columns'] = Array.from(this.visibleColumns).join(',');
+
     syncArray('hardware', this.filterService.selectedHardwares, this.filterService.hardwareOptions);
+    syncArray('os', this.filterService.selectedOs, this.filterService.osOptions);
+    syncArray('ram', this.filterService.selectedRam, this.filterService.ramOptions);
     syncArray('compute', this.filterService.selectedComputes, this.filterService.computeOptions);
     syncArray('engine', this.filterService.selectedEngines, this.filterService.engineOptions);
     syncArray('variant', this.filterService.selectedVariants, this.filterService.variantOptions);
     syncArray('api', this.filterService.selectedApis, this.filterService.apiOptions);
+    syncArray('startType', this.filterService.selectedStartTypes, this.filterService.startTypeOptions);
+    syncArray('chromeVersion', this.filterService.selectedChromeVersions, this.filterService.chromeVersionOptions);
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -260,13 +324,23 @@ export class CortexInsightsPage implements OnInit {
     const engineSet = new Set<string>();
     const variantSet = new Set<string>();
     const apiSet = new Set<string>();
+    const osSet = new Set<string>();
+    const ramSet = new Set<string>();
+    const startTypeSet = new Set<string>();
+    const chromeVersionSet = new Set<string>();
 
     this.rawBaselines.forEach(b => {
       hwSet.add(b.hw);
       computeSet.add(b.compute);
       engineSet.add(b.engine);
       variantSet.add(b.model);
-      b.tests.forEach(t => apiSet.add(t.api));
+      if (b.os) osSet.add(b.os);
+      if (b.ram) ramSet.add(b.ram + ' GB');
+      if (b.chromeVersion) chromeVersionSet.add(b.chromeVersion);
+      b.tests.forEach(t => {
+        apiSet.add(t.api);
+        if (t.startType) startTypeSet.add(t.startType);
+      });
     });
 
     this.filterService.setOptions(
@@ -274,7 +348,11 @@ export class CortexInsightsPage implements OnInit {
       Array.from(computeSet).sort(),
       Array.from(engineSet).sort(),
       Array.from(variantSet).sort(),
-      Array.from(apiSet).sort()
+      Array.from(apiSet).sort(),
+      Array.from(osSet).sort(),
+      Array.from(ramSet).sort((a, b) => parseInt(a) - parseInt(b)),
+      Array.from(startTypeSet).sort(),
+      Array.from(chromeVersionSet).sort()
     );
   }
 
@@ -289,57 +367,76 @@ export class CortexInsightsPage implements OnInit {
       if (!this.filterService.selectedComputes.includes(b.compute)) return false;
       if (!this.filterService.selectedEngines.includes(b.engine)) return false;
       if (!this.filterService.selectedVariants.includes(b.model)) return false;
-      
+      if (b.os && !this.filterService.selectedOs.includes(b.os)) return false;
+      if (b.ram && !this.filterService.selectedRam.includes(b.ram + ' GB')) return false;
+      if (b.chromeVersion && !this.filterService.selectedChromeVersions.includes(b.chromeVersion)) return false;
+
       if (this.filterService.searchQuery) {
         const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
         if (!searchTarget.includes(this.filterService.searchQuery)) return false;
       }
-      
+
       return true;
     });
+
+    // Include local benchmark results (always shown, bypasses filters)
+    const localBaseline = this.getLocalBaseline();
+    if (localBaseline) {
+      filtered = [localBaseline, ...filtered];
+    }
 
     const newLeaderboard: LeaderboardEntry[] = [];
     let idCounter = 1;
 
     filtered.forEach(b => {
       let testsToUse = b.tests.filter(t => this.filterService.selectedApis.includes(t.api));
-      
+
+      // Filter by start type
+      testsToUse = testsToUse.filter(t => {
+        if (!t.startType) return true; // Tests without startType always pass
+        return this.filterService.selectedStartTypes.includes(t.startType);
+      });
+
       if (testsToUse.length === 0) return;
 
-      const ttft = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.ttft)));
-      const speed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.speed).filter(v => v !== -1)));
-      const inputSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.inputSpeed ?? 0).filter(v => v !== -1)));
-      const charSpeed = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.charSpeed ?? 0)));
-      const total = Math.round(MathematicalCalculations.calculateAverage(testsToUse.map(t => t.total)));
+      const agg = InsightsCalculator.aggregateTestMetrics(testsToUse);
 
       newLeaderboard.push({
         id: idCounter++,
         filename: b.filename,
         hw: b.hw,
+        os: b.os || '',
+        ram: b.ram || 0,
         compute: b.compute,
         engine: b.engine,
         model: b.model,
         apis: testsToUse.map(t => t.api),
-        ttft,
-        speed: speed || 0,
-        inputSpeed: inputSpeed || 0,
-        charSpeed,
-        total,
+        ttft: agg.ttft,
+        speed: agg.speed,
+        inputSpeed: agg.inputSpeed,
+        charSpeed: agg.charSpeed,
+        total: agg.total,
+        avgInputTokens: agg.avgInputTokens,
+        avgOutputTokens: agg.avgOutputTokens,
         isCurrent: b.filename === 'local',
         trend: 'flat'
       });
     });
 
     newLeaderboard.sort((a, b) => {
+      // Pin local "My Machine" row to the top
+      if (a.isCurrent) return -1;
+      if (b.isCurrent) return 1;
+
       let valA = (a as any)[this.tableSortColumn];
       let valB = (b as any)[this.tableSortColumn];
-      
+
       if (valA === valB) return 0;
-      
+
       if (typeof valA === 'string' && typeof valB === 'string') {
         return this.tableSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
-      
+
       if (this.tableSortDirection === 'asc') {
         return valA > valB ? 1 : -1;
       } else {
@@ -349,17 +446,20 @@ export class CortexInsightsPage implements OnInit {
 
     newLeaderboard.forEach((r, idx) => {
       r.id = idx + 1;
-      if (idx === 0) r.trend = 'best';
+      if (idx === 0 && !r.isCurrent) r.trend = 'best';
+      else if (idx === 0 && r.isCurrent) r.trend = 'flat';
+      else if (idx === 1 && newLeaderboard[0].isCurrent) r.trend = 'best';
       else if (idx === newLeaderboard.length - 1) r.trend = 'worst';
     });
 
     this.leaderboard = newLeaderboard;
 
     if (newLeaderboard.length > 0) {
-      this.fleetAvgSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.speed)));
-      this.fleetAvgInputSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.inputSpeed).filter(v => v > 0)));
-      this.fleetAvgCharSpeed = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.charSpeed)));
-      this.fleetAvgTtft = Math.round(MathematicalCalculations.calculateAverage(newLeaderboard.map(r => r.ttft)));
+      const fleet = InsightsCalculator.computeFleetMetrics(newLeaderboard);
+      this.fleetAvgSpeed = fleet.avgSpeed;
+      this.fleetAvgInputSpeed = fleet.avgInputSpeed;
+      this.fleetAvgCharSpeed = fleet.avgCharSpeed;
+      this.fleetAvgTtft = fleet.avgTtft;
 
       this.topConfig = newLeaderboard[0];
       this.topSpeed = Math.round(newLeaderboard[0].speed);
@@ -447,12 +547,12 @@ export class CortexInsightsPage implements OnInit {
     this.applyFilters();
   }
 
-  setTableSort(column: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw') {
+  setTableSort(column: 'speed' | 'inputSpeed' | 'charSpeed' | 'ttft' | 'total' | 'hw' | 'os' | 'ram' | 'compute' | 'engine' | 'model') {
     if (this.tableSortColumn === column) {
       this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.tableSortColumn = column;
-      this.tableSortDirection = (column === 'ttft' || column === 'total' || column === 'hw') ? 'asc' : 'desc';
+      this.tableSortDirection = (column === 'ttft' || column === 'total' || column === 'hw' || column === 'os' || column === 'compute' || column === 'engine' || column === 'model') ? 'asc' : 'desc';
     }
     this.applyFilters();
   }
@@ -479,8 +579,8 @@ export class CortexInsightsPage implements OnInit {
       if (value === 'Cloud') return this.getBadgeClass('cloud');
       return this.getBadgeClass('emerald');
     }
-    if (filterType === 'engine') return this.getBadgeClass('default');
-    if (filterType === 'variant') return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    if (filterType === 'engine') return CortexUiHelpers.getEngineColorClass(value);
+    if (filterType === 'variant') return CortexUiHelpers.getVariantColorClass(value);
     if (filterType === 'api') return 'bg-gray-100 border-gray-200 text-gray-700 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400';
     return this.getBadgeClass('default');
   }
@@ -513,5 +613,153 @@ export class CortexInsightsPage implements OnInit {
     if (ratio <= 0.5) return '#eab308'; // yellow-500
     if (ratio <= 0.75) return '#f97316'; // orange-500
     return '#f43f5e'; // rose-500
+  }
+
+  getRank(row: LeaderboardEntry, metric: 'speed' | 'inputSpeed' | 'ttft' | 'total'): number {
+    const lowerIsBetter = metric === 'ttft' || metric === 'total';
+    const sorted = [...this.leaderboard].sort((a, b) =>
+      lowerIsBetter ? a[metric] - b[metric] : b[metric] - a[metric]
+    );
+    return sorted.findIndex(r => r.filename === row.filename) + 1;
+  }
+
+  getRankSuffix(rank: number): string {
+    if (rank % 100 >= 11 && rank % 100 <= 13) return 'th';
+    switch (rank % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
+  openPanel(row: LeaderboardEntry) {
+    this.selectedLeaderboardEntry = row;
+    this.selectedBaseline = this.rawBaselines.find(b => b.filename === row.filename) || null;
+    this.selectedBaselineFullData = null;
+    this.isPanelOpen = true;
+
+    if (row.filename !== 'local') {
+      this.http.get<any>(`/data/baselines/${row.filename}.json`).subscribe({
+        next: (data) => this.selectedBaselineFullData = data,
+        error: () => this.selectedBaselineFullData = null
+      });
+    }
+  }
+
+  startResize(event: MouseEvent) {
+    this.isResizing = true;
+    event.preventDefault();
+    const onMouseMove = (e: MouseEvent) => {
+      if (!this.isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      this.panelWidth = Math.max(360, Math.min(newWidth, window.innerWidth * 0.8));
+    };
+    const onMouseUp = () => {
+      this.isResizing = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+
+  closePanel() {
+    this.isPanelOpen = false;
+    this.selectedLeaderboardEntry = null;
+    this.selectedBaseline = null;
+    this.selectedBaselineFullData = null;
+    this.expandedTests.clear();
+  }
+
+  toggleTestExpansion(testId: string) {
+    if (this.expandedTests.has(testId)) {
+      this.expandedTests.delete(testId);
+    } else {
+      this.expandedTests.add(testId);
+    }
+  }
+
+  getSuccessIterations(iterations: any[]): any[] {
+    return (iterations || []).filter((i: any) => i.status === 'Success');
+  }
+
+  formatBytes(bytes: number): string {
+    if (!bytes) return 'N/A';
+    const gb = bytes / (1024 * 1024 * 1024);
+    return gb >= 1 ? `${Math.round(gb)} GB` : `${Math.round(gb * 1024)} MB`;
+  }
+
+  extractChromeVersion(userAgent: string): string {
+    if (!userAgent) return 'N/A';
+    const match = userAgent.match(/Chrome\/(\d+)/);
+    return match ? `Chrome ${match[1]}` : 'N/A';
+  }
+
+  formatTimestamp(timestamp: string): string {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  exportCsv(): void {
+    const headers = ['Hardware', 'OS', 'RAM (GB)', 'Compute', 'Engine', 'Model', 'Output Tokens/s', 'Input Tokens/s', 'Avg TTFT (ms)', 'Avg Total (ms)'];
+    const escape = (v: string) => v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
+    const rows = this.leaderboard.map(r => [
+      escape(r.hw), escape(r.os || 'N/A'), r.ram > 0 ? r.ram.toString() : 'N/A', escape(r.compute), escape(r.engine), escape(r.model),
+      r.speed > 0 ? r.speed.toFixed(1) : 'N/A',
+      r.inputSpeed > 0 ? r.inputSpeed.toFixed(1) : 'N/A',
+      r.ttft > 0 ? r.ttft.toFixed(0) : 'N/A',
+      r.total > 0 ? r.total.toFixed(0) : 'N/A',
+    ].join(','));
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `${today}-cortex-insights.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  isColumnVisible(key: string): boolean {
+    return this.visibleColumns.has(key);
+  }
+
+  toggleColumn(key: string, checked: boolean): void {
+    if (checked) {
+      this.visibleColumns.add(key);
+    } else {
+      this.visibleColumns.delete(key);
+    }
+    this.syncToUrl();
+  }
+
+  toggleColumnsDropdown(event: Event): void {
+    event.stopPropagation();
+    this.columnsDropdownOpen = !this.columnsDropdownOpen;
+    this.filterService.activeDropdown = null;
+  }
+
+  startTypeLabel = (value: string): string => {
+    if (value === 'cold') return 'Cold Start';
+    if (value === 'warm') return 'Warm Start';
+    return value;
+  };
+
+  getOsIcon(os?: string): string {
+    if (!os) return 'bi-pc-horizontal';
+    const lower = os.toLowerCase();
+    if (lower.includes('mac')) return 'bi-apple';
+    if (lower.includes('windows')) return 'bi-windows';
+    if (lower.includes('linux')) return 'bi-ubuntu';
+    if (lower.includes('cloud')) return 'bi-cloud';
+    return 'bi-pc-horizontal';
   }
 }

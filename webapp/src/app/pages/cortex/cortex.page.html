@@ -140,7 +140,7 @@
              <i class="bi bi-play-fill"></i> Run Cortex Test
           }
         </button>
-        @if (!isExtensionInstalled) {
+        @if (!hardwareService.isExtensionInstalled) {
           <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
              class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30 dark:hover:bg-amber-500/20 transition-colors">
             <i class="bi bi-puzzle"></i> Install WebAI Extension
@@ -171,101 +171,14 @@
        </div>
        
       <div class="flex flex-wrap items-center gap-2 shrink-0">
-        <!-- Hardware Filter -->
-        <div class="relative filter-dropdown">
-          <button (click)="filterService.toggleDropdown('hardware', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedHardwares.length > 0 && filterService.selectedHardwares.length < filterService.hardwareOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">HW:</span>
-            <span [ngClass]="filterService.selectedHardwares.length > 0 && filterService.selectedHardwares.length < filterService.hardwareOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ filterService.selectedHardwares.length === filterService.hardwareOptions.length ? 'All' : (filterService.selectedHardwares.length === 0 ? 'None' : (filterService.selectedHardwares.length === 1 ? filterService.selectedHardwares[0] : filterService.selectedHardwares.length + ' Sel')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
-          </button>
-          @if (filterService.activeDropdown === 'hardware') {
-            <div class="absolute top-full right-0 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('hardware', $event)" [value]="filterService.dropdownSearch['hardware'] || ''">
-              </div>
-              <div class="max-h-48 overflow-y-auto py-1">
-                @for (opt of filterService.getFilteredOptions('hardware'); track opt) {
-                  <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="filterService.isFilterSelected('hardware', opt)" [class.text-slate-700]="!filterService.isFilterSelected('hardware', opt)" [class.dark:text-indigo-400]="filterService.isFilterSelected('hardware', opt)" [class.dark:text-slate-300]="!filterService.isFilterSelected('hardware', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3" [checked]="filterService.isFilterSelected('hardware', opt)" (change)="filterService.selectFilter('hardware', opt, $event.target.checked)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- Compute Filter -->
-        <div class="relative filter-dropdown">
-          <button (click)="filterService.toggleDropdown('compute', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedComputes.length > 0 && filterService.selectedComputes.length < filterService.computeOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Compute:</span>
-            <span [ngClass]="filterService.selectedComputes.length > 0 && filterService.selectedComputes.length < filterService.computeOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ filterService.selectedComputes.length === filterService.computeOptions.length ? 'All' : (filterService.selectedComputes.length === 0 ? 'None' : (filterService.selectedComputes.length === 1 ? filterService.selectedComputes[0] : filterService.selectedComputes.length + ' Sel')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
-          </button>
-          @if (filterService.activeDropdown === 'compute') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('compute', $event)" [value]="filterService.dropdownSearch['compute'] || ''">
-              </div>
-              <div class="max-h-48 overflow-y-auto py-1">
-                @for (opt of filterService.getFilteredOptions('compute'); track opt) {
-                  <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="filterService.isFilterSelected('compute', opt)" [class.text-slate-700]="!filterService.isFilterSelected('compute', opt)" [class.dark:text-indigo-400]="filterService.isFilterSelected('compute', opt)" [class.dark:text-slate-300]="!filterService.isFilterSelected('compute', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3" [checked]="filterService.isFilterSelected('compute', opt)" (change)="filterService.selectFilter('compute', opt, $event.target.checked)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- Engine Filter -->
-        <div class="relative filter-dropdown">
-          <button (click)="filterService.toggleDropdown('engine', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedEngines.length > 0 && filterService.selectedEngines.length < filterService.engineOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Engine:</span>
-            <span [ngClass]="filterService.selectedEngines.length > 0 && filterService.selectedEngines.length < filterService.engineOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ filterService.selectedEngines.length === filterService.engineOptions.length ? 'All' : (filterService.selectedEngines.length === 0 ? 'None' : (filterService.selectedEngines.length === 1 ? filterService.selectedEngines[0] : filterService.selectedEngines.length + ' Sel')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
-          </button>
-          @if (filterService.activeDropdown === 'engine') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('engine', $event)" [value]="filterService.dropdownSearch['engine'] || ''">
-              </div>
-              <div class="max-h-48 overflow-y-auto py-1">
-                @for (opt of filterService.getFilteredOptions('engine'); track opt) {
-                  <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="filterService.isFilterSelected('engine', opt)" [class.text-slate-700]="!filterService.isFilterSelected('engine', opt)" [class.dark:text-indigo-400]="filterService.isFilterSelected('engine', opt)" [class.dark:text-slate-300]="!filterService.isFilterSelected('engine', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3" [checked]="filterService.isFilterSelected('engine', opt)" (change)="filterService.selectFilter('engine', opt, $event.target.checked)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- Variant Filter -->
-        <div class="relative filter-dropdown">
-          <button (click)="filterService.toggleDropdown('variant', $event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all" [ngClass]="filterService.selectedVariants.length > 0 && filterService.selectedVariants.length < filterService.variantOptions.length ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
-            <span class="opacity-60">Variant:</span>
-            <span [ngClass]="filterService.selectedVariants.length > 0 && filterService.selectedVariants.length < filterService.variantOptions.length ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'">{{ filterService.selectedVariants.length === filterService.variantOptions.length ? 'All' : (filterService.selectedVariants.length === 0 ? 'None' : (filterService.selectedVariants.length === 1 ? filterService.selectedVariants[0] : filterService.selectedVariants.length + ' Sel')) }}</span>
-            <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
-          </button>
-          @if (filterService.activeDropdown === 'variant') {
-            <div class="absolute top-full right-0 mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
-              <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
-                <input type="text" placeholder="Search..." class="w-full text-[10px] px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-800 dark:text-slate-200 placeholder-slate-400" (input)="filterService.onDropdownSearch('variant', $event)" [value]="filterService.dropdownSearch['variant'] || ''">
-              </div>
-              <div class="max-h-48 overflow-y-auto py-1">
-                @for (opt of filterService.getFilteredOptions('variant'); track opt) {
-                  <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800" [class.text-indigo-600]="filterService.isFilterSelected('variant', opt)" [class.text-slate-700]="!filterService.isFilterSelected('variant', opt)" [class.dark:text-indigo-400]="filterService.isFilterSelected('variant', opt)" [class.dark:text-slate-300]="!filterService.isFilterSelected('variant', opt)">
-                    <input type="checkbox" class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3" [checked]="filterService.isFilterSelected('variant', opt)" (change)="filterService.selectFilter('variant', opt, $event.target.checked)">
-                    {{ opt }}
-                  </label>
-                }
-              </div>
-            </div>
-          }
-        </div>
+        <app-cortex-filter-dropdown filterType="hardware" label="HW:" dropdownWidth="w-56"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="os" label="OS:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="ram" label="RAM:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="compute" label="Compute:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="engine" label="Engine:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="variant" label="Model:"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="startType" label="Start:" [labelTransform]="startTypeLabel"></app-cortex-filter-dropdown>
+        <app-cortex-filter-dropdown filterType="chromeVersion" label="Chrome:"></app-cortex-filter-dropdown>
 
         <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1"></div>
         
@@ -273,7 +186,7 @@
       </div></header>
 
     <!-- Extension Warning Banner -->
-    @if (!isExtensionInstalled) {
+    @if (!hardwareService.isExtensionInstalled) {
       <div class="px-8 py-2.5 bg-amber-50 dark:bg-amber-500/10 border-b border-amber-200 dark:border-amber-500/20 flex items-center justify-between gap-4 shrink-0">
         <div class="flex items-center gap-2 text-xs font-medium text-amber-800 dark:text-amber-300">
           <i class="bi bi-exclamation-triangle-fill text-amber-500"></i>
@@ -381,7 +294,7 @@
                       <td class="px-3 py-1.5 align-middle">
                         <div class="flex items-center gap-1.5">
                           <i class="bi bi-snow2 text-blue-500 dark:text-blue-400 text-[9px]"></i>
-                          <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ getComputeUnit() }}</span>
+                          <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ hardwareService.getComputeUnit() }}</span>
                           <span class="px-1 py-px rounded bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-[8px] font-bold uppercase">Cold</span>
                         </div>
                       </td>
@@ -438,7 +351,7 @@
                       <td class="px-3 py-1.5 align-middle">
                         <div class="flex items-center gap-1.5">
                           <i class="bi bi-fire text-orange-500 dark:text-orange-400 text-[9px]"></i>
-                          <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ getComputeUnit() }}</span>
+                          <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ hardwareService.getComputeUnit() }}</span>
                           <span class="px-1 py-px rounded bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300 text-[8px] font-bold uppercase">Warm</span>
                         </div>
                       </td>
@@ -507,7 +420,7 @@
                               <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getExecutionTypeColorClass(bDetails?.executionType)">{{ bDetails?.executionType }}</span>
                             }
                             @if (baseline.engine) {
-                              <span class="px-1 py-px rounded text-[8px] font-bold uppercase border bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">{{ baseline.engine }}</span>
+                              <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getEngineColorClass(baseline.engine)">{{ baseline.engine }}</span>
                             }
                           </div>
                         </td>
@@ -840,22 +753,22 @@
               <!-- Benchmark Comparison Table -->
               @let activeTestForBenchmark = getTestById(activeTestIdInLab || scen.tests[0].id);
               @if (activeTestForBenchmark) {
-                  @let testLocalSummary = getSummaryResults(scen.api, activeTestForBenchmark.results.startType, true);
+                  @let testLocalSummary = getTestSpecificSummaryResults(activeTestForBenchmark.id);
                   @let testLocalTtft = testLocalSummary?.averageTimeToFirstToken;
                   @let testLocalTotal = testLocalSummary?.averageTotalResponseTime;
                   @let testLocalInTok = testLocalSummary?.averageInputTokens;
                   @let testLocalInSpeed = testLocalSummary?.averageInputTokensPerSecond;
                   @let testLocalOutSpeed = testLocalSummary?.averageTokenPerSecond;
 
-                  @let testAllTtft = getTestAllValues(scen.api, 'ttft', testLocalTtft, null);
+                  @let testAllTtft = getTestSpecificAllValues(activeTestForBenchmark.id, 'ttft', testLocalTtft);
                   @let testMaxTtft = getMaxArray(testAllTtft);
-                  @let testAllTotal = getTestAllValues(scen.api, 'total', testLocalTotal, null);
+                  @let testAllTotal = getTestSpecificAllValues(activeTestForBenchmark.id, 'total', testLocalTotal);
                   @let testMaxTotal = getMaxArray(testAllTotal);
-                  @let testAllInTok = getTestAllValues(scen.api, 'inputTokens', testLocalInTok, null);
+                  @let testAllInTok = getTestSpecificAllValues(activeTestForBenchmark.id, 'inputTokens', testLocalInTok);
                   @let testMaxInTok = getMaxArray(testAllInTok);
-                  @let testAllInSpeed = getTestAllValues(scen.api, 'inputSpeed', testLocalInSpeed, null);
+                  @let testAllInSpeed = getTestSpecificAllValues(activeTestForBenchmark.id, 'inputSpeed', testLocalInSpeed);
                   @let testMaxInSpeed = getMaxArray(testAllInSpeed);
-                  @let testAllOutSpeed = getTestAllValues(scen.api, 'speed', testLocalOutSpeed, null);
+                  @let testAllOutSpeed = getTestSpecificAllValues(activeTestForBenchmark.id, 'speed', testLocalOutSpeed);
                   @let testMaxOutSpeed = getMaxArray(testAllOutSpeed);
 
                   <div class="mt-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -892,7 +805,7 @@
                             <td class="px-3 py-1.5 align-middle">
                               <div class="flex items-center gap-1.5">
                                 <i class="bi" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'bi-snow2 text-blue-500 dark:text-blue-400' : 'bi-fire text-orange-500 dark:text-orange-400'" class="text-[9px]"></i>
-                                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ getComputeUnit() }}</span>
+                                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Local {{ hardwareService.getComputeUnit() }}</span>
                                 <span class="px-1 py-px rounded text-[8px] font-bold uppercase" [ngClass]="activeTestForBenchmark.results.startType === 'cold' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'">{{ activeTestForBenchmark.results.startType === 'cold' ? 'Cold' : 'Warm' }}</span>
                               </div>
                             </td>
@@ -953,8 +866,8 @@
                           </tr>
 
                           <!-- Baseline Rows -->
-                          @for (baseline of getSortedBaselines(scen.api, selectedTestIds); track baseline.id) {
-                            @let bSummary = comparisonService.getSummaryResults(baseline.data, scen.api, selectedTestIds, true);
+                          @for (baseline of getSortedBaselinesForTest(activeTestForBenchmark.id); track baseline.id) {
+                            @let bSummary = comparisonService.getTestSpecificSummaryResults(baseline.data, activeTestForBenchmark.id);
                             @let bTtft = bSummary?.averageTimeToFirstToken || 0;
                             @let bTotal = bSummary?.averageTotalResponseTime || 0;
                             @let bInTok = bSummary?.averageInputTokens || 0;
@@ -969,7 +882,7 @@
                                     <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getExecutionTypeColorClass(bDetails?.executionType)">{{ bDetails?.executionType }}</span>
                                   }
                                   @if (baseline.engine) {
-                                    <span class="px-1 py-px rounded text-[8px] font-bold uppercase border bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">{{ baseline.engine }}</span>
+                                    <span class="px-1 py-px rounded text-[8px] font-bold uppercase border" [ngClass]="getEngineColorClass(baseline.engine)">{{ baseline.engine }}</span>
                                   }
                                 </div>
                               </td>
@@ -1092,7 +1005,7 @@
              <span class="text-rose-500 font-bold text-xs flex items-center gap-1 bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded"><i class="bi bi-x-circle-fill"></i> {{ stats.failed }}</span>
           </div>
 
-          @if (!isExtensionInstalled) {
+          @if (!hardwareService.isExtensionInstalled) {
             <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider" (click)="$event.stopPropagation()">
               <i class="bi bi-exclamation-triangle-fill text-amber-500"></i>
               <span>Extension Required</span>
@@ -1122,14 +1035,14 @@
        <!-- Local Target (inline in header) -->
        <div class="hidden xl:flex items-center gap-2 text-[9px] text-slate-500 dark:text-slate-400 shrink-0 mr-4" (click)="$event.stopPropagation()">
          <i class="bi bi-pc-display text-slate-400"></i>
-         <span class="font-bold uppercase tracking-wider">{{ getComputeUnit() }}</span>
+         <span class="font-bold uppercase tracking-wider">{{ hardwareService.getComputeUnit() }}</span>
          <span class="text-slate-300 dark:text-slate-600">|</span>
-         <span class="font-bold uppercase tracking-wider text-purple-500 dark:text-purple-400">{{ getNpuInfo() }}</span>
+         <span class="font-bold uppercase tracking-wider text-purple-500 dark:text-purple-400">{{ hardwareService.getNpuInfo() }}</span>
          <span class="text-slate-300 dark:text-slate-600">|</span>
-         <span class="font-bold uppercase tracking-wider">{{ getMemoryInfo() }}</span>
+         <span class="font-bold uppercase tracking-wider">{{ hardwareService.getMemoryInfo() }}</span>
          <span class="text-slate-300 dark:text-slate-600">|</span>
-         <span class="font-bold uppercase tracking-wider">{{ getOsProfile() }}</span>
-         @if (isExtensionInstalled) {
+         <span class="font-bold uppercase tracking-wider">{{ hardwareService.getOsProfile() }}</span>
+         @if (hardwareService.isExtensionInstalled) {
            <span class="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30">READY</span>
          }
        </div>
@@ -1259,83 +1172,24 @@
 
   <!-- Share Modal -->
   @if (showShareModal) {
-    <div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="closeShareModal()">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg mx-4 p-6" (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="bi bi-share text-indigo-500"></i> Share Report
-          </h3>
-          <button (click)="closeShareModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-
-        @if (isGeneratingUrl) {
-          <div class="flex items-center justify-center gap-3 py-8 text-slate-500 dark:text-slate-400">
-            <i class="bi bi-arrow-repeat animate-spin text-indigo-500 text-xl"></i>
-            <span class="text-sm font-medium">Generating shareable URL...</span>
-          </div>
-        } @else if (generatedShareUrl) {
-          <div class="space-y-4">
-            <p class="text-xs text-slate-500 dark:text-slate-400">Copy the URL below to share your benchmark results. The report data is compressed and embedded in the URL.</p>
-            <div class="flex items-center gap-2">
-              <input type="text" readonly [value]="generatedShareUrl" class="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono select-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <button (click)="copyShareUrl()" class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-lg transition-all" [ngClass]="isUrlCopied ? 'bg-emerald-500 text-white' : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md'">
-                <i class="bi" [ngClass]="isUrlCopied ? 'bi-check-lg' : 'bi-clipboard'"></i>
-                {{ isUrlCopied ? 'Copied!' : 'Copy' }}
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
+    <app-cortex-share-modal
+      [isGeneratingUrl]="isGeneratingUrl"
+      [generatedShareUrl]="generatedShareUrl"
+      [isUrlCopied]="isUrlCopied"
+      (close)="closeShareModal()"
+      (copyUrl)="copyShareUrl()">
+    </app-cortex-share-modal>
   }
 
   <!-- Extension Required Modal -->
   @if (showExtensionModal) {
-    <div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="showExtensionModal = false">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md mx-4 p-6" (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="bi bi-puzzle text-amber-500"></i> Extension Required
-          </h3>
-          <button (click)="showExtensionModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-        <div class="space-y-4">
-          <div class="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg">
-            <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
-            <div class="text-sm text-amber-800 dark:text-amber-300">
-              The <strong>WebAI Extension</strong> is required to run Cortex benchmarks. It provides access to Chrome's built-in AI APIs and hardware information.
-            </div>
-          </div>
-          <div class="text-xs text-slate-500 dark:text-slate-400 space-y-2">
-            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">1.</span> Install the extension from the Chrome Web Store</div>
-            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">2.</span> Reload this page after installation</div>
-            <div class="flex items-start gap-2"><span class="font-bold text-slate-700 dark:text-slate-300 shrink-0">3.</span> Click "Run Cortex Test" to start benchmarking</div>
-          </div>
-          <div class="flex items-center gap-3 pt-2">
-            <a href="https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp" target="_blank" rel="noopener noreferrer"
-               class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md">
-              <i class="bi bi-download"></i> Install Extension
-            </a>
-            <button (click)="reloadPage()" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors">
-              <i class="bi bi-arrow-clockwise"></i> Reload Page
-            </button>
-          </div>
-          <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-3">
-            <button (click)="runWithoutExtension()" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors">
-              <i class="bi bi-play-fill"></i> Run without extension
-            </button>
-            <label class="flex items-center gap-2 cursor-pointer justify-center">
-              <input type="checkbox" [checked]="skipExtensionCheck" (change)="toggleSkipExtensionCheck()" class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 dark:bg-slate-800 dark:border-slate-600">
-              <span class="text-[11px] text-slate-400 dark:text-slate-500">Don't ask again</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-cortex-extension-modal
+      [skipExtensionCheck]="skipExtensionCheck"
+      (close)="showExtensionModal = false"
+      (reload)="reloadPage()"
+      (runWithout)="runWithoutExtension()"
+      (toggleSkip)="toggleSkipExtensionCheck()">
+    </app-cortex-extension-modal>
   }
 
   <!-- Shared File Input for Imports -->

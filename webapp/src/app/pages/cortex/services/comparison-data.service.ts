@@ -1,8 +1,7 @@
 import {Injectable, Inject, PLATFORM_ID} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AxonSummaryResultsInterface} from '../axon/interfaces/axon-summary-results.interface';
-import {MathematicalCalculations} from '../axon/util/mathematical-calculations';
-import {TestStatus} from '../../../enums/test-status.enum';
+import {SummaryResultsCalculator} from '../axon/util/summary-results.calculator';
 import { isPlatformBrowser } from '@angular/common';
 import { GlobalFilterService } from './global-filter.service';
 
@@ -64,7 +63,9 @@ export class ComparisonDataService {
       if (!this.filterService.selectedComputes.includes(b.compute)) return false;
       if (!this.filterService.selectedEngines.includes(b.engine)) return false;
       if (!this.filterService.selectedVariants.includes(b.model || 'Unknown')) return false;
-      
+      if (b.os && !this.filterService.selectedOs.includes(b.os)) return false;
+      if (b.ram && !this.filterService.selectedRam.includes(b.ram + ' GB')) return false;
+
       if (this.filterService.searchQuery) {
         const searchTarget = `${b.hw} ${b.model} ${b.engine} ${b.compute}`.toLowerCase();
         if (!searchTarget.includes(this.filterService.searchQuery)) return false;
@@ -83,6 +84,8 @@ export class ComparisonDataService {
             const engineSet = new Set<string>();
             const variantSet = new Set<string>();
             const apiSet = new Set<string>();
+            const osSet = new Set<string>();
+            const ramSet = new Set<string>();
 
             // Auto fetch all baselines
             let fetches = 0;
@@ -95,7 +98,7 @@ export class ComparisonDataService {
                      else if (fn.includes('litertlm')) engine = 'LITERT-LM';
                    }
 
-                   const hw = idx.hw || idx.name;
+                   const hw = idx.hw || idx.cpu || idx.name;
                    const compute = idx.compute || idx.executionType || 'CPU';
 
                    this._allBaselines.push({ id: idx.filename, name: idx.name, data: jsonData, os: idx.os, cpu: idx.cpu, ram: idx.ram, model: idx.model, executionType: idx.executionType, hw, compute, engine });
@@ -104,6 +107,8 @@ export class ComparisonDataService {
                    computeSet.add(compute);
                    engineSet.add(engine);
                    variantSet.add(idx.model || "Unknown");
+                   if (idx.os) osSet.add(idx.os);
+                   if (idx.ram) ramSet.add(idx.ram + ' GB');
                    if ((jsonData as any).results && (jsonData as any).results.testsResults) {
                      (jsonData as any).results.testsResults.forEach((t: any) => {
                        apiSet.add(t.api);
@@ -112,7 +117,7 @@ export class ComparisonDataService {
 
                    fetches++;
                    if (fetches === data.length) {
-                     this.filterService.setOptions(Array.from(hwSet).sort(), Array.from(computeSet).sort(), Array.from(engineSet).sort(), Array.from(variantSet).sort(), Array.from(apiSet).sort());
+                     this.filterService.setOptions(Array.from(hwSet).sort(), Array.from(computeSet).sort(), Array.from(engineSet).sort(), Array.from(variantSet).sort(), Array.from(apiSet).sort(), Array.from(osSet).sort(), Array.from(ramSet).sort((a, b) => parseInt(a) - parseInt(b)));
                    }
                });
             });
@@ -120,54 +125,29 @@ export class ComparisonDataService {
     });
   }
 getSummaryResults(reportData: any, builtInAIApi: string | number, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData?.results?.testsResults) return undefined;
 
-    const results = reportData.results.testsResults;
-    const items = results.filter((value: any) => {
-      return value.api === builtInAIApi && (ignoreSelection || selectedTestIds.has(value.id));
-    }).map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { api: builtInAIApi, selectedTestIds, ignoreSelection }
+    );
+  }
 
-    if (items.length === 0) return undefined;
+  getTestSpecificSummaryResults(reportData: any, testId: string): AxonSummaryResultsInterface | undefined {
+    if (!reportData?.results?.testsResults) return undefined;
 
-    const calcAvg = (key: string) => {
-      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some((item: any) => item[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-      averageTokenPerSecond: calcAvg('tokensPerSecond'),
-      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-      averageTotalResponseTime: calcAvg('totalResponseTime'),
-      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-    };
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { testId, ignoreSelection: true }
+    );
   }
 
   getGlobalSummaryResults(reportData: any, selectedTestIds: Set<string>, ignoreSelection: boolean = false): AxonSummaryResultsInterface | undefined {
-    if (!reportData || !reportData.results || !reportData.results.testsResults) return undefined;
+    if (!reportData?.results?.testsResults) return undefined;
 
-    const results = reportData.results.testsResults;
-    const items = results.filter((value: any) => ignoreSelection || selectedTestIds.has(value.id))
-      .map((item: any) => item.testIterationResults || []).flat(1).filter((item: any) => item.status === TestStatus.Success);
-
-    if (items.length === 0) return undefined;
-
-    const calcAvg = (key: string) => {
-      const validVals = items.map((item: any) => item[key]).filter((v: any) => v != null && v !== 0 && v !== -1);
-      if (validVals.length > 0) return MathematicalCalculations.calculateAverage(validVals);
-      if (items.some((item: any) => item[key] === -1)) return -1;
-      return 0;
-    };
-
-    return {
-      averageTokenPerSecond: calcAvg('tokensPerSecond'),
-      averageInputTokensPerSecond: calcAvg('inputTokensPerSecond'),
-      averageCharactersPerSecond: calcAvg('charactersPerSecond'),
-      averageTimeToFirstToken: calcAvg('timeToFirstToken'),
-      averageTotalResponseTime: calcAvg('totalResponseTime'),
-      averageInputTokens: calcAvg('totalNumberOfInputTokens'),
-    };
-  }}
+    return SummaryResultsCalculator.fromTestResults(
+      reportData.results.testsResults,
+      { selectedTestIds, ignoreSelection }
+    );
+  }
+}

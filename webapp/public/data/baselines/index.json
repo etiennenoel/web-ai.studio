@@ -1,7 +1,7 @@
 [
   {
     "filename": "2026-04-07-apple-m4-max-64gb-litertlm",
-    "name": "Apple M4 Max (LiteRT-LM)",
+    "name": "macOS Apple M4 Max 64GB",
     "os": "macOS",
     "cpu": "Apple M4 Max",
     "ram": 64,
@@ -10,7 +10,7 @@
   },
   {
     "filename": "2026-04-07-apple-m4-max-64gb-llminferenceengine",
-    "name": "Apple M4 Max (LLM IE)",
+    "name": "macOS Apple M4 Max 64GB",
     "os": "macOS",
     "cpu": "Apple M4 Max",
     "ram": 64,
@@ -19,7 +19,7 @@
   },
   {
     "filename": "2026-04-07-apple-m1-max-64gb-litertlm",
-    "name": "Apple M1 Max (LiteRT-LM)",
+    "name": "macOS Apple M1 Max 64GB",
     "os": "macOS",
     "cpu": "Apple M1 Max",
     "ram": 64,
@@ -28,7 +28,7 @@
   },
   {
     "filename": "2026-04-07-apple-m1-max-64gb-llminferenceengine",
-    "name": "Apple M1 Max (LLM IE)",
+    "name": "macOS Apple M1 Max 64GB",
     "os": "macOS",
     "cpu": "Apple M1 Max",
     "ram": 64,
@@ -37,7 +37,7 @@
   },
   {
     "filename": "2026-04-07-apple-m3-ultra-96gb-litertlm",
-    "name": "Apple M3 Ultra (LiteRT-LM)",
+    "name": "macOS Apple M3 Ultra 96GB",
     "os": "macOS",
     "cpu": "Apple M3 Ultra",
     "ram": 96,
@@ -46,7 +46,7 @@
   },
   {
     "filename": "2026-04-07-apple-m3-ultra-96gb-llminferenceengine",
-    "name": "Apple M3 Ultra (LLM IE)",
+    "name": "macOS Apple M3 Ultra 96GB",
     "os": "macOS",
     "cpu": "Apple M3 Ultra",
     "ram": 96,
@@ -55,7 +55,7 @@
   },
   {
     "filename": "2026-04-08-apple-m4-16gb-litertlm",
-    "name": "Apple M4 (LiteRT-LM)",
+    "name": "macOS Apple M4 16GB",
     "os": "macOS",
     "cpu": "Apple M4",
     "ram": 16,
@@ -64,7 +64,7 @@
   },
   {
     "filename": "2026-04-08-apple-m4-16gb-llminferenceengine",
-    "name": "Apple M4 (LLM IE)",
+    "name": "macOS Apple M4 16GB",
     "os": "macOS",
     "cpu": "Apple M4",
     "ram": 16,
@@ -73,21 +73,21 @@
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash",
-    "name": "Gemini 3.1 Flash",
+    "name": "Cloud Gemini 3.1 Flash",
     "os": "Cloud",
     "model": "Gemini 3.1 Flash",
     "executionType": "Cloud"
   },
   {
     "filename": "2026-04-03_gemini_3.1_flash_lite",
-    "name": "Gemini 3.1 Flash Lite",
+    "name": "Cloud Gemini 3.1 Flash Lite",
     "os": "Cloud",
     "model": "Gemini 3.1 Flash Lite",
     "executionType": "Cloud"
   },
   {
     "filename": "2026-04-06-linux-AMD-7985WX-270gb-litertlm",
-    "name": "AMD 7985WX (LiteRT-LM)",
+    "name": "Linux AMD 7985WX 270GB",
     "os": "Linux",
     "cpu": "AMD 7985WX",
     "ram": 270,
@@ -96,7 +96,7 @@
   },
   {
     "filename": "2026-04-06-linux-AMD-7985WX-270gb-llminferenceengine",
-    "name": "AMD 7985WX (LLM IE)",
+    "name": "Linux AMD 7985WX 270GB",
     "os": "Linux",
     "cpu": "AMD 7985WX",
     "ram": 270,
@@ -118,25 +118,85 @@
     "os": "Windows",
     "cpu": "Intel Core i7-13800H - Nvidia RTX 4000",
     "ram": 64,
-    "model": "Nano V3 4B",
+    "model": "Nano V3 2B",
     "executionType": "GPU"
   },
   {
     "filename": "2026-04-07-windows-amd-epyc-240gb-litertlm",
-    "name": "AMD EPYC (LiteRT-LM)",
+    "name": "Windows AMD EPYC 240GB",
     "os": "Windows",
     "cpu": "AMD EPYC",
     "ram": 240,
-    "model": "Nano V3 4B",
-    "executionType": "GPU"
+    "model": "Nano V3 2B",
+    "executionType": "CPU"
   },
   {
     "filename": "2026-04-07-windows-amd-epyc-240gb-llminferenceengine",
-    "name": "AMD EPYC (LLM IE)",
+    "name": "Windows AMD EPYC 240GB",
     "os": "Windows",
     "cpu": "AMD EPYC",
     "ram": 240,
     "model": "Nano V3 4B",
+    "executionType": "CPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma3-4b",
+    "name": "macOS Apple M1 Max 64GB",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Gemma3 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma3n-4b",
+    "name": "macOS Apple M1 Max 64GB",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Gemma3n 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma3-4b",
+    "name": "macOS Apple M3 Ultra 96GB",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma3 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma3n-4b",
+    "name": "macOS Apple M3 Ultra 96GB",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma3n 4B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m1-max-64gb-lmstudio-gemma4-2b",
+    "name": "macOS Apple M1 Max 64GB",
+    "os": "macOS",
+    "cpu": "Apple M1 Max",
+    "ram": 64,
+    "model": "Gemma4 2B",
+    "engine": "LM Studio",
+    "executionType": "GPU"
+  },
+  {
+    "filename": "2026-04-09-apple-m3-ultra-96gb-lmstudio-gemma4-2b",
+    "name": "macOS Apple M3 Ultra 96GB",
+    "os": "macOS",
+    "cpu": "Apple M3 Ultra",
+    "ram": 96,
+    "model": "Gemma4 2B",
+    "engine": "LM Studio",
     "executionType": "GPU"
   },
   {

@@ -1,0 +1,30 @@
+<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="close.emit()">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg mx-4 p-6" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="bi bi-share text-indigo-500"></i> Share Report
+      </h3>
+      <button (click)="close.emit()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    @if (isGeneratingUrl) {
+      <div class="flex items-center justify-center gap-3 py-8 text-slate-500 dark:text-slate-400">
+        <i class="bi bi-arrow-repeat animate-spin text-indigo-500 text-xl"></i>
+        <span class="text-sm font-medium">Generating shareable URL...</span>
+      </div>
+    } @else if (generatedShareUrl) {
+      <div class="space-y-4">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Copy the URL below to share your benchmark results. The report data is compressed and embedded in the URL.</p>
+        <div class="flex items-center gap-2">
+          <input type="text" readonly [value]="generatedShareUrl" class="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-slate-700 dark:text-slate-300 font-mono select-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button (click)="copyUrl.emit()" class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-lg transition-all" [ngClass]="isUrlCopied ? 'bg-emerald-500 text-white' : 'bg-indigo-500 hover:bg-indigo-600 text-white shadow-md'">
+            <i class="bi" [ngClass]="isUrlCopied ? 'bi-check-lg' : 'bi-clipboard'"></i>
+            {{ isUrlCopied ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

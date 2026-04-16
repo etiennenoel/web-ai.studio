@@ -23,7 +23,7 @@
   }
 
   <main class="max-w-[1600px] mx-auto px-6 py-8 flex flex-col gap-6">
-    
+
     <!-- TOP ROW: KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -74,10 +74,10 @@
     </div>
 
     <!-- BOTTOM ROW: The Leaderboard Matrix -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg overflow-hidden flex flex-col">
-      
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg flex flex-col">
+
       <!-- Table Header Controls -->
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/30">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/30 rounded-t-2xl relative z-10">
         <div class="flex items-center gap-3">
           <i class="bi bi-hdd-network text-indigo-400 text-xl"></i>
           <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Benchmarks</h2>
@@ -107,6 +107,43 @@
               </div>
             }
           </div>
+          <!-- Columns Dropdown -->
+          <div class="relative columns-dropdown">
+            <button (click)="toggleColumnsDropdown($event)"
+              class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all"
+              [ngClass]="visibleColumns.size < allColumns.length
+                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'">
+              <i class="bi bi-layout-three-columns"></i>
+              <span>Columns</span>
+              <i class="bi bi-chevron-down opacity-50 ml-0.5 text-[9px]"></i>
+            </button>
+            @if (columnsDropdownOpen) {
+              <div class="absolute top-full right-0 mt-1 w-52 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-[100] dark:bg-slate-900 dark:border-slate-800" (click)="$event.stopPropagation()">
+                <div class="max-h-64 overflow-y-auto py-1">
+                  @for (col of allColumns; track col.key) {
+                    <label class="w-full flex items-center px-3 py-1.5 text-[10px] font-medium hover:bg-slate-50 transition-colors cursor-pointer dark:hover:bg-slate-800"
+                      [class.text-indigo-600]="isColumnVisible(col.key)"
+                      [class.text-slate-700]="!isColumnVisible(col.key)"
+                      [class.dark:text-indigo-400]="isColumnVisible(col.key)"
+                      [class.dark:text-slate-300]="!isColumnVisible(col.key)">
+                      <input type="checkbox"
+                        class="mr-2 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:border-slate-600 dark:text-indigo-500 dark:bg-slate-800 w-3 h-3"
+                        [checked]="isColumnVisible(col.key)"
+                        (change)="toggleColumn(col.key, $event.target.checked)">
+                      {{ col.label }}
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <button (click)="exportCsv()"
+            class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            title="Export to CSV">
+            <i class="bi bi-download"></i>
+            <span>Export (.csv)</span>
+          </button>
           <div class="relative">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-500"></i>
             <input
@@ -121,41 +158,90 @@
       </div>
 
       <!-- The Data Matrix -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[1000px]">
+      <div class="overflow-x-auto overflow-y-hidden rounded-b-2xl">
+        <table class="w-full text-left border-collapse min-w-[1200px]">
           <thead>
             <tr class="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
-              <th class="px-6 py-3 w-16 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-center">Rank</th>
-              <th class="px-4 py-3 w-80 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('hw')">
+              @if (isColumnVisible('hw')) {
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('hw')">
                 <div class="flex items-center justify-start gap-1.5">
-                  <span>Hardware & Config</span>
+                  <span>Hardware</span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'hw' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'hw' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'hw'}"></i>
                 </div>
               </th>
+              }
+              @if (isColumnVisible('os')) {
+              <th class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('os')">
+                <div class="flex items-center justify-start gap-1.5">
+                  <span>OS</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'os' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'os' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'os'}"></i>
+                </div>
+              </th>
+              }
+              @if (isColumnVisible('ram')) {
+              <th class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th text-right" (click)="setTableSort('ram')">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>RAM</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'ram' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'ram' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'ram'}"></i>
+                </div>
+              </th>
+              }
+              @if (isColumnVisible('compute')) {
+              <th class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('compute')">
+                <div class="flex items-center justify-start gap-1.5">
+                  <span>Compute</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'compute' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'compute' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'compute'}"></i>
+                </div>
+              </th>
+              }
+              @if (isColumnVisible('engine')) {
+              <th class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('engine')">
+                <div class="flex items-center justify-start gap-1.5">
+                  <span>Engine</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'engine' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'engine' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'engine'}"></i>
+                </div>
+              </th>
+              }
+              @if (isColumnVisible('model')) {
+              <th class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('model')">
+                <div class="flex items-center justify-start gap-1.5">
+                  <span>Model</span>
+                  <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'model' && tableSortDirection === 'asc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'model' && tableSortDirection === 'desc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'model'}"></i>
+                </div>
+              </th>
+              }
+              @if (isColumnVisible('speed')) {
               <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('speed')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Output Tokens/s</span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'speed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'speed'}"></i>
                 </div>
               </th>
+              }
+              @if (isColumnVisible('inputSpeed')) {
               <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('inputSpeed')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Input Tokens/s</span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-down text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'desc', 'bi-arrow-up text-indigo-500': tableSortColumn === 'inputSpeed' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'inputSpeed'}"></i>
                 </div>
               </th>
-                            <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('ttft')">
+              }
+              @if (isColumnVisible('ttft')) {
+              <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('ttft')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Avg TTFT <span class="opacity-50 lowercase">(ms)</span></span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'desc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'ttft' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'ttft'}"></i>
                 </div>
               </th>
+              }
+              @if (isColumnVisible('total')) {
               <th class="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right pr-8 cursor-pointer hover:text-slate-800 dark:hover:text-slate-300 transition-colors select-none group/th" (click)="setTableSort('total')">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Avg Total <span class="opacity-50 lowercase">(ms)</span></span>
                   <i class="bi text-xs transition-opacity" [ngClass]="{'bi-arrow-up text-indigo-500': tableSortColumn === 'total' && tableSortDirection === 'desc', 'bi-arrow-down text-indigo-500': tableSortColumn === 'total' && tableSortDirection === 'asc', 'bi-arrow-down-up opacity-30 group-hover/th:opacity-100': tableSortColumn !== 'total'}"></i>
                 </div>
               </th>
+              }
               <th class="px-4 py-3 w-16"></th>
             </tr>
           </thead>
@@ -164,117 +250,142 @@
               @let speedWidth = (row.speed / maxSpeed) * 100;
               @let isCurrent = row.isCurrent;
 
-              <tr class="group transition-colors" [ngClass]="isCurrent ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'">
-                <!-- Rank -->
-                <td class="px-6 py-4 text-center align-middle">
-                  <div class="w-6 h-6 mx-auto rounded flex items-center justify-center text-xs font-bold"
-                       [ngClass]="idx === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
-                                  idx === 1 ? 'bg-slate-300/20 text-slate-300 border border-slate-400/30' : 
-                                  idx === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 
-                                  'text-slate-500 dark:text-slate-500'">
-                    {{ idx + 1 }}
-                  </div>
-                </td>
-
-                <!-- Hardware Config -->
+              <tr class="group transition-colors cursor-pointer" [ngClass]="isCurrent ? 'bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100/80 dark:hover:bg-blue-900/30 border-l-2 border-l-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'" (click)="openPanel(row)">
+                <!-- Hardware -->
+                @if (isColumnVisible('hw')) {
                 <td class="px-4 py-4 align-middle">
-                  <div class="flex flex-col gap-1.5">
-                    <div class="flex items-center gap-2">
-                      <span class="text-sm font-bold tracking-tight" [ngClass]="isCurrent ? 'text-indigo-400' : 'text-slate-800 dark:text-slate-200'">
-                        {{ row.hw }}
-                      </span>
-                      @if (isCurrent) {
-                        <span class="px-1.5 py-0.5 rounded bg-indigo-500 text-slate-900 dark:text-white text-[9px] font-bold uppercase tracking-widest">You</span>
-                      }
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('compute', row.compute)">
-                        <i class="bi" [ngClass]="getFilterIcon('compute', row.compute)"></i> {{ row.compute }}
-                      </span>
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', row.engine)">
-                        <i class="bi" [ngClass]="getFilterIcon('engine', row.engine)"></i> {{ row.engine }}
-                      </span>
-                      <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 ml-1">{{ row.model }}</span>
-                    </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold tracking-tight whitespace-nowrap" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : 'text-slate-800 dark:text-slate-200'">
+                      {{ row.hw }}
+                    </span>
+                    @if (isCurrent) {
+                      <span class="px-1.5 py-0.5 rounded bg-blue-500 text-white text-[9px] font-bold uppercase tracking-widest">You</span>
+                    }
                   </div>
                 </td>
+                }
+                <!-- OS -->
+                @if (isColumnVisible('os')) {
+                <td class="px-3 py-4 align-middle">
+                  <span class="text-xs font-semibold whitespace-nowrap" [ngClass]="isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'">{{ row.os || 'N/A' }}</span>
+                </td>
+                }
+                <!-- RAM -->
+                @if (isColumnVisible('ram')) {
+                <td class="px-3 py-4 align-middle text-right">
+                  @if (row.ram > 0) {
+                    <span class="text-xs font-semibold tabular-nums" [ngClass]="isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'">{{ row.ram }}</span><span class="text-[9px] ml-0.5" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">GB</span>
+                  } @else {
+                    <span class="text-xs font-semibold" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">N/A</span>
+                  }
+                </td>
+                }
+                <!-- Compute -->
+                @if (isColumnVisible('compute')) {
+                <td class="px-3 py-4 align-middle">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('compute', row.compute)">
+                    <i class="bi" [ngClass]="getFilterIcon('compute', row.compute)"></i> {{ row.compute }}
+                  </span>
+                </td>
+                }
+                <!-- Engine -->
+                @if (isColumnVisible('engine')) {
+                <td class="px-3 py-4 align-middle">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('engine', row.engine)">
+                    <i class="bi" [ngClass]="getFilterIcon('engine', row.engine)"></i> {{ row.engine }}
+                  </span>
+                </td>
+                }
+                <!-- Model Variant -->
+                @if (isColumnVisible('model')) {
+                <td class="px-3 py-4 align-middle">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border whitespace-nowrap" [ngClass]="isCurrent ? 'bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/50 dark:text-blue-300' : getFilterBadgeClass('variant', row.model)">{{ row.model }}</span>
+                </td>
+                }
 
                 <!-- Output Tokens/s Cell -->
+                @if (isColumnVisible('speed')) {
                 <td class="px-4 py-4 align-middle pr-8 text-right">
                   <div class="flex flex-col items-end gap-1.5">
                     @if (row.speed > 0) {
                       <div class="flex items-center gap-2">
-                        @if (row.speed === maxSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                        @if (row.speed === minSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.speed === maxSpeed && maxSpeed !== minSpeed ? 'text-emerald-400' : (row.speed === minSpeed && maxSpeed !== minSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        @if (!isCurrent && row.speed === maxSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                        @if (!isCurrent && row.speed === minSpeed && maxSpeed !== minSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                        <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.speed === maxSpeed && maxSpeed !== minSpeed ? 'text-emerald-400' : (row.speed === minSpeed && maxSpeed !== minSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                           {{ row.speed | number:'1.0-0' }}
                         </span>
                       </div>
-                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
+                      <div class="w-24 h-1 rounded-full overflow-hidden flex justify-end" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                        <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getSpeedColor(row.speed, minSpeed, maxSpeed)" [style.width]="speedWidth + '%'"></div>
                       </div>
                     } @else {
                       <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
                     }
                   </div>
                 </td>
+                }
 
                 <!-- Input Tokens/s Cell -->
+                @if (isColumnVisible('inputSpeed')) {
                 <td class="px-4 py-4 align-middle pr-8 text-right">
                   <div class="flex flex-col items-end gap-1.5">
                     @if (row.inputSpeed > 0) {
                       <div class="flex items-center gap-2">
-                        @if (row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
-                        @if (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
-                        <span class="text-sm font-bold tabular-nums" [ngClass]="row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-emerald-400' : (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                        @if (!isCurrent && row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-up-arrow text-emerald-400 text-xs"></i> }
+                        @if (!isCurrent && row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed) { <i class="bi bi-graph-down-arrow text-rose-400 text-xs"></i> }
+                        <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.inputSpeed === maxInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-emerald-400' : (row.inputSpeed === minInputSpeed && maxInputSpeed !== minInputSpeed ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                           {{ row.inputSpeed | number:'1.0-0' }}
                         </span>
                       </div>
-                      <div class="w-24 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-end">
-                        <div class="h-full rounded-full transition-colors" [style.background-color]="getSpeedColor(row.inputSpeed, minInputSpeed, maxInputSpeed)" [style.width]="speedWidth + '%'"></div>
+                      <div class="w-24 h-1 rounded-full overflow-hidden flex justify-end" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                        <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getSpeedColor(row.inputSpeed, minInputSpeed, maxInputSpeed)" [style.width]="speedWidth + '%'"></div>
                       </div>
                     } @else {
-                      <span class="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</span>
+                      <span class="text-sm font-semibold" [ngClass]="isCurrent ? 'text-blue-400 dark:text-blue-500' : 'text-slate-400 dark:text-slate-500'">N/A</span>
                     }
                   </div>
                 </td>
-
+                }
 
                 <!-- TTFT Cell -->
+                @if (isColumnVisible('ttft')) {
                 <td class="px-4 py-4 align-middle text-right pr-8">
                   <div class="flex flex-col items-end gap-1.5">
                     <div class="flex items-center gap-2">
-                      @if (row.ttft === minTtft && maxTtft !== minTtft) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
-                      @if (row.ttft === maxTtft && maxTtft !== minTtft) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
-                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.ttft === minTtft && maxTtft !== minTtft ? 'text-emerald-400' : (row.ttft === maxTtft && maxTtft !== minTtft ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                      @if (!isCurrent && row.ttft === minTtft && maxTtft !== minTtft) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (!isCurrent && row.ttft === maxTtft && maxTtft !== minTtft) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.ttft === minTtft && maxTtft !== minTtft ? 'text-emerald-400' : (row.ttft === maxTtft && maxTtft !== minTtft ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                         {{ row.ttft | number:'1.0-0' }}
                       </span>
                     </div>
-                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
-                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.ttft, minTtft, maxTtft)" [style.width]="(row.ttft / maxTtft) * 100 + '%'"></div>
+                    <div class="w-32 h-1 rounded-full overflow-hidden flex justify-start" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getTimeColor(row.ttft, minTtft, maxTtft)" [style.width]="(row.ttft / maxTtft) * 100 + '%'"></div>
                     </div>
                   </div>
                 </td>
+                }
 
                 <!-- Total Time Cell -->
+                @if (isColumnVisible('total')) {
                 <td class="px-4 py-4 align-middle text-right pr-8">
                   <div class="flex flex-col items-end gap-1.5">
                     <div class="flex items-center gap-2">
-                      @if (row.total === minTotal && maxTotal !== minTotal) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
-                      @if (row.total === maxTotal && maxTotal !== minTotal) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
-                      <span class="text-sm font-bold tabular-nums" [ngClass]="row.total === minTotal && maxTotal !== minTotal ? 'text-emerald-400' : (row.total === maxTotal && maxTotal !== minTotal ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200')">
+                      @if (!isCurrent && row.total === minTotal && maxTotal !== minTotal) { <i class="bi bi-graph-down-arrow text-emerald-400 text-xs"></i> }
+                      @if (!isCurrent && row.total === maxTotal && maxTotal !== minTotal) { <i class="bi bi-graph-up-arrow text-rose-400 text-xs"></i> }
+                      <span class="text-sm font-bold tabular-nums" [ngClass]="isCurrent ? 'text-blue-700 dark:text-blue-300' : (row.total === minTotal && maxTotal !== minTotal ? 'text-emerald-400' : (row.total === maxTotal && maxTotal !== minTotal ? 'text-rose-400' : 'text-slate-800 dark:text-slate-200'))">
                         {{ row.total | number:'1.0-0' }}
                       </span>
                     </div>
-                    <div class="w-32 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex justify-start">
-                      <div class="h-full rounded-full transition-colors" [style.background-color]="getTimeColor(row.total, minTotal, maxTotal)" [style.width]="(row.total / maxTotal) * 100 + '%'"></div>
+                    <div class="w-32 h-1 rounded-full overflow-hidden flex justify-start" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-slate-100 dark:bg-slate-800'">
+                      <div class="h-full rounded-full transition-colors" [style.background-color]="isCurrent ? '#3b82f6' : getTimeColor(row.total, minTotal, maxTotal)" [style.width]="(row.total / maxTotal) * 100 + '%'"></div>
                     </div>
                   </div>
                 </td>
+                }
 
                 <!-- Action -->
                 <td class="px-4 py-4 align-middle text-center">
-                  <button class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white flex items-center justify-center transition-colors mx-auto">
+                  <button (click)="openPanel(row)" class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors mx-auto" [ngClass]="isCurrent ? 'bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white'">
                     <i class="bi bi-chevron-right"></i>
                   </button>
                 </td>
@@ -286,4 +397,455 @@
     </div>
 
   </main>
+
+  <!-- RIGHT PANEL OVERLAY -->
+  @if (isPanelOpen && selectedLeaderboardEntry) {
+    @let entry = selectedLeaderboardEntry;
+    @let baseline = selectedBaseline;
+    @let fullData = selectedBaselineFullData;
+    @let hw = fullData?.hardware;
+
+    <!-- Panel -->
+    <div class="fixed top-0 right-0 bottom-0 z-[101] flex" [style.width.px]="panelWidth">
+      <!-- Resize handle - flex child so it's never covered by the scrollable area -->
+      <div class="w-2 flex-shrink-0 cursor-col-resize hover:bg-indigo-500/30 active:bg-indigo-500/50 transition-colors" (mousedown)="startResize($event)"></div>
+      <!-- Scrollable content -->
+      <div class="flex-1 min-w-0 overflow-y-auto bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
+
+      <!-- Panel Header -->
+      <div class="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+              <i class="bi bi-cpu text-white text-base"></i>
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">{{ entry.hw }}</h2>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('compute', entry.compute)">
+                  <i class="bi" [ngClass]="getFilterIcon('compute', entry.compute)"></i> {{ entry.compute }}
+                </span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('engine', entry.engine)">
+                  <i class="bi" [ngClass]="getFilterIcon('engine', entry.engine)"></i> {{ entry.engine }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button (click)="closePanel()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center transition-colors flex-shrink-0">
+            <i class="bi bi-x-lg text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="px-6 py-5 space-y-6">
+
+        <!-- Identity Card -->
+        <section>
+          <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">System Information</h3>
+          <div class="grid grid-cols-2 gap-3">
+            @if (baseline?.os) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi text-xs" [ngClass]="getOsIcon(baseline?.os)"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">OS</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.os }}</span>
+              </div>
+            }
+            @if (baseline?.cpu) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-cpu text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">CPU</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.cpu }}</span>
+              </div>
+            }
+            @if (baseline?.ram) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-memory text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">RAM</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ baseline?.ram }} GB</span>
+              </div>
+            }
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-seam text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Model</span>
+              </div>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border" [ngClass]="getFilterBadgeClass('variant', entry.model)">{{ entry.model }}</span>
+            </div>
+            @if (fullData?.timestamp) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-calendar3 text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Date</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ formatTimestamp(fullData.timestamp) }}</span>
+              </div>
+            }
+            @if (fullData?.userAgent) {
+              <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                  <i class="bi bi-globe text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Browser</span>
+                </div>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ extractChromeVersion(fullData.userAgent) }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Overall Performance -->
+        <section>
+          <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Overall Performance</h3>
+          <div class="grid grid-cols-2 gap-3">
+            @let speedRank = getRank(entry, 'speed');
+            @let inputSpeedRank = getRank(entry, 'inputSpeed');
+            @let ttftRank = getRank(entry, 'ttft');
+            @let totalRank = getRank(entry, 'total');
+            @let total_count = leaderboard.length;
+
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-speedometer2 text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Output t/s</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="speedRank === 1 ? 'text-emerald-500' : speedRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ speedRank }}{{ getRankSuffix(speedRank) }} / {{ total_count }}</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.speed > 0 ? (entry.speed | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.speed > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-box-arrow-in-right text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Input t/s</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="inputSpeedRank === 1 ? 'text-emerald-500' : inputSpeedRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ inputSpeedRank }}{{ getRankSuffix(inputSpeedRank) }} / {{ total_count }}</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.inputSpeed > 0 ? (entry.inputSpeed | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.inputSpeed > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-stopwatch text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Avg TTFT</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="ttftRank === 1 ? 'text-emerald-500' : ttftRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ ttftRank }}{{ getRankSuffix(ttftRank) }} / {{ total_count }}</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.ttft | number:'1.0-0' }}</span>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500">ms</span>
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500">
+                  <i class="bi bi-clock-history text-xs"></i>
+                  <span class="text-[9px] font-bold uppercase tracking-widest">Avg Total</span>
+                </div>
+                <span class="text-[9px] font-bold tabular-nums" [ngClass]="totalRank === 1 ? 'text-emerald-500' : totalRank === total_count ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500'">{{ totalRank }}{{ getRankSuffix(totalRank) }} / {{ total_count }}</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.total | number:'1.0-0' }}</span>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500">ms</span>
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-arrow-in-down text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Input Tokens</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.avgInputTokens > 0 ? (entry.avgInputTokens | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.avgInputTokens > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">tokens</span>
+                }
+              </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 mb-1">
+                <i class="bi bi-box-arrow-up text-xs"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Avg Output Tokens</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{{ entry.avgOutputTokens > 0 ? (entry.avgOutputTokens | number:'1.0-0') : 'N/A' }}</span>
+                @if (entry.avgOutputTokens > 0) {
+                  <span class="text-[9px] text-slate-400 dark:text-slate-500">tokens</span>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Per-API Breakdown -->
+        @if (baseline && baseline.tests.length > 0) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Per-API Breakdown</h3>
+            <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
+              <table class="w-full text-left min-w-[520px]">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest sticky left-0 bg-slate-50 dark:bg-slate-800/50">API</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Avg In</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Avg Out</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Out t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">In t/s</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">TTFT</th>
+                    <th class="px-3 py-2 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                  @for (test of baseline.tests; track test.api) {
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td class="px-3 py-2.5">
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">{{ test.api }}</span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.avgInputTokens ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.avgInputTokens ? (test.avgInputTokens | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.avgOutputTokens ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.avgOutputTokens ? (test.avgOutputTokens | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="test.speed > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ test.speed > 0 ? (test.speed | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="(test.inputSpeed ?? 0) > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                          {{ (test.inputSpeed ?? 0) > 0 ? (test.inputSpeed! | number:'1.0-0') : 'N/A' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-200">
+                          {{ test.ttft | number:'1.0-0' }}
+                          <span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                        </span>
+                      </td>
+                      <td class="px-3 py-2.5 text-right">
+                        <span class="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-200">
+                          {{ test.total | number:'1.0-0' }}
+                          <span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        <!-- Per-Test Raw Results -->
+        @if (selectedBaselineFullData?.results?.testsResults) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Per-Test Results</h3>
+            <div class="space-y-2">
+              @for (testResult of selectedBaselineFullData.results.testsResults; track testResult.id) {
+                @let successIterations = getSuccessIterations(testResult.testIterationResults);
+                <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <!-- Test header (clickable to expand) -->
+                  <button class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between text-left" (click)="toggleTestExpansion(testResult.id)">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <i class="bi text-xs transition-transform" [ngClass]="expandedTests.has(testResult.id) ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                      <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider truncate">{{ testResult.api }}</span>
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider"
+                            [ngClass]="testResult.startType === 'cold' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'">
+                        {{ testResult.startType }}
+                      </span>
+                    </div>
+                    <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500 flex-shrink-0 ml-2">{{ successIterations.length }}/{{ testResult.numberOfIterations }} pass</span>
+                  </button>
+                  <!-- Expanded iteration details -->
+                  @if (expandedTests.has(testResult.id)) {
+                    <div class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                      @for (iter of testResult.testIterationResults; track $index; let i = $index) {
+                        <div class="px-3 py-2 text-[10px]" [ngClass]="iter.status === 'Success' ? '' : 'opacity-50'">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="font-bold text-slate-600 dark:text-slate-400">Iteration {{ i + 1 }}</span>
+                            <span class="font-bold px-1.5 py-0.5 rounded"
+                                  [ngClass]="iter.status === 'Success' ? 'text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-500/20' : 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-500/20'">
+                              {{ iter.status }}
+                            </span>
+                          </div>
+                          @if (iter.status === 'Success') {
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">TTFT</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.timeToFirstToken | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Total</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalResponseTime | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Creation</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.creationTime | number:'1.1-1' }} <span class="text-slate-400 dark:text-slate-600">ms</span></span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out t/s</span>
+                                <span class="font-bold tabular-nums" [ngClass]="iter.tokensPerSecond > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                                  {{ iter.tokensPerSecond > 0 ? (iter.tokensPerSecond | number:'1.1-1') : (iter.tokensPerSecond === -1 ? 'N/A' : '0') }}
+                                </span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">In t/s</span>
+                                <span class="font-bold tabular-nums" [ngClass]="iter.inputTokensPerSecond > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'">
+                                  {{ iter.inputTokensPerSecond > 0 ? (iter.inputTokensPerSecond | number:'1.1-1') : (iter.inputTokensPerSecond === -1 ? 'N/A' : '0') }}
+                                </span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Chars/s</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.charactersPerSecond | number:'1.1-1' }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">In Tokens</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfInputTokens ?? 0 }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out Tokens</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfOutputTokens ?? 0 }}</span>
+                              </div>
+                              <div class="flex justify-between">
+                                <span class="text-slate-500 dark:text-slate-500">Out Chars</span>
+                                <span class="font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ iter.totalNumberOfOutputCharacters ?? 0 }}</span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Hardware Details -->
+        @if (hw) {
+          <section>
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Hardware Details</h3>
+            <div class="space-y-2">
+              @if (hw.cpu?.archName) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Architecture</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.cpu.archName }}</span>
+                </div>
+              }
+              @if (hw.cpu?.numOfProcessors) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">CPU Cores</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.cpu.numOfProcessors }}</span>
+                </div>
+              }
+              @if (hw.memory?.capacity) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Total Memory</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ formatBytes(hw.memory.capacity) }}</span>
+                </div>
+              }
+              @if (hw.memory?.availableCapacity) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Available Memory</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ formatBytes(hw.memory.availableCapacity) }}</span>
+                </div>
+              }
+              @if (hw.navigator?.deviceMemory) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Device Memory (JS)</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.navigator.deviceMemory }} GB</span>
+                </div>
+              }
+              @if (hw.webgpu?.vendor) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">WebGPU Vendor</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.webgpu.vendor }}</span>
+                </div>
+              }
+              @if (hw.webgpu?.architecture) {
+                <div class="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">WebGPU Architecture</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ hw.webgpu.architecture }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Per-API Cold/Warm Summary -->
+        @if (fullData?.results?.summary) {
+          <section class="pb-6">
+            <h3 class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Cold vs Warm Breakdown</h3>
+            <div class="space-y-3">
+              @for (apiEntry of fullData.results.summary | keyvalue; track apiEntry.key) {
+                @let apiSummary = apiEntry.value;
+                @let hasColdData = apiSummary.cold && (apiSummary.cold.averageTokenPerSecond > 0 || apiSummary.cold.averageTimeToFirstToken > 0);
+                @let hasWarmData = apiSummary.warm && (apiSummary.warm.averageTokenPerSecond > 0 || apiSummary.warm.averageTimeToFirstToken > 0);
+                @if (hasColdData || hasWarmData) {
+                  <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                    <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                      <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{{ apiEntry.key }}</span>
+                    </div>
+                    <div class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                      @if (hasColdData) {
+                        <div class="px-3 py-2 flex items-center justify-between">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30">
+                            <i class="bi bi-snow"></i> Cold
+                          </span>
+                          <div class="flex items-center gap-4 text-xs">
+                            @if (apiSummary.cold.averageTokenPerSecond > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.cold.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span></span>
+                            }
+                            @if (apiSummary.cold.averageTimeToFirstToken > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.cold.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">ms ttft</span></span>
+                            }
+                          </div>
+                        </div>
+                      }
+                      @if (hasWarmData) {
+                        <div class="px-3 py-2 flex items-center justify-between">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30">
+                            <i class="bi bi-fire"></i> Warm
+                          </span>
+                          <div class="flex items-center gap-4 text-xs">
+                            @if (apiSummary.warm.averageTokenPerSecond > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.warm.averageTokenPerSecond | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">t/s</span></span>
+                            }
+                            @if (apiSummary.warm.averageTimeToFirstToken > 0) {
+                              <span class="tabular-nums font-bold text-slate-800 dark:text-slate-200">{{ apiSummary.warm.averageTimeToFirstToken | number:'1.0-0' }} <span class="text-[9px] text-slate-400 dark:text-slate-500">ms ttft</span></span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+      </div>
+      </div><!-- end scrollable content -->
+    </div>
+  }
 </div>

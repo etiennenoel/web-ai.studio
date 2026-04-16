@@ -1,10 +1,14 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { CortexInsightsPage } from './cortex-insights.page';
+import { CortexFilterDropdownComponent } from '../cortex/components/filter-dropdown/filter-dropdown.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { PLATFORM_ID } from '@angular/core';
+import { AxonTestSuiteExecutor } from '../cortex/axon/axon-test-suite.executor';
+import { HardwareInfoService } from '../cortex/services/hardware-info.service';
+import { TestStatus } from '../../enums/test-status.enum';
 
 describe('CortexInsightsPage', () => {
   let component: CortexInsightsPage;
@@ -18,12 +22,14 @@ describe('CortexInsightsPage', () => {
     const metaSpy = jasmine.createSpyObj('Meta', ['updateTag']);
 
     await TestBed.configureTestingModule({
-      declarations: [CortexInsightsPage],
+      declarations: [CortexInsightsPage, CortexFilterDropdownComponent],
       imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [
         { provide: Title, useValue: titleSpy },
         { provide: Meta, useValue: metaSpy },
-        { provide: PLATFORM_ID, useValue: 'browser' }
+        { provide: PLATFORM_ID, useValue: 'browser' },
+        { provide: AxonTestSuiteExecutor, useValue: { results: { status: TestStatus.Idle, testsResults: [] } } },
+        { provide: HardwareInfoService, useValue: { hardwareInfo: null, isExtensionInstalled: false, getOsProfile: () => 'Unknown' } }
       ]
     }).compileComponents();
 
@@ -434,8 +440,8 @@ describe('CortexInsightsPage', () => {
     expect(component.chartPointsTop).toBe('');
 
     component.topConfig = {
-      id: 1, filename: 'test', hw: 'test', compute: 'test', engine: 'test', model: 'test',
-      apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, isCurrent: false, trend: 'best'
+      id: 1, filename: 'test', hw: 'test', os: '', ram: 0, compute: 'test', engine: 'test', model: 'test',
+      apis: [], ttft: 100, speed: 200, inputSpeed: 100, charSpeed: 1000, total: 500, avgInputTokens: 0, avgOutputTokens: 0, isCurrent: false, trend: 'best'
     };
     component.activeMetric = 'speed';
     component.fleetAvgSpeed = 100;
