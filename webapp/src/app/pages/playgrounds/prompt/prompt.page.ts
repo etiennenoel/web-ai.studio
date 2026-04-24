@@ -15,6 +15,14 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   
   // State
   availabilityStatus: string | null = null;
+  
+  availabilityTimeMs: number | null = null;
+  sessionCreationTimeMs: number | null = null;
+  executionTimeMs: number | null = null;
+
+  private availabilityTimer: any = null;
+  private sessionTimer: any = null;
+  private executionTimer: any = null;
   session: any = null;
   clonedSession: any = null;
   
@@ -127,6 +135,9 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroySession();
     this.destroyClonedSession();
+    if (this.availabilityTimer) clearInterval(this.availabilityTimer);
+    if (this.sessionTimer) clearInterval(this.sessionTimer);
+    if (this.executionTimer) clearInterval(this.executionTimer);
   }
 
   isInputDropdownOpen = false;
@@ -406,16 +417,28 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   async checkAvailability() {
     const ai = this.getLanguageModel();
     if (!ai) {
-      this.availabilityStatus = 'API not found. Is the flag enabled?';
+      this.availabilityStatus = 'API not found.';
       return;
     }
+
+    this.availabilityTimeMs = 0;
+    const startTime = performance.now();
+    this.availabilityTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.availabilityTimeMs = Math.floor(performance.now() - startTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
+
     try {
       this.availabilityStatus = 'Checking...';
-      const options = this.getCreateOptions();
-      const status = await ai.availability(options);
+      const status = await ai.availability(this.getCreateOptions());
       this.availabilityStatus = status;
     } catch (e: any) {
       this.availabilityStatus = 'Error: ' + e.message;
+    } finally {
+      clearInterval(this.availabilityTimer);
+      this.availabilityTimeMs = Math.floor(performance.now() - startTime);
     }
   }
 
@@ -429,6 +452,15 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     this.isCreating = true;
     this.errorMessage = '';
     this.downloadProgress = 0;
+
+    this.sessionCreationTimeMs = 0;
+    const sessionStartTime = performance.now();
+    this.sessionTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.sessionCreationTimeMs = Math.floor(performance.now() - sessionStartTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
     this.isDownloading = false;
 
     if (this.playgroundForm.value.useAbortSignal) {
@@ -469,6 +501,8 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       this.errorMessage = e.message || 'Failed to create session';
       this.isDownloading = false;
     } finally {
+      clearInterval(this.sessionTimer);
+      this.sessionCreationTimeMs = Math.floor(performance.now() - sessionStartTime);
       this.isCreating = false;
       this.creationAbortController = null;
     }
@@ -504,6 +538,15 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     this.isPrompting = true;
     this.errorMessage = '';
     this.fullOutput = '';
+
+    this.executionTimeMs = 0;
+    const execStartTime = performance.now();
+    this.executionTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.executionTimeMs = Math.floor(performance.now() - execStartTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
     this.outputChunks = [];
     
     if (this.playgroundForm.value.useAbortSignal) {
@@ -567,6 +610,8 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
       this.errorMessage = e.message || 'Error during prompt';
     } finally {
       this.isPrompting = false;
+      clearInterval(this.executionTimer);
+      this.executionTimeMs = Math.floor(performance.now() - execStartTime);
       this.activeAbortController = null;
     }
   }

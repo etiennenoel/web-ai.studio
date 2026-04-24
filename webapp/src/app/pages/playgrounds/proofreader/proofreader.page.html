@@ -93,6 +93,9 @@
                   [ngClass]="{'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20': availabilityStatus === 'available', 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20': availabilityStatus !== 'available'}">
               {{availabilityStatus}}
             </span>
+            <span *ngIf="availabilityTimeMs !== null" class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+              {{availabilityTimeMs}}ms
+            </span>
           </div>
         </div>
         <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
@@ -127,7 +130,7 @@
           </div>
 
           <div *ngIf="isCreating" class="rounded-lg px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-500/20 shadow-sm flex flex-col items-center justify-center gap-2 w-full sm:w-auto min-w-[280px]">
-            <div class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin text-lg"></i> Initializing Session...</div>
+            <div class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin text-lg"></i> Initializing Session... <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span></div>
             <div *ngIf="isDownloading" class="w-full bg-indigo-200 dark:bg-indigo-900/50 h-1.5 mt-1 overflow-hidden shadow-inner" style="border-radius: 9999px !important;">
               <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 transition-all duration-300 ease-out" style="border-radius: 9999px !important;" [style.width]="downloadProgress + '%'"></div>
             </div>
@@ -135,7 +138,7 @@
 
           <div *ngIf="session" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
              <div class="rounded-lg px-5 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
-                <i class="bi bi-check-circle-fill"></i> Session Active
+                <i class="bi bi-check-circle-fill"></i> Session Active <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
              </div>
              <button type="button" (click)="destroySession()" [disabled]="isProofreading" class="rounded-md px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm"  title="Destroy Session">
               <i class="bi bi-trash3 text-lg"></i>
@@ -214,6 +217,9 @@
                 <i class="bi bi-stars text-sm"></i>
               </div>
               <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Execution Output</span>
+            </div>
+            <div *ngIf="executionTimeMs !== null" class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+              {{executionTimeMs}}ms
             </div>
           </div>
           

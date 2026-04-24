@@ -14,6 +14,14 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
   playgroundForm!: FormGroup;
   
   availabilityStatus: string | null = null;
+  
+  availabilityTimeMs: number | null = null;
+  sessionCreationTimeMs: number | null = null;
+  executionTimeMs: number | null = null;
+
+  private availabilityTimer: any = null;
+  private sessionTimer: any = null;
+  private executionTimer: any = null;
   session: any = null;
   
   isCreating = false;
@@ -115,7 +123,10 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.destroySession();
-  }
+    if (this.availabilityTimer) clearInterval(this.availabilityTimer);
+    if (this.sessionTimer) clearInterval(this.sessionTimer);
+    if (this.executionTimer) clearInterval(this.executionTimer);
+    }
 
   
   isInputLangDropdownOpen = false;
@@ -217,12 +228,25 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
       this.availabilityStatus = 'API not found.';
       return;
     }
+
+    this.availabilityTimeMs = 0;
+    const startTime = performance.now();
+    this.availabilityTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.availabilityTimeMs = Math.floor(performance.now() - startTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
+
     try {
       this.availabilityStatus = 'Checking...';
       const status = await ai.availability(this.getCreateOptions());
       this.availabilityStatus = status;
     } catch (e: any) {
       this.availabilityStatus = 'Error: ' + e.message;
+    } finally {
+      clearInterval(this.availabilityTimer);
+      this.availabilityTimeMs = Math.floor(performance.now() - startTime);
     }
   }
 
@@ -233,6 +257,15 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
     this.isCreating = true;
     this.errorMessage = '';
     this.downloadProgress = 0;
+
+    this.sessionCreationTimeMs = 0;
+    const sessionStartTime = performance.now();
+    this.sessionTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.sessionCreationTimeMs = Math.floor(performance.now() - sessionStartTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
 
     if (this.playgroundForm.value.useAbortSignal) {
       this.creationAbortController = new AbortController();
@@ -260,6 +293,8 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
     } catch (e: any) {
       this.errorMessage = e.message || 'Failed to create detector session';
     } finally {
+      clearInterval(this.sessionTimer);
+      this.sessionCreationTimeMs = Math.floor(performance.now() - sessionStartTime);
       this.isCreating = false;
       this.isDownloading = false;
       this.creationAbortController = null;
@@ -285,6 +320,14 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
     this.isDetecting = true;
     this.errorMessage = '';
     this.detections = [];
+    this.executionTimeMs = 0;
+    const execStartTime = performance.now();
+    this.executionTimer = setInterval(() => {
+      this.ngZone.run(() => {
+        this.executionTimeMs = Math.floor(performance.now() - execStartTime);
+        this.cdr.detectChanges();
+      });
+    }, 10);
     
     if (this.playgroundForm.value.useAbortSignal) {
       this.activeAbortController = new AbortController();
@@ -305,6 +348,8 @@ export class LanguageDetectorPlaygroundPage implements OnInit, OnDestroy {
       this.errorMessage = e.message || 'Error during detection';
     } finally {
       this.isDetecting = false;
+      clearInterval(this.executionTimer);
+      this.executionTimeMs = Math.floor(performance.now() - execStartTime);
       this.activeAbortController = null;
     }
   }
