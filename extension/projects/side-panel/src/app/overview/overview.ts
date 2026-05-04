@@ -154,7 +154,17 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
     
     const sessions = Object.keys(sessionsMap).map(sid => {
-      const calls = sessionsMap[sid];
+      const calls = sessionsMap[sid].map(call => {
+        let durationMs = null;
+        if (call.timestamps) {
+          const start = call.timestamps.execute || call.timestamps.create;
+          const end = call.timestamps.completed || call.timestamps.error;
+          if (start && end) {
+            durationMs = end - start;
+          }
+        }
+        return { ...call, durationMs };
+      });
       calls.sort((a, b) => b.timestamp - a.timestamp);
       const latestCall = calls[0];
       const apiName = latestCall.api || 'Unknown API';
