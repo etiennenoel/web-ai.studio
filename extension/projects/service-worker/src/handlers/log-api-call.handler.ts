@@ -3,6 +3,8 @@ import { RuntimeMessage, LogApiCallMessage } from '../../../shared/interfaces/ru
 import { WebAIDatabase } from '../db';
 import { RuntimeMessageHandler } from './runtime-message-handler.interface';
 
+declare const chrome: any;
+
 /**
  * Handles LOG_API_CALL messages by saving the API call payload to IndexedDB.
  *
@@ -25,6 +27,11 @@ export class LogApiCallHandler implements RuntimeMessageHandler {
       } catch {
         // Invalid URL - leave origin unset
       }
+    }
+
+    // Indicate active AI API usage for this specific browser tab
+    if (typeof chrome !== 'undefined' && chrome.action && sender.tab?.id) {
+      chrome.action.setIcon({ path: 'assets/images/spark.png', tabId: sender.tab.id });
     }
 
     await this.database.saveCall(payload);

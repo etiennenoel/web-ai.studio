@@ -7,13 +7,15 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { OverviewComponent } from './overview/overview';
 import { SettingsComponent } from './settings/settings';
+import { SessionsComponent } from './sessions/sessions';
 import { SettingsComponent as LibSettingsComponent, DiagnosisComponent } from 'base';
 
 @NgModule({
   declarations: [
     App,
     OverviewComponent,
-    SettingsComponent
+    SettingsComponent,
+    SessionsComponent
   ],
   imports: [
     BrowserModule,
