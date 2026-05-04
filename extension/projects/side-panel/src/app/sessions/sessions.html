@@ -1,0 +1,85 @@
+<div class="p-4">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-2">
+    <div class="flex items-center gap-3">
+      <a routerLink="/" class="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors" title="Back to Overview">
+        <i class="fa-solid fa-arrow-left text-lg"></i>
+      </a>
+      <h1 class="text-xl font-semibold">All Sessions</h1>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg">
+    <i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i>
+    <p class="text-sm">Loading sessions...</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <div *ngIf="origins.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/20">
+      <i class="fas fa-ghost text-2xl mb-2"></i>
+      <p class="text-sm">No active sessions found.</p>
+    </div>
+
+    <div *ngFor="let origin of origins" class="mb-4 last:mb-0 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="font-medium truncate text-sm" [title]="origin">{{ origin }}</h3>
+        <button (click)="clearHistory(origin)" class="text-xs text-red-500 hover:text-red-700 p-1" title="Clear all sessions for this site">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+      
+      <div class="p-2 space-y-2 bg-white dark:bg-gray-900">
+        <div *ngFor="let session of sessionsByOrigin[origin]" class="p-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded">
+          <div class="flex justify-between items-start mb-1">
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              {{ session.apiName }}
+            </span>
+            <span class="text-[10px] text-gray-500 dark:text-gray-400" [title]="session.latestTimestamp | date:'medium'">
+              {{ session.latestTimestamp | date:'shortTime' }}
+            </span>
+          </div>
+          <div class="text-[10px] text-gray-600 dark:text-gray-300 flex justify-between">
+            <span class="font-mono truncate" style="max-width: 150px;">{{ session.sessionId }}</span>
+            <span>{{ session.calls.length }} call(s)</span>
+          </div>
+          
+          <!-- Detailed Calls List -->
+          <div class="mt-2 space-y-1">
+            <div *ngFor="let call of session.calls" class="border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-900">
+              <div class="flex justify-between items-center p-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" (click)="toggleDetails(call.id)">
+                <div class="flex items-center gap-2 text-[10px]">
+                  <span class="font-semibold text-gray-700 dark:text-gray-300">{{ call.method }}</span>
+                  <span class="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">{{ call.stage }}</span>
+                  <span *ngIf="call.durationMs !== null" class="text-gray-500 dark:text-gray-400">{{ call.durationMs }}ms</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] text-red-500 font-semibold" *ngIf="call.errorMessage">Error</span>
+                  <i class="fas fa-chevron-down text-gray-400 text-[10px] transition-transform duration-200" [class.rotate-180]="expandedCalls.has(call.id)"></i>
+                </div>
+              </div>
+              
+              <div *ngIf="expandedCalls.has(call.id)" class="p-2 border-t border-gray-200 dark:border-gray-700 text-[10px] space-y-2 bg-gray-50 dark:bg-gray-800/30 overflow-x-auto">
+                <div *ngIf="call.errorMessage" class="text-red-600 dark:text-red-400 font-mono break-words whitespace-pre-wrap mb-1">
+                  Error: {{ call.errorMessage }}
+                </div>
+                <div *ngIf="call.options">
+                  <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Options</div>
+                  <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.options | json }}</code></pre>
+                </div>
+                <div *ngIf="call.args">
+                  <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Arguments</div>
+                  <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.args | json }}</code></pre>
+                </div>
+                <div *ngIf="call.response">
+                  <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Response</div>
+                  <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.response | json }}</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

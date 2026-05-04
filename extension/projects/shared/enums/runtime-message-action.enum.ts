@@ -38,4 +38,7 @@ export enum RuntimeMessageAction {
 
   /** Trigger API availability diagnosis (sent from devtools panel to content script). */
   DIAGNOSE_APIS = 'diagnose_apis',
+
+  /** Retrieve the list of API calls for the current page session (content script memory). */
+  GET_PAGE_SESSIONS = 'get_page_sessions',
 }

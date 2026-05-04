@@ -1,6 +1,7 @@
 import { WindowMessageType } from '../../shared/enums/window-message-type.enum';
 import { RuntimeMessageAction } from '../../shared/enums/runtime-message-action.enum';
 import { WindowMessageDispatcher } from './window-message-dispatcher';
+import { ApiCallForwardHandler } from './handlers/api-call-forward.handler';
 
 declare const chrome: any;
 
@@ -47,14 +48,16 @@ window.addEventListener('message', (event) => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. Handle diagnose_apis requests from the devtools panel
-//
-// The devtools panel sends this message via chrome.runtime to the content script.
-// We forward it to the injected script (which can check window.LanguageModel etc.)
-// and relay the response back.
+// 3. Handle requests from the side panel or devtools
 // ---------------------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener((request: any, _sender: any, sendResponse: any) => {
+  // Return current page sessions from memory
+  if (request.action === RuntimeMessageAction.GET_PAGE_SESSIONS) {
+    sendResponse({ data: ApiCallForwardHandler.getCurrentPageCalls() });
+    return false;
+  }
+
   if (request.action === RuntimeMessageAction.DIAGNOSE_APIS) {
     const messageId = 'webai-diag-' + Date.now() + '-' + Math.random();
 
