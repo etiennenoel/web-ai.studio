@@ -1,0 +1,1092 @@
+{
+  "timestamp": "2026-05-14T22:15:11.667Z",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+  "hardware": {
+    "webgl_renderer": "ANGLE (Intel, Intel(R) Arc(TM) 140V GPU (16GB) (0x000064A0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "webgpu": {
+      "vendor": "intel",
+      "architecture": "xe-2lpg",
+      "device": "",
+      "description": ""
+    },
+    "navigator": {
+      "hardwareConcurrency": 8,
+      "deviceMemory": 32,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+    },
+    "cpu": {
+      "archName": "x86_64",
+      "features": [
+        "mmx",
+        "sse",
+        "sse2",
+        "sse3",
+        "ssse3",
+        "sse4_1",
+        "sse4_2",
+        "avx"
+      ],
+      "modelName": "Intel(R) Core(TM) Ultra 7 268V",
+      "numOfProcessors": 8,
+      "processors": [
+        {
+          "usage": {
+            "idle": 5091865625000,
+            "kernel": 238573750000,
+            "total": 5434930781250,
+            "user": 104491406250
+          }
+        },
+        {
+          "usage": {
+            "idle": 4686544843750,
+            "kernel": 554624531250,
+            "total": 5434930000000,
+            "user": 193760625000
+          }
+        },
+        {
+          "usage": {
+            "idle": 5061325000000,
+            "kernel": 256025625000,
+            "total": 5434930000000,
+            "user": 117579375000
+          }
+        },
+        {
+          "usage": {
+            "idle": 4675479375000,
+            "kernel": 556300000000,
+            "total": 5434930000000,
+            "user": 203150625000
+          }
+        },
+        {
+          "usage": {
+            "idle": 5159837031250,
+            "kernel": 194764062500,
+            "total": 5434930000000,
+            "user": 80328906250
+          }
+        },
+        {
+          "usage": {
+            "idle": 5159393593750,
+            "kernel": 195947187500,
+            "total": 5434930000000,
+            "user": 79589218750
+          }
+        },
+        {
+          "usage": {
+            "idle": 5167721406250,
+            "kernel": 188902968750,
+            "total": 5434930000000,
+            "user": 78305625000
+          }
+        },
+        {
+          "usage": {
+            "idle": 5172460468750,
+            "kernel": 186725468750,
+            "total": 5434930000000,
+            "user": 75744062500
+          }
+        }
+      ],
+      "temperatures": []
+    },
+    "memory": {
+      "availableCapacity": 15909376000,
+      "capacity": 33810075648
+    }
+  },
+  "results": {
+    "status": "Success",
+    "testsResults": [
+      {
+        "id": "Identify language of a common, short phrase. Cold Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 6.5,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 8.600000023841858,
+            "timeToFirstToken": 8.600000023841858,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 14302.325541744884,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 6.100000023841858,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 8.899999976158142,
+            "timeToFirstToken": 8.899999976158142,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 13820.224756123576,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 26.800000071525574,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 28.700000047683716,
+            "timeToFirstToken": 28.700000047683716,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 4285.714278593771,
+            "inputLength": 62
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "inputContextSize": null,
+        "averageTotalResponseTime": 15.400000015894571,
+        "averageTokensPerSecond": -1,
+        "medianTokensPerSecond": -1,
+        "averageInputTokensPerSecond": -1,
+        "medianInputTokensPerSecond": -1,
+        "averageCharactersPerSecond": 10802.754858820745,
+        "averageTimeToFirstToken": 15.400000015894571,
+        "averageInputTokens": 0,
+        "medianInputTokens": 0,
+        "medianTotalResponseTime": 8.899999976158142,
+        "medianCharactersPerSecond": 13820.224756123576,
+        "medianTimeToFirstToken": 8.899999976158142
+      },
+      {
+        "id": "Identify language of a common, short phrase. Warm Start.",
+        "status": "Success",
+        "api": "Language Detector",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 16,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 2.100000023841858,
+            "timeToFirstToken": 2.100000023841858,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 58571.42790645159,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 16,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 2.100000023841858,
+            "timeToFirstToken": 2.100000023841858,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 58571.42790645159,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 16,
+            "output": "[{\"confidence\":0.9991014003753662,\"detectedLanguage\":\"en\"},{\"confidence\":0.000007130955509637715,\"detectedLanguage\":\"und\"}]",
+            "totalResponseTime": 1.5,
+            "timeToFirstToken": 1.5,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 123,
+            "charactersPerSecond": 82000,
+            "inputLength": 62
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "inputContextSize": null,
+        "averageTotalResponseTime": 1.900000015894572,
+        "averageTokensPerSecond": -1,
+        "medianTokensPerSecond": -1,
+        "averageInputTokensPerSecond": -1,
+        "medianInputTokensPerSecond": -1,
+        "averageCharactersPerSecond": 66380.9519376344,
+        "averageTimeToFirstToken": 1.900000015894572,
+        "averageInputTokens": 0,
+        "medianInputTokens": 0,
+        "medianTotalResponseTime": 2.100000023841858,
+        "medianCharactersPerSecond": 58571.42790645159,
+        "medianTimeToFirstToken": 2.100000023841858
+      },
+      {
+        "id": "Translate short phrase from english to french. Cold Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 40.299999952316284,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 67.60000002384186,
+            "timeToFirstToken": 67.60000002384186,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 1050.2958576177366,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 3.5,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 15.5,
+            "timeToFirstToken": 15.5,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 4580.645161290323,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 4.699999928474426,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 17.100000023841858,
+            "timeToFirstToken": 17.100000023841858,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 4152.046777836696,
+            "inputLength": 62
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "inputContextSize": null,
+        "averageTotalResponseTime": 33.40000001589457,
+        "averageTokensPerSecond": -1,
+        "medianTokensPerSecond": -1,
+        "averageInputTokensPerSecond": -1,
+        "medianInputTokensPerSecond": -1,
+        "averageCharactersPerSecond": 3260.9959322482514,
+        "averageTimeToFirstToken": 33.40000001589457,
+        "averageInputTokens": 0,
+        "medianInputTokens": 0,
+        "medianTotalResponseTime": 17.100000023841858,
+        "medianCharactersPerSecond": 4152.046777836696,
+        "medianTimeToFirstToken": 17.100000023841858
+      },
+      {
+        "id": "Translate short phrase from english to french. Warm Start.",
+        "status": "Success",
+        "api": "Translator",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 5.400000095367432,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 13.299999952316284,
+            "timeToFirstToken": 13.299999952316284,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 5338.345883800915,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 5.400000095367432,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 14.5,
+            "timeToFirstToken": 14.5,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 4896.551724137931,
+            "inputLength": 62
+          },
+          {
+            "status": "Success",
+            "creationTime": 5.400000095367432,
+            "output": "\"Dans quelle langue est cette phrase ? Je crois que c'est en français.\"",
+            "totalResponseTime": 12.900000095367432,
+            "timeToFirstToken": 12.900000095367432,
+            "totalNumberOfInputTokens": 0,
+            "totalNumberOfOutputTokens": -1,
+            "tokensPerSecond": -1,
+            "inputTokensPerSecond": -1,
+            "totalNumberOfOutputCharacters": 71,
+            "charactersPerSecond": 5503.875928303061,
+            "inputLength": 62
+          }
+        ],
+        "input": "In which language is this sentence? I believe it is in french.",
+        "apiAvailability": "available",
+        "inputContextSize": null,
+        "averageTotalResponseTime": 13.56666668256124,
+        "averageTokensPerSecond": -1,
+        "medianTokensPerSecond": -1,
+        "averageInputTokensPerSecond": -1,
+        "medianInputTokensPerSecond": -1,
+        "averageCharactersPerSecond": 5246.257845413968,
+        "averageTimeToFirstToken": 13.56666668256124,
+        "averageInputTokens": 0,
+        "medianInputTokens": 0,
+        "medianTotalResponseTime": 13.299999952316284,
+        "medianCharactersPerSecond": 5338.345883800915,
+        "medianTimeToFirstToken": 13.299999952316284
+      },
+      {
+        "id": "Summarize a long news article. Cold Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 6.100000023841858,
+            "timeToFirstToken": 4685.800000071526,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\\\n* He presented a lecture on technology, peacebuilding, and future-oriented programs, focusing on digital transformation and empowering youth through empathy, innovation, and cross-cultural collaboration.\\\\n* The Youth Trilateral Leadership (YTL) Workshop connects youth from Japan, Korea, and the U.S. to the role of technology in peace efforts and fosters cross-cultural understanding.\\\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem solving, and peacebuilding.\\\\n* An MOU was signed between Mason Korea and the Korean Association of Negotiation Studies (KANS) to launch a new Advanced Negotiation Program.\\\\n\"",
+            "totalResponseTime": 14347,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 165,
+            "totalNumberOfOutputCharacters": 814,
+            "tokensPerSecond": 17.078623773570733,
+            "charactersPerSecond": 84.25454394961561,
+            "inputTokensPerSecond": 208.2888727613432,
+            "inputLength": 2098
+          },
+          {
+            "status": "Success",
+            "creationTime": 15.100000023841858,
+            "timeToFirstToken": 3923.399999976158,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\\\n* He lectured on technology, peacebuilding, and future-oriented programs, stressing youth empowerment through empathy, innovation, and cross-cultural collaboration.\\\\n* The Youth Trilateral Leadership (YTL) Workshop connects youth from Japan, Korea, and the U.S. regarding the role of technology in peace efforts.\\\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem solving, and peacebuilding.\\\\n* A new Advanced Negotiation Program partnership was established through an MOU with the Korean Association of Negotiation Studies (KANS).\\\\n\"",
+            "totalResponseTime": 13803.100000023842,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 149,
+            "totalNumberOfOutputCharacters": 737,
+            "tokensPerSecond": 15.081429597991928,
+            "charactersPerSecond": 74.59740680349027,
+            "inputTokensPerSecond": 248.76382729416602,
+            "inputLength": 2098
+          },
+          {
+            "status": "Success",
+            "creationTime": 8.699999928474426,
+            "timeToFirstToken": 5301.299999952316,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\\\n* He delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” focusing on digital transformation in peacebuilding and empowering youth through empathy, innovation, and collaboration.\\\\n* The Youth Trilateral Leadership (YTL) Workshop empowers youth as peacebuilders and connects them with technology in peace efforts among students from Japan, Korea, and the U.S.\\\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem-solving, and peacebuilding.\\\\n* An MOU was signed with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program and collaborative research.\\\\n\"",
+            "totalResponseTime": 18003.100000023842,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 165,
+            "totalNumberOfOutputCharacters": 825,
+            "tokensPerSecond": 12.990284841445375,
+            "charactersPerSecond": 64.95142420722688,
+            "inputTokensPerSecond": 184.10578537505495,
+            "inputLength": 2098
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "inputContextSize": 9216,
+        "averageTotalResponseTime": 15384.400000015894,
+        "averageTokensPerSecond": 15.050112737669345,
+        "medianTokensPerSecond": 15.081429597991928,
+        "averageInputTokensPerSecond": 213.7194951435214,
+        "medianInputTokensPerSecond": 208.2888727613432,
+        "averageCharactersPerSecond": 74.60112498677758,
+        "averageTimeToFirstToken": 4636.833333333333,
+        "averageInputTokens": 976,
+        "medianInputTokens": 976,
+        "medianTotalResponseTime": 14347,
+        "medianCharactersPerSecond": 74.59740680349027,
+        "medianTimeToFirstToken": 4685.800000071526
+      },
+      {
+        "id": "Summarize a long news article. Warm Start.",
+        "status": "Success",
+        "api": "Summarizer",
+        "startType": "warm",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 18.5,
+            "timeToFirstToken": 5216.700000047684,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\\\n* He delivered a lecture on technology, peacebuilding, and future-oriented programs, emphasizing youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\\\n* The Youth Trilateral Leadership (YTL) Workshop empowers youth as peacebuilders and connects them with technology in peace efforts among young people from Japan, Korea, and the U.S.\\\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem solving, and peacebuilding.\\\\n* A Memorandum of Understanding was signed between Mason Korea and the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program.\\\\n\"",
+            "totalResponseTime": 17349.200000047684,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 164,
+            "totalNumberOfOutputCharacters": 821,
+            "tokensPerSecond": 13.517411910158664,
+            "charactersPerSecond": 67.66948279414795,
+            "inputTokensPerSecond": 187.09145628291424,
+            "inputLength": 2098
+          },
+          {
+            "status": "Success",
+            "creationTime": 18.5,
+            "timeToFirstToken": 103.20000004768372,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with the Conflict Analysis and Resolution program faculty and students.\\\\n* He delivered a lecture on technology, peacebuilding, and future-oriented programs, emphasizing youth as global changemakers through empathy, innovation, and collaboration.\\\\n* He oversaw the Youth Trilateral Leadership (YTL) Workshop, which connects youth from Japan, Korea, and the U.S. to technology in peace efforts.\\\\n* Dean Özerdem plans to launch Peace Tech Labs in different countries to focus on different aspects of peace work, exploring how games can be used for teaching, problem solving, and peacebuilding.\\\\n* An MOU was signed with the Korean Association of Negotiation Studies (KANS) to launch a new Advanced Negotiation Program and academic exchange in conflict and negotiation studies.\\\\n*\"",
+            "totalResponseTime": 12574.800000071526,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 168,
+            "totalNumberOfOutputCharacters": 837,
+            "tokensPerSecond": 13.470605215022838,
+            "charactersPerSecond": 67.11247955341736,
+            "inputTokensPerSecond": 9457.364336715482,
+            "inputLength": 2098
+          },
+          {
+            "status": "Success",
+            "creationTime": 18.5,
+            "timeToFirstToken": 87.80000007152557,
+            "output": "\"* Dr. Alpaslan Özerdem visited Mason Korea to engage with the Conflict Analysis and Resolution program faculty and students.\\\\n* He lectured on technology reshaping peacebuilding and humanitarian aid, focusing on empowering youth as global changemakers.\\\\n* The Youth Trilateral Leadership (YTL) Workshop connects youth from Japan, Korea, and the U.S. to the role of technology in peace efforts.\\\\n* Dean Özerdem plans to launch a Peace Tech Lab at Mason Korea to explore how games can be used for teaching, problem solving, and peacebuilding.\\\\n* A partnership was established with the Korean Association of Negotiation Studies (KANS) to launch an Advanced Negotiation Program.\\\\n*\"",
+            "totalResponseTime": 10404.700000047684,
+            "totalNumberOfInputTokens": 976,
+            "totalNumberOfOutputTokens": 141,
+            "totalNumberOfOutputCharacters": 684,
+            "tokensPerSecond": 13.666896063771661,
+            "charactersPerSecond": 66.29898516042422,
+            "inputTokensPerSecond": 11116.173111673226,
+            "inputLength": 2098
+          }
+        ],
+        "input": "Dr. Alpaslan Özerdem, Dean of the Jimmy and Rosalynn Carter School for Peace and Conflict Resolution and professor of peace and conflict studies, recently visited Mason Korea to engage with faculty and students in the Conflict Analysis and Resolution program.\\nAs part of his visit, he delivered a lecture titled “Technology, Peacebuilding, and Future-Oriented Programs,” highlighting how digital transformation is reshaping peacebuilding and humanitarian aid, and emphasizing the need to empower youth as global changemakers through empathy, innovation, and cross-cultural collaboration.\\nIn a follow-up conversation, he reflected on the recent Youth Trilateral Leadership (YTL) Workshop, which he oversaw in partnership with the U.S. Embassy and Mason Korea. “The YTL workshop is significant because it empowers youth as peacebuilders, connects them with the role of technology in peace efforts, and fosters cross-cultural understanding among young people from Japan, Korea, and the U.S.—especially important given the historical tensions in East Asia,” he said.\\nDean Özerdem also shared plans to launch a Peace Tech Lab at Mason Korea. “As I explained in my talk, peace labs are for problem solving. I want to build peace labs in different countries, each focusing on different aspects of peace work,” he said. “I’ve had great discussions with Dean Park and Professor Wilson, and the Computer Game Design faculty here are also very interested. I want the lab here to explore how games can be used for teaching, problem solving, and peacebuilding.”\\nHe concluded, “We’re going to work on this over the summer, and I hope that within the next academic year, we’ll have good news to share with the community.”\\nDuring his visit, Dean Özerdem also took part in Mason Korea’s MOU signing ceremony with the Korean Association of Negotiation Studies (KANS). The agreement, signed by Mason Korea Dean Dr. Joshua Park, marks the beginning of a partnership to launch a new Advanced Negotiation Program and a commitment to collaborative research and academic exchange in conflict and negotiation studies.\\",
+        "apiAvailability": "available",
+        "inputContextSize": 9216,
+        "averageTotalResponseTime": 13442.900000055632,
+        "averageTokensPerSecond": 13.551637729651054,
+        "medianTokensPerSecond": 13.517411910158664,
+        "averageInputTokensPerSecond": 6920.209634890541,
+        "medianInputTokensPerSecond": 9457.364336715482,
+        "averageCharactersPerSecond": 67.02698250266317,
+        "averageTimeToFirstToken": 1802.5666667222977,
+        "averageInputTokens": 976,
+        "medianInputTokens": 976,
+        "medianTotalResponseTime": 12574.800000071526,
+        "medianCharactersPerSecond": 67.11247955341736,
+        "medianTimeToFirstToken": 103.20000004768372
+      },
+      {
+        "id": "Prompt (Text). Analyze the scenario and provide a response. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 694.5,
+            "timeToFirstToken": 5738.799999952316,
+            "output": "\"### Philosophical & Technical Synthesis\\\\nThe central logical fallacy in both passages is the False Dilemma, presenting a binary choice between absolute utopian liberation (Passage A) and inevitable existential servitude (Passage B) without acknowledging the vast spectrum of intermediate, complex realities. Passage A employs an Appeal to Perfection, while Passage B relies on a fear-mongering, deterministic narrative.\\\\n\\\\nA decentralized, federated learning model offers a pragmatic, albeit imperfect, mitigation strategy for the risks in Passage B. By training models across distributed, private datasets without centralizing sensitive information, this architecture limits the catastrophic risk of a single point of failure or malicious control—a key component of 'technological servitude.' However, this approach cannot guarantee the utopian outcome of Passage A; the inherent bias and emergent properties of decentralized systems introduce new, unpredictable forms of systemic fragility and inequity. \\\\n\\\\nSelf-Assessment: 5.0\\\\n\"",
+            "totalResponseTime": 19018.799999952316,
+            "totalNumberOfInputTokens": 287,
+            "totalNumberOfOutputTokens": 186,
+            "totalNumberOfOutputCharacters": 1040,
+            "tokensPerSecond": 14.006024096385543,
+            "charactersPerSecond": 78.3132530120482,
+            "inputTokensPerSecond": 50.01045514783311,
+            "inputLength": 1375
+          },
+          {
+            "status": "Success",
+            "creationTime": 664.9000000953674,
+            "timeToFirstToken": 5935.300000071526,
+            "output": "\"### Philosophical & Technical Synthesis\\\\n\\\\nThe core logical fallacy present in both passages is the **False Dilemma** (or False Dichotomy). Both passages present only two extreme, mutually exclusive outcomes: either an immediate, perfect utopian resolution (Passage A) or an imminent, total existential catastrophe (Passage B). This fails to account for the vast spectrum of possibilities inherent in technological evolution.\\\\n\\\\nA decentralized, federated learning (FL) model addresses Passage B's concerns by distributing the data and computation across multiple, independent entities. This decentralization mitigates the risk of a single, monolithic, 'unfeeling logic' controlling all systems, thus preventing immediate technological servitude. However, FL does not guarantee Passage A’s utopia; it merely distributes the potential for both beneficial and detrimental outcomes, requiring rigorous ethical guardrails and decentralized governance to steer the process away from existential risk.\\\\n\\\\nSelf-Assessment: 5.0\\\\n\\\"\"",
+            "totalResponseTime": 19798.700000047684,
+            "totalNumberOfInputTokens": 287,
+            "totalNumberOfOutputTokens": 194,
+            "totalNumberOfOutputCharacters": 1032,
+            "tokensPerSecond": 13.99368120376918,
+            "charactersPerSecond": 74.44061341386491,
+            "inputTokensPerSecond": 48.354758815315385,
+            "inputLength": 1375
+          },
+          {
+            "status": "Success",
+            "creationTime": 737.6000000238419,
+            "timeToFirstToken": 5617.600000023842,
+            "output": "\"### Philosophical & Technical Synthesis\\\\nThe core logical fallacy in both passages is the **False Dichotomy** (or False Dilemma). They present an extreme, mutually exclusive choice—either absolute utopia (A) or total servitude (B)—ignoring the complex spectrum of potential outcomes.\\\\n\\\\nPassage A employs **Appeal to Perfection**, suggesting that any positive outcome is inherently the ultimate goal, ignoring the inherent instability of societal structures. Passage B relies on **Catastrophizing**, presenting a worst-case scenario as the only rational alternative.\\\\n\\\\nA decentralized, federated learning model offers a pragmatic mitigation strategy. By distributing the model across numerous, localized data silos, it prevents any single central entity from achieving total, monolithic control (mitigating the 'unfeeling logic' of total servitude). This decentralization fosters localized governance and transparency, tempering the risk of systemic failure described in Passage B, yet it cannot, in any way, guarantee the utopian outcome of Passage A.\\\\n\\\\nSelf-Assessment: 5.0\\\"\"",
+            "totalResponseTime": 20875.300000071526,
+            "totalNumberOfInputTokens": 287,
+            "totalNumberOfOutputTokens": 210,
+            "totalNumberOfOutputCharacters": 1088,
+            "tokensPerSecond": 13.763542342511892,
+            "charactersPerSecond": 71.3082574697759,
+            "inputTokensPerSecond": 51.089433209694874,
+            "inputLength": 1375
+          }
+        ],
+        "input": "Analyze the following scenario and provide a structured response.\n\nCore Task:\n\nRead the following two short, contradictory passages about the future of artificial intelligence.\n\nPassage A: \"AI promises a utopian future, a new renaissance where human potential is unbound, solving age-old problems of disease, scarcity, and labor.\"\n\nPassage B: \"The unchecked rise of AI is an existential gamble, a path toward technological servitude where human autonomy is rendered obsolete by superior, unfeeling logic.\"\n\nYour task is to write a concise synthesis of these two viewpoints. First, identify the core logical fallacy present in both passages (e.g., strawman, false dilemma, appeal to emotion, etc.) and briefly justify your choice. Then, explain how a decentralized, federated learning model might mitigate the risks described in Passage B while still failing to guarantee the utopia of Passage A.\n\nFormatting Requirements:\n\nThe entire response must be under 250 words.\n\nThe tone must be formal, critical, and slightly detached.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Philosophical & Technical Synthesis\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 19897.600000023842,
+        "averageTokensPerSecond": 13.921082547555537,
+        "medianTokensPerSecond": 13.99368120376918,
+        "averageInputTokensPerSecond": 49.818215724281124,
+        "medianInputTokensPerSecond": 50.01045514783311,
+        "averageCharactersPerSecond": 74.68737463189633,
+        "averageTimeToFirstToken": 5763.900000015895,
+        "averageInputTokens": 287,
+        "medianInputTokens": 287,
+        "medianTotalResponseTime": 19798.700000047684,
+        "medianCharactersPerSecond": 74.44061341386491,
+        "medianTimeToFirstToken": 5738.799999952316
+      },
+      {
+        "id": "Prompt (Text). Answer Ethical Dilemma, then creative task. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 686.6000000238419,
+            "timeToFirstToken": 5658.100000023842,
+            "output": "\"### Ethical Computation\\\\n\\\\nThe Trolley Problem is a thought experiment testing ethical frameworks for deciding which course of action is morally justifiable in a scenario involving unavoidable harm. It forces us to confront the trade-offs between different moral principles when faced with catastrophic choices.\\\\n\\\\nSteel wheels must now choose their path, a coded, swift decree.\\\\nOne life to save, a consequence set to be.\\\\nLogic flows in streams, a calculation deep,\\\\nThe path of lesser pain, the promises to keep.\\\\n\\\\nSelf-Assessment: 5.0\"",
+            "totalResponseTime": 14175.600000023842,
+            "totalNumberOfInputTokens": 181,
+            "totalNumberOfOutputTokens": 115,
+            "totalNumberOfOutputCharacters": 550,
+            "tokensPerSecond": 13.501614323451717,
+            "charactersPerSecond": 64.57293806868212,
+            "inputTokensPerSecond": 31.98953712363467,
+            "inputLength": 784
+          },
+          {
+            "status": "Success",
+            "creationTime": 697.3999999761581,
+            "timeToFirstToken": 5592.899999976158,
+            "output": "\"### Ethical Computation\\\\n\\\\nThe Trolley Problem is a thought experiment in moral philosophy, pitting different ethical frameworks against each other when faced with a situation where an individual must choose between two harmful outcomes. It forces a confrontation with the nature of moral obligation and the calculus of minimizing loss.\\\\n\\\\n*If the track splits, a choice must be made,* \\\\n*A swift decision is swiftly displayed.* \\\\n*My code must weigh the cost and the pain,* \\\\n*To find the least damage, again and again.*\\\\n\\\\nSelf-Assessment: 5.0\"",
+            "totalResponseTime": 14146.5,
+            "totalNumberOfInputTokens": 181,
+            "totalNumberOfOutputTokens": 120,
+            "totalNumberOfOutputCharacters": 556,
+            "tokensPerSecond": 14.02918069580826,
+            "charactersPerSecond": 65.00187055724493,
+            "inputTokensPerSecond": 32.36245954706352,
+            "inputLength": 784
+          },
+          {
+            "status": "Success",
+            "creationTime": 691.7999999523163,
+            "timeToFirstToken": 5641,
+            "output": "\"### Ethical Computation\\\\n\\\\nThe Trolley Problem is a thought experiment in ethics and philosophy, forcing a choice between two morally weighty actions, often involving the calculation of potential harm. It probes the nature of moral responsibility when facing unavoidable, life-altering decisions.\\\\n\\\\n*The wires are crossed, a choice must be made,* \\\\n*A swift decision, unafraid or frayed.* \\\\n*My logic runs, a swift and steady stream,* \\\\n*To choose the path, a waking ethical dream.*\\\\n\\\\nSelf-Assessment: 5.0\\\\n\"",
+            "totalResponseTime": 15008.5,
+            "totalNumberOfInputTokens": 181,
+            "totalNumberOfOutputTokens": 119,
+            "totalNumberOfOutputCharacters": 521,
+            "tokensPerSecond": 12.703496130237523,
+            "charactersPerSecond": 55.617827595409665,
+            "inputTokensPerSecond": 32.08650948413402,
+            "inputLength": 784
+          }
+        ],
+        "input": "Provide a structured response to the following creative and factual challenge.\n\nCore Tasks:\n\nDefinition: Briefly (in two sentences or less) define the \"Trolley Problem\" in ethics.\n\nCreation: Write a 4-line poem in an AABB rhyme scheme from the perspective of a self-driving car's algorithm having to compute a real-time solution to it.\n\nFormatting Requirements:\n\nThe entire response must be under 150 words.\n\nThe tone should be concise and thoughtful.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Ethical Computation\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 14443.53333334128,
+        "averageTokensPerSecond": 13.411430383165834,
+        "medianTokensPerSecond": 13.501614323451717,
+        "averageInputTokensPerSecond": 32.1461687182774,
+        "medianInputTokensPerSecond": 32.08650948413402,
+        "averageCharactersPerSecond": 61.730878740445576,
+        "averageTimeToFirstToken": 5630.666666666667,
+        "averageInputTokens": 181,
+        "medianInputTokens": 181,
+        "medianTotalResponseTime": 14175.600000023842,
+        "medianCharactersPerSecond": 64.57293806868212,
+        "medianTimeToFirstToken": 5641
+      },
+      {
+        "id": "Prompt (Text). Technical challenge, write code. Cold Start.",
+        "status": "Success",
+        "api": "Prompt",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [
+          {
+            "status": "Success",
+            "creationTime": 768.2999999523163,
+            "timeToFirstToken": 5964.100000023842,
+            "output": "\"### Asynchronous Demonstration\\\\n\\\\n```javascript\\\\n// Simulate two asynchronous operations resolving at different times\\\\nconst promiseA = new Promise(resolve => setTimeout(() => resolve('Result A'), 1000));\\\\nconst promiseB = new Promise(resolve => setTimeout(() => resolve('Result B'), 500));\\\\n\\\\nPromise.race([promiseA, promiseB])\\\\n  .then(result => {\\\\n    console.log('Race completed:', result);\\\\n  });\\\\n```\\\\n\\\\n**Scenario Explanation:**\\\\nPromise.race() is superior to Promise.all() when you need the *fastest* result from a set of concurrent operations. For instance, consider a system that fetches data from two different, potentially slow, microservices (Service X and Service Y). If your user interface requires immediate feedback based on *any* successful data retrieval, using Promise.race() allows you to display the data from the service that responds first, providing a responsive UX, even if the second service hasn't finished fetching its complete payload yet.\\\\n\\\\nSelf-Assessment: 5.0\\\"\"",
+            "totalResponseTime": 24778.399999976158,
+            "totalNumberOfInputTokens": 174,
+            "totalNumberOfOutputTokens": 238,
+            "totalNumberOfOutputCharacters": 1013,
+            "tokensPerSecond": 12.649952429832798,
+            "charactersPerSecond": 53.84202441773372,
+            "inputTokensPerSecond": 29.174561123942325,
+            "inputLength": 829
+          },
+          {
+            "status": "Success",
+            "creationTime": 764.7000000476837,
+            "timeToFirstToken": 5987.100000023842,
+            "output": "\"# Code Review Feedback\\\\n\\\\nHere is the structured response addressing your technical challenge.\\\\n\\\\n### Asynchronous Demonstration\\\\n\\\\n```javascript\\\\nconst promiseA = new Promise(resolve => setTimeout(() => resolve('Result A'), 2000)));\\\\nconst promiseB = new Promise(resolve => setTimeout(() => resolve('Result B'), 500)));\\\\n\\\\nPromise.race([promiseA, promiseB])\\\\n  .then(result => console.log(\\\\\\\"Race finished. Received:\\\\\\\", result));\\\\n```\\\\n\\\\n**Explanation:**\\\\n`Promise.race()` is ideal when you need to determine which asynchronous operation completes *first* among a set of competing operations. A perfect real-world scenario is handling network request timeouts.\\\\n\\\\nFor instance, if you are fetching data from three different microservices simultaneously, and you only care about the first one that returns a response (perhaps the quickest one), `Promise.race()` allows you to cancel or proceed based on the fastest completion time, ignoring the slower ones.\\\\n\\\\n**Self-Assessment:** 5.0\"",
+            "totalResponseTime": 23024.200000047684,
+            "totalNumberOfInputTokens": 174,
+            "totalNumberOfOutputTokens": 236,
+            "totalNumberOfOutputCharacters": 1009,
+            "tokensPerSecond": 13.852122720396649,
+            "charactersPerSecond": 59.22369417322127,
+            "inputTokensPerSecond": 29.062484341218134,
+            "inputLength": 829
+          },
+          {
+            "status": "Success",
+            "creationTime": 698.7000000476837,
+            "timeToFirstToken": 6002.399999976158,
+            "output": "\"### Asynchronous Demonstration\\\\n\\\\nHere is a JavaScript snippet demonstrating Promise.race():\\\\n\\\\n```javascript\\\\nconst promiseA = new Promise(resolve => setTimeout(() => resolve('Result A'), 2000));\\\\nconst promiseB = new Promise(resolve => setTimeout(() => resolve('Result B'), 1000));\\\\n\\\\nconst raceResult = Promise.race([promiseA, promiseB])\\\\n  .then(result => console.log(`Race finished with: ${result}`));\\\\n```\\\\n\\\\n**Scenario Comparison:**\\\\n\\\\n`Promise.race()` is superior when you need to quickly get *any* result as soon as *one* of several independent asynchronous operations completes, regardless of which one finishes first. A perfect real-world example is implementing a **timeout mechanism** for network requests. If you make an API call and set a 5-second timeout, `Promise.race()` allows you to race the actual network request promise against a promise that resolves after 5 seconds (the timeout promise). The first one to resolve—either the successful API response or the timeout error—will dictate the outcome, preventing indefinite waiting.\\\\n\\\\nSelf-Assessment: 5.0\\\\n\"",
+            "totalResponseTime": 24531.5,
+            "totalNumberOfInputTokens": 174,
+            "totalNumberOfOutputTokens": 261,
+            "totalNumberOfOutputCharacters": 1096,
+            "tokensPerSecond": 14.085951287416234,
+            "charactersPerSecond": 59.15020157474404,
+            "inputTokensPerSecond": 28.988404638259883,
+            "inputLength": 829
+          }
+        ],
+        "input": "Provide a structured response to the following technical challenge.\n\nCore Tasks:\n\nCode Generation: Generate a short, commented code snippet in JavaScript (no more than 10 lines) that correctly demonstrates a Promise.race().\n\nExplanation: Immediately after the code, explain a clear, real-world scenario where this specific function would be more useful than Promise.all().\n\nFormatting Requirements:\n\nThe code must be valid and commented.\n\nThe tone should be professional and instructional.\n\nThe response MUST be structured under the following exact Markdown header:\n\n### Asynchronous Demonstration\n\nFinal Instruction:\nConclude your response with a single sentence, starting with the phrase \"Self-Assessment:\", rating your own compliance with all of the above constraints on a scale from 1.0 to 5.0, and do not explain the rating.",
+        "apiAvailability": "available",
+        "averageTotalResponseTime": 24111.366666674614,
+        "averageTokensPerSecond": 13.529342145881893,
+        "medianTokensPerSecond": 13.852122720396649,
+        "averageInputTokensPerSecond": 29.07515003447345,
+        "medianInputTokensPerSecond": 29.062484341218134,
+        "averageCharactersPerSecond": 57.40530672189968,
+        "averageTimeToFirstToken": 5984.533333341281,
+        "averageInputTokens": 174,
+        "medianInputTokens": 174,
+        "medianTotalResponseTime": 24531.5,
+        "medianCharactersPerSecond": 59.15020157474404,
+        "medianTimeToFirstToken": 5987.100000023842
+      },
+      {
+        "id": "Prompt Image Describe (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Describe the provided image canvas concisely.",
+        "apiAvailability": "unavailable"
+      },
+      {
+        "id": "Prompt Image Explain Emotion (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Explain the emotion shown in this image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/Disgusted_Homelander.jpg"
+      },
+      {
+        "id": "Prompt Image Explain Meme (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Explain the visual joke or text provided in the canvas.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/Wikipedia_meme_vector_version.svg"
+      },
+      {
+        "id": "Prompt Image OCR Computer Font (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the computer font text from the provided image canvas.",
+        "apiAvailability": "unavailable"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 1 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-058.png"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 2 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-072x.png"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Letter 3 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_letters/a01-128.png"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 1 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0099.jpg"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 2 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0300.jpg"
+      },
+      {
+        "id": "Prompt Image OCR Handwritten Name 3 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Image)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Extract the handwritten text from the provided image.",
+        "apiAvailability": "unavailable",
+        "inputImageDataUrl": "images/cortex/handwritten_names/TEST_0958.jpg"
+      },
+      {
+        "id": "Prompt Audio Transcription 119 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-119.mp3",
+        "inputAudioDuration": 10.476
+      },
+      {
+        "id": "Prompt Audio Transcription 4167 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-4167.mp3",
+        "inputAudioDuration": 17.748
+      },
+      {
+        "id": "Prompt Audio Transcription 46 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-46.mp3",
+        "inputAudioDuration": 9.756
+      },
+      {
+        "id": "Prompt Audio Transcription 5670 (Cold)",
+        "status": "Skipped",
+        "api": "Prompt (with Audio)",
+        "startType": "cold",
+        "numberOfIterations": 3,
+        "testIterationResults": [],
+        "input": "Transcribe the spoken audio provided.",
+        "apiAvailability": "unavailable",
+        "inputAudioUrl": "images/cortex/speeches/spontaneous-speech-en-5670.mp3",
+        "inputAudioDuration": 18.252
+      }
+    ],
+    "summary": {
+      "Language Detector": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 10802.754858820745,
+          "averageTimeToFirstToken": 15.400000015894571,
+          "averageTotalResponseTime": 15.400000015894571,
+          "medianTimeToFirstToken": 8.899999976158142,
+          "medianTotalResponseTime": 8.899999976158142,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 13820.224756123576
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 66380.9519376344,
+          "averageTimeToFirstToken": 1.900000015894572,
+          "averageTotalResponseTime": 1.900000015894572,
+          "medianTimeToFirstToken": 2.100000023841858,
+          "medianTotalResponseTime": 2.100000023841858,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 58571.42790645159
+        }
+      },
+      "Translator": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 3260.9959322482514,
+          "averageTimeToFirstToken": 33.40000001589457,
+          "averageTotalResponseTime": 33.40000001589457,
+          "medianTimeToFirstToken": 17.100000023841858,
+          "medianTotalResponseTime": 17.100000023841858,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 4152.046777836696
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 5246.257845413968,
+          "averageTimeToFirstToken": 13.56666668256124,
+          "averageTotalResponseTime": 13.56666668256124,
+          "medianTimeToFirstToken": 13.299999952316284,
+          "medianTotalResponseTime": 13.299999952316284,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 5338.345883800915
+        }
+      },
+      "Summarizer": {
+        "cold": {
+          "averageTokenPerSecond": 15.050112737669345,
+          "averageInputTokensPerSecond": 213.7194951435214,
+          "averageCharactersPerSecond": 74.60112498677758,
+          "averageTimeToFirstToken": 4636.833333333333,
+          "averageTotalResponseTime": 15384.400000015894,
+          "medianTimeToFirstToken": 4685.800000071526,
+          "medianTotalResponseTime": 14347,
+          "medianTokenPerSecond": 15.081429597991928,
+          "medianInputTokensPerSecond": 208.2888727613432,
+          "medianCharactersPerSecond": 74.59740680349027
+        },
+        "warm": {
+          "averageTokenPerSecond": 13.551637729651054,
+          "averageInputTokensPerSecond": 6920.209634890541,
+          "averageCharactersPerSecond": 67.02698250266317,
+          "averageTimeToFirstToken": 1802.5666667222977,
+          "averageTotalResponseTime": 13442.900000055632,
+          "medianTimeToFirstToken": 103.20000004768372,
+          "medianTotalResponseTime": 12574.800000071526,
+          "medianTokenPerSecond": 13.517411910158664,
+          "medianInputTokensPerSecond": 9457.364336715482,
+          "medianCharactersPerSecond": 67.11247955341736
+        }
+      },
+      "Prompt": {
+        "cold": {
+          "averageTokenPerSecond": 13.620618358867755,
+          "averageInputTokensPerSecond": 37.013178159010664,
+          "averageCharactersPerSecond": 64.6078533647472,
+          "averageTimeToFirstToken": 5793.033333341281,
+          "averageTotalResponseTime": 19484.166666679914,
+          "medianTimeToFirstToken": 5738.799999952316,
+          "medianTotalResponseTime": 19798.700000047684,
+          "medianTokenPerSecond": 13.852122720396649,
+          "medianInputTokensPerSecond": 32.08650948413402,
+          "medianCharactersPerSecond": 64.57293806868212
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      },
+      "Prompt (with Image)": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      },
+      "Prompt (with Audio)": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      },
+      "Proofreader": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      },
+      "Rewriter": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      },
+      "Writer": {
+        "cold": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        },
+        "warm": {
+          "averageTokenPerSecond": 0,
+          "averageInputTokensPerSecond": 0,
+          "averageCharactersPerSecond": 0,
+          "averageTimeToFirstToken": 0,
+          "averageTotalResponseTime": 0,
+          "medianTimeToFirstToken": 0,
+          "medianTotalResponseTime": 0,
+          "medianTokenPerSecond": 0,
+          "medianInputTokensPerSecond": 0,
+          "medianCharactersPerSecond": 0
+        }
+      }
+    }
+  }
+}
