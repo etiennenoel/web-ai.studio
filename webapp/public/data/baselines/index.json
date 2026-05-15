@@ -225,5 +225,14 @@
     "ram": 31,
     "model": "Gemma4 2B",
     "executionType": "CPU"
+  },
+  {
+    "filename": "2026-05-14-windows-i5-1245u-16gb-litertlm",
+    "name": "Intel Core i5-1245U (LiteRT-LM)",
+    "os": "Windows",
+    "cpu": "Intel Core i5-1245U",
+    "ram": 16,
+    "model": "Gemma4 2B",
+    "executionType": "CPU"
   }
 ]
