@@ -47,6 +47,12 @@ import {
   SummarizerLongNewsArticleWarmStartAxonTest
 } from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
 import {
+  SummarizerLongNewsArticleSpeedColdStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-speed-cold-start.axon-test';
+import {
+  SummarizerLongNewsArticleSpeedWarmStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-speed-warm-start.axon-test';
+import {
   PromptTextFactAnalysisColdStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
 import {
@@ -260,6 +266,8 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
     // Summarizer
     SummarizerLongNewsArticleColdStartAxonTest,
     SummarizerLongNewsArticleWarmStartAxonTest,
+    SummarizerLongNewsArticleSpeedColdStartAxonTest,
+    SummarizerLongNewsArticleSpeedWarmStartAxonTest,
 
     // Prompt API Text
     PromptTextFactAnalysisColdStartAxonTest,

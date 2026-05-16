@@ -110,6 +110,8 @@ export class CortexPage implements OnInit, AfterViewInit, OnDestroy {
     [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: {},
     [AxonTestId.SummarizerLongNewsArticleColdStart]: {},
     [AxonTestId.SummarizerLongNewsArticleWarmStart]: {},
+    [AxonTestId.SummarizerLongNewsArticleSpeedColdStart]: {},
+    [AxonTestId.SummarizerLongNewsArticleSpeedWarmStart]: {},
     [AxonTestId.PromptTextFactAnalysisColdStart]: {},
     [AxonTestId.PromptTextEthicalAndCreativeColdStart]: {},
     [AxonTestId.PromptTextTechnicalChallengeColdStart]: {},

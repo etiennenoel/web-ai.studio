@@ -17,6 +17,7 @@ export class SummarizationDemoComponent extends BaseDemoComponent implements OnI
   
   _apiChoice: 'summarizer' | 'prompt' = 'summarizer';
   summaryType: 'key-points' | 'tl;dr' | 'teaser' | 'headline' = 'key-points';
+  preference: 'auto' | 'speed' | 'capability' = 'auto';
   
   get apiChoice() { return this._apiChoice; }
   set apiChoice(val: 'summarizer' | 'prompt') {
@@ -61,7 +62,8 @@ export class SummarizationDemoComponent extends BaseDemoComponent implements OnI
     
     if (this.apiChoice === 'summarizer') {
       return `const summarizer = await Summarizer.create({
-  type: "${this.summaryType}"
+  type: "${this.summaryType}",
+  preference: "${this.preference}"
 });
 
 const result = await summarizer.summarize("${escapedPrompt}");
@@ -92,7 +94,10 @@ for await (const chunk of stream) {
     
     try {
       if (this.apiChoice === 'summarizer') {
-        const summarizer = await Summarizer.create({ type: this.summaryType });
+        const summarizer = await Summarizer.create({ 
+          type: this.summaryType,
+          preference: this.preference
+        });
         const stream = summarizer.summarizeStreaming(this.sourceText, { signal: this.abortController.signal });
         
         for await (const chunk of stream) {

@@ -24,6 +24,12 @@ import {
   SummarizerLongNewsArticleWarmStartAxonTest
 } from './tests/summarizer/summarizer-long-news-article-warm-start.axon-test';
 import {
+  SummarizerLongNewsArticleSpeedColdStartAxonTest
+} from './tests/summarizer/summarizer-long-news-article-speed-cold-start.axon-test';
+import {
+  SummarizerLongNewsArticleSpeedWarmStartAxonTest
+} from './tests/summarizer/summarizer-long-news-article-speed-warm-start.axon-test';
+import {
   PromptTextFactAnalysisColdStartAxonTest
 } from './tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
 import {
@@ -60,6 +66,8 @@ export class AxonTestSuiteExecutor {
     AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart,
     AxonTestId.SummarizerLongNewsArticleColdStart,
     AxonTestId.SummarizerLongNewsArticleWarmStart,
+    AxonTestId.SummarizerLongNewsArticleSpeedColdStart,
+    AxonTestId.SummarizerLongNewsArticleSpeedWarmStart,
     AxonTestId.PromptTextFactAnalysisColdStart,
     AxonTestId.PromptTextEthicalAndCreativeColdStart,
     AxonTestId.PromptTextTechnicalChallengeColdStart,
@@ -90,6 +98,8 @@ export class AxonTestSuiteExecutor {
     private readonly translatorShortStringEnglishToFrenchWarmStartAxonTest: TranslatorShortStringEnglishToFrenchWarmStartAxonTest,
     private readonly summarizerLongNewsArticleWarmStartAxonTest: SummarizerLongNewsArticleWarmStartAxonTest,
     private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
+    private readonly summarizerLongNewsArticleSpeedColdStartAxonTest: SummarizerLongNewsArticleSpeedColdStartAxonTest,
+    private readonly summarizerLongNewsArticleSpeedWarmStartAxonTest: SummarizerLongNewsArticleSpeedWarmStartAxonTest,
     private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
     private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
     private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
@@ -116,6 +126,8 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.TranslatorShortStringEnglishToFrenchWarmStart]: this.translatorShortStringEnglishToFrenchWarmStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleColdStart]: this.summarizerLongNewsArticleColdStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleWarmStart]: this.summarizerLongNewsArticleWarmStartAxonTest,
+      [AxonTestId.SummarizerLongNewsArticleSpeedColdStart]: this.summarizerLongNewsArticleSpeedColdStartAxonTest,
+      [AxonTestId.SummarizerLongNewsArticleSpeedWarmStart]: this.summarizerLongNewsArticleSpeedWarmStartAxonTest,
       [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
       [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
       [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
