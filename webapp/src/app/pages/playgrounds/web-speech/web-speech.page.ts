@@ -41,13 +41,24 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
   recognitionLog: LogEntry[] = [];
   recognitionError = '';
 
+  // Setup + per-portion transcription latency metrics
+  installTimeMs: number | null = null;
+  setupLatencyMs: number | null = null;
+  portions: { index: number; text: string; firstWordMs: number | null; finalMs: number | null }[] = [];
+  private startCallTime = 0;
+  private recognitionStartedTime = 0;
+  private portionAnchorTime = 0;
+  private currentPortionFirstWordMs: number | null = null;
+
   // --- Synthesis state ---
   voices: any[] = [];
   isSpeaking = false;
   isPaused = false;
   synthesisLog: LogEntry[] = [];
   synthesisError = '';
+  timeToFirstAudioMs: number | null = null;
   private currentUtterance: any = null;
+  private speakCallTime = 0;
 
   // --- Generated code ---
   codeRecognition = '';
@@ -129,6 +140,25 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
   removePhrase(index: number) {
     this.phrases.removeAt(index);
+  }
+
+  private firstWordValues(): number[] {
+    return this.portions.map(p => p.firstWordMs).filter((v): v is number => v != null);
+  }
+
+  get avgFirstWordMs(): number | null {
+    const v = this.firstWordValues();
+    return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+  }
+
+  get fastestFirstWordMs(): number | null {
+    const v = this.firstWordValues();
+    return v.length ? Math.min(...v) : null;
+  }
+
+  get slowestFirstWordMs(): number | null {
+    const v = this.firstWordValues();
+    return v.length ? Math.max(...v) : null;
   }
 
   switchTab(tab: 'recognition' | 'synthesis') {
@@ -262,8 +292,10 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.isDownloading = true;
     this.downloadProgress = 0;
     this.installResult = null;
+    this.installTimeMs = null;
     this.recognitionError = '';
 
+    const t0 = performance.now();
     try {
       const result = await SR.install(this.getRecognitionOptions());
       this.installResult = result ? 'Model installed successfully' : 'Installation failed';
@@ -272,6 +304,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       this.installResult = 'Error';
       this.recognitionError = e.message || 'Installation failed';
     } finally {
+      this.installTimeMs = Math.round(performance.now() - t0);
       this.isInstalling = false;
       this.isDownloading = false;
     }
@@ -290,6 +323,9 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.interimTranscript = '';
     this.alternatives = [];
     this.recognitionLog = [];
+    this.setupLatencyMs = null;
+    this.portions = [];
+    this.currentPortionFirstWordMs = null;
 
     try {
       this.recognition = new SR();
@@ -314,6 +350,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       }
 
       this.bindRecognitionEvents();
+      this.startCallTime = performance.now();
       this.recognition.start();
     } catch (e: any) {
       this.recognitionError = e.message || 'Failed to start recognition';
@@ -326,17 +363,26 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
     r.onstart = () => this.ngZone.run(() => {
       this.isListening = true;
-      this.addRecognitionLog('start', 'Recognition service started');
+      this.recognitionStartedTime = performance.now();
+      this.setupLatencyMs = Math.round(this.recognitionStartedTime - this.startCallTime);
+      this.portionAnchorTime = this.recognitionStartedTime;
+      this.addRecognitionLog('start', `Recognition service started — setup ${this.setupLatencyMs}ms`);
       this.cdr.detectChanges();
     });
 
     r.onaudiostart = () => this.ngZone.run(() => this.addRecognitionLog('audiostart', 'Audio capture started'));
-    r.onspeechstart = () => this.ngZone.run(() => this.addRecognitionLog('speechstart', 'Speech detected'));
+    r.onspeechstart = () => this.ngZone.run(() => {
+      // "moment it's heard" anchor for the current portion
+      this.portionAnchorTime = performance.now();
+      this.currentPortionFirstWordMs = null;
+      this.addRecognitionLog('speechstart', 'Speech detected');
+    });
     r.onspeechend = () => this.ngZone.run(() => this.addRecognitionLog('speechend', 'Speech ended'));
     r.onaudioend = () => this.ngZone.run(() => this.addRecognitionLog('audioend', 'Audio capture ended'));
     r.onnomatch = () => this.ngZone.run(() => this.addRecognitionLog('nomatch', 'No confident match'));
 
     r.onresult = (event: any) => this.ngZone.run(() => {
+      const now = performance.now();
       let interim = '';
       this.alternatives = [];
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -350,9 +396,24 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
               confidence: result[j].confidence,
             });
           }
-          this.addRecognitionLog('result (final)', `"${best.transcript.trim()}"`);
+          // Per-portion latency: anchored to speechstart (the moment it's heard)
+          const finalMs = Math.round(now - this.portionAnchorTime);
+          const firstWordMs = this.currentPortionFirstWordMs ?? finalMs;
+          this.portions.push({
+            index: this.portions.length + 1,
+            text: best.transcript.trim(),
+            firstWordMs,
+            finalMs,
+          });
+          this.addRecognitionLog('result (final)', `"${best.transcript.trim()}" — first word ${firstWordMs}ms, final ${finalMs}ms`);
+          // next portion anchors here until a new speechstart fires
+          this.portionAnchorTime = now;
+          this.currentPortionFirstWordMs = null;
         } else {
           interim += best.transcript;
+          if (this.currentPortionFirstWordMs === null) {
+            this.currentPortionFirstWordMs = Math.round(now - this.portionAnchorTime);
+          }
         }
       }
       this.interimTranscript = interim;
@@ -394,6 +455,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.finalTranscript = '';
     this.interimTranscript = '';
     this.alternatives = [];
+    this.portions = [];
+    this.currentPortionFirstWordMs = null;
   }
 
   // ====================================================
@@ -424,6 +487,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
     this.synthesisError = '';
     this.synthesisLog = [];
+    this.timeToFirstAudioMs = null;
 
     try {
       synth.cancel();
@@ -441,7 +505,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       utterance.onstart = () => this.ngZone.run(() => {
         this.isSpeaking = true;
         this.isPaused = false;
-        this.addSynthesisLog('start', 'Speech started');
+        this.timeToFirstAudioMs = Math.round(performance.now() - this.speakCallTime);
+        this.addSynthesisLog('start', `Speech started — first audio ${this.timeToFirstAudioMs}ms`);
         this.cdr.detectChanges();
       });
       utterance.onend = () => this.ngZone.run(() => {
@@ -471,6 +536,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       });
 
       this.currentUtterance = utterance;
+      this.speakCallTime = performance.now();
       synth.speak(utterance);
     } catch (e: any) {
       this.synthesisError = e.message || 'Failed to start synthesis';
