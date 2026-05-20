@@ -41,14 +41,13 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
   recognitionLog: LogEntry[] = [];
   recognitionError = '';
 
-  // Setup + per-portion transcription latency metrics
+  // Setup + transcription latency metrics
   installTimeMs: number | null = null;
   setupLatencyMs: number | null = null;
-  timeToFirstResultMs: number | null = null;
-  portions: { index: number; text: string; recognitionMs: number; partials: number }[] = [];
+  soundToFirstWordMs: number | null = null;
   private startCallTime = 0;
-  private recognitionStartedTime = 0;
-  private resultTracker = new Map<number, { firstSeen: number; finalSeen: number | null; partials: number }>();
+  private soundStartTime = 0;
+  private firstSoundCaptured = false;
 
   // --- Synthesis state ---
   voices: any[] = [];
@@ -140,25 +139,6 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
   removePhrase(index: number) {
     this.phrases.removeAt(index);
-  }
-
-  private recognitionValues(): number[] {
-    return this.portions.map(p => p.recognitionMs);
-  }
-
-  get avgRecognitionMs(): number | null {
-    const v = this.recognitionValues();
-    return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
-  }
-
-  get fastestRecognitionMs(): number | null {
-    const v = this.recognitionValues();
-    return v.length ? Math.min(...v) : null;
-  }
-
-  get slowestRecognitionMs(): number | null {
-    const v = this.recognitionValues();
-    return v.length ? Math.max(...v) : null;
   }
 
   switchTab(tab: 'recognition' | 'synthesis') {
@@ -324,9 +304,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.alternatives = [];
     this.recognitionLog = [];
     this.setupLatencyMs = null;
-    this.timeToFirstResultMs = null;
-    this.portions = [];
-    this.resultTracker.clear();
+    this.soundToFirstWordMs = null;
+    this.firstSoundCaptured = false;
 
     try {
       this.recognition = new SR();
@@ -364,14 +343,28 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
     r.onstart = () => this.ngZone.run(() => {
       this.isListening = true;
-      this.recognitionStartedTime = performance.now();
-      this.setupLatencyMs = Math.round(this.recognitionStartedTime - this.startCallTime);
+      this.setupLatencyMs = Math.round(performance.now() - this.startCallTime);
       this.addRecognitionLog('start', `Recognition service started — setup ${this.setupLatencyMs}ms`);
       this.cdr.detectChanges();
     });
 
     r.onaudiostart = () => this.ngZone.run(() => this.addRecognitionLog('audiostart', 'Audio capture started'));
-    r.onspeechstart = () => this.ngZone.run(() => this.addRecognitionLog('speechstart', 'Speech detected'));
+    r.onsoundstart = () => this.ngZone.run(() => {
+      // Anchor for "sound to first word" — the moment any sound is detected.
+      if (!this.firstSoundCaptured) {
+        this.soundStartTime = performance.now();
+        this.firstSoundCaptured = true;
+      }
+      this.addRecognitionLog('soundstart', 'Sound detected');
+    });
+    r.onspeechstart = () => this.ngZone.run(() => {
+      // Fallback anchor if the engine never fired soundstart.
+      if (!this.firstSoundCaptured) {
+        this.soundStartTime = performance.now();
+        this.firstSoundCaptured = true;
+      }
+      this.addRecognitionLog('speechstart', 'Speech detected');
+    });
     r.onspeechend = () => this.ngZone.run(() => this.addRecognitionLog('speechend', 'Speech ended'));
     r.onaudioend = () => this.ngZone.run(() => this.addRecognitionLog('audioend', 'Audio capture ended'));
     r.onnomatch = () => this.ngZone.run(() => this.addRecognitionLog('nomatch', 'No confident match'));
@@ -382,45 +375,25 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       let interim = '';
       let lastFinal: any = null;
 
-      // Each result slot is tracked independently by its index. A portion is timed
-      // intrinsically — from its OWN first partial result to its OWN final result —
-      // so the dead time/pause between sentences is never counted.
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
         const best = result[0];
-
-        let track = this.resultTracker.get(i);
-        if (!track) {
-          track = { firstSeen: now, finalSeen: null, partials: 0 };
-          this.resultTracker.set(i, track);
-          if (this.timeToFirstResultMs === null) {
-            this.timeToFirstResultMs = Math.round(now - this.recognitionStartedTime);
-          }
-        }
-
         if (result.isFinal) {
           finalText += best.transcript + ' ';
           lastFinal = result;
-          // Record the portion exactly once, when this slot first becomes final.
-          if (track.finalSeen === null) {
-            track.finalSeen = now;
-            const recognitionMs = Math.round(track.finalSeen - track.firstSeen);
-            this.portions.push({
-              index: this.portions.length + 1,
-              text: best.transcript.trim(),
-              partials: track.partials,
-              recognitionMs,
-            });
-            this.addRecognitionLog('result (final)', `"${best.transcript.trim()}" — recognised in ${recognitionMs}ms (${track.partials} partial${track.partials === 1 ? '' : 's'})`);
-          }
         } else {
           interim += best.transcript;
-          track.partials++;
         }
       }
 
       this.finalTranscript = finalText;
       this.interimTranscript = interim;
+
+      // Sound to first word — captured once, on the very first transcribed word.
+      if (this.soundToFirstWordMs === null && this.firstSoundCaptured && (finalText || interim)) {
+        this.soundToFirstWordMs = Math.round(now - this.soundStartTime);
+        this.addRecognitionLog('first word', `transcribed ${this.soundToFirstWordMs}ms after sound detected`);
+      }
 
       // Alternatives of the most recent final result.
       if (lastFinal) {
@@ -471,9 +444,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.finalTranscript = '';
     this.interimTranscript = '';
     this.alternatives = [];
-    this.portions = [];
-    this.resultTracker.clear();
-    this.timeToFirstResultMs = null;
+    this.soundToFirstWordMs = null;
+    this.firstSoundCaptured = false;
   }
 
   // ====================================================
