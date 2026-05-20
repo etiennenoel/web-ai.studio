@@ -145,6 +145,7 @@ import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.pa
 import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/translator.page';
 import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
+import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 
 @NgModule({
   declarations: [
@@ -186,6 +187,7 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
     TranslatorPlaygroundPage,
     LanguageDetectorPlaygroundPage,
     ProofreaderPlaygroundPage,
+    WebSpeechPlaygroundPage,
     DemoLayoutComponent,
     SafeHtmlPipe,
     TranslationDemoComponent,

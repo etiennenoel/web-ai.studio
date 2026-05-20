@@ -1,0 +1,373 @@
+<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <i class="bi bi-mic text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Web Speech API</h1>
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">On-device speech recognition &amp; text-to-speech in the browser.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="sharePlayground()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0">
+          <i class="bi" [ngClass]="shareText === 'Copied!' ? 'bi-check2' : 'bi-share'"></i> {{shareText}}
+        </button>
+        <a href="https://webaudio.github.io/web-speech-api/" target="_blank" rel="noopener" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="text-decoration: none;">
+          <i class="bi bi-book"></i> Read the spec
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto p-8 space-y-8">
+
+    <!-- Tabs -->
+    <div class="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 w-fit mx-auto shadow-sm">
+      <button type="button" (click)="switchTab('recognition')"
+              class="rounded-lg px-5 py-2 text-sm font-semibold transition-colors flex items-center gap-2"
+              [ngClass]="activeTab === 'recognition' ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'">
+        <i class="bi bi-mic"></i> Speech to Text
+      </button>
+      <button type="button" (click)="switchTab('synthesis')"
+              class="rounded-lg px-5 py-2 text-sm font-semibold transition-colors flex items-center gap-2"
+              [ngClass]="activeTab === 'synthesis' ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'">
+        <i class="bi bi-volume-up"></i> Text to Speech
+      </button>
+    </div>
+
+    <form [formGroup]="playgroundForm" class="space-y-8">
+
+      <!-- ============================================ -->
+      <!-- SPEECH RECOGNITION TAB                       -->
+      <!-- ============================================ -->
+      <ng-container *ngIf="activeTab === 'recognition'">
+
+        <!-- 1. Configuration -->
+        <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">1</div>
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Recognition Configuration</h2>
+          </div>
+          <div class="p-6 space-y-6">
+
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex flex-col gap-1.5 flex-1">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Language (BCP-47)</label>
+                <input type="text" formControlName="lang" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-400 dark:placeholder-zinc-600 shadow-sm" placeholder="en-US">
+              </div>
+              <div class="flex flex-col gap-1.5 w-full md:w-40">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Max Alternatives</label>
+                <input type="number" min="1" max="10" formControlName="maxAlternatives" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <label class="flex items-center gap-3 flex-1 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm cursor-pointer">
+                <input type="checkbox" formControlName="continuous" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Continuous results</span>
+              </label>
+              <label class="flex items-center gap-3 flex-1 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm cursor-pointer">
+                <input type="checkbox" formControlName="interimResults" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Interim results</span>
+              </label>
+            </div>
+
+            <details open class="group bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+                <div class="flex items-center justify-between w-full">
+                  <span class="flex items-center gap-2"><i class="bi bi-stars text-slate-400"></i> On-Device &amp; Contextual Biasing</span>
+                  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                </div>
+              </summary>
+              <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
+
+                <!-- processLocally -->
+                <label class="flex items-center gap-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm cursor-pointer">
+                  <input type="checkbox" formControlName="processLocally" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
+                  <span>
+                    <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 block">Process locally (on-device)</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Forces recognition to run on the device — no audio leaves the browser.</span>
+                  </span>
+                </label>
+
+                <!-- Quality level -->
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 pl-1">Quality Level</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <label *ngFor="let q of qualityLevels"
+                           class="flex flex-col gap-1 p-3 rounded-lg border cursor-pointer transition-all shadow-sm"
+                           [ngClass]="playgroundForm.value.quality === q.value ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-300 dark:border-indigo-500/40' : 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700'">
+                      <span class="flex items-center gap-2">
+                        <input type="radio" formControlName="quality" [value]="q.value" class="text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{q.label}}</span>
+                      </span>
+                      <span class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug pl-6">{{q.hint}}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Contextual biasing phrases -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Contextual Biasing Phrases</label>
+                    <button type="button" (click)="addPhrase()" class="rounded-md px-2.5 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors flex items-center gap-1">
+                      <i class="bi bi-plus-lg"></i> Add phrase
+                    </button>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2 pl-1">Hint the recognizer towards specific words/names. Boost ranges 0.0–10.0 (default 1.0).</p>
+                  <div formArrayName="phrases" class="space-y-2">
+                    <div *ngFor="let p of phrases.controls; let i = index" [formGroupName]="i" class="flex items-center gap-2 bg-white dark:bg-zinc-800 p-2 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
+                      <input type="text" formControlName="phrase" placeholder="e.g. Etienne Noel" class="flex-1 bg-transparent border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-md px-3 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500">
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Boost</span>
+                        <input type="number" formControlName="boost" min="0" max="10" step="0.5" class="w-16 bg-transparent border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500">
+                      </div>
+                      <button type="button" (click)="removePhrase(i)" class="rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"><i class="bi bi-trash3"></i></button>
+                    </div>
+                    <p *ngIf="phrases.controls.length === 0" class="text-xs text-slate-400 dark:text-slate-500 italic pl-1">No phrases added.</p>
+                  </div>
+                </div>
+
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 2. Availability & Install -->
+        <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">2</div>
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Check Availability &amp; Install Model</h2>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <button type="button" (click)="checkAvailability()" class="rounded-lg px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit">
+                <i class="bi bi-activity"></i> Check Availability
+              </button>
+              <div *ngIf="availabilityStatus" class="flex items-center gap-2">
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Status:</span>
+                <span class="rounded-lg px-3 py-1.5 text-xs font-mono font-bold tracking-wide border shadow-sm"
+                      [ngClass]="{'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20': availabilityStatus === 'available', 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20': availabilityStatus !== 'available'}">
+                  {{availabilityStatus}}
+                </span>
+                <span *ngIf="availabilityTimeMs !== null" class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">{{availabilityTimeMs}}ms</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <button type="button" (click)="installModel()" [disabled]="isInstalling" class="rounded-lg px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium shadow-sm hover:bg-indigo-700 transition-colors flex items-center gap-2 w-fit disabled:opacity-50">
+                <i class="bi" [ngClass]="isInstalling ? 'bi-arrow-repeat animate-spin' : 'bi-download'"></i> {{ isInstalling ? 'Installing...' : 'Install On-Device Model' }}
+              </button>
+              <span *ngIf="installResult" class="text-sm font-medium text-slate-600 dark:text-slate-400">{{installResult}}</span>
+            </div>
+            <div *ngIf="isDownloading" class="w-full bg-indigo-100 dark:bg-indigo-900/50 h-1.5 overflow-hidden" style="border-radius: 9999px !important;">
+              <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 animate-pulse" style="border-radius: 9999px !important; width: 100%;"></div>
+            </div>
+
+            <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+                <div class="flex items-center justify-between w-full">
+                  <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Recognition Code</span>
+                  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                </div>
+              </summary>
+              <div class="h-[520px] min-h-[300px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+                <app-code-editor [code]="codeRecognition" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 3. Live Recognition -->
+        <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">3</div>
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Live Recognition</h2>
+          </div>
+          <div class="p-6 space-y-6">
+
+            <div class="flex flex-wrap items-center justify-center gap-3 bg-slate-50/50 dark:bg-zinc-900/30 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+              <button *ngIf="!isListening" type="button" (click)="startRecognition()" class="rounded-lg px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm shadow-md hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                <i class="bi bi-mic-fill text-lg"></i> Start Listening
+              </button>
+              <button *ngIf="isListening" type="button" (click)="stopRecognition()" class="rounded-lg px-6 py-2.5 bg-red-600 text-white font-semibold text-sm shadow-md hover:bg-red-700 transition-colors flex items-center gap-2">
+                <i class="bi bi-stop-circle-fill text-lg animate-pulse"></i> Stop Listening
+              </button>
+              <button type="button" (click)="abortRecognition()" [disabled]="!isListening" class="rounded-lg px-4 py-2.5 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all shadow-sm disabled:opacity-50">
+                Abort
+              </button>
+              <button type="button" (click)="clearTranscript()" class="rounded-lg px-4 py-2.5 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all shadow-sm">
+                Clear
+              </button>
+              <span *ngIf="isListening" class="flex items-center gap-2 text-sm font-bold text-red-600 dark:text-red-400">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span> Listening...
+              </span>
+            </div>
+
+            <div *ngIf="recognitionError" class="p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-sm">
+              <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+              <div>{{recognitionError}}</div>
+            </div>
+
+            <!-- Transcript -->
+            <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-3 bg-slate-50/50 dark:bg-zinc-800/50">
+                <div class="w-6 h-6 bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 dark:text-indigo-400 rounded"><i class="bi bi-card-text text-sm"></i></div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Transcript</span>
+              </div>
+              <div class="p-6 min-h-[120px] text-base leading-relaxed text-slate-800 dark:text-slate-200">
+                <span *ngIf="!finalTranscript && !interimTranscript" class="text-slate-400 dark:text-slate-500 italic text-sm">Start listening and speak — your transcript appears here.</span>
+                <span class="font-medium">{{finalTranscript}}</span>
+                <span class="text-slate-400 dark:text-slate-500 italic">{{interimTranscript}}</span>
+              </div>
+            </div>
+
+            <!-- Alternatives -->
+            <div *ngIf="alternatives.length > 0" class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/50">
+                <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Alternatives (last final result)</span>
+              </div>
+              <div class="divide-y divide-slate-100 dark:divide-zinc-800">
+                <div *ngFor="let alt of alternatives; let i = index" class="px-5 py-2.5 flex items-center justify-between gap-4">
+                  <span class="text-sm text-slate-700 dark:text-slate-300">{{i + 1}}. {{alt.transcript}}</span>
+                  <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">{{ alt.confidence != null ? (alt.confidence * 100 | number:'1.0-1') + '%' : 'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event log -->
+            <div *ngIf="recognitionLog.length > 0" class="bg-slate-900 dark:bg-[#0d1117] rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-5 py-2.5 border-b border-zinc-700/50 flex items-center gap-2">
+                <i class="bi bi-list-ul text-slate-400 text-sm"></i>
+                <span class="font-bold text-slate-300 text-xs uppercase tracking-wider">Event Log</span>
+              </div>
+              <div class="max-h-[220px] overflow-auto p-3 font-mono text-xs space-y-1">
+                <div *ngFor="let log of recognitionLog" class="flex gap-2">
+                  <span class="text-slate-500 shrink-0">{{log.time}}</span>
+                  <span class="text-indigo-400 font-bold shrink-0 w-32">{{log.event}}</span>
+                  <span class="text-slate-300">{{log.detail}}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ============================================ -->
+      <!-- SPEECH SYNTHESIS TAB                         -->
+      <!-- ============================================ -->
+      <ng-container *ngIf="activeTab === 'synthesis'">
+
+        <!-- 1. Configuration -->
+        <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">1</div>
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Synthesis Configuration</h2>
+          </div>
+          <div class="p-6 space-y-6">
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 pl-1">Text to Speak</label>
+              <textarea formControlName="synthesisText" class="w-full p-4 text-slate-700 dark:text-slate-300 bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y min-h-[120px] leading-relaxed text-sm outline-none placeholder-slate-400 dark:placeholder-zinc-600 font-medium transition-all shadow-sm" placeholder="Type something to speak..."></textarea>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex flex-col gap-1.5 flex-1">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Voice</label>
+                <select formControlName="voiceURI" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
+                  <option value="">Default voice</option>
+                  <option *ngFor="let v of voices" [value]="v.voiceURI">{{v.name}} ({{v.lang}}){{v.localService ? ' — local' : ''}}</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1.5 w-full md:w-48">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Language (BCP-47)</label>
+                <input type="text" formControlName="synthesisLang" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="en-US">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Rate <span class="font-mono text-indigo-500">{{playgroundForm.value.rate}}</span></label>
+                <input type="range" formControlName="rate" min="0.1" max="2" step="0.1" class="w-full accent-indigo-600">
+              </div>
+              <div>
+                <label class="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Pitch <span class="font-mono text-indigo-500">{{playgroundForm.value.pitch}}</span></label>
+                <input type="range" formControlName="pitch" min="0" max="2" step="0.1" class="w-full accent-indigo-600">
+              </div>
+              <div>
+                <label class="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Volume <span class="font-mono text-indigo-500">{{playgroundForm.value.volume}}</span></label>
+                <input type="range" formControlName="volume" min="0" max="1" step="0.1" class="w-full accent-indigo-600">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Speak -->
+        <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+          <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">2</div>
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Speak</h2>
+          </div>
+          <div class="p-6 space-y-6">
+
+            <div class="flex flex-wrap items-center justify-center gap-3 bg-slate-50/50 dark:bg-zinc-900/30 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+              <button type="button" (click)="speak()" class="rounded-lg px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm shadow-md hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                <i class="bi bi-play-fill text-lg"></i> Speak
+              </button>
+              <button type="button" (click)="pauseSpeech()" [disabled]="!isSpeaking || isPaused" class="rounded-lg px-5 py-2.5 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all shadow-sm disabled:opacity-50 flex items-center gap-2">
+                <i class="bi bi-pause-fill"></i> Pause
+              </button>
+              <button type="button" (click)="resumeSpeech()" [disabled]="!isPaused" class="rounded-lg px-5 py-2.5 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all shadow-sm disabled:opacity-50 flex items-center gap-2">
+                <i class="bi bi-play-fill"></i> Resume
+              </button>
+              <button type="button" (click)="cancelSpeech()" [disabled]="!isSpeaking" class="rounded-lg px-5 py-2.5 bg-red-600 text-white font-semibold text-sm shadow-md hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+                <i class="bi bi-stop-fill"></i> Cancel
+              </button>
+              <span *ngIf="isSpeaking" class="flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                <i class="bi bi-volume-up-fill animate-pulse"></i> {{ isPaused ? 'Paused' : 'Speaking...' }}
+              </span>
+            </div>
+
+            <div *ngIf="synthesisError" class="p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-sm">
+              <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+              <div>{{synthesisError}}</div>
+            </div>
+
+            <!-- Event log -->
+            <div *ngIf="synthesisLog.length > 0" class="bg-slate-900 dark:bg-[#0d1117] rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-5 py-2.5 border-b border-zinc-700/50 flex items-center gap-2">
+                <i class="bi bi-list-ul text-slate-400 text-sm"></i>
+                <span class="font-bold text-slate-300 text-xs uppercase tracking-wider">Event Log</span>
+              </div>
+              <div class="max-h-[220px] overflow-auto p-3 font-mono text-xs space-y-1">
+                <div *ngFor="let log of synthesisLog" class="flex gap-2">
+                  <span class="text-slate-500 shrink-0">{{log.time}}</span>
+                  <span class="text-indigo-400 font-bold shrink-0 w-24">{{log.event}}</span>
+                  <span class="text-slate-300">{{log.detail}}</span>
+                </div>
+              </div>
+            </div>
+
+            <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden">
+              <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+                <div class="flex items-center justify-between w-full">
+                  <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Synthesis Code</span>
+                  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                </div>
+              </summary>
+              <div class="h-[420px] min-h-[300px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+                <app-code-editor [code]="codeSynthesis" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+              </div>
+            </details>
+
+          </div>
+        </div>
+      </ng-container>
+
+    </form>
+  </div>
+</div>
