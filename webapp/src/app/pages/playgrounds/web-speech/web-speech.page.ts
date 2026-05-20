@@ -98,8 +98,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       continuous: [true],
       interimResults: [true],
       maxAlternatives: [1],
-      processLocally: [false],
-      quality: ['command'],
+      processLocally: [true],
+      quality: ['dictation'],
       phrases: this.fb.array([]),
 
       // Synthesis options
