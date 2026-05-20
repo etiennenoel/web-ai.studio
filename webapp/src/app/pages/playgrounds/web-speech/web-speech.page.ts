@@ -49,6 +49,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
   private recognitionStartedTime = 0;
   private portionAnchorTime = 0;
   private currentPortionFirstWordMs: number | null = null;
+  private recordedFinalCount = 0;
 
   // --- Synthesis state ---
   voices: any[] = [];
@@ -326,6 +327,7 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.setupLatencyMs = null;
     this.portions = [];
     this.currentPortionFirstWordMs = null;
+    this.recordedFinalCount = 0;
 
     try {
       this.recognition = new SR();
@@ -383,40 +385,63 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
     r.onresult = (event: any) => this.ngZone.run(() => {
       const now = performance.now();
+
+      // Results finalize in order, so all final results form a prefix of the list.
+      // Rebuild the transcript from scratch each event — this is implementation-agnostic
+      // and avoids relying on event.resultIndex (which the on-device path may not advance).
+      let finalText = '';
       let interim = '';
-      this.alternatives = [];
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      let finalCount = 0;
+      let lastFinal: any = null;
+      for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
-        const best = result[0];
         if (result.isFinal) {
-          this.finalTranscript += best.transcript + ' ';
-          for (let j = 0; j < result.length; j++) {
-            this.alternatives.push({
-              transcript: result[j].transcript,
-              confidence: result[j].confidence,
-            });
-          }
-          // Per-portion latency: anchored to speechstart (the moment it's heard)
+          finalText += result[0].transcript + ' ';
+          finalCount++;
+          lastFinal = result;
+        } else {
+          interim += result[0].transcript;
+        }
+      }
+      this.finalTranscript = finalText;
+      this.interimTranscript = interim;
+
+      // Record one portion per newly finalized result (never re-count old finals).
+      if (finalCount > this.recordedFinalCount) {
+        for (let i = this.recordedFinalCount; i < finalCount; i++) {
+          const result = event.results[i];
           const finalMs = Math.round(now - this.portionAnchorTime);
           const firstWordMs = this.currentPortionFirstWordMs ?? finalMs;
           this.portions.push({
             index: this.portions.length + 1,
-            text: best.transcript.trim(),
+            text: result[0].transcript.trim(),
             firstWordMs,
             finalMs,
           });
-          this.addRecognitionLog('result (final)', `"${best.transcript.trim()}" — first word ${firstWordMs}ms, final ${finalMs}ms`);
-          // next portion anchors here until a new speechstart fires
+          this.addRecognitionLog('result (final)', `"${result[0].transcript.trim()}" — first word ${firstWordMs}ms, final ${finalMs}ms`);
+          // The next portion is anchored here until a new speechstart fires.
           this.portionAnchorTime = now;
           this.currentPortionFirstWordMs = null;
-        } else {
-          interim += best.transcript;
-          if (this.currentPortionFirstWordMs === null) {
-            this.currentPortionFirstWordMs = Math.round(now - this.portionAnchorTime);
-          }
+        }
+        this.recordedFinalCount = finalCount;
+      }
+
+      // Time to first word of the in-progress portion (anchored to speechstart).
+      if (interim && this.currentPortionFirstWordMs === null && now > this.portionAnchorTime) {
+        this.currentPortionFirstWordMs = Math.round(now - this.portionAnchorTime);
+      }
+
+      // Alternatives of the most recent final result.
+      if (lastFinal) {
+        this.alternatives = [];
+        for (let j = 0; j < lastFinal.length; j++) {
+          this.alternatives.push({
+            transcript: lastFinal[j].transcript,
+            confidence: lastFinal[j].confidence,
+          });
         }
       }
-      this.interimTranscript = interim;
+
       this.cdr.detectChanges();
     });
 
