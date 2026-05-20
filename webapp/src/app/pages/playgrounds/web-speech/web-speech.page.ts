@@ -44,12 +44,11 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
   // Setup + per-portion transcription latency metrics
   installTimeMs: number | null = null;
   setupLatencyMs: number | null = null;
-  portions: { index: number; text: string; firstWordMs: number | null; finalMs: number | null }[] = [];
+  timeToFirstResultMs: number | null = null;
+  portions: { index: number; text: string; recognitionMs: number; partials: number }[] = [];
   private startCallTime = 0;
   private recognitionStartedTime = 0;
-  private portionAnchorTime = 0;
-  private currentPortionFirstWordMs: number | null = null;
-  private recordedFinalCount = 0;
+  private resultTracker = new Map<number, { firstSeen: number; finalSeen: number | null; partials: number }>();
 
   // --- Synthesis state ---
   voices: any[] = [];
@@ -143,22 +142,22 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.phrases.removeAt(index);
   }
 
-  private firstWordValues(): number[] {
-    return this.portions.map(p => p.firstWordMs).filter((v): v is number => v != null);
+  private recognitionValues(): number[] {
+    return this.portions.map(p => p.recognitionMs);
   }
 
-  get avgFirstWordMs(): number | null {
-    const v = this.firstWordValues();
+  get avgRecognitionMs(): number | null {
+    const v = this.recognitionValues();
     return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
   }
 
-  get fastestFirstWordMs(): number | null {
-    const v = this.firstWordValues();
+  get fastestRecognitionMs(): number | null {
+    const v = this.recognitionValues();
     return v.length ? Math.min(...v) : null;
   }
 
-  get slowestFirstWordMs(): number | null {
-    const v = this.firstWordValues();
+  get slowestRecognitionMs(): number | null {
+    const v = this.recognitionValues();
     return v.length ? Math.max(...v) : null;
   }
 
@@ -325,9 +324,9 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.alternatives = [];
     this.recognitionLog = [];
     this.setupLatencyMs = null;
+    this.timeToFirstResultMs = null;
     this.portions = [];
-    this.currentPortionFirstWordMs = null;
-    this.recordedFinalCount = 0;
+    this.resultTracker.clear();
 
     try {
       this.recognition = new SR();
@@ -367,69 +366,61 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
       this.isListening = true;
       this.recognitionStartedTime = performance.now();
       this.setupLatencyMs = Math.round(this.recognitionStartedTime - this.startCallTime);
-      this.portionAnchorTime = this.recognitionStartedTime;
       this.addRecognitionLog('start', `Recognition service started — setup ${this.setupLatencyMs}ms`);
       this.cdr.detectChanges();
     });
 
     r.onaudiostart = () => this.ngZone.run(() => this.addRecognitionLog('audiostart', 'Audio capture started'));
-    r.onspeechstart = () => this.ngZone.run(() => {
-      // "moment it's heard" anchor for the current portion
-      this.portionAnchorTime = performance.now();
-      this.currentPortionFirstWordMs = null;
-      this.addRecognitionLog('speechstart', 'Speech detected');
-    });
+    r.onspeechstart = () => this.ngZone.run(() => this.addRecognitionLog('speechstart', 'Speech detected'));
     r.onspeechend = () => this.ngZone.run(() => this.addRecognitionLog('speechend', 'Speech ended'));
     r.onaudioend = () => this.ngZone.run(() => this.addRecognitionLog('audioend', 'Audio capture ended'));
     r.onnomatch = () => this.ngZone.run(() => this.addRecognitionLog('nomatch', 'No confident match'));
 
     r.onresult = (event: any) => this.ngZone.run(() => {
       const now = performance.now();
-
-      // Results finalize in order, so all final results form a prefix of the list.
-      // Rebuild the transcript from scratch each event — this is implementation-agnostic
-      // and avoids relying on event.resultIndex (which the on-device path may not advance).
       let finalText = '';
       let interim = '';
-      let finalCount = 0;
       let lastFinal: any = null;
+
+      // Each result slot is tracked independently by its index. A portion is timed
+      // intrinsically — from its OWN first partial result to its OWN final result —
+      // so the dead time/pause between sentences is never counted.
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
+        const best = result[0];
+
+        let track = this.resultTracker.get(i);
+        if (!track) {
+          track = { firstSeen: now, finalSeen: null, partials: 0 };
+          this.resultTracker.set(i, track);
+          if (this.timeToFirstResultMs === null) {
+            this.timeToFirstResultMs = Math.round(now - this.recognitionStartedTime);
+          }
+        }
+
         if (result.isFinal) {
-          finalText += result[0].transcript + ' ';
-          finalCount++;
+          finalText += best.transcript + ' ';
           lastFinal = result;
+          // Record the portion exactly once, when this slot first becomes final.
+          if (track.finalSeen === null) {
+            track.finalSeen = now;
+            const recognitionMs = Math.round(track.finalSeen - track.firstSeen);
+            this.portions.push({
+              index: this.portions.length + 1,
+              text: best.transcript.trim(),
+              partials: track.partials,
+              recognitionMs,
+            });
+            this.addRecognitionLog('result (final)', `"${best.transcript.trim()}" — recognised in ${recognitionMs}ms (${track.partials} partial${track.partials === 1 ? '' : 's'})`);
+          }
         } else {
-          interim += result[0].transcript;
+          interim += best.transcript;
+          track.partials++;
         }
       }
+
       this.finalTranscript = finalText;
       this.interimTranscript = interim;
-
-      // Record one portion per newly finalized result (never re-count old finals).
-      if (finalCount > this.recordedFinalCount) {
-        for (let i = this.recordedFinalCount; i < finalCount; i++) {
-          const result = event.results[i];
-          const finalMs = Math.round(now - this.portionAnchorTime);
-          const firstWordMs = this.currentPortionFirstWordMs ?? finalMs;
-          this.portions.push({
-            index: this.portions.length + 1,
-            text: result[0].transcript.trim(),
-            firstWordMs,
-            finalMs,
-          });
-          this.addRecognitionLog('result (final)', `"${result[0].transcript.trim()}" — first word ${firstWordMs}ms, final ${finalMs}ms`);
-          // The next portion is anchored here until a new speechstart fires.
-          this.portionAnchorTime = now;
-          this.currentPortionFirstWordMs = null;
-        }
-        this.recordedFinalCount = finalCount;
-      }
-
-      // Time to first word of the in-progress portion (anchored to speechstart).
-      if (interim && this.currentPortionFirstWordMs === null && now > this.portionAnchorTime) {
-        this.currentPortionFirstWordMs = Math.round(now - this.portionAnchorTime);
-      }
 
       // Alternatives of the most recent final result.
       if (lastFinal) {
@@ -481,7 +472,8 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     this.interimTranscript = '';
     this.alternatives = [];
     this.portions = [];
-    this.currentPortionFirstWordMs = null;
+    this.resultTracker.clear();
+    this.timeToFirstResultMs = null;
   }
 
   // ====================================================
