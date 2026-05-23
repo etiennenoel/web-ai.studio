@@ -309,12 +309,18 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
 
     try {
       this.recognition = new SR();
+
+      // Apply the full options dict (langs, processLocally, quality) — per the
+      // on-device-speech-recognition + quality-levels explainers. This is how the
+      // instance picks up which quality-tier model to use.
+      try { this.recognition.options = this.getRecognitionOptions(); } catch (e) {}
+
       this.recognition.lang = val.lang;
       this.recognition.continuous = val.continuous;
       this.recognition.interimResults = val.interimResults;
       this.recognition.maxAlternatives = val.maxAlternatives;
 
-      // On-device recognition (explainer: on-device-speech-recognition)
+      // Backwards compat: also set processLocally directly (older explainer pattern).
       try { this.recognition.processLocally = val.processLocally; } catch (e) {}
 
       // Contextual biasing (explainer: contextual-biasing)
@@ -574,11 +580,11 @@ export class WebSpeechPlaygroundPage implements OnInit, OnDestroy {
     rec += `}\n\n`;
 
     rec += `const recognition = new SpeechRecognition();\n`;
+    rec += `recognition.options = options;            // applies langs, processLocally, quality\n`;
     rec += `recognition.lang = "${val.lang}";\n`;
     rec += `recognition.continuous = ${val.continuous};\n`;
     rec += `recognition.interimResults = ${val.interimResults};\n`;
-    rec += `recognition.maxAlternatives = ${val.maxAlternatives};\n`;
-    rec += `recognition.processLocally = ${val.processLocally};\n\n`;
+    rec += `recognition.maxAlternatives = ${val.maxAlternatives};\n\n`;
 
     if (val.phrases?.length) {
       rec += `// Contextual biasing (explainer: contextual-biasing)\n`;
