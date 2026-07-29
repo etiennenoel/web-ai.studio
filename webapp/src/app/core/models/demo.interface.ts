@@ -1,5 +1,6 @@
 import {PromptRunOptions} from './prompt-run.options';
 import {AttachmentTypeEnum} from '../enums/attachment-type.enum';
+import {DemoPreview} from './demo-preview.interface';
 
 export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings' | 'Speech';
 
@@ -23,6 +24,9 @@ export interface DemoExample {
   icon: string;
   onDeviceReason: string;
   codeSnippet: string;
+
+  /** Hand-authored sample of what the demo produces, shown on the listing card. */
+  preview?: DemoPreview;
   
   // To power the execution
   promptRunOptions: Partial<PromptRunOptions>;

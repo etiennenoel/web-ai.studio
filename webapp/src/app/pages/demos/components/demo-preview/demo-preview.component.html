@@ -1,0 +1,142 @@
+<!--
+  Illustrative only — the card's title and description carry the accessible name,
+  so the whole block is hidden from assistive tech.
+-->
+<div aria-hidden="true"
+     class="relative max-h-32 rounded-xl border border-slate-200/80 dark:border-zinc-700/60 bg-slate-50 dark:bg-zinc-900/60 px-3 py-2.5 overflow-hidden select-none">
+
+  @if (preview.source; as source) {
+    <div class="flex items-center gap-1.5 mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+      <i class="bi {{ source.icon }} {{ accent }} text-xs"></i>
+      <span class="truncate">{{ source.label }}</span>
+    </div>
+  }
+
+  @switch (preview.kind) {
+
+    <!-- Input -> output, as two stacked blocks -->
+    @case ('io') {
+      <div class="flex flex-col gap-1.5">
+        @for (row of io.rows; track $index) {
+          @if (row.role === 'in') {
+            <div class="text-[11px] leading-snug text-slate-400 dark:text-zinc-500 line-clamp-2">{{ row.text }}</div>
+          } @else {
+            <div class="flex gap-1.5">
+              <i class="bi bi-arrow-return-right {{ accent }} text-[11px] shrink-0 mt-px"></i>
+              <div class="text-[11px] leading-snug font-medium text-slate-700 dark:text-slate-300 line-clamp-3">{{ row.text }}</div>
+            </div>
+          }
+        }
+      </div>
+    }
+
+    <!-- Conversation bubbles -->
+    @case ('chat') {
+      <div class="flex flex-col gap-1.5">
+        @for (row of io.rows; track $index) {
+          <div class="flex" [class.justify-end]="row.role === 'in'">
+            <div class="max-w-[85%] rounded-lg px-2 py-1 text-[11px] leading-snug line-clamp-2"
+                 [ngClass]="row.role === 'in'
+                   ? 'bg-slate-200/70 dark:bg-zinc-700/70 text-slate-600 dark:text-slate-300'
+                   : 'bg-[#ffffff] dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 font-medium'">
+              {{ row.text }}
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Stacked transcript tracks -->
+    @case ('captions') {
+      <div class="flex flex-col gap-1.5">
+        @for (row of io.rows; track $index) {
+          <div class="flex items-start gap-1.5">
+            <span class="w-1 self-stretch rounded-full shrink-0"
+                  [ngClass]="row.role === 'in' ? 'bg-slate-300 dark:bg-zinc-600' : 'bg-current ' + accent"></span>
+            <span class="text-[11px] leading-snug line-clamp-2"
+                  [ngClass]="row.role === 'in'
+                    ? 'text-slate-400 dark:text-zinc-500'
+                    : 'text-slate-700 dark:text-slate-300 font-medium'">{{ row.text }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Before / after with the changed spans marked -->
+    @case ('diff') {
+      <div class="flex flex-col gap-2">
+        <p class="m-0 text-[11px] leading-snug text-slate-400 dark:text-zinc-500 line-clamp-2">
+          @for (span of diff.before; track $index) {
+            <span [class]="span.changed ? 'line-through decoration-rose-400/70 text-rose-500/80 dark:text-rose-400/80' : ''">{{ span.text }}</span>
+          }
+        </p>
+        <p class="m-0 text-[11px] leading-snug font-medium text-slate-700 dark:text-slate-300 line-clamp-3">
+          @for (span of diff.after; track $index) {
+            <span [class]="span.changed ? 'rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-0.5' : ''">{{ span.text }}</span>
+          }
+        </p>
+      </div>
+    }
+
+    <!-- Ranked rows with score bars -->
+    @case ('list') {
+      <div class="flex flex-col gap-1.5">
+        @if (list.query) {
+          <div class="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-zinc-500">
+            <i class="bi bi-search text-[10px]"></i>
+            <span class="truncate italic">{{ list.query }}</span>
+          </div>
+        }
+        @for (row of list.rows; track $index) {
+          <div class="flex items-center gap-2">
+            <span class="flex-1 min-w-0 truncate text-[11px] leading-snug text-slate-700 dark:text-slate-300">
+              {{ row.text }}
+              @if (row.meta) {
+                <span class="text-slate-400 dark:text-zinc-500">· {{ row.meta }}</span>
+              }
+            </span>
+            <span class="h-1 w-10 shrink-0 rounded-full bg-slate-200 dark:bg-zinc-700 overflow-hidden">
+              <span class="block h-full rounded-full bg-current {{ accent }}" [style.width.%]="row.score * 100"></span>
+            </span>
+            <span class="w-7 shrink-0 text-right text-[10px] font-semibold tabular-nums text-slate-400 dark:text-zinc-500">{{ row.score * 100 | number: '1.0-0' }}%</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Labels, clusters, categories -->
+    @case ('chips') {
+      <div class="flex flex-col gap-2">
+        @if (chips.caption) {
+          <div class="text-[11px] leading-snug text-slate-400 dark:text-zinc-500 line-clamp-2">{{ chips.caption }}</div>
+        }
+        <div class="flex flex-wrap gap-1">
+          @for (row of chips.rows; track $index) {
+            <span class="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+              @if (row.group) {
+                <span class="{{ accent }} font-bold uppercase tracking-wider text-[9px]">{{ row.group }}</span>
+              }
+              {{ row.label }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Structured output / generated code -->
+    @case ('json') { <ng-container *ngTemplateOutlet="codeTemplate"></ng-container> }
+    @case ('code') { <ng-container *ngTemplateOutlet="codeTemplate"></ng-container> }
+  }
+
+  <!-- Fade the overflow out instead of clipping mid-line -->
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-slate-50 dark:from-[#18181b] to-transparent"></div>
+</div>
+
+<ng-template #codeTemplate>
+  <div class="flex flex-col gap-1.5">
+    @if (codeBlock.caption) {
+      <div class="text-[11px] leading-snug text-slate-400 dark:text-zinc-500 line-clamp-1">{{ codeBlock.caption }}</div>
+    }
+    <pre class="m-0 overflow-hidden font-mono text-[10px] leading-[1.45] text-slate-600 dark:text-slate-300"><code>@for (line of codeLines; track $index) {<span class="block overflow-hidden text-ellipsis whitespace-pre">{{ line }}</span>}</code></pre>
+  </div>
+</ng-template>
