@@ -1,0 +1,192 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-embedder-status
+      [embedderStatus]="embedderStatus"
+      [showPromptApi]="true"
+      [promptApiStatus]="languageModelAvailability"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress">
+    </app-embedder-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Scoreboard -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
+        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Cache Hits</div>
+        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ hits }}</div>
+      </div>
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
+        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Cache Misses</div>
+        <div class="text-2xl font-bold text-slate-700 dark:text-slate-300">{{ misses }}</div>
+      </div>
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
+        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Hit vs Generation</div>
+        <div class="text-2xl font-bold text-slate-800 dark:text-slate-200">
+          {{ averageHitMs !== null ? averageHitMs + 'ms' : 'N/A' }}
+          <span class="text-sm font-medium text-slate-400 dark:text-slate-500">vs {{ averageGenerationMs !== null ? averageGenerationMs + 'ms' : 'N/A' }}</span>
+        </div>
+      </div>
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
+        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Est. Tokens Saved</div>
+        <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">≈{{ tokensSaved }}</div>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- Ask panel -->
+      <div class="lg:flex-[3] flex flex-col gap-4">
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5">
+          <div class="flex gap-3">
+            <input
+              type="text"
+              class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/40 text-sm"
+              [(ngModel)]="question"
+              (keydown.enter)="ask()"
+              placeholder="Ask a question..." />
+            @if (state === 'Inferencing') {
+              <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                      (click)="onCancel()">
+                <i class="bi bi-stop-fill"></i> Stop
+              </button>
+            } @else {
+              <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                      (click)="ask()"
+                      [disabled]="!canAsk || !question.trim()">
+                <i class="bi bi-send"></i> Ask
+              </button>
+            }
+          </div>
+
+          <div class="mt-3 flex flex-col gap-1.5">
+            @for (pair of samplePairs; track pair.first) {
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <button class="px-3 py-1.5 rounded-full font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors"
+                        (click)="useSample(pair.first)">
+                  1. {{ pair.first }}
+                </button>
+                <i class="bi bi-arrow-right text-slate-300 dark:text-zinc-600"></i>
+                <button class="px-3 py-1.5 rounded-full font-medium bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 transition-colors"
+                        (click)="useSample(pair.paraphrase)">
+                  2. {{ pair.paraphrase }}
+                </button>
+              </div>
+            }
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 m-0 mt-1">Ask 1 first (generates), then 2 — the paraphrase hits the cache instantly.</p>
+          </div>
+        </div>
+
+        <!-- Outcome banner -->
+        @if (lastOutcome) {
+          @if (lastOutcome.type === 'hit') {
+            <div class="bg-emerald-50 border-2 border-emerald-300 dark:bg-emerald-900/15 dark:border-emerald-700 rounded-2xl p-4">
+              <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-sm uppercase tracking-wider">
+                <i class="bi bi-lightning-charge-fill"></i> Cache Hit — {{ lastOutcome.timeMs }}ms, zero LLM tokens
+              </div>
+              <p class="text-xs text-emerald-800 dark:text-emerald-200/80 m-0 mt-1.5">
+                Matched "{{ lastOutcome.matchedQuestion }}" with similarity {{ lastOutcome.score?.toFixed(3) }} — saved ≈{{ lastOutcome.tokensSaved }} tokens of generation.
+              </p>
+            </div>
+          } @else {
+            <div class="bg-slate-100 border border-slate-200 dark:bg-zinc-800/70 dark:border-zinc-700 rounded-2xl p-4">
+              <div class="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-bold text-sm uppercase tracking-wider">
+                <i class="bi bi-hourglass-split"></i> Cache Miss — generated in {{ lastOutcome.timeMs }}ms
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 m-0 mt-1.5">
+                The answer is now cached under this question's embedding. Ask a paraphrase to see the difference.
+              </p>
+            </div>
+          }
+        }
+
+        <!-- Answer -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col flex-grow min-h-[140px] overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-chat-square-dots text-indigo-500"></i> Answer
+            </span>
+            @if (state === 'Inferencing') {
+              <app-latency-loader></app-latency-loader>
+            }
+          </div>
+          <div class="p-5 text-slate-800 dark:text-slate-200 leading-relaxed text-[15px] whitespace-pre-wrap flex-grow">
+            @if (answer) {
+              {{ answer }}
+            } @else {
+              <span class="text-slate-400 dark:text-slate-500 font-light select-none">Ask a question to see caching in action...</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache contents -->
+      <div class="lg:flex-[2] bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col max-h-[600px]">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center gap-3">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-hdd-stack text-indigo-500"></i> Semantic Cache
+          </span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">{{ cache.length }} entries</span>
+            @if (cache.length > 0) {
+              <button class="text-xs font-medium text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 bg-transparent border-none transition-colors"
+                      (click)="clearCache()">
+                Clear
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Threshold -->
+        <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 flex items-center gap-3">
+          <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Hit threshold</span>
+          <input type="range" min="0.7" max="0.95" step="0.01" class="flex-grow accent-indigo-600" [(ngModel)]="threshold" />
+          <span class="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 w-10">{{ threshold.toFixed(2) }}</span>
+        </div>
+
+        <div class="overflow-y-auto flex-grow p-3 flex flex-col gap-2">
+          @if (cache.length === 0) {
+            <p class="text-sm text-slate-400 dark:text-slate-500 m-auto text-center font-light p-6">Every generated answer is stored here under its question's embedding.</p>
+          }
+          @for (entry of cache; track entry.question) {
+            <div class="rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/60 dark:bg-[#161616]/60 p-3 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+                 (click)="entry.expanded = !entry.expanded">
+              <div class="flex items-start gap-2">
+                <i class="bi {{ entry.expanded ? 'bi-chevron-down' : 'bi-chevron-right' }} text-[10px] text-slate-400 mt-1"></i>
+                <div class="flex-grow min-w-0">
+                  <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 m-0 leading-snug">{{ entry.question }}</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500">generated in {{ entry.generationTimeMs }}ms</span>
+                    @if (entry.lastScore !== null) {
+                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                            [ngClass]="entry.lastScore >= threshold ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-slate-200/70 dark:bg-zinc-800 text-slate-500 dark:text-slate-400'">
+                        last query: {{ entry.lastScore.toFixed(3) }}
+                      </span>
+                    }
+                  </div>
+                  @if (entry.expanded) {
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mt-2 leading-relaxed whitespace-pre-wrap">{{ entry.answer }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

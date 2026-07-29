@@ -1,0 +1,163 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-embedder-status
+      [embedderStatus]="embedderStatus"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress">
+    </app-embedder-status>
+
+    @if (!gameReady && embedderStatus !== 'unavailable' && !isPreparing) {
+      <div class="mb-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/10 dark:border-indigo-900/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <span class="text-sm text-indigo-900 dark:text-indigo-200">
+          <i class="bi bi-controller"></i> A secret word is picked and embedded locally. Guess it by getting semantically closer.
+        </span>
+        <button class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-md transition-all active:scale-95 border-none whitespace-nowrap"
+                (click)="newGame()">
+          Start Game
+        </button>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- Game board -->
+      <div class="lg:flex-[3] w-full flex flex-col gap-4">
+
+        <!-- Win / reveal banner -->
+        @if (won) {
+          <div class="bg-emerald-50 border-2 border-emerald-300 dark:bg-emerald-900/15 dark:border-emerald-700 rounded-3xl p-6 text-center">
+            <div class="text-4xl mb-2">🎉</div>
+            <div class="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+              You found "{{ secretWord }}" in {{ guessCount }} {{ guessCount === 1 ? 'guess' : 'guesses' }}!
+            </div>
+            <button class="mt-4 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                    (click)="newGame()">
+              <i class="bi bi-arrow-repeat"></i> Play Again
+            </button>
+          </div>
+        } @else if (gaveUp) {
+          <div class="bg-slate-100 border border-slate-200 dark:bg-zinc-800/70 dark:border-zinc-700 rounded-3xl p-6 text-center">
+            <div class="text-lg font-bold text-slate-700 dark:text-slate-300">
+              The word was "<span class="text-indigo-600 dark:text-indigo-400">{{ secretWord }}</span>"
+            </div>
+            <button class="mt-4 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                    (click)="newGame()">
+              <i class="bi bi-arrow-repeat"></i> New Word
+            </button>
+          </div>
+        }
+
+        <!-- Guess input -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5">
+          <div class="flex gap-3">
+            <input
+              type="text"
+              class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/40"
+              [(ngModel)]="guessInput"
+              (keydown.enter)="submitGuess()"
+              [disabled]="!gameReady || isOver"
+              placeholder="Guess a word..." />
+            <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                    (click)="submitGuess()"
+                    [disabled]="!gameReady || isOver || !guessInput.trim() || isGuessing">
+              @if (isGuessing) {
+                <i class="bi bi-arrow-repeat animate-spin"></i>
+              } @else {
+                <i class="bi bi-thermometer-half"></i>
+              }
+              Guess
+            </button>
+          </div>
+          <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
+            <div class="flex items-center gap-3">
+              @if (inputError) {
+                <span class="text-xs text-red-500">{{ inputError }}</span>
+              } @else if (guessLatencyMs !== null) {
+                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                  <i class="bi bi-cpu"></i> scored on-device in {{ guessLatencyMs }}ms
+                </span>
+              } @else if (gameReady) {
+                <span class="text-xs text-slate-400 dark:text-slate-500">The secret word is embedded — guesses are scored by cosine similarity.</span>
+              }
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">{{ guessCount }} {{ guessCount === 1 ? 'guess' : 'guesses' }}</span>
+              @if (gameReady && !isOver && guessCount > 0) {
+                <button class="text-xs font-medium text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 bg-transparent border-none transition-colors"
+                        (click)="giveUp()">
+                  Give up
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Guess history -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col min-h-[220px]">
+          <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+            <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-list-ol text-indigo-500"></i> Guesses, Closest First
+            </span>
+          </div>
+          <div class="p-4 flex flex-col gap-2 flex-grow">
+            @if (guesses.length === 0) {
+              <p class="text-sm text-slate-400 dark:text-slate-500 m-auto text-center font-light">
+                {{ gameReady ? 'Make your first guess — any English word works.' : 'Start a game to begin guessing.' }}
+              </p>
+            }
+            @for (guess of sortedGuesses; track guess.word) {
+              @let temp = temperature(guess.score);
+              <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all"
+                   [ngClass]="guess.isLatest ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-900/10' : 'border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-[#161616]/50'">
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200 w-28 truncate">{{ guess.word }}</span>
+                <div class="flex-grow h-2.5 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500 {{ temp.barClass }}" [style.width.%]="barWidth(guess.score)"></div>
+                </div>
+                <span class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 w-12 text-right">{{ guess.score.toFixed(3) }}</span>
+                <span class="text-xs font-bold w-20 text-right {{ temp.textClass }}">
+                  <i class="bi {{ temp.icon }}"></i> {{ temp.label }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div class="lg:flex-[2] w-full bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-6">
+        <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-4">
+          <i class="bi bi-lightbulb text-amber-500"></i> How It Works
+        </span>
+        <ol class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-5 flex flex-col gap-3 m-0">
+          <li>A secret word is picked and embedded <span class="font-semibold">once</span>, on-device.</li>
+          <li>Every guess is embedded locally and compared with cosine similarity — no server ever sees your guesses.</li>
+          <li>The temperature tells you how semantically close you are: "ocean" is scorching for "submarine", "banana" is freezing.</li>
+          <li>Think in <span class="font-semibold">meaning</span>, not spelling — related concepts, categories, and contexts score high.</li>
+        </ol>
+        @if (bestGuess) {
+          <div class="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-700/50">
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Best so far</span>
+            <div class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+              {{ bestGuess.word }}
+              <span class="text-sm font-mono font-semibold {{ temperature(bestGuess.score).textClass }}">{{ bestGuess.score.toFixed(3) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

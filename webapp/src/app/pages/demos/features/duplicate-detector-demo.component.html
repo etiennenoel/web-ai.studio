@@ -1,0 +1,159 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-embedder-status
+      [embedderStatus]="embedderStatus"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress">
+    </app-embedder-status>
+
+    @if (!indexReady && embedderStatus !== 'unavailable') {
+      <div class="mb-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/10 dark:border-indigo-900/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <span class="text-sm text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
+          @if (isIndexing) {
+            <i class="bi bi-arrow-repeat animate-spin"></i> Embedding the issue tracker on-device...
+          } @else {
+            <i class="bi bi-database"></i> The tracker's existing issues need to be embedded before duplicate detection can run.
+          }
+        </span>
+        @if (!isIndexing) {
+          <button class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-md transition-all active:scale-95 border-none whitespace-nowrap"
+                  (click)="buildIndex()">
+            Build Index
+          </button>
+        }
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- New issue form -->
+      <div class="lg:flex-[3] flex flex-col gap-4">
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-bug text-indigo-500"></i> Report an Issue
+            </span>
+            @if (checkLatencyMs !== null && hasChecked) {
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                <i class="bi bi-cpu"></i> checked in {{ checkLatencyMs }}ms
+              </span>
+            }
+          </div>
+          <div class="p-5 flex flex-col gap-4">
+            <input
+              type="text"
+              class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/40 text-base"
+              [(ngModel)]="draftTitle"
+              (ngModelChange)="onDraftChanged()"
+              [disabled]="!indexReady"
+              placeholder="Issue title — duplicates are checked while you type..." />
+
+            <div class="flex flex-wrap gap-2">
+              @for (sample of sampleDrafts; track sample) {
+                <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                        [disabled]="!indexReady"
+                        (click)="useSample(sample)">
+                  {{ sample }}
+                </button>
+              }
+            </div>
+
+            <!-- Duplicate warnings -->
+            @if (hasChecked && draftTitle.trim()) {
+              @if (duplicates.length > 0) {
+                <div class="bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30 rounded-2xl p-4">
+                  <div class="flex items-center gap-2 mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-amber-500"></i>
+                    <span class="text-sm font-bold text-amber-800 dark:text-amber-300">
+                      {{ duplicates.length }} possible {{ duplicates.length === 1 ? 'duplicate' : 'duplicates' }} found
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    @for (match of duplicates; track match.issue.id) {
+                      <div class="flex items-center gap-3 bg-[#ffffff] dark:bg-zinc-800/80 rounded-xl border border-amber-200/60 dark:border-amber-900/30 px-3.5 py-2.5">
+                        <span class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500">#{{ match.issue.id }}</span>
+                        <span class="text-sm text-slate-700 dark:text-slate-300 flex-grow">{{ match.issue.title }}</span>
+                        <div class="w-16 h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden shrink-0">
+                          <div class="h-full bg-amber-500 rounded-full" [style.width.%]="match.score * 100"></div>
+                        </div>
+                        <span class="text-xs font-mono font-semibold text-amber-700 dark:text-amber-400 shrink-0">{{ (match.score * 100).toFixed(0) }}%</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-900/30 rounded-2xl p-4 flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-300">
+                  <i class="bi bi-check-circle-fill text-emerald-500"></i>
+                  No similar issues above the threshold — this looks like a new problem.
+                </div>
+              }
+            }
+
+            @if (submittedMessage) {
+              <div class="bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-900/30 rounded-2xl p-4 flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-300">
+                <i class="bi bi-send-check-fill text-emerald-500"></i> {{ submittedMessage }}
+              </div>
+            }
+
+            <!-- Threshold + submit -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
+              <div class="flex items-center gap-3 flex-grow">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Similarity threshold</span>
+                <input type="range" min="0.3" max="0.9" step="0.05"
+                       class="flex-grow accent-indigo-600"
+                       [(ngModel)]="threshold"
+                       (ngModelChange)="onThresholdChanged()" />
+                <span class="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 w-10">{{ threshold.toFixed(2) }}</span>
+              </div>
+              <button class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none whitespace-nowrap"
+                      (click)="submitIssue()"
+                      [disabled]="!draftTitle.trim() || !indexReady || isChecking">
+                <i class="bi bi-send"></i> File Issue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing issues -->
+      <div class="lg:flex-[2] bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col max-h-[560px]">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-list-task text-indigo-500"></i> Open Issues
+          </span>
+          <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">{{ issues.length }}</span>
+        </div>
+        <div class="overflow-y-auto flex-grow p-3 flex flex-col gap-1.5">
+          @if (issues.length === 0) {
+            <p class="text-sm text-slate-400 dark:text-slate-500 m-auto text-center font-light p-6">Issues appear here once the index is built.</p>
+          }
+          @for (issue of issues; track issue.id) {
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors"
+                 [ngClass]="issue.isNew ? 'bg-emerald-50 dark:bg-emerald-900/15 border border-emerald-200 dark:border-emerald-900/40' : 'hover:bg-slate-50 dark:hover:bg-zinc-800'">
+              <span class="text-[10px] font-mono font-bold shrink-0"
+                    [ngClass]="issue.isNew ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'">#{{ issue.id }}</span>
+              <span class="text-xs text-slate-600 dark:text-slate-400 leading-snug">{{ issue.title }}</span>
+              @if (issue.isNew) {
+                <span class="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white uppercase shrink-0">New</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

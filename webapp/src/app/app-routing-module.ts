@@ -37,6 +37,14 @@ import { StructuredJsonDemoComponent } from './pages/demos/features/structured-j
 import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
 import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
 import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
+import { DocumentChatDemoComponent } from './pages/demos/features/document-chat-demo.component';
+import { SemanticSearchDemoComponent } from './pages/demos/features/semantic-search-demo.component';
+import { SmartTriageDemoComponent } from './pages/demos/features/smart-triage-demo.component';
+import { DuplicateDetectorDemoComponent } from './pages/demos/features/duplicate-detector-demo.component';
+import { ClusterLabelDemoComponent } from './pages/demos/features/cluster-label-demo.component';
+import { SemanticCacheDemoComponent } from './pages/demos/features/semantic-cache-demo.component';
+import { CommandPaletteDemoComponent } from './pages/demos/features/command-palette-demo.component';
+import { SemanticWordGameDemoComponent } from './pages/demos/features/semantic-word-game-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -448,6 +456,62 @@ const routes: Routes = [
       {
         path: "demos/receipt-to-json",
         component: ReceiptToJsonDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/document-chat",
+        component: DocumentChatDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/semantic-search",
+        component: SemanticSearchDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/smart-triage",
+        component: SmartTriageDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/duplicate-detector",
+        component: DuplicateDetectorDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/cluster-and-label",
+        component: ClusterLabelDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/semantic-cache",
+        component: SemanticCacheDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/command-palette",
+        component: CommandPaletteDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/semantic-word-game",
+        component: SemanticWordGameDemoComponent,
         data: {
           route: RouteEnum.Demos
         }
