@@ -137,6 +137,13 @@ import { ContextualBiasingDemoComponent } from './pages/demos/features/contextua
 import { PolyglotChatDemoComponent } from './pages/demos/features/polyglot-chat-demo.component';
 import { ProofreaderInlineDemoComponent } from './pages/demos/features/proofreader-inline-demo.component';
 import { UniversalInboxDemoComponent } from './pages/demos/features/universal-inbox-demo.component';
+import { TonePadDemoComponent } from './pages/demos/features/tone-pad-demo.component';
+import { SummarizerMatrixDemoComponent } from './pages/demos/features/summarizer-matrix-demo.component';
+import { ReplyComposerDemoComponent } from './pages/demos/features/reply-composer-demo.component';
+import { DictateAndPolishDemoComponent } from './pages/demos/features/dictate-and-polish-demo.component';
+import { CameraQaDemoComponent } from './pages/demos/features/camera-qa-demo.component';
+import { DrawAndGuessDemoComponent } from './pages/demos/features/draw-and-guess-demo.component';
+import { StoryTimeDemoComponent } from './pages/demos/features/story-time-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
@@ -250,6 +257,13 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     PolyglotChatDemoComponent,
     ProofreaderInlineDemoComponent,
     UniversalInboxDemoComponent,
+    TonePadDemoComponent,
+    SummarizerMatrixDemoComponent,
+    ReplyComposerDemoComponent,
+    DictateAndPolishDemoComponent,
+    CameraQaDemoComponent,
+    DrawAndGuessDemoComponent,
+    StoryTimeDemoComponent,
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,

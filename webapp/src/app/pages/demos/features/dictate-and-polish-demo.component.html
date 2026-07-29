@@ -1,0 +1,119 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      [showInstall]="true"
+      [isInstalling]="isInstalling"
+      (install)="installSpeechModel({ quality: 'dictation' })"
+      unavailableHint="<span class='font-semibold'>An API is unavailable.</span> Without the mic you can still load the sample dictation below and polish it with the Proofreader and Rewriter.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Raw dictation -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden min-h-[340px]">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-soundwave text-cyan-500"></i> Raw Dictation
+          </span>
+          <div class="flex items-center gap-2">
+            @if (isListening) {
+              <button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      (click)="stopDictation()">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Stop
+              </button>
+            } @else {
+              <button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none"
+                      [disabled]="speechStatus !== 'available'"
+                      (click)="startDictation()">
+                <i class="bi bi-mic-fill"></i> {{ rawText ? 'Continue' : 'Dictate' }}
+              </button>
+            }
+            @if (rawText) {
+              <button class="text-xs font-medium text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 bg-transparent border-none transition-colors"
+                      (click)="clearAll()">
+                Clear
+              </button>
+            }
+          </div>
+        </div>
+        <div class="p-5 flex-grow text-base text-slate-800 dark:text-slate-200 leading-relaxed">
+          {{ rawText }}
+          @if (interim) {
+            <span class="text-slate-400 dark:text-slate-500 italic">{{ rawText ? ' ' : '' }}{{ interim }}</span>
+          }
+          @if (!rawText && !interim) {
+            <span class="text-slate-400 dark:text-slate-500 font-light select-none">
+              Dictate freely — ums, tangents, and run-ons welcome. Or
+              <button class="text-cyan-600 dark:text-cyan-400 underline bg-transparent border-none p-0 font-light" (click)="useSample()">load a sample dictation</button>.
+            </span>
+          }
+        </div>
+        <!-- Polish actions -->
+        <div class="p-4 border-t border-slate-100 dark:border-zinc-700/50 flex flex-wrap gap-2">
+          @for (action of actions; track action.id) {
+            <button class="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 border-none shadow-sm disabled:opacity-40"
+                    [ngClass]="activeAction === action ? 'bg-cyan-600 text-white' : 'bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-300'"
+                    [disabled]="!rawText.trim() || isPolishing || !actionAvailable(action)"
+                    (click)="polish(action)">
+              <i class="bi {{ action.icon }}"></i> {{ action.label }}
+              <span class="text-[9px] opacity-60 font-mono">{{ action.api }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Polished result -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border flex flex-col overflow-hidden min-h-[340px]"
+           [ngClass]="polishedText ? 'border-cyan-200 dark:border-cyan-900/50' : 'border-slate-200 dark:border-zinc-700'">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 flex justify-between items-center"
+             [ngClass]="polishedText ? 'bg-cyan-50/50 dark:bg-cyan-900/10' : 'bg-slate-50/50 dark:bg-[#161616]/50'">
+          <span class="text-sm font-bold uppercase tracking-wider flex items-center gap-2"
+                [ngClass]="polishedText ? 'text-cyan-700 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'">
+            <i class="bi bi-stars text-amber-500"></i> Polished
+            @if (activeAction && polishedText) {
+              <span class="normal-case font-medium text-slate-400 dark:text-slate-500">— {{ activeAction.label }}</span>
+            }
+          </span>
+          <div class="flex items-center gap-2">
+            @if (polishTimeMs !== null && polishedText) {
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                {{ polishTimeMs }}ms
+              </span>
+            }
+            @if (polishedText && !isPolishing) {
+              <button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      title="Use this as the new draft and keep polishing"
+                      (click)="keepPolished()">
+                <i class="bi bi-arrow-left"></i> Keep
+              </button>
+            }
+          </div>
+        </div>
+        <div class="p-5 flex-grow text-base text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+          @if (isPolishing) {
+            <span class="text-cyan-500"><i class="bi bi-arrow-repeat animate-spin"></i> {{ activeAction?.label }}...</span>
+          } @else if (polishedText) {
+            {{ polishedText }}
+          } @else {
+            <span class="text-slate-400 dark:text-slate-500 font-light select-none">Pick a polish action — the cleaned-up version lands here. "Keep" it to chain another pass.</span>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

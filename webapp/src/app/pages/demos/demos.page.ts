@@ -20,8 +20,8 @@ interface CategoryStyle {
 })
 export class DemosPage extends BasePage implements OnInit {
   demos: DemoExample[] = DEMOS_DATA;
-  categories: DemoCategory[] = ['Speech', 'Embeddings', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
-  apis: DemoApi[] = ['Prompt API', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Proofreader'];
+  categories: DemoCategory[] = ['Embeddings', 'Speech', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
+  apis: DemoApi[] = ['Prompt API', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader'];
 
   searchQuery = '';
   selectedCategory: DemoCategory | null = null;

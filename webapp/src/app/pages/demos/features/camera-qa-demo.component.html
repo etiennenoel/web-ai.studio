@@ -1,0 +1,134 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>The Prompt API with image input is not available in this browser.</span> Use a Chrome build with multimodal Gemini Nano enabled.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- Camera panel -->
+      <div class="lg:flex-[3] w-full">
+        <div class="bg-[#101014] rounded-3xl shadow-xl border border-zinc-800 overflow-hidden relative aspect-video flex items-center justify-center">
+          @if (cameraState === 'live') {
+            <video #video autoplay playsinline muted class="w-full h-full object-cover"></video>
+            <button class="absolute top-4 right-4 px-3.5 py-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white text-xs font-semibold backdrop-blur transition-colors border-none"
+                    (click)="stopCamera()">
+              <i class="bi bi-camera-video-off"></i> Stop
+            </button>
+            @if (state === 'Inferencing') {
+              <div class="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 text-white text-xs font-semibold backdrop-blur">
+                <i class="bi bi-arrow-repeat animate-spin"></i> Analyzing frame...
+              </div>
+            }
+          } @else {
+            <div class="text-center p-8">
+              <i class="bi bi-camera-video text-5xl text-zinc-700"></i>
+              <p class="text-zinc-500 text-sm mt-3 mb-5 font-light max-w-sm">
+                @if (cameraState === 'denied') {
+                  Camera access was denied — update the site permission and try again.
+                } @else if (cameraState === 'unavailable') {
+                  No camera is available in this browser.
+                } @else {
+                  The feed stays on this device: frames go straight from the sensor to the on-device model.
+                }
+              </p>
+              @if (cameraState === 'idle' || cameraState === 'denied') {
+                <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-700 text-white font-medium shadow-md transition-all active:scale-95 border-none mx-auto"
+                        (click)="startCamera()">
+                  <i class="bi bi-camera-video"></i> Start Camera
+                </button>
+              } @else if (cameraState === 'starting') {
+                <span class="text-zinc-400 text-sm"><i class="bi bi-arrow-repeat animate-spin"></i> Starting camera...</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Question bar -->
+        <div class="mt-4 bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-4">
+          <div class="flex gap-3">
+            <input type="text"
+                   class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-violet-500/40"
+                   [(ngModel)]="question"
+                   (keydown.enter)="captureAndAsk()"
+                   [disabled]="cameraState !== 'live'"
+                   placeholder="Ask about what the camera sees..." />
+            @if (state === 'Inferencing') {
+              <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                      (click)="onCancel()">
+                <i class="bi bi-stop-fill"></i> Stop
+              </button>
+            } @else {
+              <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-violet-600 hover:bg-violet-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none whitespace-nowrap"
+                      [disabled]="cameraState !== 'live' || !question.trim() || languageModelAvailability === 'unavailable'"
+                      (click)="captureAndAsk()">
+                <i class="bi bi-camera"></i> Capture & Ask
+              </button>
+            }
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            @for (sample of sampleQuestions; track sample) {
+              <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                      [disabled]="cameraState !== 'live' || state === 'Inferencing'"
+                      (click)="useSample(sample)">
+                {{ sample }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Snapshot + answer -->
+      <div class="lg:flex-[2] w-full flex flex-col gap-4">
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-image text-violet-500"></i> Frozen Frame
+            </span>
+          </div>
+          <div class="bg-slate-100 dark:bg-[#161616] flex items-center justify-center min-h-[120px]">
+            <canvas #snapshot class="w-full h-auto" [class.hidden]="!hasSnapshot"></canvas>
+            @if (!hasSnapshot) {
+              <span class="text-xs text-slate-400 dark:text-zinc-600 font-light p-6">The captured frame appears here.</span>
+            }
+          </div>
+        </div>
+
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden flex-grow min-h-[160px]">
+          <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-stars text-amber-500"></i> Answer
+            </span>
+            @if (state === 'Inferencing') {
+              <app-latency-loader></app-latency-loader>
+            }
+          </div>
+          <div class="p-5 text-[15px] text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap flex-grow">
+            @if (answer) {
+              {{ answer }}
+            } @else {
+              <span class="text-slate-400 dark:text-slate-500 font-light select-none">The model's answer about the frame appears here.</span>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

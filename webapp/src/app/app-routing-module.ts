@@ -52,6 +52,13 @@ import { ContextualBiasingDemoComponent } from './pages/demos/features/contextua
 import { PolyglotChatDemoComponent } from './pages/demos/features/polyglot-chat-demo.component';
 import { ProofreaderInlineDemoComponent } from './pages/demos/features/proofreader-inline-demo.component';
 import { UniversalInboxDemoComponent } from './pages/demos/features/universal-inbox-demo.component';
+import { TonePadDemoComponent } from './pages/demos/features/tone-pad-demo.component';
+import { SummarizerMatrixDemoComponent } from './pages/demos/features/summarizer-matrix-demo.component';
+import { ReplyComposerDemoComponent } from './pages/demos/features/reply-composer-demo.component';
+import { DictateAndPolishDemoComponent } from './pages/demos/features/dictate-and-polish-demo.component';
+import { CameraQaDemoComponent } from './pages/demos/features/camera-qa-demo.component';
+import { DrawAndGuessDemoComponent } from './pages/demos/features/draw-and-guess-demo.component';
+import { StoryTimeDemoComponent } from './pages/demos/features/story-time-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -568,6 +575,55 @@ const routes: Routes = [
       {
         path: "demos/universal-inbox",
         component: UniversalInboxDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/tone-pad",
+        component: TonePadDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/summarizer-matrix",
+        component: SummarizerMatrixDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/reply-composer",
+        component: ReplyComposerDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/dictate-and-polish",
+        component: DictateAndPolishDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/camera-qa",
+        component: CameraQaDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/draw-and-guess",
+        component: DrawAndGuessDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/story-time",
+        component: StoryTimeDemoComponent,
         data: {
           route: RouteEnum.Demos
         }
