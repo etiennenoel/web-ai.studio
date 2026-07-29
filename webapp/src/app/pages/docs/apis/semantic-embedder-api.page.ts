@@ -216,6 +216,115 @@ semanticEmbedder.destroy();
 console.log(&quot;Semantic embedder destroyed.&quot;);"></app-code-snippet>
           </section>
 
+          <!-- API reference -->
+          <section id="api-reference" class="scroll-mt-6">
+            <app-docs-section-header anchorId="api-reference" title="API reference"></app-docs-section-header>
+            <p class="text-slate-600 dark:text-slate-400 mb-4">
+              The explainer does not yet publish formal WebIDL. The interface below is reconstructed from the examples and prose in the proposal, and is the shape you should expect to code against during a developer trial — not normative spec text.
+            </p>
+
+            <div class="mb-6 p-4 bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex gap-3">
+              <i class="bi bi-info-circle-fill text-lg mt-0.5 text-slate-400 dark:text-slate-500"></i>
+              <div>
+                Members marked <code class="text-xs font-mono text-amber-600 dark:text-amber-400">// under discussion</code> appear in the explainer as open questions or future extensibility, not as committed surface.
+              </div>
+            </div>
+
+            <app-code-snippet code="// Shared with the other Built-In AI APIs
+enum Availability &#123; &quot;unavailable&quot;, &quot;downloadable&quot;, &quot;downloading&quot;, &quot;available&quot; &#125;;
+
+[Exposed=(Window,Worker), SecureContext]
+interface SemanticEmbedder &#123;
+  static Promise&lt;Availability&gt; availability();
+  static Promise&lt;SemanticEmbedder&gt; create(
+      optional SemanticEmbedderCreateOptions options = &#123;&#125;);
+
+  // Polymorphic: a single string, or a batch of strings.
+  Promise&lt;EmbedderResult&gt; embed((DOMString or sequence&lt;DOMString&gt;) input);
+
+  undefined destroy();
+
+  // static double compare(EmbedderResult a, EmbedderResult b);  // under discussion
+  // static sequence&lt;DOMString&gt; chunk(DOMString text);           // under discussion
+&#125;;
+
+dictionary SemanticEmbedderCreateOptions &#123;
+  AbortSignal signal;
+  CreateMonitorCallback monitor;
+  DOMString taskType;   // under discussion: optional hint browsers may ignore
+&#125;;
+
+dictionary EmbedderResult &#123;
+  sequence&lt;Embedding&gt; embeddings;   // 1:1 with the inputs
+  EmbedderMetadata metadata;
+&#125;;
+
+dictionary Embedding &#123;
+  Float32Array values;
+  EmbeddingStatistics statistics;   // under discussion
+&#125;;
+
+dictionary EmbeddingStatistics &#123;   // under discussion
+  unsigned long long tokenCount;
+  boolean truncated;
+&#125;;
+
+dictionary EmbedderMetadata &#123;
+  DOMString embeddingSpace;         // e.g. &quot;embeddinggemma-300m&quot;
+  unsigned long long maxInputTokens; // e.g. 2048
+&#125;;"></app-code-snippet>
+
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 mt-8">Members at a glance</h3>
+            <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800">
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Member</th>
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Returns</th>
+                    <th class="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">SemanticEmbedder.availability()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">Promise&lt;Availability&gt;</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Proposed</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">SemanticEmbedder.create()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">Promise&lt;SemanticEmbedder&gt;</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Proposed</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">semanticEmbedder.embed()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">Promise&lt;EmbedderResult&gt;</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Proposed</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">semanticEmbedder.destroy()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">undefined</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Proposed</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-amber-600 dark:text-amber-400">SemanticEmbedder.compare()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Under discussion — would validate embedding-space compatibility before comparing.</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-amber-600 dark:text-amber-400">SemanticEmbedder.chunk()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">sequence&lt;DOMString&gt;</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Under discussion — native splitting of large documents.</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-amber-600 dark:text-amber-400">options.taskType</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Under discussion — optional quality hint (e.g. retrieval, classification) that browsers may ignore.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
           <!-- Cosine similarity -->
           <section id="cosine-similarity" class="scroll-mt-6">
             <app-docs-section-header anchorId="cosine-similarity" title="Comparing embeddings"></app-docs-section-header>
