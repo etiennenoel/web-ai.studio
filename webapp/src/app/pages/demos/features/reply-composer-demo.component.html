@@ -1,0 +1,121 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="[{ name: 'Writer', status: writerStatus }]"
+      unavailableHint="<span class='font-semibold'>The Writer API is not available in this browser.</span> Enable it in a recent Chrome build to compose replies.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- Inbox side -->
+      <div class="lg:flex-[2] w-full flex flex-col gap-3">
+        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="bi bi-envelope text-indigo-500"></i> Incoming
+        </span>
+        @for (email of emails; track email.subject) {
+          <button class="text-left rounded-2xl border p-4 transition-all bg-transparent"
+                  [ngClass]="selectedEmail === email
+                    ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/60 dark:bg-indigo-900/10 shadow-sm'
+                    : 'border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90 hover:border-slate-300 dark:hover:border-zinc-600'"
+                  (click)="selectEmail(email)">
+            <div class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ email.from }}</div>
+            <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5">{{ email.subject }}</div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-500 m-0 mt-1.5 leading-relaxed"
+               [ngClass]="selectedEmail === email ? '' : 'line-clamp-2'">{{ email.body }}</p>
+          </button>
+        }
+      </div>
+
+      <!-- Composer side -->
+      <div class="lg:flex-[3] w-full flex flex-col gap-4">
+
+        <!-- Controls -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 flex flex-col gap-4">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Reply intent</span>
+            <div class="flex flex-wrap gap-2 mt-2">
+              @for (intent of intents; track intent.label) {
+                <button class="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 border-none shadow-sm disabled:opacity-50"
+                        [ngClass]="selectedIntent === intent ? 'bg-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-300'"
+                        [disabled]="isWriting || writerStatus === 'unavailable'"
+                        (click)="compose(intent)">
+                  <i class="bi {{ intent.icon }}"></i> {{ intent.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-x-8 gap-y-3">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tone</span>
+              <div class="inline-flex bg-slate-200/50 dark:bg-zinc-800/80 p-1 rounded-xl ml-3">
+                @for (option of ['formal', 'neutral', 'casual']; track option) {
+                  <button class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border-none outline-none"
+                          [ngClass]="tone === option ? 'bg-[#ffffff] dark:bg-zinc-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 bg-transparent hover:text-slate-800 dark:hover:text-slate-200'"
+                          (click)="tone = option === 'formal' ? 'formal' : option === 'casual' ? 'casual' : 'neutral'">
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Length</span>
+              <div class="inline-flex bg-slate-200/50 dark:bg-zinc-800/80 p-1 rounded-xl ml-3">
+                @for (option of ['short', 'medium', 'long']; track option) {
+                  <button class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border-none outline-none"
+                          [ngClass]="length === option ? 'bg-[#ffffff] dark:bg-zinc-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 bg-transparent hover:text-slate-800 dark:hover:text-slate-200'"
+                          (click)="length = option === 'short' ? 'short' : option === 'long' ? 'long' : 'medium'">
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Draft -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden min-h-[240px]">
+          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-reply text-indigo-500"></i> Draft Reply
+              @if (selectedIntent) {
+                <span class="normal-case font-medium text-slate-400">— {{ selectedIntent.label }}, {{ tone }}, {{ length }}</span>
+              }
+            </span>
+            @if (isWriting) {
+              <button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      (click)="cancel()">
+                <i class="bi bi-stop-fill"></i> Stop
+              </button>
+            }
+          </div>
+          <div class="p-5 text-[15px] text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap flex-grow">
+            @if (draft) {
+              {{ draft }}@if (isWriting) {<span class="inline-block w-0.5 h-4 bg-indigo-500 animate-pulse align-middle ml-0.5"></span>}
+            } @else if (isWriting) {
+              <span class="text-indigo-500"><i class="bi bi-arrow-repeat animate-spin"></i></span>
+            } @else {
+              <span class="text-slate-400 dark:text-slate-500 font-light select-none">Pick an intent above — the reply streams here, written entirely on-device.</span>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

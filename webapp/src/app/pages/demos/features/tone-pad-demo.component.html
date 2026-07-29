@@ -1,0 +1,102 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="[{ name: 'Rewriter', status: rewriterStatus }]"
+      unavailableHint="<span class='font-semibold'>The Rewriter API is not available in this browser.</span> Enable the Rewriter API in a recent Chrome build to use the pad.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Input -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden mb-6">
+      <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center flex-wrap gap-2">
+        <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+          <i class="bi bi-pencil text-sky-500"></i> Your Message
+        </span>
+        <button class="flex items-center gap-2 px-5 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                [disabled]="isGeneratingAll || pendingCount === 0 || rewriterStatus === 'unavailable' || !text.trim()"
+                (click)="generateAll()">
+          @if (isGeneratingAll) {
+            <i class="bi bi-arrow-repeat animate-spin"></i> Rewriting... ({{ 8 - pendingCount }}/8)
+          } @else {
+            <i class="bi bi-grid-3x3-gap"></i> Fill the Pad
+          }
+        </button>
+      </div>
+      <textarea
+        class="w-full bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 resize-none p-5 leading-relaxed text-base min-h-[80px]"
+        [(ngModel)]="text"
+        (ngModelChange)="onTextChanged()"
+        placeholder="Type a message to reshape..."></textarea>
+    </div>
+
+    <!-- The pad -->
+    <div class="flex flex-col items-center gap-2 mb-6">
+      <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        ← more casual · tone · more formal →
+      </div>
+      <div class="flex items-center gap-2 w-full">
+        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+          ← shorter · length · longer →
+        </div>
+        <div class="grid grid-cols-3 gap-3 flex-grow">
+          @for (row of grid; track $index) {
+            @for (cell of row; track cellLabel(cell)) {
+              <button class="text-left rounded-2xl border p-3.5 min-h-[120px] transition-all flex flex-col gap-1.5 relative bg-transparent"
+                      [ngClass]="selected === cell
+                        ? 'border-sky-400 dark:border-sky-600 ring-2 ring-sky-200 dark:ring-sky-900/60 bg-sky-50/60 dark:bg-sky-900/10'
+                        : isCenter(cell)
+                          ? 'border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-[#161616] hover:border-slate-400'
+                          : 'border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90 hover:border-sky-300 dark:hover:border-sky-800 hover:shadow-md'"
+                      (click)="selectCell(cell)">
+                <span class="text-[9px] font-bold uppercase tracking-wider"
+                      [ngClass]="isCenter(cell) ? 'text-slate-500 dark:text-slate-400' : 'text-sky-600 dark:text-sky-400'">
+                  {{ cellLabel(cell) }}
+                  @if (cell.timeMs !== null) {
+                    <span class="font-mono text-slate-300 dark:text-zinc-600 normal-case ml-1">{{ cell.timeMs }}ms</span>
+                  }
+                </span>
+                @if (cell.isGenerating) {
+                  <span class="m-auto text-sky-500"><i class="bi bi-arrow-repeat animate-spin text-lg"></i></span>
+                } @else if (displayText(cell)) {
+                  <span class="text-[11px] text-slate-600 dark:text-slate-400 leading-snug line-clamp-4">{{ displayText(cell) }}</span>
+                } @else {
+                  <span class="m-auto text-slate-300 dark:text-zinc-600 text-xs font-light">click to rewrite</span>
+                }
+              </button>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected preview -->
+    @if (selected) {
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-sky-200 dark:border-sky-900/50 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-sky-100 dark:border-sky-900/30 bg-sky-50/50 dark:bg-sky-900/10 flex items-center gap-2">
+          <i class="bi bi-joystick text-sky-500"></i>
+          <span class="text-xs font-bold text-sky-700 dark:text-sky-300 uppercase tracking-wider">{{ cellLabel(selected) }}</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500">tone: {{ selected.tone }} · length: {{ selected.length }}</span>
+        </div>
+        <div class="p-5 text-base text-slate-800 dark:text-slate-200 leading-relaxed">
+          @if (selected.isGenerating) {
+            <i class="bi bi-arrow-repeat animate-spin text-sky-400"></i>
+          } @else {
+            {{ displayText(selected) || '—' }}
+          }
+        </div>
+      </div>
+    }
+  </div>
+</app-demo-layout>

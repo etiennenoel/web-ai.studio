@@ -145,6 +145,69 @@ recognition.start();`,
     initialPrompt: ''
   },
 
+  {
+    id: 'dictate-and-polish',
+    title: 'Dictate & Polish',
+    description: 'Speak your messy first draft, then let the Proofreader and Rewriter turn it into publishable text.',
+    category: 'Speech',
+    apis: ['Web Speech', 'Proofreader', 'Rewriter'],
+    icon: 'bi-soundwave',
+    onDeviceReason: 'Speak like a human, publish like an editor: dictation, proofreading, and rewriting chain together locally, so rough spoken thoughts never leave the device.',
+    codeSnippet: `// 1. Dictate on-device
+const recognition = new SpeechRecognition();
+recognition.options = { langs: ["en-US"], processLocally: true, quality: "dictation" };
+recognition.continuous = true;
+recognition.onresult = (e) => (rawTranscript = collect(e));
+recognition.start();
+
+// 2. Fix punctuation, casing, and grammar with the Proofreader
+const proofreader = await Proofreader.create({ expectedInputLanguages: ["en"] });
+const { correctedInput } = await proofreader.proofread(rawTranscript);
+
+// 3. Reshape it with the Rewriter
+const rewriter = await Rewriter.create({
+  tone: "more-formal",   // or "more-casual"
+  length: "shorter",     // or "longer"
+  format: "plain-text"
+});
+const polished = await rewriter.rewrite(correctedInput);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'story-time',
+    title: 'Story Time',
+    description: 'The Writer invents a bedtime story from three ingredients, then the browser reads it aloud — highlighting each word as it speaks.',
+    category: 'Speech',
+    apis: ['Writer', 'Web Speech'],
+    icon: 'bi-moon-stars',
+    onDeviceReason: 'A complete storyteller with no servers: generation by the on-device Writer, narration by speechSynthesis, word-by-word karaoke highlighting from boundary events.',
+    codeSnippet: `// 1. Write the story on-device
+const writer = await Writer.create({
+  tone: "casual",
+  format: "plain-text",
+  length: "medium",
+  sharedContext: "You write warm bedtime stories for young children."
+});
+const stream = writer.writeStreaming(
+  "Write a bedtime story featuring a dragon, a submarine, and pancakes."
+);
+for await (const chunk of stream) story += chunk;
+
+// 2. Narrate it with word-by-word highlighting
+const utterance = new SpeechSynthesisUtterance(story);
+utterance.rate = 0.9;
+
+utterance.onboundary = (event) => {
+  // event.charIndex points at the word being spoken right now
+  highlightWordAt(event.charIndex);
+};
+
+speechSynthesis.speak(utterance);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+
   // MULTI-API
   {
     id: 'polyglot-chat',
@@ -211,6 +274,161 @@ for (const c of result.corrections) {
   // startIndex/endIndex point into the ORIGINAL string — perfect for underlines
   console.log(c.startIndex, c.endIndex, "→", c.correction, c.types, c.explanation);
 }`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'tone-pad',
+    title: 'Tone Pad',
+    description: 'A 3×3 pad of the Rewriter\'s option space: pick a tone and a length, and the same text reshapes live.',
+    category: 'Text Input',
+    apis: ['Rewriter'],
+    icon: 'bi-joystick',
+    onDeviceReason: 'Trying nine variations of a message costs nothing when rewriting happens on-device — preview every tone before you hit send, without your draft leaving the machine.',
+    codeSnippet: `// The Rewriter's option space is a grid:
+// tone:   more-casual | as-is | more-formal
+// length: shorter     | as-is | longer
+
+const rewriter = await Rewriter.create({
+  tone: "more-formal",
+  length: "shorter",
+  format: "plain-text"
+});
+
+const original =
+  "hey! quick heads up - the demo kinda broke on my machine, might wanna check before the meeting";
+
+const rewritten = await rewriter.rewrite(original);
+// "Please note the demo malfunctioned on my machine; I recommend
+//  verifying it before the meeting."
+
+rewriter.destroy();`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'summarizer-matrix',
+    title: 'Summarizer Options Matrix',
+    description: 'One article, every Summarizer option: tldr, key-points, teaser, and headline at each length, side by side.',
+    category: 'Text Input',
+    apis: ['Summarizer'],
+    icon: 'bi-grid-3x3-gap',
+    onDeviceReason: 'The fastest way to learn which type and length fit your product is to generate them all — free and instant when the Summarizer runs on-device.',
+    codeSnippet: `// Summarizer options:
+// type:   "tldr" | "key-points" | "teaser" | "headline"
+// length: "short" | "medium" | "long"
+
+for (const type of ["tldr", "key-points", "teaser", "headline"]) {
+  for (const length of ["short", "medium", "long"]) {
+    const summarizer = await Summarizer.create({
+      type,
+      length,
+      format: "plain-text"
+    });
+
+    const summary = await summarizer.summarize(articleText, {
+      context: "This is a technology news article."
+    });
+
+    renderCell(type, length, summary);
+    summarizer.destroy();
+  }
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'reply-composer',
+    title: 'Reply Composer',
+    description: 'Pick an intent — accept, decline, stall — and the Writer drafts the reply to a real email, streaming, with tone and length knobs.',
+    category: 'Text Input',
+    apis: ['Writer'],
+    icon: 'bi-reply',
+    onDeviceReason: 'Replies are drafted next to your inbox with zero upload: the incoming email is the Writer\'s sharedContext and never leaves the device.',
+    codeSnippet: `const writer = await Writer.create({
+  tone: "formal",              // formal | neutral | casual
+  length: "short",             // short | medium | long
+  format: "plain-text",
+  sharedContext: incomingEmail // the email being replied to
+});
+
+// The intent is the writing task
+const stream = writer.writeStreaming(
+  "Write a reply that politely declines the invitation but proposes an alternative."
+);
+
+for await (const chunk of stream) {
+  draft += chunk;
+}
+
+writer.destroy();`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'camera-qa',
+    title: 'Live Camera Q&A',
+    description: 'Point your camera at anything, freeze a frame, and ask the on-device model about what it sees.',
+    category: 'Image Input',
+    apis: ['Prompt API'],
+    icon: 'bi-camera-video',
+    onDeviceReason: 'Your camera feed is the most private data you have — frames go straight from the sensor to the on-device model, and never anywhere else.',
+    codeSnippet: `// 1. Show the camera
+const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+videoElement.srcObject = stream;
+
+// 2. Freeze a frame when the user asks a question
+const bitmap = await createImageBitmap(videoElement);
+
+// 3. Ask the on-device model about it
+const session = await LanguageModel.create({
+  expectedInputs: [{ type: "image" }]
+});
+
+const answer = session.promptStreaming([{
+  role: "user",
+  content: [
+    { type: "text", value: "What am I holding in this picture?" },
+    { type: "image", value: bitmap }
+  ]
+}]);
+
+for await (const chunk of answer) {
+  console.log(chunk);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'draw-and-guess',
+    title: 'Draw & Guess',
+    description: 'You sketch, Gemini Nano guesses: the model interprets your doodle after every stroke.',
+    category: 'Image Input',
+    apis: ['Prompt API'],
+    icon: 'bi-brush',
+    onDeviceReason: 'Guessing on every stroke only works when vision inference is local — no upload per doodle, no latency, no cost per guess.',
+    codeSnippet: `const session = await LanguageModel.create({
+  expectedInputs: [{ type: "image" }],
+  systemPrompt: "You are playing a drawing guessing game. " +
+    "Reply with only your single best guess for what the line drawing shows, in 1-3 words."
+});
+
+canvas.addEventListener("pointerup", async () => {
+  // After each stroke, let the model take a guess
+  const bitmap = await createImageBitmap(canvas);
+
+  const guess = await session.prompt([{
+    role: "user",
+    content: [
+      { type: "text", value: "What is this simple line drawing?" },
+      { type: "image", value: bitmap }
+    ]
+  }]);
+
+  if (guess.toLowerCase().includes(secretWord)) {
+    celebrate("The model guessed it!");
+  }
+});`,
     promptRunOptions: {},
     initialPrompt: ''
   },
