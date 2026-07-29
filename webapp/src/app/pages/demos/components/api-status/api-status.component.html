@@ -1,0 +1,39 @@
+<div class="mb-4 flex flex-col gap-3">
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+    @for (api of apis; track api.name) {
+      <div class="text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
+        {{ api.name }}:
+        @if (api.status === 'available') {
+          <span class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Available</span>
+        } @else if (api.status === 'unavailable') {
+          <span class="text-red-600 dark:text-red-400 flex items-center gap-1"><i class="bi bi-x-circle-fill"></i> Unavailable</span>
+        } @else if (api.status === 'loading...') {
+          <span class="text-slate-600 dark:text-slate-400 flex items-center gap-1"><i class="bi bi-hourglass-split"></i> Loading...</span>
+        } @else if (api.status === 'downloading') {
+          <span class="text-amber-600 dark:text-amber-400 flex items-center gap-1"><i class="bi bi-arrow-down-circle-fill"></i> Downloading...</span>
+        } @else {
+          <span class="text-amber-600 dark:text-amber-400 flex items-center gap-1"><i class="bi bi-arrow-down-circle-fill"></i> Download Required</span>
+        }
+      </div>
+    }
+
+    @if (showInstall && hasDownloadable) {
+      <button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none"
+              [disabled]="isInstalling"
+              (click)="install.emit()">
+        @if (isInstalling) {
+          <i class="bi bi-arrow-repeat animate-spin"></i> Installing...
+        } @else {
+          <i class="bi bi-download"></i> Install Model
+        }
+      </button>
+    }
+  </div>
+
+  @if (hasUnavailable && unavailableHint) {
+    <div class="bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30 rounded-2xl p-4 text-sm text-amber-900 dark:text-amber-100/90 flex items-start gap-3">
+      <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg"></i>
+      <div [innerHTML]="unavailableHint"></div>
+    </div>
+  }
+</div>

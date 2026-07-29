@@ -1,9 +1,18 @@
 import {PromptRunOptions} from './prompt-run.options';
 import {AttachmentTypeEnum} from '../enums/attachment-type.enum';
 
-export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings';
+export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings' | 'Speech';
 
-export type DemoApi = 'Prompt API' | 'Semantic Embedder';
+export type DemoApi =
+  | 'Prompt API'
+  | 'Semantic Embedder'
+  | 'Web Speech'
+  | 'Translator'
+  | 'Language Detector'
+  | 'Summarizer'
+  | 'Writer'
+  | 'Rewriter'
+  | 'Proofreader';
 
 export interface DemoExample {
   id: string;

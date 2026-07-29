@@ -45,6 +45,13 @@ import { ClusterLabelDemoComponent } from './pages/demos/features/cluster-label-
 import { SemanticCacheDemoComponent } from './pages/demos/features/semantic-cache-demo.component';
 import { CommandPaletteDemoComponent } from './pages/demos/features/command-palette-demo.component';
 import { SemanticWordGameDemoComponent } from './pages/demos/features/semantic-word-game-demo.component';
+import { LiveTranslatedCaptionsDemoComponent } from './pages/demos/features/live-translated-captions-demo.component';
+import { SpeakToFillDemoComponent } from './pages/demos/features/speak-to-fill-demo.component';
+import { AsrQualityTiersDemoComponent } from './pages/demos/features/asr-quality-tiers-demo.component';
+import { ContextualBiasingDemoComponent } from './pages/demos/features/contextual-biasing-demo.component';
+import { PolyglotChatDemoComponent } from './pages/demos/features/polyglot-chat-demo.component';
+import { ProofreaderInlineDemoComponent } from './pages/demos/features/proofreader-inline-demo.component';
+import { UniversalInboxDemoComponent } from './pages/demos/features/universal-inbox-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -512,6 +519,55 @@ const routes: Routes = [
       {
         path: "demos/semantic-word-game",
         component: SemanticWordGameDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/live-translated-captions",
+        component: LiveTranslatedCaptionsDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/speak-to-fill",
+        component: SpeakToFillDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/asr-quality-tiers",
+        component: AsrQualityTiersDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/contextual-biasing",
+        component: ContextualBiasingDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/polyglot-chat",
+        component: PolyglotChatDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/proofreader-inline",
+        component: ProofreaderInlineDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/universal-inbox",
+        component: UniversalInboxDemoComponent,
         data: {
           route: RouteEnum.Demos
         }

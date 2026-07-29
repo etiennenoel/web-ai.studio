@@ -1,0 +1,132 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      [showInstall]="true"
+      [isInstalling]="isInstalling"
+      (install)="installSpeechModel({ lang: spokenLang, quality: 'dictation' })"
+      unavailableHint="<span class='font-semibold'>An API needed for live captions is unavailable.</span> On-device speech needs a recent Chrome build; the Translator and Language Detector need their models available on this device.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Controls -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6 flex flex-wrap items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">I speak</span>
+        <select [(ngModel)]="spokenLang" (ngModelChange)="onSpokenLangChanged()"
+                [disabled]="isListening"
+                class="bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
+          @for (lang of spokenLanguages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </div>
+      <i class="bi bi-arrow-right text-slate-300 dark:text-zinc-600"></i>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Caption in</span>
+        <select [(ngModel)]="targetLang"
+                [disabled]="isListening"
+                class="bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
+          @for (lang of targetLanguages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="flex-grow"></div>
+
+      @if (isListening) {
+        <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                (click)="stop()">
+          <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Stop Captions
+        </button>
+      } @else {
+        <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                [disabled]="speechStatus !== 'available'"
+                (click)="start()">
+          <i class="bi bi-mic-fill"></i> Start Captions
+        </button>
+      }
+    </div>
+
+    <!-- Caption cinema -->
+    <div class="bg-[#101014] rounded-3xl shadow-xl border border-zinc-800 overflow-hidden">
+      <div class="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+        <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+          <i class="bi bi-badge-cc"></i> Live Captions
+        </span>
+        <div class="flex items-center gap-3">
+          @if (lastDetected) {
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">
+              detected: {{ languageLabel(lastDetected.language) }} ({{ (lastDetected.confidence * 100).toFixed(0) }}%)
+            </span>
+          }
+          @if (isListening) {
+            <span class="flex items-center gap-1.5 text-[10px] font-bold text-red-400 uppercase tracking-wider">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Live
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="p-6 md:p-8 min-h-[260px] flex flex-col justify-end gap-4">
+        @if (segments.length === 0 && !interim) {
+          <p class="text-zinc-600 text-center font-light m-auto">
+            {{ isListening ? 'Listening — start speaking...' : 'Captions will appear here, in both languages, as you speak.' }}
+          </p>
+        }
+
+        @for (segment of segments.slice(-3); track $index) {
+          <div class="flex flex-col gap-1">
+            <p class="m-0 text-zinc-400 text-base leading-snug">{{ segment.original }}</p>
+            <div class="flex items-baseline gap-2">
+              <p class="m-0 text-white text-xl font-medium leading-snug">
+                @if (segment.translated !== null) {
+                  {{ segment.translated }}
+                } @else {
+                  <span class="text-zinc-600 italic text-base">translating…</span>
+                }
+              </p>
+              @if (segment.translateMs !== null && segment.translateMs > 0) {
+                <span class="text-[9px] font-mono text-zinc-600 shrink-0">{{ segment.translateMs }}ms</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (interim) {
+          <p class="m-0 text-zinc-500 italic text-base leading-snug">{{ interim }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Full transcript -->
+    @if (segments.length > 3) {
+      <div class="mt-6 bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Full Session Transcript</span>
+        </div>
+        <div class="p-5 flex flex-col gap-3 max-h-[300px] overflow-y-auto">
+          @for (segment of segments; track $index) {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm border-b border-slate-100 dark:border-zinc-800 pb-2.5">
+              <span class="text-slate-500 dark:text-slate-400">{{ segment.original }}</span>
+              <span class="text-slate-800 dark:text-slate-200">{{ segment.translated ?? '…' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</app-demo-layout>

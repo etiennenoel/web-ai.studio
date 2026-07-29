@@ -4,6 +4,7 @@ import { Subject, debounceTime } from 'rxjs';
 import { BaseEmbedderDemoComponent } from '../components/base-demo/base-embedder-demo.component';
 import { DEMOS_DATA } from '../../../core/services/demos.data';
 import { ThemeService } from '../../../core/services/theme.service';
+import { WebSpeechService } from '../../../core/services/web-speech.service';
 
 interface PaletteAction {
   id: string;
@@ -65,6 +66,11 @@ export class CommandPaletteDemoComponent extends BaseEmbedderDemoComponent imple
   isRanking = false;
   rankLatencyMs: number | null = null;
 
+  private readonly webSpeech = inject(WebSpeechService);
+  micStatus: string = 'loading...';
+  isListening = false;
+  private abortListen: (() => void) | null = null;
+
   executedLog: { label: string; icon: string; real: boolean }[] = [];
 
   private query$ = new Subject<string>();
@@ -80,9 +86,52 @@ export class CommandPaletteDemoComponent extends BaseEmbedderDemoComponent imple
 
     if (isPlatformServer(this.platformId)) return;
     await this.checkEmbedderAvailability();
+    this.micStatus = await this.webSpeech.available({ quality: 'command' });
     if (this.embedderStatus === 'available') {
       await this.buildIndex();
     }
+  }
+
+  get micAvailable(): boolean {
+    return this.micStatus === 'available';
+  }
+
+  /** Speak an intent instead of typing it — interim results rank live as you talk. */
+  async listen() {
+    if (this.isListening || !this.micAvailable || !this.indexReady) return;
+
+    this.isListening = true;
+    this.errorMessage = '';
+    try {
+      const { result, abort } = this.webSpeech.listenOnce(
+        { quality: 'command' },
+        interim => {
+          this.query = interim;
+          this.query$.next(interim);
+        }
+      );
+      this.abortListen = abort;
+
+      const transcript = await result;
+      if (transcript) {
+        this.query = transcript;
+        await this.rank(transcript);
+      }
+    } catch (e: any) {
+      if (e.message !== 'aborted') this.errorMessage = e.message || 'Voice input failed.';
+    } finally {
+      this.isListening = false;
+      this.abortListen = null;
+    }
+  }
+
+  stopListening() {
+    this.abortListen?.();
+  }
+
+  override ngOnDestroy() {
+    this.abortListen?.();
+    super.ngOnDestroy();
   }
 
   async buildIndex() {

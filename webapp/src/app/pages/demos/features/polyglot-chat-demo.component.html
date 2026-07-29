@@ -1,0 +1,107 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>Translation is unavailable.</span> The Translator and Language Detector models must be available on this device — language pairs download on first use.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      @for (pane of panes; track pane.speaker; let paneIdx = $index) {
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden min-h-[480px]">
+
+          <!-- Pane header -->
+          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex items-center gap-3">
+            <span class="text-2xl">{{ pane.avatar }}</span>
+            <div class="flex-grow">
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ pane.speaker }}</div>
+              <div class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">reads & writes</div>
+            </div>
+            <select [(ngModel)]="pane.lang"
+                    class="bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
+              @for (lang of languages; track lang.code) {
+                <option [value]="lang.code">{{ lang.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Messages, rendered in THIS pane's language -->
+          <div class="flex-grow p-4 flex flex-col gap-2.5 overflow-y-auto max-h-[340px]">
+            @if (messages.length === 0) {
+              <p class="text-xs text-slate-400 dark:text-slate-500 m-auto text-center font-light px-6">
+                Each person writes in their own language and reads the whole conversation in it too.
+              </p>
+            }
+            @for (message of messages; track $index) {
+              <div class="max-w-[85%] flex flex-col gap-0.5"
+                   [ngClass]="message.paneIndex === paneIdx ? 'self-end items-end' : 'self-start items-start'">
+                <div class="px-3.5 py-2 rounded-2xl text-sm leading-snug"
+                     [ngClass]="message.paneIndex === paneIdx
+                       ? 'bg-indigo-600 text-white rounded-br-md'
+                       : 'bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 rounded-bl-md'">
+                  @if (message.isTranslating && message.paneIndex !== paneIdx) {
+                    <i class="bi bi-three-dots animate-pulse"></i>
+                  } @else if (message.showOriginal && message.paneIndex !== paneIdx) {
+                    {{ message.original }}
+                  } @else {
+                    {{ displayText(message, pane) }}
+                  }
+                </div>
+                @if (message.paneIndex !== paneIdx && isTranslatedFor(message, pane) && !message.isTranslating) {
+                  <button class="text-[9px] text-slate-400 dark:text-slate-500 hover:text-indigo-500 bg-transparent border-none px-1 transition-colors"
+                          (click)="message.showOriginal = !message.showOriginal">
+                    @if (message.showOriginal) {
+                      show translation
+                    } @else {
+                      translated from {{ languageLabel(message.detectedLanguage) || 'auto' }}
+                      @if (message.detectedConfidence !== null) {
+                        ({{ (message.detectedConfidence * 100).toFixed(0) }}%)
+                      }
+                      — show original
+                    }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Composer -->
+          <div class="p-4 border-t border-slate-100 dark:border-zinc-700/50">
+            <div class="flex gap-2">
+              <input type="text"
+                     class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/40"
+                     [(ngModel)]="pane.draft"
+                     (keydown.enter)="send(pane)"
+                     placeholder="Write in {{ languageLabel(pane.lang) }}..." />
+              <button class="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all active:scale-95 disabled:opacity-50 border-none flex items-center justify-center"
+                      [disabled]="!pane.draft.trim()"
+                      (click)="send(pane)">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mt-2.5">
+              @for (starter of pane.starters; track starter) {
+                <button class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors"
+                        (click)="useStarter(pane, starter)">
+                  {{ starter }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</app-demo-layout>
