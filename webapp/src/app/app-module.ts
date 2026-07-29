@@ -129,6 +129,14 @@ import { ClusterLabelDemoComponent } from './pages/demos/features/cluster-label-
 import { SemanticCacheDemoComponent } from './pages/demos/features/semantic-cache-demo.component';
 import { CommandPaletteDemoComponent } from './pages/demos/features/command-palette-demo.component';
 import { SemanticWordGameDemoComponent } from './pages/demos/features/semantic-word-game-demo.component';
+import { ApiStatusComponent } from './pages/demos/components/api-status/api-status.component';
+import { LiveTranslatedCaptionsDemoComponent } from './pages/demos/features/live-translated-captions-demo.component';
+import { SpeakToFillDemoComponent } from './pages/demos/features/speak-to-fill-demo.component';
+import { AsrQualityTiersDemoComponent } from './pages/demos/features/asr-quality-tiers-demo.component';
+import { ContextualBiasingDemoComponent } from './pages/demos/features/contextual-biasing-demo.component';
+import { PolyglotChatDemoComponent } from './pages/demos/features/polyglot-chat-demo.component';
+import { ProofreaderInlineDemoComponent } from './pages/demos/features/proofreader-inline-demo.component';
+import { UniversalInboxDemoComponent } from './pages/demos/features/universal-inbox-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
@@ -234,6 +242,14 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     SemanticCacheDemoComponent,
     CommandPaletteDemoComponent,
     SemanticWordGameDemoComponent,
+    ApiStatusComponent,
+    LiveTranslatedCaptionsDemoComponent,
+    SpeakToFillDemoComponent,
+    AsrQualityTiersDemoComponent,
+    ContextualBiasingDemoComponent,
+    PolyglotChatDemoComponent,
+    ProofreaderInlineDemoComponent,
+    UniversalInboxDemoComponent,
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,

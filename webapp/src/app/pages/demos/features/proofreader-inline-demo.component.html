@@ -1,0 +1,183 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="[{ name: 'Proofreader', status: proofreaderStatus }]"
+      unavailableHint="<span class='font-semibold'>The Proofreader API is not exposed in this browser.</span> Enable <code class='font-mono text-xs'>chrome://flags/#proofreader-api</code> in a recent Chrome build, then restart.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- Editor -->
+      <div class="lg:flex-[3] w-full flex flex-col gap-4">
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center flex-wrap gap-2">
+            <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-patch-check text-sky-500"></i> Your Draft
+            </span>
+            <div class="flex items-center gap-3">
+              @if (proofreadTimeMs !== null && hasResult) {
+                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                  proofread in {{ proofreadTimeMs }}ms
+                </span>
+              }
+              <button class="flex items-center gap-2 px-5 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                      [disabled]="isProofreading || !text.trim() || proofreaderStatus === 'unavailable'"
+                      (click)="proofread()">
+                @if (isProofreading) {
+                  <i class="bi bi-arrow-repeat animate-spin"></i> Proofreading...
+                } @else {
+                  <i class="bi bi-spellcheck"></i> Proofread
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Annotated view OR editable textarea -->
+          @if (hasResult && corrections.length > 0) {
+            <div class="p-5 text-lg leading-relaxed text-slate-800 dark:text-slate-200 font-serif">
+              @for (segment of segments; track $index) {
+                @if (segment.correction) {
+                  <button class="bg-transparent border-none p-0 font-serif text-lg cursor-pointer transition-colors rounded-sm"
+                          [ngClass]="selectedIndex === segment.correctionIndex
+                            ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300'
+                            : 'text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'"
+                          style="text-decoration: underline wavy #ef4444 1.5px; text-underline-offset: 4px;"
+                          (click)="select(segment.correctionIndex)">
+                    {{ segment.text }}
+                  </button>
+                } @else {
+                  <span>{{ segment.text }}</span>
+                }
+              }
+            </div>
+            <div class="px-5 pb-4 flex items-center justify-between flex-wrap gap-2">
+              <button class="text-xs font-medium text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 bg-transparent border-none transition-colors"
+                      (click)="onTextChanged()">
+                <i class="bi bi-pencil"></i> Edit text
+              </button>
+              <button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      (click)="acceptAll()">
+                <i class="bi bi-check2-all"></i> Accept all {{ corrections.length }}
+              </button>
+            </div>
+          } @else if (hasResult && corrections.length === 0) {
+            <div class="p-5">
+              <div class="bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-900/30 rounded-2xl p-4 flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-300">
+                <i class="bi bi-check-circle-fill text-emerald-500"></i>
+                No errors found{{ acceptedCount > 0 ? ' — ' + acceptedCount + ' corrections accepted this session' : '' }}.
+              </div>
+              <div class="mt-4 text-lg leading-relaxed text-slate-800 dark:text-slate-200 font-serif">{{ text }}</div>
+              <button class="mt-3 text-xs font-medium text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 bg-transparent border-none transition-colors"
+                      (click)="onTextChanged()">
+                <i class="bi bi-pencil"></i> Edit text
+              </button>
+            </div>
+          } @else {
+            <textarea
+              class="w-full bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 resize-none p-5 leading-relaxed text-lg font-serif min-h-[180px]"
+              [(ngModel)]="text"
+              (ngModelChange)="onTextChanged()"
+              placeholder="Type or paste text with errors..."></textarea>
+          }
+        </div>
+
+        <!-- Options -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-700 px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+            <input type="checkbox" class="accent-sky-600" [(ngModel)]="includeTypes" (ngModelChange)="onOptionsChanged()" />
+            <code class="text-xs font-mono">includeCorrectionTypes</code>
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+            <input type="checkbox" class="accent-sky-600" [(ngModel)]="includeExplanations" (ngModelChange)="onOptionsChanged()" />
+            <code class="text-xs font-mono">includeCorrectionExplanations</code>
+          </label>
+          @if (hasResult && !hasStructuredMetadata && corrections.length > 0) {
+            <span class="text-[11px] text-amber-600 dark:text-amber-400"><i class="bi bi-info-circle"></i> Chrome's current build doesn't return types/explanations yet — the indices and corrections below are live.</span>
+          }
+        </div>
+      </div>
+
+      <!-- Correction inspector -->
+      <div class="lg:flex-[2] w-full flex flex-col gap-4">
+        @if (hasResult && corrections.length > 0) {
+          <!-- Summary chips -->
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+              {{ corrections.length }} {{ corrections.length === 1 ? 'issue' : 'issues' }}
+            </span>
+            @for (entry of typeCounts; track entry.type) {
+              @if (entry.type !== 'unlabeled') {
+                <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ typeChipClass(entry.type) }}">
+                  {{ entry.type }} × {{ entry.count }}
+                </span>
+              }
+            }
+          </div>
+
+          <!-- Correction list -->
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col max-h-[480px]">
+            <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Corrections</span>
+            </div>
+            <div class="overflow-y-auto p-3 flex flex-col gap-2">
+              @for (correction of corrections; track $index) {
+                <div class="rounded-xl border p-3.5 cursor-pointer transition-all"
+                     [ngClass]="selectedIndex === $index
+                       ? 'border-sky-300 dark:border-sky-700 bg-sky-50/60 dark:bg-sky-900/15'
+                       : 'border-slate-200 dark:border-zinc-700 bg-slate-50/40 dark:bg-[#161616]/40 hover:border-slate-300 dark:hover:border-zinc-600'"
+                     (click)="select($index)">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-mono text-red-600 dark:text-red-400 line-through">{{ text.slice(correction.startIndex, correction.endIndex) }}</span>
+                    <i class="bi bi-arrow-right text-slate-300 dark:text-zinc-600 text-xs"></i>
+                    <span class="text-sm font-mono font-semibold text-emerald-700 dark:text-emerald-400">{{ correction.correction }}</span>
+                    <div class="flex-grow"></div>
+                    <button class="px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold shadow-sm transition-all active:scale-95 border-none"
+                            (click)="$event.stopPropagation(); acceptCorrection($index)">
+                      Accept
+                    </button>
+                  </div>
+                  @if (correction.types.length > 0 || correction.explanation) {
+                    <div class="mt-2 flex flex-col gap-1.5">
+                      @if (correction.types.length > 0) {
+                        <div class="flex gap-1.5">
+                          @for (type of correction.types; track type) {
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ typeChipClass(type) }}">{{ type }}</span>
+                          }
+                        </div>
+                      }
+                      @if (correction.explanation) {
+                        <p class="text-xs text-slate-500 dark:text-slate-400 m-0 leading-relaxed">{{ correction.explanation }}</p>
+                      }
+                    </div>
+                  }
+                  <div class="text-[10px] font-mono text-slate-300 dark:text-zinc-600 mt-1.5">chars {{ correction.startIndex }}–{{ correction.endIndex }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-8 text-center">
+            <i class="bi bi-patch-check text-4xl text-slate-200 dark:text-zinc-700"></i>
+            <p class="text-sm text-slate-400 dark:text-slate-500 mt-3 font-light m-0">
+              Run the proofreader to see structured corrections — each with its exact character range, suggested fix, error label, and explanation.
+            </p>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

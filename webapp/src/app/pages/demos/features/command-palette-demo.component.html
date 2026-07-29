@@ -60,6 +60,23 @@
                 {{ rankLatencyMs }}ms
               </span>
             }
+            @if (micAvailable) {
+              @if (isListening) {
+                <button class="w-9 h-9 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-md transition-all active:scale-95 border-none flex items-center justify-center relative shrink-0"
+                        title="Stop listening"
+                        (click)="stopListening()">
+                  <span class="absolute inset-0 rounded-full bg-red-500/40 animate-ping"></span>
+                  <i class="bi bi-stop-fill relative"></i>
+                </button>
+              } @else {
+                <button class="w-9 h-9 rounded-full bg-slate-100 hover:bg-indigo-600 hover:text-white dark:bg-zinc-800 dark:hover:bg-indigo-600 text-slate-500 dark:text-slate-400 shadow-sm transition-all active:scale-95 border-none flex items-center justify-center shrink-0 disabled:opacity-40"
+                        title="Say your intent (on-device recognition, command quality tier)"
+                        [disabled]="!indexReady"
+                        (click)="listen()">
+                  <i class="bi bi-mic-fill"></i>
+                </button>
+              }
+            }
           </div>
 
           <!-- Results -->

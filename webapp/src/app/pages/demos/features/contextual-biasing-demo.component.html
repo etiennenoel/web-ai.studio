@@ -1,0 +1,157 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="[{ name: 'Web Speech (on-device)', status: speechStatus }]"
+      [showInstall]="true"
+      [isInstalling]="isInstalling"
+      (install)="installSpeechModel({ quality: 'dictation' })"
+      unavailableHint="<span class='font-semibold'>On-device speech recognition is not available in this browser.</span> Use a recent Chrome build with on-device Web Speech support (<code class='font-mono text-xs'>processLocally: true</code>).">
+    </app-api-status>
+
+    @if (speechStatus === 'available' && !biasingSupported) {
+      <div class="mb-4 bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30 rounded-2xl p-4 text-sm text-amber-900 dark:text-amber-100/90 flex items-start gap-3">
+        <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg"></i>
+        <div><span class="font-semibold">SpeechRecognitionPhrase is not exposed in this browser</span> — the "with biasing" recording will behave like the unbiased one. The contextual-biasing explainer is still rolling out.</div>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col xl:flex-row gap-6">
+
+      <!-- Phrase list -->
+      <div class="xl:flex-[2] bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden self-start w-full">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-sliders text-cyan-500"></i> Boosted Phrases
+          </span>
+          <button class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors flex items-center justify-center"
+                  title="Add phrase" (click)="addPhrase()">
+            <i class="bi bi-plus text-sm"></i>
+          </button>
+        </div>
+        <div class="p-4 flex flex-col gap-3">
+          @for (phrase of phrases; track trackByIndex($index); let i = $index) {
+            <div class="flex items-center gap-3 group">
+              <input type="text"
+                     class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm font-mono text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-cyan-500/40"
+                     [(ngModel)]="phrase.phrase"
+                     placeholder="Domain term..." />
+              <input type="range" min="0" max="10" step="0.5"
+                     class="w-24 accent-cyan-600"
+                     [(ngModel)]="phrase.boost"
+                     title="Boost" />
+              <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 w-8">{{ phrase.boost.toFixed(1) }}</span>
+              <button class="w-6 h-6 rounded-full text-slate-400 hover:text-red-500 bg-transparent border-none transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                      title="Remove" (click)="removePhrase(i)">
+                <i class="bi bi-x-lg text-xs"></i>
+              </button>
+            </div>
+          }
+          <p class="text-[11px] text-slate-400 dark:text-slate-500 m-0">Boost 0–10. Higher values make the recognizer favor these spellings. Phrases apply only to the "with biasing" recording.</p>
+        </div>
+
+        <!-- Scoreboard -->
+        @if (bothRecorded) {
+          <div class="border-t border-slate-100 dark:border-zinc-700/50 p-4">
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Terms recognized</span>
+            <table class="w-full mt-2">
+              <thead>
+                <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+                  <th class="text-left pb-1">Term</th>
+                  <th class="text-center pb-1">Without</th>
+                  <th class="text-center pb-1">With</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (phrase of validPhrases; track phrase.phrase) {
+                  <tr class="text-sm border-t border-slate-100 dark:border-zinc-800">
+                    <td class="py-1.5 font-mono text-xs text-slate-700 dark:text-slate-300">{{ phrase.phrase }}</td>
+                    <td class="text-center">
+                      <i class="bi" [ngClass]="termFound('without', phrase.phrase) ? 'bi-check-circle-fill text-emerald-500' : 'bi-x-circle-fill text-red-400'"></i>
+                    </td>
+                    <td class="text-center">
+                      <i class="bi" [ngClass]="termFound('with', phrase.phrase) ? 'bi-check-circle-fill text-emerald-500' : 'bi-x-circle-fill text-red-400'"></i>
+                    </td>
+                  </tr>
+                }
+                <tr class="text-xs font-bold border-t border-slate-200 dark:border-zinc-700">
+                  <td class="py-1.5 text-slate-500 dark:text-slate-400">Total</td>
+                  <td class="text-center text-slate-700 dark:text-slate-300">{{ hitCount('without') }}/{{ validPhrases.length }}</td>
+                  <td class="text-center" [ngClass]="hitCount('with') > hitCount('without') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'">{{ hitCount('with') }}/{{ validPhrases.length }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <!-- Recordings -->
+      <div class="xl:flex-[3] flex flex-col gap-4 w-full">
+        <div class="bg-cyan-50 border border-cyan-200 dark:bg-cyan-900/10 dark:border-cyan-900/30 rounded-2xl p-4 text-sm text-cyan-900 dark:text-cyan-100/90">
+          <i class="bi bi-megaphone"></i> Say this sentence in both recordings:
+          <span class="font-semibold block mt-1">"{{ suggestedSentence }}"</span>
+        </div>
+
+        @for (mode of modes; track mode) {
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border overflow-hidden"
+               [ngClass]="mode === 'with' ? 'border-cyan-200 dark:border-cyan-900/50' : 'border-slate-200 dark:border-zinc-700'">
+            <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 flex justify-between items-center"
+                 [ngClass]="mode === 'with' ? 'bg-cyan-50/50 dark:bg-cyan-900/10' : 'bg-slate-50/50 dark:bg-[#161616]/50'">
+              <span class="text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                    [ngClass]="mode === 'with' ? 'text-cyan-700 dark:text-cyan-300' : 'text-slate-500 dark:text-slate-400'">
+                @if (mode === 'with') {
+                  <i class="bi bi-stars"></i> With Biasing
+                } @else {
+                  <i class="bi bi-mic"></i> Without Biasing
+                }
+              </span>
+              @if (activeMode === mode) {
+                <button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                        (click)="stop()">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Stop
+                </button>
+              } @else {
+                <button class="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none text-white"
+                        [ngClass]="mode === 'with' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-slate-600 hover:bg-slate-700'"
+                        [disabled]="activeMode !== null || speechStatus !== 'available'"
+                        (click)="record(mode)">
+                  <i class="bi bi-mic-fill"></i> Record
+                </button>
+              }
+            </div>
+            <div class="p-4 min-h-[70px] text-base leading-relaxed">
+              @if (activeMode === mode && interim) {
+                <span class="text-slate-400 dark:text-slate-500 italic">{{ interim }}</span>
+              } @else if (transcripts[mode]) {
+                @for (segment of highlight(mode); track $index) {
+                  @if (segment.hit) {
+                    <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded px-1 font-semibold">{{ segment.text }}</span>
+                  } @else {
+                    <span class="text-slate-800 dark:text-slate-200">{{ segment.text }}</span>
+                  }
+                }
+              } @else if (activeMode === mode) {
+                <span class="text-slate-400 dark:text-slate-500 font-light">Listening...</span>
+              } @else {
+                <span class="text-slate-400 dark:text-slate-500 font-light">Transcript will appear here.</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

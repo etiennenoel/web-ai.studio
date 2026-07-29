@@ -1,0 +1,243 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>Part of the pipeline is unavailable on this device.</span> Detection, translation, and triage are required to process the inbox; the digest and reply steps degrade gracefully if the Summarizer or Writer is missing.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Control bar -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6 flex flex-wrap items-center gap-4">
+      <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+              [disabled]="!canProcess"
+              (click)="processInbox()">
+        @if (isProcessing) {
+          <i class="bi bi-arrow-repeat animate-spin"></i> Processing...
+        } @else {
+          <i class="bi bi-play-fill text-lg"></i> {{ processed ? 'Re-process Inbox' : 'Process Inbox' }}
+        }
+      </button>
+
+      <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <span class="font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-zinc-800">detect</span>
+        <i class="bi bi-arrow-right text-slate-300"></i>
+        <span class="font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-zinc-800">translate</span>
+        <i class="bi bi-arrow-right text-slate-300"></i>
+        <span class="font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-zinc-800">triage</span>
+        <i class="bi bi-arrow-right text-slate-300"></i>
+        <span class="font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-zinc-800">digest</span>
+        <i class="bi bi-arrow-right text-slate-300"></i>
+        <span class="font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-zinc-800">reply</span>
+      </div>
+
+      <div class="flex-grow"></div>
+
+      @if (totalPipelineMs !== null) {
+        <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+          {{ inbox.length }} messages piped in {{ totalPipelineMs }}ms
+        </span>
+      }
+    </div>
+
+    <!-- Folder chips -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      @for (folder of folders; track folder.name) {
+        <div class="flex items-center gap-2 px-3.5 py-2 rounded-full border border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90 shadow-sm">
+          <i class="bi {{ folder.icon }} text-sm text-slate-500 dark:text-slate-400"></i>
+          <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ folder.name }}</span>
+          <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md {{ folder.chipClass }}">{{ folderCount(folder) }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
+
+      <!-- Inbox list -->
+      <div class="xl:flex-[3] w-full bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-inbox text-rose-500"></i> Inbox — {{ inbox.length }} messages, 4 languages
+          </span>
+        </div>
+
+        <div class="divide-y divide-slate-100 dark:divide-zinc-800">
+          @for (message of inbox; track message.id) {
+            <div class="px-5 py-3.5 flex items-start gap-3 transition-colors cursor-pointer"
+                 [ngClass]="{
+                   'hover:bg-slate-50 dark:hover:bg-zinc-800/60': message.stage === 'done',
+                   'bg-indigo-50/60 dark:bg-indigo-900/10': selectedMessage?.id === message.id,
+                   'opacity-90': message.stage !== 'done' && message.stage !== 'pending'
+                 }"
+                 (click)="selectMessage(message)">
+              <span class="text-xl mt-0.5">{{ message.flag }}</span>
+              <div class="flex-grow min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ message.sender }}</span>
+                  @if (message.detectedLanguage) {
+                    <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400">
+                      {{ languageName(message.detectedLanguage) }} {{ message.detectedConfidence !== null ? (message.detectedConfidence * 100).toFixed(0) + '%' : '' }}
+                    </span>
+                  }
+                  @if (message.folder) {
+                    @let folder = folderByName(message.folder);
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md {{ folder?.chipClass }}">
+                      <i class="bi {{ folder?.icon }}"></i> {{ message.folder }}
+                    </span>
+                  }
+                  <div class="flex-grow"></div>
+                  @if (message.pipelineMs !== null) {
+                    <span class="text-[9px] font-mono text-slate-300 dark:text-zinc-600">{{ message.pipelineMs }}ms</span>
+                  }
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 m-0 mt-1 leading-relaxed">
+                  @if (message.english && !message.showOriginal && message.english !== message.body) {
+                    {{ message.english }}
+                  } @else {
+                    {{ message.body }}
+                  }
+                </p>
+                @if (message.english && message.english !== message.body) {
+                  <button class="text-[9px] text-slate-400 dark:text-slate-500 hover:text-indigo-500 bg-transparent border-none p-0 mt-1 transition-colors"
+                          (click)="$event.stopPropagation(); message.showOriginal = !message.showOriginal">
+                    {{ message.showOriginal ? 'show translation' : 'show original' }}
+                  </button>
+                }
+              </div>
+
+              <!-- Pipeline stage indicators -->
+              <div class="flex items-center gap-1.5 mt-1 shrink-0">
+                @for (stage of ['detect', 'translate', 'triage']; track stage) {
+                  @let state = stageIcon(message, stage === 'detect' ? 'detect' : stage === 'translate' ? 'translate' : 'triage');
+                  <span class="w-2 h-2 rounded-full transition-colors"
+                        [ngClass]="{
+                          'bg-slate-200 dark:bg-zinc-700': state === 'idle',
+                          'bg-indigo-500 animate-pulse': state === 'active',
+                          'bg-emerald-500': state === 'done',
+                          'bg-red-500': state === 'error'
+                        }"
+                        title="{{ stage }}"></span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right column: digest + detail -->
+      <div class="xl:flex-[2] w-full flex flex-col gap-5">
+
+        <!-- Digest -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-stars text-amber-500"></i> Inbox Digest
+              <span class="normal-case font-medium text-slate-400">(Summarizer)</span>
+            </span>
+            @if (processed && summarizerStatus !== 'unavailable') {
+              <button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none"
+                      [disabled]="isDigesting"
+                      (click)="generateDigest()">
+                @if (isDigesting) {
+                  <i class="bi bi-arrow-repeat animate-spin"></i> Summarizing...
+                } @else {
+                  Generate
+                }
+              </button>
+            }
+          </div>
+          <div class="p-5 text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap min-h-[60px]">
+            @if (digest) {
+              {{ digest }}
+            } @else if (summarizerStatus === 'unavailable') {
+              <span class="text-slate-400 dark:text-slate-500 font-light">The Summarizer API is unavailable — the digest step is skipped.</span>
+            } @else {
+              <span class="text-slate-400 dark:text-slate-500 font-light">{{ processed ? 'Generate a key-points digest of the processed inbox.' : 'Process the inbox first, then summarize it here.' }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Selected message + reply -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-reply text-indigo-500"></i> Reply
+              <span class="normal-case font-medium text-slate-400">(Writer + Translator)</span>
+            </span>
+          </div>
+
+          <div class="p-5">
+            @if (!selectedMessage) {
+              <p class="text-sm text-slate-400 dark:text-slate-500 font-light m-0 text-center py-4">
+                {{ processed ? 'Select a processed message to draft a reply.' : 'Process the inbox, then pick a message.' }}
+              </p>
+            } @else {
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-lg">{{ selectedMessage.flag }}</span>
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ selectedMessage.sender }}</span>
+                <span class="text-xs text-slate-400">speaks {{ languageName(selectedMessage.detectedLanguage) }}</span>
+              </div>
+
+              @if (!canReply) {
+                <p class="text-sm text-slate-400 dark:text-slate-500 font-light m-0">The Writer API is unavailable — the reply step is skipped.</p>
+              } @else if (!reply) {
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Draft a</span>
+                  @for (tone of ['formal', 'neutral', 'casual']; track tone) {
+                    <button class="px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all active:scale-95 border-none"
+                            (click)="draftReply(tone === 'formal' ? 'formal' : tone === 'neutral' ? 'neutral' : 'casual')">
+                      {{ tone }}
+                    </button>
+                  }
+                  <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">reply</span>
+                </div>
+              } @else if (reply.isDrafting) {
+                <div class="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 py-3">
+                  <i class="bi bi-arrow-repeat animate-spin"></i> Writing a {{ reply.tone }} reply, then translating it back to {{ languageName(reply.targetLanguage) }}...
+                </div>
+              } @else {
+                <div class="rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50/60 dark:bg-[#161616]/60 p-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                      {{ reply.showEnglish || !reply.translated ? 'English draft' : 'In ' + languageName(reply.targetLanguage) }}
+                    </span>
+                    @if (reply.translated) {
+                      <button class="text-[10px] text-slate-400 hover:text-indigo-500 bg-transparent border-none transition-colors"
+                              (click)="reply.showEnglish = !reply.showEnglish">
+                        {{ reply.showEnglish ? 'show ' + languageName(reply.targetLanguage) : 'show English draft' }}
+                      </button>
+                    }
+                  </div>
+                  <p class="text-sm text-slate-700 dark:text-slate-300 m-0 leading-relaxed whitespace-pre-wrap">
+                    {{ reply.showEnglish || !reply.translated ? reply.english : reply.translated }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2 mt-3">
+                  <button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none">
+                    <i class="bi bi-send"></i> Send (pretend)
+                  </button>
+                  <button class="text-xs font-medium text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 bg-transparent border-none transition-colors"
+                          (click)="reply = null">
+                    Try another tone
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</app-demo-layout>

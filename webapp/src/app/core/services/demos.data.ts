@@ -2,6 +2,259 @@ import { DemoExample } from '../models/demo.interface';
 import { AttachmentTypeEnum } from '../enums/attachment-type.enum';
 
 export const DEMOS_DATA: DemoExample[] = [
+  // SPEECH
+  {
+    id: 'live-translated-captions',
+    title: 'Live Translated Captions',
+    description: 'Speak into the mic: on-device captions appear instantly, and a second track renders them live in another language.',
+    category: 'Speech',
+    apis: ['Web Speech', 'Language Detector', 'Translator'],
+    icon: 'bi-badge-cc',
+    onDeviceReason: 'Recognition, detection, and translation all run locally — captions work offline and the audio never leaves the microphone\'s device. A babel fish in a browser tab.',
+    codeSnippet: `// On-device recognition (explainer: on-device-speech-recognition)
+const options = { langs: ["en-US"], processLocally: true, quality: "dictation" };
+if (await SpeechRecognition.available(options) === "downloadable") {
+  await SpeechRecognition.install(options);
+}
+
+const recognition = new SpeechRecognition();
+recognition.options = options;
+recognition.continuous = true;
+recognition.interimResults = true;
+
+const detector = await LanguageDetector.create();
+const translators = new Map(); // cached per language pair
+
+recognition.onresult = async (event) => {
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const result = event.results[i];
+    showCaption(result[0].transcript, result.isFinal);
+    if (!result.isFinal) continue;
+
+    // New final segment: detect its language, then translate it
+    const [{ detectedLanguage }] = await detector.detect(result[0].transcript);
+    const key = detectedLanguage + "->fr";
+    if (!translators.has(key)) {
+      translators.set(key, await Translator.create({
+        sourceLanguage: detectedLanguage, targetLanguage: "fr"
+      }));
+    }
+    showTranslatedCaption(await translators.get(key).translate(result[0].transcript));
+  }
+};
+
+recognition.start();`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'speak-to-fill',
+    title: 'Speak to Fill',
+    description: 'Say "table for four next Friday at seven, outside" and watch the booking form fill itself — speech in, structured data out.',
+    category: 'Speech',
+    apis: ['Web Speech', 'Prompt API'],
+    icon: 'bi-ui-checks',
+    onDeviceReason: 'Voice hits the on-device recognizer, the transcript hits the on-device LLM with a JSON schema, and the form fills — no audio or personal details ever reach a server.',
+    codeSnippet: `// 1. Capture one utterance on-device
+const recognition = new SpeechRecognition();
+recognition.options = { langs: ["en-US"], processLocally: true, quality: "dictation" };
+recognition.onresult = (e) => extract(e.results[0][0].transcript);
+recognition.start();
+
+// 2. Turn the transcript into structured form data
+const schema = {
+  type: "object",
+  properties: {
+    name: { type: ["string", "null"] },
+    date: { type: ["string", "null"] },
+    time: { type: ["string", "null"] },
+    partySize: { type: ["number", "null"] },
+    seating: { type: ["string", "null"], enum: ["inside", "outside", null] },
+    specialRequests: { type: ["string", "null"] }
+  },
+  additionalProperties: false
+};
+
+async function extract(utterance) {
+  const session = await LanguageModel.create({
+    systemPrompt: "Extract restaurant booking details. " +
+      "Return null for fields the user did not mention. Today is " + new Date().toDateString()
+  });
+  const result = await session.prompt(utterance, { responseConstraint: schema });
+  fillForm(JSON.parse(result)); // only non-null fields overwrite the form
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'asr-quality-tiers',
+    title: 'ASR Quality Tier Lab',
+    description: 'Read the same passage against the command, dictation, and conversation models — then compare accuracy and latency.',
+    category: 'Speech',
+    apis: ['Web Speech'],
+    icon: 'bi-speedometer2',
+    onDeviceReason: 'The quality-levels explainer lets sites pick the right on-device model for the job — this lab makes the size/accuracy/latency trade-off measurable on your own hardware.',
+    codeSnippet: `// Quality tiers (explainer: quality-levels): each maps to a different on-device model
+for (const quality of ["command", "dictation", "conversation"]) {
+  const options = { langs: ["en-US"], processLocally: true, quality };
+
+  const availability = await SpeechRecognition.available(options);
+  if (availability === "downloadable") await SpeechRecognition.install(options);
+
+  const recognition = new SpeechRecognition();
+  recognition.options = options;
+  recognition.interimResults = true;
+
+  recognition.onresult = (event) => {
+    const transcript = [...event.results].map(r => r[0].transcript).join("");
+    // Score against the reference passage with word error rate
+    console.log(quality, wordErrorRate(referenceText, transcript));
+  };
+
+  recognition.start(); // record one attempt per tier, then compare
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'contextual-biasing',
+    title: 'Jargon Dictation',
+    description: 'Dictate product names the recognizer has never heard — then boost them with contextual biasing and watch the diff.',
+    category: 'Speech',
+    apis: ['Web Speech'],
+    icon: 'bi-sliders',
+    onDeviceReason: 'Contextual biasing tunes the on-device recognizer to your app\'s vocabulary at runtime — no custom model training, and your domain terms stay on the device.',
+    codeSnippet: `const options = { langs: ["en-US"], processLocally: true, quality: "dictation" };
+const recognition = new SpeechRecognition();
+recognition.options = options;
+
+// Contextual biasing (explainer: contextual-biasing):
+// boost domain terms the base model would otherwise mangle
+recognition.phrases.push(new SpeechRecognitionPhrase("TinyGemma", 3.0));
+recognition.phrases.push(new SpeechRecognitionPhrase("WebNN", 3.0));
+recognition.phrases.push(new SpeechRecognitionPhrase("Axon", 2.0));
+
+recognition.onresult = (event) => {
+  // "Add TinyGemma and WebNN benchmarks to the Axon suite"
+  // Without biasing: "add tiny gemma and web and then benchmarks to the axon sweet"
+  console.log(event.results[0][0].transcript);
+};
+
+recognition.start();`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+
+  // MULTI-API
+  {
+    id: 'polyglot-chat',
+    title: 'Polyglot Chat',
+    description: 'Two people, two languages, one conversation — every message is detected and translated both ways as it is sent.',
+    category: 'Mix-and-Match',
+    apis: ['Translator', 'Language Detector'],
+    icon: 'bi-chat-dots',
+    onDeviceReason: 'Private conversations get translated without a translation server in the middle — detection and translation are instant, local, and free per message.',
+    codeSnippet: `const detector = await LanguageDetector.create();
+const translators = new Map();
+
+async function send(message, recipientLanguage) {
+  // 1. Detect what language the sender actually typed
+  const [{ detectedLanguage, confidence }] = await detector.detect(message);
+
+  if (detectedLanguage === recipientLanguage) {
+    return { original: message }; // same language, nothing to do
+  }
+
+  // 2. Translate into the recipient's language (translators cached per pair)
+  const key = \`\${detectedLanguage}->\${recipientLanguage}\`;
+  if (!translators.has(key)) {
+    translators.set(key, await Translator.create({
+      sourceLanguage: detectedLanguage,
+      targetLanguage: recipientLanguage
+    }));
+  }
+
+  return {
+    original: message,
+    translated: await translators.get(key).translate(message),
+    from: detectedLanguage
+  };
+}
+
+await send("On se voit demain à midi ?", "en");
+// → { translated: "See you tomorrow at noon?", from: "fr" }`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'proofreader-inline',
+    title: 'Proofreader, Inline',
+    description: 'The dedicated Proofreader API: every error underlined in place, with a label, an explanation, and one-click accept.',
+    category: 'Text Input',
+    apis: ['Proofreader'],
+    icon: 'bi-patch-check',
+    onDeviceReason: 'Structured corrections — indices, labels, explanations — enable real editor UX, not just corrected text. And drafts are proofread without leaving the device.',
+    codeSnippet: `const proofreader = await Proofreader.create({
+  expectedInputLanguages: ["en"],
+  includeCorrectionTypes: true,        // not yet returned by Chrome's current build
+  includeCorrectionExplanations: true  // not yet returned by Chrome's current build
+});
+
+const result = await proofreader.proofread(
+  "I has went to the libary yesterday, but they was allready closed."
+);
+
+console.log(result.correctedInput);
+// "I went to the library yesterday, but they were already closed."
+
+for (const c of result.corrections) {
+  // startIndex/endIndex point into the ORIGINAL string — perfect for underlines
+  console.log(c.startIndex, c.endIndex, "→", c.correction, c.types, c.explanation);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'universal-inbox',
+    title: 'Universal Inbox',
+    description: 'A five-API pipeline: detect each message\'s language, translate it, triage it into folders, digest the inbox, and draft replies in the sender\'s language.',
+    category: 'Mix-and-Match',
+    apis: ['Language Detector', 'Translator', 'Semantic Embedder', 'Summarizer', 'Writer'],
+    icon: 'bi-inbox',
+    onDeviceReason: 'Five Built-In AI APIs chained into one workflow, entirely on-device: a support inbox that reads every language, sorts itself, summarizes itself, and answers customers in their own words.',
+    codeSnippet: `const detector = await LanguageDetector.create();
+const embedder = await SemanticEmbedder.create({ taskType: "classification" });
+
+for (const message of inbox) {
+  // 1. Detect the sender's language
+  const [{ detectedLanguage }] = await detector.detect(message.body);
+
+  // 2. Translate to English for the pipeline
+  const translator = await Translator.create({
+    sourceLanguage: detectedLanguage, targetLanguage: "en"
+  });
+  message.english = await translator.translate(message.body);
+
+  // 3. Triage into a folder by embedding similarity to category centroids
+  const { embeddings: [e] } = await embedder.embed(message.english);
+  message.folder = nearestCentroid(e.values, folderCentroids);
+}
+
+// 4. Digest the whole inbox
+const summarizer = await Summarizer.create({ type: "key-points", length: "short" });
+const digest = await summarizer.summarize(
+  inbox.map(m => \`From \${m.sender}: \${m.english}\`).join("\\n")
+);
+
+// 5. Draft a reply — then translate it BACK to the sender's language
+const writer = await Writer.create({ tone: "formal", length: "short" });
+const reply = await writer.write(\`Reply to: "\${message.english}"\`);
+const back = await Translator.create({ sourceLanguage: "en", targetLanguage: message.lang });
+message.draft = await back.translate(reply);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+
   // EMBEDDINGS
   {
     id: 'document-chat',
@@ -177,7 +430,7 @@ async function ask(question) {
     title: 'Semantic Command Palette',
     description: 'A ⌘K palette that understands intent: describe what you want in your own words and the right action lights up.',
     category: 'Embeddings',
-    apis: ['Semantic Embedder'],
+    apis: ['Semantic Embedder', 'Web Speech'],
     icon: 'bi-command',
     onDeviceReason: 'Intent matching on every keystroke is only viable when embedding is free, instant, and private — exactly what an on-device embedder provides.',
     codeSnippet: `const actions = [
@@ -239,7 +492,7 @@ await guess("banana");   // Freezing`,
     title: 'Translation',
     description: 'Translate text from one language to another with native-like fluency.',
     category: 'Text Input',
-    apis: ['Prompt API'],
+    apis: ['Translator', 'Language Detector', 'Prompt API'],
     icon: 'bi-translate',
     onDeviceReason: 'Translations happen instantly without sending user content to external servers, preserving privacy and enabling offline use.',
     codeSnippet: `const session = await LanguageModel.create({
@@ -259,7 +512,7 @@ console.log(response);`,
     title: 'Summarization',
     description: 'Condense long articles or text into concise, digestible bullet points.',
     category: 'Text Input',
-    apis: ['Prompt API'],
+    apis: ['Summarizer', 'Prompt API'],
     icon: 'bi-card-text',
     onDeviceReason: 'Summarize sensitive documents or personal emails locally, ensuring your private data never leaves your device.',
     codeSnippet: `const session = await LanguageModel.create({
