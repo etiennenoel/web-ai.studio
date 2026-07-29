@@ -28,6 +28,15 @@
         }
       </button>
     }
+
+    @if (isDownloading) {
+      <div class="flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+        <div class="w-32 h-2 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+          <div class="h-full bg-indigo-500 rounded-full transition-all" [style.width.%]="downloadProgress"></div>
+        </div>
+        {{ downloadProgress }}%
+      </div>
+    }
   </div>
 
   @if (hasUnavailable && unavailableHint) {

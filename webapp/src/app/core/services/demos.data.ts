@@ -4,6 +4,36 @@ import { AttachmentTypeEnum } from '../enums/attachment-type.enum';
 export const DEMOS_DATA: DemoExample[] = [
   // SPEECH
   {
+    id: 'tongue-twister',
+    title: 'Tongue Twister Trial',
+    description: 'Say "she sells seashells" as fast as you can — the on-device recognizer scores how much of it survived.',
+    category: 'Speech',
+    apis: ['Web Speech'],
+    icon: 'bi-stopwatch',
+    onDeviceReason: 'A pronunciation game with zero backend: every attempt is transcribed and scored locally, so you can embarrass yourself in complete privacy.',
+    codeSnippet: `const twister = "She sells seashells by the seashore.";
+
+const recognition = new SpeechRecognition();
+recognition.options = { langs: ["en-US"], processLocally: true, quality: "dictation" };
+recognition.interimResults = true;
+
+recognition.onresult = (event) => {
+  const transcript = [...event.results].map(r => r[0].transcript).join("");
+
+  // Score with word error rate against the target sentence
+  const accuracy = 1 - wordErrorRate(twister, transcript);
+
+  if (accuracy >= 0.95) rank = "🏆 Tongue Master";
+  else if (accuracy >= 0.85) rank = "🥈 Silver Tongue";
+  else if (accuracy >= 0.70) rank = "Getting There";
+  else rank = "🙃 Tongue Tied";
+};
+
+recognition.start(); // now say it FAST`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
     id: 'live-translated-captions',
     title: 'Live Translated Captions',
     description: 'Speak into the mic: on-device captions appear instantly, and a second track renders them live in another language.',
@@ -209,6 +239,146 @@ speechSynthesis.speak(utterance);`,
   },
 
   // MULTI-API
+  {
+    id: 'omnibox',
+    title: 'The Omnibox',
+    description: 'One input, every API: whatever you paste is intent-routed to the right tool — translate, summarize, proofread, rewrite, or answer.',
+    category: 'Mix-and-Match',
+    apis: ['Semantic Embedder', 'Language Detector', 'Translator', 'Summarizer', 'Proofreader', 'Rewriter', 'Prompt API'],
+    icon: 'bi-input-cursor-text',
+    onDeviceReason: 'The router itself is AI: language detection and embedding similarity pick the destination in milliseconds, then the chosen API runs — a whole product surface with zero server calls.',
+    codeSnippet: `// Route exemplars define each destination
+const routes = {
+  summarize: ["Condense this long text", "Give me the key points of this article"],
+  proofread: ["Fix the typos and grammar in this", "Correct my writing mistakes"],
+  rewrite:   ["Make this sound more professional", "Rephrase this politely"],
+  answer:    ["What is the capital of France?", "How does photosynthesis work?"]
+};
+// Embed the exemplars once; a route's centroid is its mean vector
+
+async function route(input) {
+  // Rule 1: foreign language wins — translate it
+  const [lang] = await detector.detect(input);
+  if (lang.detectedLanguage !== "en" && lang.confidence > 0.6) {
+    return { route: "translate", from: lang.detectedLanguage };
+  }
+
+  // Rule 2: otherwise, nearest intent centroid decides
+  const { embeddings: [e] } = await embedder.embed(input);
+  const best = Object.entries(centroids)
+    .map(([name, c]) => ({ name, score: cosineSimilarity(e.values, c) }))
+    .sort((a, b) => b.score - a.score)[0];
+
+  return { route: best.name, score: best.score };
+}
+
+// Then dispatch: Translator, Summarizer, Proofreader, Rewriter, or the Prompt API`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'moderation-cascade',
+    title: 'Moderation Cascade',
+    description: 'The production pattern for cheap moderation: embeddings clear the obvious 90% in microseconds, the LLM judges only the borderline.',
+    category: 'Embeddings',
+    apis: ['Semantic Embedder', 'Prompt API'],
+    icon: 'bi-funnel',
+    onDeviceReason: 'Cascades are how real systems afford moderation — and on-device they cost literally nothing. Watch the counters: most comments never touch the language model.',
+    codeSnippet: `// Stage 1: embedding classifier (microseconds, runs on everything)
+const { embeddings: [e] } = await embedder.embed(comment);
+const scores = {
+  benign: cosineSimilarity(e.values, centroids.benign),
+  toxic:  cosineSimilarity(e.values, centroids.toxic),
+  spam:   cosineSimilarity(e.values, centroids.spam)
+};
+const [top, second] = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+const margin = top[1] - second[1];
+
+if (margin >= 0.05) {
+  return top[0]; // confident — the LLM never runs
+}
+
+// Stage 2: LLM judge (only for the borderline few)
+const verdict = await session.prompt(
+  \`Is this comment benign, toxic, or spam? Comment: "\${comment}"\`,
+  { responseConstraint: {
+      type: "object",
+      properties: {
+        verdict: { type: "string", enum: ["benign", "toxic", "spam"] },
+        reason: { type: "string" }
+      },
+      required: ["verdict", "reason"]
+  }}
+);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'photo-search',
+    title: 'Photo Semantic Search',
+    description: 'Drop in your photos, and search them by meaning — "food on a table", "someone smiling" — without one pixel leaving your device.',
+    category: 'Image Input',
+    apis: ['Prompt API', 'Semantic Embedder'],
+    icon: 'bi-images',
+    onDeviceReason: 'Cloud photo search means uploading your life. Here the vision model captions each photo locally, the captions are embedded locally, and queries rank them locally.',
+    codeSnippet: `// 1. Index: caption every photo with the vision model, embed the captions
+const session = await LanguageModel.create({ expectedInputs: [{ type: "image" }] });
+const embedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+
+for (const photo of photos) {
+  const bitmap = await createImageBitmap(photo.file);
+  photo.caption = await session.prompt([{
+    role: "user",
+    content: [
+      { type: "text", value: "Describe this photo in one factual sentence." },
+      { type: "image", value: bitmap }
+    ]
+  }]);
+  const { embeddings: [e] } = await embedder.embed(photo.caption);
+  photo.vector = e.values;
+}
+
+// 2. Search: embed the query, rank photos by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const { embeddings: [q] } = await queryEmbedder.embed("food on a table");
+
+photos.sort((a, b) =>
+  cosineSimilarity(q.values, b.vector) - cosineSimilarity(q.values, a.vector)
+);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'mystery-language',
+    title: 'Mystery Language',
+    description: 'Guess which language the snippet is written in — then see if you beat the Language Detector\'s confidence-ranked answer.',
+    category: 'Text Input',
+    apis: ['Language Detector', 'Translator'],
+    icon: 'bi-question-diamond',
+    onDeviceReason: 'A trivia game that doubles as an API showcase: ranked detections with confidences, revealed instantly and offline — plus a translation of what the snippet actually says.',
+    codeSnippet: `const detector = await LanguageDetector.create();
+
+// The player guesses first...
+const playerGuess = "it"; // Italian?
+
+// ...then the detector shows its ranked answer
+const results = await detector.detect("Chi dorme non piglia pesci.");
+// [{ detectedLanguage: "it", confidence: 0.98 }, ...]
+
+const [top] = results;
+if (playerGuess === top.detectedLanguage) score.player++;
+if (top.confidence > 0.5) score.detector++;
+
+// Reveal what it means with the Translator
+const translator = await Translator.create({
+  sourceLanguage: top.detectedLanguage,
+  targetLanguage: "en"
+});
+console.log(await translator.translate("Chi dorme non piglia pesci."));
+// "He who sleeps doesn't catch fish."`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
   {
     id: 'polyglot-chat',
     title: 'Polyglot Chat',
@@ -459,6 +629,48 @@ async function fix(issue) {
   });
   localeStrings[issue.key] = await translator.translate(issue.value);
 }`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'study-kit',
+    title: 'Lecture Study Kit',
+    description: 'Drop a lecture recording: transcript, key-point notes, a Q&A chat over the content, and auto-generated flashcards.',
+    category: 'Audio Input',
+    apis: ['Prompt API', 'Summarizer', 'Semantic Embedder'],
+    icon: 'bi-mortarboard',
+    onDeviceReason: 'A lecture is an hour of your professor\'s voice — big, personal, and slow to upload. The whole study pipeline runs where the recording already is: on your machine.',
+    codeSnippet: `// 1. Transcribe the recording with the multimodal Prompt API
+const session = await LanguageModel.create({ expectedInputs: [{ type: "audio" }] });
+const transcript = await session.prompt([{
+  role: "user",
+  content: [
+    { type: "text", value: "Transcribe this lecture exactly as spoken." },
+    { type: "audio", value: audioFile }
+  ]
+}]);
+
+// 2. Key-point notes with the Summarizer
+const summarizer = await Summarizer.create({ type: "key-points", length: "long" });
+const notes = await summarizer.summarize(transcript);
+
+// 3. Index the transcript for Q&A (RAG over the lecture)
+const chunks = splitIntoChunks(transcript);
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(chunks);
+
+// 4. Flashcards via structured output
+const cards = await session.prompt(
+  "Create 4 flashcards from this lecture:\\n" + transcript,
+  { responseConstraint: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { question: { type: "string" }, answer: { type: "string" } },
+        required: ["question", "answer"]
+      }
+  }}
+);`,
     promptRunOptions: {},
     initialPrompt: ''
   },

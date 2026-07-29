@@ -1,0 +1,111 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="[{ name: 'Web Speech (on-device)', status: speechStatus }]"
+      [showInstall]="true"
+      [isInstalling]="isInstalling"
+      (install)="installSpeechModel({ quality: 'dictation' })"
+      unavailableHint="<span class='font-semibold'>On-device speech recognition is not available in this browser.</span> Use a recent Chrome build with on-device Web Speech support.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Twister picker -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      @for (option of twisters; track option) {
+        <button class="px-3.5 py-2 rounded-full text-xs font-medium transition-all border disabled:opacity-40"
+                [ngClass]="twister === option
+                  ? 'bg-cyan-600 text-white border-cyan-600 shadow-md'
+                  : 'bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-zinc-700'"
+                [disabled]="isListening"
+                (click)="selectTwister(option)">
+          {{ option.length > 44 ? option.slice(0, 44) + '…' : option }}
+        </button>
+      }
+    </div>
+
+    <!-- The stage -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-8 text-center mb-6">
+      <p class="text-2xl md:text-3xl font-serif font-bold text-slate-800 dark:text-slate-100 leading-snug m-0 max-w-2xl mx-auto">
+        "{{ twister }}"
+      </p>
+
+      <div class="mt-6 flex flex-col items-center gap-3">
+        @if (isListening) {
+          <button class="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700 text-white text-3xl shadow-lg transition-all active:scale-95 border-none relative"
+                  (click)="stop()">
+            <span class="absolute inset-0 rounded-full bg-red-500/40 animate-ping"></span>
+            <i class="bi bi-stop-fill relative"></i>
+          </button>
+          <p class="text-sm text-slate-500 dark:text-slate-400 m-0 min-h-[24px]">
+            @if (interim || liveTranscript) {
+              <span class="italic">"{{ liveTranscript }} {{ interim }}"</span>
+            } @else {
+              Go — as fast as you can!
+            }
+          </p>
+        } @else {
+          <button class="w-20 h-20 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white text-3xl shadow-lg transition-all active:scale-95 disabled:opacity-40 border-none"
+                  [disabled]="speechStatus !== 'available'"
+                  (click)="record()">
+            <i class="bi bi-mic-fill"></i>
+          </button>
+          <p class="text-sm text-slate-400 dark:text-slate-500 m-0">
+            Tap and say it as fast as you dare. Scored on-device, judged mercilessly.
+          </p>
+        }
+        @if (bestAccuracy !== null) {
+          <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+            <i class="bi bi-trophy"></i> Best: {{ bestAccuracy }}%
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Attempts -->
+    @if (attempts.length > 0) {
+      <div class="flex flex-col gap-3">
+        @for (attempt of attempts; track $index) {
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl shadow-sm border p-4"
+               [ngClass]="$first ? 'border-cyan-200 dark:border-cyan-900/50' : 'border-slate-200 dark:border-zinc-700'">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-2xl">{{ attempt.rank.emoji }}</span>
+              <span class="text-sm font-bold {{ attempt.rank.textClass }}">{{ attempt.rank.label }}</span>
+              <div class="flex-grow h-2 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden min-w-[100px]">
+                <div class="h-full rounded-full transition-all duration-500"
+                     [ngClass]="attempt.accuracy >= 85 ? 'bg-emerald-500' : attempt.accuracy >= 70 ? 'bg-amber-500' : 'bg-rose-500'"
+                     [style.width.%]="attempt.accuracy"></div>
+              </div>
+              <span class="text-lg font-extrabold"
+                    [ngClass]="attempt.accuracy >= 85 ? 'text-emerald-600 dark:text-emerald-400' : attempt.accuracy >= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'">
+                {{ attempt.accuracy }}%
+              </span>
+              <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500">{{ (attempt.durationMs / 1000).toFixed(1) }}s</span>
+            </div>
+            <p class="text-sm m-0 mt-2 leading-relaxed">
+              @for (token of attempt.diff; track $index) {
+                <span [ngClass]="diffTokenClass(token.kind)">{{ token.text }}</span>{{ ' ' }}
+              }
+            </p>
+          </div>
+        }
+      </div>
+      <div class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-slate-400 dark:text-slate-500">
+        <span><span class="inline-block w-3 h-3 rounded bg-red-100 dark:bg-red-900/30 align-middle mr-1"></span> wrong word</span>
+        <span><span class="inline-block w-3 h-3 rounded bg-amber-100 dark:bg-amber-900/30 align-middle mr-1"></span> extra word</span>
+        <span><span class="line-through mr-1">word</span> missed word</span>
+      </div>
+    }
+  </div>
+</app-demo-layout>

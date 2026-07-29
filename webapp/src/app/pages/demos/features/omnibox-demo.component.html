@@ -1,0 +1,133 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress"
+      unavailableHint="<span class='font-semibold'>The router needs the Semantic Embedder and Language Detector.</span> The destination APIs (Translator, Summarizer, Proofreader, Rewriter, Prompt) are created lazily when a route fires.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- The one box -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border-2 border-rose-200 dark:border-rose-900/50 p-5 mb-6">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <textarea
+          class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-2xl px-5 py-3.5 text-base text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-rose-500/40 resize-none min-h-[76px]"
+          [(ngModel)]="input"
+          placeholder="Paste anything — a question, a draft, a foreign paragraph, a wall of text..."></textarea>
+        <button class="self-end flex items-center gap-2 px-7 py-3 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold shadow-md transition-all active:scale-95 disabled:opacity-50 border-none whitespace-nowrap"
+                [disabled]="!input.trim() || isRunning"
+                (click)="run()">
+          @if (isRunning) {
+            <i class="bi bi-arrow-repeat animate-spin"></i> Routing...
+          } @else {
+            <i class="bi bi-magic"></i> Route & Run
+          }
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        @for (sample of sampleInputs; track sample.label) {
+          <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                  [disabled]="isRunning"
+                  (click)="useSample(sample)">
+            {{ sample.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- Routing decision -->
+      <div class="lg:flex-[2] w-full bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-signpost-split text-rose-500"></i> Routing Decision
+          </span>
+          @if (decision) {
+            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+              routed in {{ decision.routingMs }}ms
+            </span>
+          }
+        </div>
+        <div class="p-5">
+          @if (!decision) {
+            <p class="text-sm text-slate-400 dark:text-slate-500 font-light m-0 text-center py-6">
+              Three rules pick the destination:<br />
+              <span class="text-xs">1. foreign language → Translate · 2. very long text → Summarize · 3. nearest intent embedding</span>
+            </p>
+          } @else {
+            <!-- Winner -->
+            <div class="rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-900/10 p-4 mb-4">
+              <div class="flex items-center gap-2">
+                <i class="bi text-xl text-rose-600 dark:text-rose-400"
+                   [ngClass]="decision.route === 'translate' ? 'bi-translate' : routeById(decision.route)?.icon"></i>
+                <span class="text-lg font-bold text-rose-700 dark:text-rose-300 capitalize">{{ decision.route }}</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 m-0 mt-1.5">{{ decision.rule }}</p>
+            </div>
+
+            <!-- Intent scores -->
+            @if (routes[0].score !== null) {
+              <div class="flex flex-col gap-2">
+                @for (route of routes; track route.id) {
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold w-20 shrink-0"
+                          [ngClass]="decision.route === route.id ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'">
+                      {{ route.label }}
+                    </span>
+                    <div class="flex-grow h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full"
+                           [ngClass]="decision.route === route.id ? 'bg-rose-500' : 'bg-slate-400 dark:bg-zinc-500'"
+                           [style.width.%]="(route.score ?? 0) * 100"></div>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500 w-10 text-right">{{ route.score?.toFixed(3) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div class="lg:flex-[3] w-full bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden min-h-[260px]">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-box-arrow-down text-rose-500"></i> {{ outputLabel || 'Output' }}
+          </span>
+          <div class="flex items-center gap-2">
+            @if (executionMs !== null) {
+              <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500">ran in {{ executionMs }}ms</span>
+            }
+            @if (state === 'Inferencing') {
+              <app-latency-loader></app-latency-loader>
+            }
+          </div>
+        </div>
+        <div class="p-5 text-[15px] text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap flex-grow">
+          @if (output) {
+            {{ output }}
+          } @else if (isRunning) {
+            <span class="text-rose-500"><i class="bi bi-arrow-repeat animate-spin"></i> Running the chosen API...</span>
+          } @else {
+            <span class="text-slate-400 dark:text-slate-500 font-light select-none">The chosen API's result lands here, labeled with which tool ran.</span>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

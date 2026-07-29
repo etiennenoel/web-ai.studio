@@ -1,0 +1,178 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress"
+      unavailableHint="<span class='font-semibold'>Part of the kit is unavailable.</span> Audio transcription needs the multimodal Prompt API — without it, paste a transcript instead. Notes and flashcards degrade gracefully.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Input + pipeline -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6">
+      <div class="flex flex-wrap items-center gap-3">
+        <label class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-zinc-700 cursor-pointer transition-colors">
+          <i class="bi bi-file-earmark-music"></i> {{ audioFile ? audioFile.name : 'Upload Lecture Audio' }}
+          <input type="file" accept="audio/*" class="hidden" (change)="onFileSelected($event)" />
+        </label>
+        <span class="text-xs text-slate-400 dark:text-slate-500">or</span>
+        <button class="px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-zinc-700 transition-colors"
+                (click)="useSampleTranscript()">
+          <i class="bi bi-journal-text"></i> Use Sample Transcript
+        </button>
+        <div class="flex-grow"></div>
+        <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                [disabled]="!canBuild"
+                (click)="build()">
+          @if (isBuilding) {
+            <i class="bi bi-arrow-repeat animate-spin"></i> Building...
+          } @else {
+            <i class="bi bi-mortarboard"></i> Build Study Kit
+          }
+        </button>
+      </div>
+
+      @if (pastedTranscript && !audioFile) {
+        <textarea
+          class="w-full mt-3 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs text-slate-600 dark:text-slate-400 outline-none focus:ring-2 focus:ring-amber-500/40 resize-none leading-relaxed"
+          rows="4"
+          [(ngModel)]="pastedTranscript"></textarea>
+      }
+
+      <!-- Pipeline stages -->
+      <div class="flex items-center gap-2 mt-4 flex-wrap">
+        @for (stageDef of [{ id: 'transcribe', label: 'Transcribe', api: 'Prompt' }, { id: 'notes', label: 'Notes', api: 'Summarizer' }, { id: 'index', label: 'Index', api: 'Embedder' }, { id: 'flashcards', label: 'Flashcards', api: 'Prompt' }]; track stageDef.id; let last = $last) {
+          @let state = stageState(stageDef.id === 'transcribe' ? 'transcribe' : stageDef.id === 'notes' ? 'notes' : stageDef.id === 'index' ? 'index' : 'flashcards');
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors"
+               [ngClass]="{
+                 'border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-slate-500': state === 'idle',
+                 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400': state === 'active',
+                 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/15 text-emerald-700 dark:text-emerald-400': state === 'done'
+               }">
+            @if (state === 'active') {
+              <i class="bi bi-arrow-repeat animate-spin"></i>
+            } @else if (state === 'done') {
+              <i class="bi bi-check-circle-fill"></i>
+            }
+            {{ stageDef.label }}
+            <span class="text-[9px] opacity-60 font-mono">{{ stageDef.api }}</span>
+          </div>
+          @if (!last) {
+            <i class="bi bi-arrow-right text-slate-300 dark:text-zinc-600 text-xs"></i>
+          }
+        }
+        @if (buildMs !== null && built) {
+          <span class="ml-auto text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+            kit built in {{ buildMs }}ms
+          </span>
+        }
+      </div>
+    </div>
+
+    @if (built) {
+      <div class="flex flex-col xl:flex-row gap-6 items-start">
+
+        <!-- Notes + Q&A -->
+        <div class="xl:flex-[3] w-full flex flex-col gap-5">
+          @if (notes) {
+            <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+              <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                  <i class="bi bi-journal-check text-amber-500"></i> Key-Point Notes
+                </span>
+              </div>
+              <div class="p-5 text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{{ notes }}</div>
+            </div>
+          }
+
+          <!-- Q&A -->
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="bi bi-chat-square-quote text-amber-500"></i> Ask the Lecture
+              </span>
+              @if (isAnswering) {
+                <app-latency-loader></app-latency-loader>
+              }
+            </div>
+            <div class="p-5">
+              <div class="flex gap-3">
+                <input type="text"
+                       class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-amber-500/40"
+                       [(ngModel)]="question"
+                       (keydown.enter)="ask()"
+                       placeholder="Ask anything covered in the lecture..." />
+                <button class="px-6 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                        [disabled]="!question.trim() || isAnswering"
+                        (click)="ask()">
+                  Ask
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-2 mt-3">
+                @for (sample of sampleQuestions; track sample) {
+                  <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                          [disabled]="isAnswering"
+                          (click)="useSampleQuestion(sample)">
+                    {{ sample }}
+                  </button>
+                }
+              </div>
+
+              @if (answer) {
+                <div class="mt-4 rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50/60 dark:bg-[#161616]/60 p-4 text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                  {{ answer }}
+                </div>
+                @if (retrieved.length > 0) {
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500 m-0 mt-2">
+                    Grounded in {{ retrieved.length }} retrieved passages (top similarity {{ retrieved[0].score.toFixed(3) }}).
+                  </p>
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcards -->
+        <div class="xl:flex-[2] w-full">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+            <i class="bi bi-collection text-amber-500"></i> Flashcards — click to flip
+          </span>
+          <div class="flex flex-col gap-3">
+            @for (card of flashcards; track $index) {
+              <button class="text-left rounded-2xl border p-5 min-h-[100px] transition-all active:scale-[0.99] bg-transparent"
+                      [ngClass]="card.flipped
+                        ? 'border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-amber-900/15'
+                        : 'border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90 hover:border-amber-300 dark:hover:border-amber-800 shadow-sm'"
+                      (click)="card.flipped = !card.flipped">
+                <div class="text-[9px] font-bold uppercase tracking-wider mb-1.5"
+                     [ngClass]="card.flipped ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'">
+                  {{ card.flipped ? 'Answer' : 'Question ' + ($index + 1) }}
+                </div>
+                <div class="text-sm leading-relaxed"
+                     [ngClass]="card.flipped ? 'text-amber-900 dark:text-amber-100' : 'text-slate-800 dark:text-slate-200 font-medium'">
+                  {{ card.flipped ? card.answer : card.question }}
+                </div>
+              </button>
+            }
+            @if (flashcards.length === 0) {
+              <p class="text-sm text-slate-400 dark:text-slate-500 font-light">Flashcards need the Prompt API — they were skipped.</p>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</app-demo-layout>
