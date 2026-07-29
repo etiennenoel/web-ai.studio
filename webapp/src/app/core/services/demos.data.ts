@@ -433,6 +433,36 @@ canvas.addEventListener("pointerup", async () => {
     initialPrompt: ''
   },
   {
+    id: 'localization-qa',
+    title: 'Localization QA',
+    description: 'Scan a locale file for strings left in the wrong language, then fix the stragglers with one click.',
+    category: 'Mix-and-Match',
+    apis: ['Language Detector', 'Translator'],
+    icon: 'bi-file-earmark-diff',
+    onDeviceReason: 'A practical build-time tool running in a tab: the Language Detector audits every string locally and the Translator patches the misses — no localization service required.',
+    codeSnippet: `const detector = await LanguageDetector.create();
+const expected = "fr"; // this is supposed to be fr.json
+
+const issues = [];
+for (const [key, value] of Object.entries(localeStrings)) {
+  const [top] = await detector.detect(value);
+  if (top.detectedLanguage !== expected && top.confidence > 0.5) {
+    issues.push({ key, value, found: top.detectedLanguage, confidence: top.confidence });
+  }
+}
+
+// Fix a straggler: translate it into the expected language
+async function fix(issue) {
+  const translator = await Translator.create({
+    sourceLanguage: issue.found,
+    targetLanguage: expected
+  });
+  localeStrings[issue.key] = await translator.translate(issue.value);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
     id: 'universal-inbox',
     title: 'Universal Inbox',
     description: 'A five-API pipeline: detect each message\'s language, translate it, triage it into folders, digest the inbox, and draft replies in the sender\'s language.',
@@ -1093,6 +1123,188 @@ const result = await session.prompt([{
   },
 
   // TOOLS CALLING
+  {
+    id: 'tool-calling',
+    title: 'Tool Calling: Smart Home',
+    description: 'Real function calling: tell the model what you want and watch it invoke JavaScript tools that drive a live dashboard.',
+    category: 'Tools Calling',
+    apis: ['Prompt API'],
+    icon: 'bi-house-gear',
+    onDeviceReason: 'The agentic loop — reason, call a function, read the result, respond — runs entirely on-device. Your smart-home state and commands never leave the browser.',
+    codeSnippet: `const session = await LanguageModel.create({
+  systemPrompt: "You control a smart home. Use the tools to fulfil requests.",
+  tools: [
+    {
+      name: "setLight",
+      description: "Turn a room's light on or off.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          room: { type: "string", enum: ["living room", "bedroom", "kitchen"] },
+          on: { type: "boolean" }
+        },
+        required: ["room", "on"]
+      },
+      async execute({ room, on }) {
+        home.lights[room] = on;        // really updates the dashboard
+        return JSON.stringify({ ok: true, room, on });
+      }
+    },
+    {
+      name: "setThermostat",
+      description: "Set the target temperature in Celsius.",
+      inputSchema: {
+        type: "object",
+        properties: { temperature: { type: "number" } },
+        required: ["temperature"]
+      },
+      async execute({ temperature }) {
+        home.thermostat = temperature;
+        return JSON.stringify({ ok: true, temperature });
+      }
+    }
+  ]
+});
+
+// The model decides which tools to call, in what order
+const reply = await session.prompt("Make the living room cozy and warm for movie night.");`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'csv-qa',
+    title: 'CSV Q&A',
+    description: 'Paste a CSV and ask questions in plain English — answers come back structured, with the reasoning shown.',
+    category: 'Tools Calling',
+    apis: ['Prompt API'],
+    icon: 'bi-table',
+    onDeviceReason: 'Business data is exactly what should not be pasted into a cloud chatbot. Here the spreadsheet is analyzed by the on-device model and never leaves the tab.',
+    codeSnippet: `const schema = {
+  type: "object",
+  properties: {
+    answer: { type: "string" },
+    reasoning: { type: "string" }
+  },
+  required: ["answer", "reasoning"],
+  additionalProperties: false
+};
+
+const session = await LanguageModel.create({
+  systemPrompt: "You answer questions about CSV data accurately. " +
+    "Show your calculation in the reasoning field."
+});
+
+const result = await session.prompt(
+  \`CSV data:\\n\${csvText}\\n\\nQuestion: Which region had the highest total revenue?\`,
+  { responseConstraint: schema }
+);
+
+const { answer, reasoning } = JSON.parse(result);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'screenshot-to-code',
+    title: 'Screenshot → UI Code',
+    description: 'Drop a UI screenshot and the multimodal model rebuilds it as HTML — rendered live next to the original.',
+    category: 'Image Input',
+    apis: ['Prompt API'],
+    icon: 'bi-window-split',
+    onDeviceReason: 'Design mockups and internal screenshots are sensitive by default. On-device vision turns them into code without uploading a single pixel.',
+    codeSnippet: `const session = await LanguageModel.create({
+  expectedInputs: [{ type: "image" }],
+  systemPrompt: "You convert UI screenshots into clean, semantic HTML " +
+    "with inline CSS styles. Output ONLY the HTML, no explanations."
+});
+
+const bitmap = await createImageBitmap(screenshotFile);
+
+const stream = session.promptStreaming([{
+  role: "user",
+  content: [
+    { type: "text", value: "Rebuild this UI as HTML with inline styles." },
+    { type: "image", value: bitmap }
+  ]
+}]);
+
+let html = "";
+for await (const chunk of stream) html += chunk;
+
+// Render the result safely in a sandboxed iframe
+iframe.sandbox = "";
+iframe.srcdoc = html;`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'regex-lab',
+    title: 'Regex Lab',
+    description: 'Describe a pattern in English, get a regex with an explanation — and test it live with match highlighting.',
+    category: 'Text Input',
+    apis: ['Prompt API'],
+    icon: 'bi-asterisk',
+    onDeviceReason: 'A regex assistant that lives in your dev workflow: instant, offline, and free to iterate against as many test strings as you like.',
+    codeSnippet: `const schema = {
+  type: "object",
+  properties: {
+    pattern: { type: "string" },
+    flags: { type: "string" },
+    explanation: { type: "string" }
+  },
+  required: ["pattern", "flags", "explanation"],
+  additionalProperties: false
+};
+
+const session = await LanguageModel.create({
+  systemPrompt: "You write JavaScript regular expressions. " +
+    "Return the pattern WITHOUT surrounding slashes."
+});
+
+const result = await session.prompt(
+  "Write a regex that matches ISO dates like 2026-07-29.",
+  { responseConstraint: schema }
+);
+
+const { pattern, flags, explanation } = JSON.parse(result);
+const regex = new RegExp(pattern, flags.includes("g") ? flags : flags + "g");
+
+for (const match of testString.matchAll(regex)) {
+  highlight(match.index, match[0]);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'session-branching',
+    title: 'Branching Conversations',
+    description: 'Fork one conversation into two futures with session.clone() — both branches inherit the context, then diverge side by side.',
+    category: 'Text Input',
+    apis: ['Prompt API'],
+    icon: 'bi-signpost-2',
+    onDeviceReason: 'Cloning a session copies its context without re-processing a single token — exploring multiple continuations is instant and free when the model is local.',
+    codeSnippet: `const session = await LanguageModel.create();
+
+// Build up shared context once
+const base = await session.prompt(
+  "We're naming a new open-source library for on-device AI benchmarks. Suggest a direction."
+);
+
+// Fork the conversation — each clone inherits the full history
+const optimist = await session.clone();
+const skeptic = await session.clone();
+
+// The branches diverge from the same starting point
+const [praise, critique] = await Promise.all([
+  optimist.prompt("Build on your suggestion enthusiastically. What makes it great?"),
+  skeptic.prompt("Now be brutally honest. What's wrong with your suggestion?")
+]);
+
+// The original session is untouched by either branch
+optimist.destroy();
+skeptic.destroy();`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
   {
     id: 'structured-json',
     title: 'Structured JSON Output',

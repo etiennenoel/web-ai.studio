@@ -1,0 +1,137 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>An API is unavailable.</span> The Language Detector powers the scan; the Translator powers the one-click fixes. Language pairs download on first use.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Controls -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6 flex flex-wrap items-center gap-4">
+      <div class="flex items-center gap-2 font-mono text-sm">
+        <i class="bi bi-file-earmark-code text-slate-400"></i>
+        <span class="font-bold text-slate-800 dark:text-slate-200">{{ fileName }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">should be entirely in</span>
+        <select [(ngModel)]="expectedLanguage" (ngModelChange)="onExpectedChanged()"
+                class="bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
+          @for (lang of expectedLanguages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="flex-grow"></div>
+      @if (hasScanned) {
+        <div class="flex items-center gap-2">
+          @if (issueCount > 0) {
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+              {{ issueCount }} {{ issueCount === 1 ? 'issue' : 'issues' }}
+            </span>
+            @if (translatorStatus !== 'unavailable') {
+              <button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      (click)="fixAll()">
+                <i class="bi bi-magic"></i> Fix All
+              </button>
+            }
+          } @else {
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+              <i class="bi bi-check-circle"></i> All strings in {{ languageLabel(expectedLanguage) }}{{ fixedCount > 0 ? ' — ' + fixedCount + ' fixed' : '' }}
+            </span>
+          }
+        </div>
+      }
+      <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+              [disabled]="isScanning || detectorStatus === 'unavailable'"
+              (click)="scan()">
+        @if (isScanning) {
+          <i class="bi bi-arrow-repeat animate-spin"></i> Scanning...
+        } @else {
+          <i class="bi bi-search"></i> {{ hasScanned ? 'Re-scan' : 'Scan File' }}
+        }
+      </button>
+    </div>
+
+    <!-- Entries table -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-slate-50/80 dark:bg-[#161616]/80">
+              <th class="px-5 py-3 text-left text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Key</th>
+              <th class="px-5 py-3 text-left text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Value</th>
+              <th class="px-5 py-3 text-left text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Detected</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of entries; track entry.key) {
+              <tr class="border-t border-slate-100 dark:border-zinc-800 transition-colors"
+                  [ngClass]="{
+                    'bg-amber-50/60 dark:bg-amber-900/10': entry.status === 'wrong-language',
+                    'bg-emerald-50/50 dark:bg-emerald-900/10': entry.status === 'fixed'
+                  }">
+                <td class="px-5 py-3 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{{ entry.key }}</td>
+                <td class="px-5 py-3 text-sm text-slate-700 dark:text-slate-300">
+                  {{ entry.value }}
+                  @if (entry.status === 'fixed' && entry.previousValue) {
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500 line-through mt-0.5">{{ entry.previousValue }}</div>
+                  }
+                </td>
+                <td class="px-5 py-3 whitespace-nowrap">
+                  @if (entry.detectedLanguage) {
+                    <span class="text-[11px] font-semibold px-2 py-1 rounded-md"
+                          [ngClass]="entry.status === 'wrong-language'
+                            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                            : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400'">
+                      {{ languageLabel(entry.detectedLanguage) }}
+                      @if (entry.confidence !== null && entry.status !== 'fixed') {
+                        {{ (entry.confidence * 100).toFixed(0) }}%
+                      }
+                    </span>
+                  } @else {
+                    <span class="text-xs text-slate-300 dark:text-zinc-600">—</span>
+                  }
+                </td>
+                <td class="px-5 py-3 text-right whitespace-nowrap">
+                  @if (entry.status === 'wrong-language') {
+                    <button class="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold shadow-sm transition-all active:scale-95 disabled:opacity-50 border-none"
+                            [disabled]="entry.isFixing || translatorStatus === 'unavailable'"
+                            (click)="fix(entry)">
+                      @if (entry.isFixing) {
+                        <i class="bi bi-arrow-repeat animate-spin"></i>
+                      } @else {
+                        Translate to {{ languageLabel(expectedLanguage) }}
+                      }
+                    </button>
+                  } @else if (entry.status === 'fixed') {
+                    <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><i class="bi bi-check-circle-fill"></i> Fixed</span>
+                  } @else if (entry.status === 'ok' && hasScanned) {
+                    <i class="bi bi-check text-emerald-500"></i>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (scanTimeMs !== null) {
+        <div class="px-5 py-2.5 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-slate-400 dark:text-slate-500">
+          {{ entries.length }} strings audited on-device in {{ scanTimeMs }}ms
+        </div>
+      }
+    </div>
+  </div>
+</app-demo-layout>

@@ -1,0 +1,102 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>The Prompt API with image input is not available in this browser.</span> Use a Chrome build with multimodal Gemini Nano enabled.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Controls -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6 flex flex-wrap items-center gap-3">
+      <label class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-zinc-700 cursor-pointer transition-colors">
+        <i class="bi bi-upload"></i> Upload Screenshot
+        <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+      </label>
+      <button class="px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-zinc-700 transition-colors"
+              (click)="useSampleScreenshot()">
+        <i class="bi bi-image"></i> Use Sample Mockup
+      </button>
+      <div class="flex-grow"></div>
+      @if (state === 'Inferencing') {
+        <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                (click)="onCancel()">
+          <i class="bi bi-stop-fill"></i> Stop
+        </button>
+      } @else {
+        <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                [disabled]="!imageUrl || languageModelAvailability === 'unavailable'"
+                (click)="generate()">
+          <i class="bi bi-code-slash"></i> Generate HTML
+        </button>
+      }
+    </div>
+
+    <!-- Side by side -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Original -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col min-h-[320px]">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-image text-violet-500"></i> Original Screenshot
+          </span>
+        </div>
+        <div class="flex-grow flex items-center justify-center bg-slate-50 dark:bg-[#161616] p-4">
+          @if (imageUrl) {
+            <img [src]="imageUrl" alt="Uploaded screenshot" class="max-w-full max-h-[400px] rounded-lg shadow-sm" />
+          } @else {
+            <span class="text-sm text-slate-400 dark:text-zinc-600 font-light">Upload a UI screenshot, or use the sample mockup.</span>
+          }
+        </div>
+      </div>
+
+      <!-- Rebuilt -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col min-h-[320px]">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-window text-violet-500"></i> Rebuilt as HTML
+          </span>
+          <div class="flex items-center gap-3">
+            @if (state === 'Inferencing') {
+              <app-latency-loader></app-latency-loader>
+            }
+            @if (renderedHtml) {
+              <button class="text-[11px] font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 bg-transparent border-none transition-colors"
+                      (click)="showCode = !showCode">
+                {{ showCode ? 'show preview' : 'show code' }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="flex-grow bg-slate-50 dark:bg-[#161616]">
+          @if (state === 'Inferencing') {
+            <pre class="p-4 m-0 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-mono whitespace-pre-wrap max-h-[400px] overflow-y-auto">{{ generatedHtml }}<span class="inline-block w-1.5 h-3 bg-violet-500 animate-pulse"></span></pre>
+          } @else if (renderedHtml && !showCode) {
+            <iframe sandbox="" [srcdoc]="renderedHtml" class="w-full h-full min-h-[400px] border-0 bg-white" title="Rebuilt UI preview"></iframe>
+          } @else if (generatedHtml && showCode) {
+            <div class="h-[400px]">
+              <app-code-editor [code]="generatedHtml" [language]="'html'" [height]="'400px'"></app-code-editor>
+            </div>
+          } @else {
+            <div class="h-full flex items-center justify-center p-6">
+              <span class="text-sm text-slate-400 dark:text-zinc-600 font-light">The generated markup streams in here, then renders in a sandboxed iframe.</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</app-demo-layout>

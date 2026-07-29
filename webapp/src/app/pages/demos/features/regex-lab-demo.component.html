@@ -1,0 +1,132 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>The Prompt API is not available in this browser.</span> You can still edit the pattern and flags manually — the live tester works without the model.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Description input -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6">
+      <div class="flex gap-3">
+        <input type="text"
+               class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-sky-500/40"
+               [(ngModel)]="description"
+               (keydown.enter)="generate()"
+               placeholder="Describe what to match, in plain English..." />
+        <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none whitespace-nowrap"
+                [disabled]="!description.trim() || state === 'Inferencing' || languageModelAvailability === 'unavailable'"
+                (click)="generate()">
+          @if (state === 'Inferencing') {
+            <i class="bi bi-arrow-repeat animate-spin"></i> Writing...
+          } @else {
+            <i class="bi bi-asterisk"></i> Generate
+          }
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        @for (sample of sampleRequests; track sample) {
+          <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors"
+                  (click)="useSample(sample)">
+            {{ sample }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Pattern editor -->
+    <div class="bg-[#101014] rounded-2xl shadow-lg border border-zinc-800 p-4 mb-3 flex items-center gap-2 font-mono text-lg">
+      <span class="text-zinc-500">/</span>
+      <input type="text"
+             class="flex-grow bg-transparent border-none outline-none text-emerald-400 placeholder-zinc-600 min-w-0"
+             [(ngModel)]="pattern"
+             (ngModelChange)="runTest()"
+             placeholder="pattern" />
+      <span class="text-zinc-500">/</span>
+      <input type="text"
+             class="w-16 bg-transparent border-none outline-none text-sky-400 placeholder-zinc-600"
+             [(ngModel)]="flags"
+             (ngModelChange)="runTest()"
+             placeholder="flags" />
+    </div>
+
+    @if (regexError) {
+      <div class="mb-3 text-xs text-red-500 font-mono px-2">{{ regexError }}</div>
+    }
+    @if (explanation && hasGenerated) {
+      <div class="mb-6 bg-sky-50 border border-sky-200 dark:bg-sky-900/10 dark:border-sky-900/30 rounded-2xl p-4 text-sm text-sky-900 dark:text-sky-100/90">
+        <i class="bi bi-lightbulb text-sky-500"></i> {{ explanation }}
+      </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Test string with highlights -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Test String</span>
+          <span class="text-xs font-semibold" [ngClass]="matches.length > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'">
+            {{ matches.length }} {{ matches.length === 1 ? 'match' : 'matches' }}
+          </span>
+        </div>
+        <!-- Highlighted preview -->
+        <div class="p-4 text-sm font-mono leading-relaxed whitespace-pre-wrap border-b border-slate-100 dark:border-zinc-800 min-h-[120px]">
+          @if (segments.length > 0) {
+            @for (segment of segments; track $index) {
+              @if (segment.isMatch) {
+                <span class="bg-emerald-200/70 dark:bg-emerald-600/40 text-emerald-900 dark:text-emerald-200 rounded-sm">{{ segment.text }}</span>
+              } @else {
+                <span class="text-slate-600 dark:text-slate-400">{{ segment.text }}</span>
+              }
+            }
+          } @else {
+            <span class="text-slate-600 dark:text-slate-400">{{ testString }}</span>
+          }
+        </div>
+        <textarea
+          class="w-full bg-slate-50/60 dark:bg-[#161616]/60 border-none outline-none focus:ring-0 text-slate-700 dark:text-slate-300 resize-none p-4 text-xs font-mono leading-relaxed min-h-[110px]"
+          [(ngModel)]="testString"
+          (ngModelChange)="runTest()"
+          placeholder="Edit the test string..."></textarea>
+      </div>
+
+      <!-- Match details -->
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden flex flex-col max-h-[420px]">
+        <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Matches</span>
+        </div>
+        <div class="overflow-y-auto p-3 flex flex-col gap-1.5 flex-grow">
+          @if (matches.length === 0) {
+            <p class="text-sm text-slate-400 dark:text-slate-500 m-auto text-center font-light px-6">
+              {{ hasGenerated || pattern ? 'No matches in the test string.' : 'Generate a regex (or type one) to see its matches.' }}
+            </p>
+          }
+          @for (match of matches; track $index) {
+            <div class="flex items-center gap-3 px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700">
+              <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500 w-10 shrink-0">@{{ match.index }}</span>
+              <code class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 break-all">{{ match.match }}</code>
+              @if (match.groups.length > 0) {
+                <span class="ml-auto text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate shrink-0" title="Capture groups">
+                  [{{ match.groups.join(', ') }}]
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</app-demo-layout>

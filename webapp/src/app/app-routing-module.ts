@@ -59,6 +59,12 @@ import { DictateAndPolishDemoComponent } from './pages/demos/features/dictate-an
 import { CameraQaDemoComponent } from './pages/demos/features/camera-qa-demo.component';
 import { DrawAndGuessDemoComponent } from './pages/demos/features/draw-and-guess-demo.component';
 import { StoryTimeDemoComponent } from './pages/demos/features/story-time-demo.component';
+import { ToolCallingDemoComponent } from './pages/demos/features/tool-calling-demo.component';
+import { ScreenshotToCodeDemoComponent } from './pages/demos/features/screenshot-to-code-demo.component';
+import { RegexLabDemoComponent } from './pages/demos/features/regex-lab-demo.component';
+import { CsvQaDemoComponent } from './pages/demos/features/csv-qa-demo.component';
+import { SessionBranchingDemoComponent } from './pages/demos/features/session-branching-demo.component';
+import { LocalizationQaDemoComponent } from './pages/demos/features/localization-qa-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -624,6 +630,48 @@ const routes: Routes = [
       {
         path: "demos/story-time",
         component: StoryTimeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/tool-calling",
+        component: ToolCallingDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/screenshot-to-code",
+        component: ScreenshotToCodeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/regex-lab",
+        component: RegexLabDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/csv-qa",
+        component: CsvQaDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/session-branching",
+        component: SessionBranchingDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/localization-qa",
+        component: LocalizationQaDemoComponent,
         data: {
           route: RouteEnum.Demos
         }

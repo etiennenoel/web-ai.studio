@@ -1,0 +1,123 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>The Prompt API is not available in this browser.</span> Use a recent Chrome build with Gemini Nano enabled.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Question bar -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6">
+      <div class="flex gap-3">
+        <input type="text"
+               class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+               [(ngModel)]="question"
+               (keydown.enter)="ask()"
+               placeholder="Ask a question about the data below..." />
+        @if (state === 'Inferencing') {
+          <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                  (click)="onCancel()">
+            <i class="bi bi-stop-fill"></i> Stop
+          </button>
+        } @else {
+          <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                  [disabled]="!question.trim() || languageModelAvailability === 'unavailable'"
+                  (click)="ask()">
+            <i class="bi bi-search"></i> Ask
+          </button>
+        }
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        @for (sample of sampleQuestions; track sample) {
+          <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                  [disabled]="state === 'Inferencing'"
+                  (click)="useSample(sample)">
+            {{ sample }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Answer -->
+    @if (answer || state === 'Inferencing') {
+      <div class="mb-6 bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-emerald-200 dark:border-emerald-900/50 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 flex justify-between items-center">
+          <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-check-square"></i> Answer
+          </span>
+          @if (state === 'Inferencing') {
+            <app-latency-loader></app-latency-loader>
+          }
+        </div>
+        <div class="p-5">
+          @if (answer) {
+            <p class="text-lg font-semibold text-slate-800 dark:text-slate-200 m-0">{{ answer }}</p>
+            @if (reasoning) {
+              <div class="mt-3 pt-3 border-t border-slate-100 dark:border-zinc-800">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Reasoning</span>
+                <p class="text-sm text-slate-600 dark:text-slate-400 m-0 mt-1 leading-relaxed whitespace-pre-wrap">{{ reasoning }}</p>
+              </div>
+            }
+          } @else {
+            <span class="text-sm text-emerald-600 dark:text-emerald-400"><i class="bi bi-arrow-repeat animate-spin"></i> Analyzing the data...</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Data -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="bi bi-table text-emerald-500"></i> Your Data — {{ dataRows.length }} rows
+        </span>
+        <button class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 bg-transparent border-none transition-colors"
+                (click)="showData = !showData">
+          {{ showData ? 'edit as CSV' : 'show as table' }}
+        </button>
+      </div>
+
+      @if (showData) {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-slate-50/80 dark:bg-[#161616]/80">
+                @for (header of headerRow; track header) {
+                  <th class="px-4 py-2.5 text-left text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ header }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of dataRows; track $index) {
+                <tr class="border-t border-slate-100 dark:border-zinc-800">
+                  @for (cell of row; track $index) {
+                    <td class="px-4 py-2 text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{{ cell }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <textarea
+          class="w-full bg-transparent border-none outline-none focus:ring-0 text-slate-700 dark:text-slate-300 resize-none p-5 text-xs font-mono leading-relaxed min-h-[260px]"
+          [(ngModel)]="csvText"
+          placeholder="Paste CSV data with a header row..."></textarea>
+      }
+    </div>
+  </div>
+</app-demo-layout>
