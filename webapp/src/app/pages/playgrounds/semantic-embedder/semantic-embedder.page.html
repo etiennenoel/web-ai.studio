@@ -1,0 +1,327 @@
+<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <i class="bi bi-diagram-3 text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Semantic Embedder</h1>
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Turn text into on-device vectors and compare their meaning.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="sharePlayground()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0">
+          <i class="bi" [ngClass]="shareText === 'Copied!' ? 'bi-check2' : 'bi-share'"></i> {{shareText}}
+        </button>
+        <a routerLink="/docs/semantic-embedder" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="text-decoration: none;">
+          <i class="bi bi-book"></i> Read the docs
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto p-8 space-y-8">
+
+    <!-- Flag notice -->
+    <div class="p-4 bg-violet-50 dark:bg-violet-900/10 border border-violet-200 dark:border-violet-900/30 rounded-xl text-violet-800 dark:text-violet-300 text-sm leading-relaxed flex gap-3">
+      <i class="bi bi-flag-fill text-lg mt-0.5"></i>
+      <div>
+        This API is in an early developer trial. Use <strong>Chrome Canary</strong> and enable <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">#semantic-embedder-api</code> in <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>. The shape of the API may still change.
+      </div>
+    </div>
+
+    <form [formGroup]="playgroundForm" class="space-y-8">
+
+      <!-- 1. Configuration -->
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">1</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Configuration</h2>
+        </div>
+        <div class="p-6 space-y-6">
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Task Type Hint</label>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Under discussion</span>
+            </div>
+            <select formControlName="taskType" class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-300 font-medium">
+              <option *ngFor="let t of taskTypes" [value]="t.value">{{t.label}}</option>
+            </select>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 pl-1 font-medium">
+              An optional hint to optimize embedding quality for a use case. Browsers may safely ignore it.
+            </p>
+          </div>
+
+          <details class="group bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+            <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+              <div class="flex items-center justify-between w-full">
+                <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced Session Configuration</span>
+                <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+              </div>
+            </summary>
+            <div class="p-3 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-3">
+              <div class="flex items-center gap-3 mt-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
+                <input type="checkbox" formControlName="useAbortSignal" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- 2. Check Availability -->
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">2</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Check Availability</h2>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <button type="button" (click)="checkAvailability()" class="rounded-lg px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit">
+              <i class="bi bi-activity"></i> Check Availability
+            </button>
+            <div *ngIf="availabilityStatus" class="flex items-center gap-2">
+              <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Status:</span>
+              <span class="rounded-lg px-3 py-1.5 text-xs font-mono font-bold tracking-wide border shadow-sm"
+                    [ngClass]="{'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20': availabilityStatus === 'available', 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20': availabilityStatus !== 'available'}">
+                {{availabilityStatus}}
+              </span>
+              <span *ngIf="availabilityTimeMs !== null" class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+                {{availabilityTimeMs}}ms
+              </span>
+            </div>
+          </div>
+          <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+            <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+              <div class="flex items-center justify-between w-full">
+                <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Initialization Code</span>
+                <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+              </div>
+            </summary>
+            <div class="h-[300px] min-h-[200px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+              <app-code-editor [code]="codeAvailability" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- 3. Create Session -->
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">3</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Create Session</h2>
+        </div>
+        <div class="p-6 space-y-6">
+
+          <p class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-4">Initialize the embedder with the configuration defined above. The model downloads on first use.</p>
+
+          <div class="flex flex-col items-center gap-3">
+            <div *ngIf="!session && !isCreating" class="w-full flex justify-center">
+              <button type="button" (click)="createSession()" class="rounded-lg group relative px-6 py-3 w-full bg-indigo-600 text-white text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                <i class="bi bi-play-circle text-lg"></i> Create Semantic Embedder
+              </button>
+            </div>
+
+            <div *ngIf="isCreating" class="rounded-lg px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-500/20 shadow-sm flex flex-col items-center justify-center gap-2 w-full sm:w-auto min-w-[280px]">
+              <div class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin text-lg"></i> Initializing Session... <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span></div>
+              <div *ngIf="isDownloading" class="w-full bg-indigo-200 dark:bg-indigo-900/50 h-1.5 mt-1 overflow-hidden shadow-inner" style="border-radius: 9999px !important;">
+                <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 transition-all duration-300 ease-out" style="border-radius: 9999px !important;" [style.width]="downloadProgress + '%'"></div>
+              </div>
+              <button *ngIf="isDownloading" type="button" (click)="abortCreation()" class="text-xs font-bold underline hover:no-underline">Abort</button>
+            </div>
+
+            <div *ngIf="session" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+              <div class="rounded-lg px-5 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
+                <i class="bi bi-check-circle-fill"></i> Session Active <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
+              </div>
+              <button type="button" (click)="destroySession()" [disabled]="isEmbedding" class="rounded-md px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm" title="Destroy Session">
+                <i class="bi bi-trash3 text-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+            <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+              <div class="flex items-center justify-between w-full">
+                <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Session Creation Code</span>
+                <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+              </div>
+            </summary>
+            <div class="h-[300px] min-h-[200px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+              <app-code-editor [code]="codeSession" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- 4. Input -->
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">4</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">The Input</h2>
+        </div>
+        <div class="p-6 space-y-6">
+
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Passages to embed</label>
+            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{{inputs.length}} input(s)</span>
+          </div>
+
+          <p class="text-xs text-slate-500 dark:text-slate-400 pl-1 font-medium -mt-3">
+            One input embeds a single string; two or more are sent as a batch in a single <code class="font-mono">embed()</code> call. The API does not chunk for you — keep each passage within the model's token limit.
+          </p>
+
+          <div formArrayName="inputs" class="space-y-3">
+            <div *ngFor="let control of inputs.controls; let i = index" class="flex gap-2 items-start">
+              <div class="mt-3 w-6 h-6 shrink-0 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 text-xs font-bold flex items-center justify-center">{{i + 1}}</div>
+              <textarea [formControlName]="i" class="w-full p-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y min-h-[70px] leading-relaxed text-sm outline-none placeholder-slate-400 dark:placeholder-zinc-600 font-medium transition-all shadow-sm" placeholder="A passage to embed..."></textarea>
+              <button type="button" (click)="removeInput(i)" [disabled]="inputs.length === 1" class="mt-2 rounded-md px-2.5 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all disabled:opacity-30 disabled:pointer-events-none shadow-sm shrink-0" title="Remove input">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" (click)="addInput()" class="rounded-lg px-4 py-2 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-2 border border-slate-200 dark:border-zinc-700">
+            <i class="bi bi-plus-lg"></i> Add passage
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Execution -->
+      <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+        <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">5</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Execution</h2>
+        </div>
+        <div class="p-6 space-y-6">
+
+          <div class="py-4 flex flex-col items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center transition-all" [class.opacity-50]="!session" [class.pointer-events-none]="!session">
+              <div class="flex flex-wrap items-center justify-center gap-3 w-full bg-slate-50/50 dark:bg-zinc-900/30 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+                <button type="button" (click)="runPrompt()" [disabled]="isEmbedding" class="rounded-lg flex-1 sm:flex-none px-6 py-2.5 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden disabled:opacity-50">
+                  <span class="flex items-center justify-center gap-2"><i class="bi bi-diagram-3 text-lg" [ngClass]="isEmbedding ? 'animate-pulse' : ''"></i> {{ isEmbedding ? 'Embedding...' : 'Generate Embeddings' }}</span>
+                </button>
+                <button *ngIf="isEmbedding" type="button" (click)="abortPrompt()" class="rounded-lg px-5 py-2.5 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all shadow-sm">
+                  <span class="flex items-center justify-center gap-2"><i class="bi bi-stop-circle"></i> Abort</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+            <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+              <div class="flex items-center justify-between w-full">
+                <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Execution Code</span>
+                <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+              </div>
+            </summary>
+            <div class="h-[600px] min-h-[400px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+              <app-code-editor [code]="codeExecution" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+            </div>
+          </details>
+
+          <!-- Output -->
+          <div id="output-section" class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden relative transition-all mt-6" [class.opacity-50]="!session && embeddings.length === 0 && !errorMessage">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/50">
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 dark:text-indigo-400 rounded">
+                  <i class="bi bi-stars text-sm"></i>
+                </div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Execution Output</span>
+              </div>
+              <div *ngIf="executionTimeMs !== null" class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+                {{executionTimeMs}}ms
+              </div>
+            </div>
+
+            <div class="p-6 md:p-8 text-base leading-relaxed text-slate-800 dark:text-slate-200 min-h-[120px] flex flex-col justify-center">
+              <div *ngIf="errorMessage" class="p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 mb-3 flex items-start gap-3 shadow-sm">
+                <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+                <div>{{errorMessage}}</div>
+              </div>
+
+              <span *ngIf="embeddings.length === 0 && !isEmbedding && !errorMessage" class="text-slate-400 dark:text-slate-500 italic font-semibold flex items-center justify-center text-sm w-full">Generate embeddings to see the vectors.</span>
+              <span *ngIf="isEmbedding" class="text-indigo-500 dark:text-indigo-400 italic animate-pulse flex items-center justify-center gap-2 text-base font-medium w-full"><i class="bi bi-magic text-xl"></i> Embedding...</span>
+
+              <div *ngIf="embeddings.length > 0" class="space-y-6">
+
+                <!-- Metadata -->
+                <div *ngIf="metadata" class="flex flex-wrap gap-3">
+                  <div class="px-4 py-2 rounded-lg bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 shadow-sm">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Embedding space</div>
+                    <div class="font-mono font-bold text-sm text-indigo-600 dark:text-indigo-400">{{metadata.embeddingSpace || 'N/A'}}</div>
+                  </div>
+                  <div class="px-4 py-2 rounded-lg bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 shadow-sm">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Max input tokens</div>
+                    <div class="font-mono font-bold text-sm text-slate-700 dark:text-slate-300">{{metadata.maxInputTokens ?? 'N/A'}}</div>
+                  </div>
+                  <div class="px-4 py-2 rounded-lg bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 shadow-sm">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Dimensions</div>
+                    <div class="font-mono font-bold text-sm text-slate-700 dark:text-slate-300">{{embeddings[0].dimensions}}</div>
+                  </div>
+                </div>
+
+                <!-- Vectors -->
+                <div>
+                  <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Vectors</h3>
+                  <ul class="space-y-3">
+                    <li *ngFor="let row of embeddings; let i = index" class="p-4 bg-slate-50 dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
+                      <div class="flex items-start justify-between gap-4 mb-2">
+                        <div class="flex items-start gap-3 min-w-0">
+                          <span class="mt-0.5 w-6 h-6 shrink-0 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold flex items-center justify-center">{{i + 1}}</span>
+                          <span class="text-sm font-medium text-slate-700 dark:text-slate-300 break-words">{{row.text}}</span>
+                        </div>
+                        <button type="button" (click)="copyVector(row)" class="shrink-0 rounded-md px-2.5 py-1.5 bg-white dark:bg-zinc-800 text-slate-500 dark:text-slate-400 text-xs border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-all shadow-sm" title="Copy full vector as JSON">
+                          <i class="bi bi-clipboard"></i>
+                        </button>
+                      </div>
+                      <div class="flex flex-wrap gap-3 text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 pl-9">
+                        <span><span class="font-mono font-bold text-slate-700 dark:text-slate-300">{{row.dimensions}}</span> dims</span>
+                        <span><span class="font-mono font-bold text-slate-700 dark:text-slate-300">{{row.tokenCount ?? 'N/A'}}</span> tokens</span>
+                        <span *ngIf="row.truncated" class="text-amber-600 dark:text-amber-400 font-bold"><i class="bi bi-scissors"></i> truncated</span>
+                      </div>
+                      <div class="pl-9 overflow-x-auto">
+                        <code class="text-xs font-mono text-slate-500 dark:text-slate-500 whitespace-nowrap">{{previewVector(row.values)}}</code>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Similarity matrix -->
+                <div *ngIf="embeddings.length > 1">
+                  <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Cosine similarity</h3>
+                  <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-700 rounded-lg">
+                    <table class="w-full text-left border-collapse">
+                      <thead>
+                        <tr class="bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-700">
+                          <th class="px-4 py-2 text-xs font-semibold text-slate-900 dark:text-white"></th>
+                          <th *ngFor="let row of embeddings; let j = index" class="px-4 py-2 text-xs font-semibold text-slate-900 dark:text-white text-center">{{j + 1}}</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-200 dark:divide-zinc-700 bg-white dark:bg-[#121212]">
+                        <tr *ngFor="let row of embeddings; let i = index">
+                          <th class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 whitespace-nowrap" [title]="row.text">{{i + 1}}. {{truncateLabel(row.text)}}</th>
+                          <td *ngFor="let score of similarityMatrix[i]" class="px-4 py-2 text-center text-xs font-mono font-bold" [ngClass]="similarityClass(score)">
+                            {{score | number:'1.3-3'}}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                    Computed locally from the returned vectors. 1.000 means identical direction — the diagonal is always 1.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

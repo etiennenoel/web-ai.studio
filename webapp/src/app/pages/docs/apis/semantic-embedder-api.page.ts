@@ -20,8 +20,8 @@ import { Component } from '@angular/core';
                 <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Semantic Embedder API
                 </h1>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400 uppercase tracking-wider border border-violet-200 dark:border-violet-500/30">
-                  Explainer
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 uppercase tracking-wider border border-amber-200 dark:border-amber-500/30">
+                  Dev Trial
                 </span>
               </div>
             </div>
@@ -34,6 +34,9 @@ import { Component } from '@angular/core';
               <a href="https://github.com/explainers-by-googlers/semantic-embedder-api/issues" target="_blank" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-bug"></i> File an issue
               </a>
+              <a routerLink="/playgrounds/semantic-embedder" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors border border-indigo-600 flex items-center gap-2">
+                <i class="bi bi-play-circle"></i> Playground
+              </a>
             </div>
           </div>
 
@@ -41,11 +44,11 @@ import { Component } from '@angular/core';
             The Semantic Embedder API generates high-dimensional vector representations (embeddings) of text directly on the user's device. It unlocks semantic search, retrieval-augmented generation, and real-time content intelligence without the latency, cost, and privacy trade-offs of cloud embedding services — or the storage bloat of every site shipping its own model.
           </p>
 
-          <!-- Proposal Notice -->
-          <div class="mt-6 p-4 bg-violet-50 dark:bg-violet-900/10 border border-violet-200 dark:border-violet-900/30 rounded-xl text-violet-800 dark:text-violet-300 text-sm leading-relaxed max-w-4xl flex gap-3">
-            <i class="bi bi-lightbulb-fill text-lg mt-0.5"></i>
+          <!-- Dev Trial Notice -->
+          <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
+            <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
             <div>
-              <strong>Early proposal:</strong> This is a design sketch by the Chrome Built-in AI team to describe the problem and solicit feedback. It has <strong>not been approved to ship in Chrome</strong>, no <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> entry exists yet, and the shape of the API — including the <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">SemanticEmbedder</code> name itself — is still an open question.
+              <strong>Developer Trial:</strong> This API is in an early developer trial. To use it, run <strong>Chrome Canary</strong> and enable the <strong>#semantic-embedder-api</strong> flag in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>. It has not yet been approved to ship, and the shape of the API — including the <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">SemanticEmbedder</code> name itself — is still an open question.
             </div>
           </div>
         </div>
