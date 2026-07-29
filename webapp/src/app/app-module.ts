@@ -144,6 +144,12 @@ import { DictateAndPolishDemoComponent } from './pages/demos/features/dictate-an
 import { CameraQaDemoComponent } from './pages/demos/features/camera-qa-demo.component';
 import { DrawAndGuessDemoComponent } from './pages/demos/features/draw-and-guess-demo.component';
 import { StoryTimeDemoComponent } from './pages/demos/features/story-time-demo.component';
+import { ToolCallingDemoComponent } from './pages/demos/features/tool-calling-demo.component';
+import { ScreenshotToCodeDemoComponent } from './pages/demos/features/screenshot-to-code-demo.component';
+import { RegexLabDemoComponent } from './pages/demos/features/regex-lab-demo.component';
+import { CsvQaDemoComponent } from './pages/demos/features/csv-qa-demo.component';
+import { SessionBranchingDemoComponent } from './pages/demos/features/session-branching-demo.component';
+import { LocalizationQaDemoComponent } from './pages/demos/features/localization-qa-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
@@ -264,6 +270,12 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     CameraQaDemoComponent,
     DrawAndGuessDemoComponent,
     StoryTimeDemoComponent,
+    ToolCallingDemoComponent,
+    ScreenshotToCodeDemoComponent,
+    RegexLabDemoComponent,
+    CsvQaDemoComponent,
+    SessionBranchingDemoComponent,
+    LocalizationQaDemoComponent,
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,

@@ -1,0 +1,168 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet"
+  [ttft]="ttft"
+  [totalTime]="totalTime">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      unavailableHint="<span class='font-semibold'>The Prompt API is not available.</span> Tool calling additionally requires a Chrome build where the Prompt API supports the <code class='font-mono text-xs'>tools</code> option — if commands answer without any tool calls appearing in the log, this build doesn't support it yet.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Command bar -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6">
+      <div class="flex gap-3">
+        <input type="text"
+               class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-5 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+               [(ngModel)]="command"
+               (keydown.enter)="send()"
+               placeholder="Tell the house what you want..." />
+        @if (state === 'Inferencing') {
+          <button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-md transition-all active:scale-95 border-none"
+                  (click)="onCancel()">
+            <i class="bi bi-stop-fill"></i> Stop
+          </button>
+        } @else {
+          <button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+                  [disabled]="!command.trim() || languageModelAvailability === 'unavailable'"
+                  (click)="send()">
+            <i class="bi bi-send"></i> Send
+          </button>
+        }
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        @for (sample of sampleCommands; track sample) {
+          <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                  [disabled]="state === 'Inferencing'"
+                  (click)="useSample(sample)">
+            {{ sample }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
+
+      <!-- Dashboard -->
+      <div class="xl:flex-[3] w-full flex flex-col gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          @for (room of rooms; track room) {
+            <button class="rounded-3xl border p-5 text-center transition-all duration-300 bg-transparent"
+                    [ngClass]="home.lights[room]
+                      ? 'border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20 shadow-[0_0_30px_rgba(251,191,36,0.25)]'
+                      : 'border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90'"
+                    (click)="toggleLight(room)"
+                    title="Click to toggle manually">
+              <i class="bi text-3xl transition-colors"
+                 [ngClass]="home.lights[room] ? 'bi-lightbulb-fill text-amber-400' : 'bi-lightbulb text-slate-300 dark:text-zinc-600'"></i>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-2 capitalize">{{ room }}</div>
+              <div class="text-[10px] font-semibold uppercase tracking-wider mt-0.5"
+                   [ngClass]="home.lights[room] ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-zinc-600'">
+                {{ home.lights[room] ? 'On' : 'Off' }}
+              </div>
+            </button>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Thermostat -->
+          <div class="rounded-3xl border border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90 p-5 text-center">
+            <i class="bi bi-thermometer-half text-2xl"
+               [ngClass]="home.thermostat >= 23 ? 'text-orange-500' : home.thermostat <= 17 ? 'text-sky-500' : 'text-slate-400'"></i>
+            <div class="text-4xl font-extrabold text-slate-800 dark:text-slate-200 mt-1">
+              {{ home.thermostat }}<span class="text-lg text-slate-400">°C</span>
+            </div>
+            <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">Thermostat</div>
+          </div>
+
+          <!-- Music -->
+          <div class="rounded-3xl border p-5 text-center transition-all"
+               [ngClass]="home.music.playing ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/15' : 'border-slate-200 dark:border-zinc-700 bg-[#ffffff] dark:bg-zinc-800/90'">
+            @if (home.music.playing) {
+              <div class="flex items-end justify-center gap-1 h-8">
+                <span class="w-1.5 bg-indigo-500 rounded-full animate-pulse" style="height: 60%"></span>
+                <span class="w-1.5 bg-indigo-500 rounded-full animate-pulse" style="height: 100%; animation-delay: 150ms"></span>
+                <span class="w-1.5 bg-indigo-500 rounded-full animate-pulse" style="height: 40%; animation-delay: 300ms"></span>
+                <span class="w-1.5 bg-indigo-500 rounded-full animate-pulse" style="height: 80%; animation-delay: 450ms"></span>
+              </div>
+              <div class="text-sm font-bold text-indigo-700 dark:text-indigo-300 mt-1 capitalize">{{ home.music.genre }}</div>
+            } @else {
+              <i class="bi bi-music-note-beamed text-2xl text-slate-300 dark:text-zinc-600 leading-8"></i>
+              <div class="text-sm font-bold text-slate-400 dark:text-zinc-600 mt-1">Silence</div>
+            }
+            <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">Speakers</div>
+          </div>
+        </div>
+
+        <!-- Assistant reply -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-robot text-emerald-500"></i> Assistant
+            </span>
+            @if (state === 'Inferencing') {
+              <app-latency-loader></app-latency-loader>
+            }
+          </div>
+          <div class="p-4 text-sm text-slate-800 dark:text-slate-200 leading-relaxed min-h-[52px] whitespace-pre-wrap">
+            @if (assistantReply) {
+              {{ assistantReply }}
+            } @else if (state === 'Inferencing') {
+              <span class="text-emerald-600 dark:text-emerald-400"><i class="bi bi-gear animate-spin inline-block"></i> Working the tools...</span>
+            } @else {
+              <span class="text-slate-400 dark:text-slate-500 font-light select-none">Give the house an instruction — the model chooses which tools to call.</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool call log -->
+      <div class="xl:flex-[2] w-full bg-[#101014] rounded-3xl shadow-xl border border-zinc-800 overflow-hidden flex flex-col min-h-[380px]">
+        <div class="px-5 py-3.5 border-b border-zinc-800 flex justify-between items-center">
+          <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-terminal"></i> Tool Calls
+          </span>
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] font-mono text-zinc-500">{{ totalToolCalls }} total</span>
+            @if (totalToolCalls > 0) {
+              <button class="text-[10px] font-medium text-zinc-500 hover:text-zinc-300 bg-transparent border-none transition-colors"
+                      (click)="resetSession()">
+                reset session
+              </button>
+            }
+          </div>
+        </div>
+        <div class="p-4 flex flex-col gap-2.5 flex-grow overflow-y-auto font-mono text-xs">
+          @if (toolCalls.length === 0) {
+            <p class="text-zinc-600 m-auto text-center font-sans font-light text-sm px-6">
+              Every function the model invokes appears here with its arguments and result.
+            </p>
+          }
+          @for (call of toolCalls; track $index) {
+            <div class="rounded-xl bg-zinc-900/80 border border-zinc-800 p-3">
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-400">ƒ</span>
+                <span class="text-sky-400 font-semibold">{{ call.tool }}</span>
+                <span class="text-zinc-500 truncate">({{ call.args }})</span>
+                <span class="text-zinc-600 ml-auto shrink-0">+{{ call.timeMs }}ms</span>
+              </div>
+              <div class="text-zinc-500 mt-1 pl-5 truncate">→ {{ call.result }}</div>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>
