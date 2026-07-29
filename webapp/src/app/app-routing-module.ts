@@ -50,6 +50,7 @@ import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
 import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
+import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api.page';
 import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
 import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
 import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
@@ -181,6 +182,13 @@ const routes: Routes = [
         component: ProofreaderApiPage,
         data: {
           route: RouteEnum.ProofreaderApi
+        }
+      },
+      {
+        path: "docs/semantic-embedder",
+        component: SemanticEmbedderApiPage,
+        data: {
+          route: RouteEnum.SemanticEmbedderApi
         }
       },
       {

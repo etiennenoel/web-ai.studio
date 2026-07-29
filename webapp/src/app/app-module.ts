@@ -133,6 +133,7 @@ import { RewriterApiPage } from './pages/docs/apis/rewriter-api.page';
 import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
+import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api.page';
 import { CodeSnippetComponent } from './components/code-snippet/code-snippet.component';
 import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
 
@@ -180,6 +181,7 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     TranslatorApiPage,
     LanguageDetectorApiPage,
     ProofreaderApiPage,
+    SemanticEmbedderApiPage,
     PromptPlaygroundPage,
     SummarizerPlaygroundPage,
     WriterPlaygroundPage,

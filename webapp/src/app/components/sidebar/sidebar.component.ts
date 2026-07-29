@@ -71,7 +71,8 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       RouteEnum.RewriterApi,
       RouteEnum.TranslatorApi,
       RouteEnum.LanguageDetectorApi,
-      RouteEnum.ProofreaderApi
+      RouteEnum.ProofreaderApi,
+      RouteEnum.SemanticEmbedderApi
     ].includes(this.routeEnum);
   }
 
@@ -198,6 +199,9 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         break;
       case "proofreader":
         this.routeEnum = RouteEnum.ProofreaderApi;
+        break;
+      case "semantic-embedder":
+        this.routeEnum = RouteEnum.SemanticEmbedderApi;
         break;
 
       default:
