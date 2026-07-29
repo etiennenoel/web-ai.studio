@@ -1,0 +1,153 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-embedder-status
+      [embedderStatus]="embedderStatus"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress">
+    </app-embedder-status>
+
+    @if (embedderStatus === 'downloadable' && !centroidsReady && !isEmbeddingExamples) {
+      <div class="mb-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/10 dark:border-indigo-900/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <span class="text-sm text-indigo-900 dark:text-indigo-200"><i class="bi bi-download"></i> The embedding model needs to be downloaded before classifying.</span>
+        <button class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-md transition-all active:scale-95 border-none whitespace-nowrap"
+                (click)="rebuildCentroids()">
+          Download & Prepare
+        </button>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col xl:flex-row gap-6">
+
+      <!-- Incoming message + results -->
+      <div class="xl:flex-[3] flex flex-col gap-4">
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+            <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-envelope-open text-indigo-500"></i> Incoming Message
+            </span>
+            @if (classifyLatencyMs !== null && results.length > 0) {
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                <i class="bi bi-cpu"></i> classified in {{ classifyLatencyMs }}ms
+              </span>
+            }
+          </div>
+          <textarea
+            class="w-full bg-transparent border-none outline-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 resize-none p-5 leading-relaxed text-base min-h-[110px]"
+            [(ngModel)]="message"
+            (ngModelChange)="onMessageChanged()"
+            placeholder="Type a support message — it is classified live as you type..."></textarea>
+          <div class="px-5 pb-4 flex flex-wrap gap-2">
+            @for (sample of sampleMessages; track sample) {
+              <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors"
+                      (click)="useSample(sample)">
+                {{ sample }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Classification results -->
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 min-h-[240px] flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="bi bi-signpost-split text-indigo-500"></i> Routing Decision
+            </span>
+            @if (isClassifying || isEmbeddingExamples) {
+              <i class="bi bi-arrow-repeat animate-spin text-indigo-400"></i>
+            }
+          </div>
+
+          @if (results.length === 0) {
+            <p class="text-sm text-slate-400 dark:text-slate-500 m-auto text-center font-light">
+              {{ centroidsReady ? 'Start typing a message to see it routed in real time.' : 'Preparing category centroids...' }}
+            </p>
+          } @else {
+            <div class="flex flex-col gap-3">
+              @for (result of results; track result.category.name) {
+                <div class="rounded-2xl border p-4 transition-all"
+                     [ngClass]="$first ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-900/10 shadow-sm' : 'border-slate-200 dark:border-zinc-700 bg-slate-50/40 dark:bg-[#161616]/40'">
+                  <div class="flex items-center gap-3">
+                    <i class="bi {{ result.category.icon }} text-xl {{ result.category.colorClass }}"></i>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm">{{ result.category.name }}</span>
+                    @if ($first) {
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-600 text-white uppercase tracking-wider">
+                        {{ isUncertain ? 'Best guess' : 'Route here' }}
+                      </span>
+                    }
+                    <div class="flex-grow"></div>
+                    <span class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400">{{ result.score.toFixed(3) }}</span>
+                  </div>
+                  <div class="h-2 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-2.5">
+                    <div class="h-full rounded-full transition-all duration-300 {{ result.category.barClass }}" [style.width.%]="result.score * 100"></div>
+                  </div>
+                  @if ($first) {
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mt-2">
+                      Closest example: "{{ result.bestExample }}"
+                    </p>
+                  }
+                </div>
+              }
+              @if (isUncertain) {
+                <p class="text-xs text-amber-600 dark:text-amber-400 m-0 flex items-center gap-1.5">
+                  <i class="bi bi-question-circle"></i> The top two categories are very close — a production system might ask a human here.
+                </p>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Editable categories -->
+      <div class="xl:flex-[2] flex flex-col gap-4">
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          <i class="bi bi-sliders text-indigo-500"></i> Categories — edit the examples to "retrain" instantly
+        </div>
+        @for (category of categories; track category.name) {
+          <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-700 p-4">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="bi {{ category.icon }} {{ category.colorClass }}"></i>
+              <span class="font-semibold text-sm text-slate-800 dark:text-slate-200">{{ category.name }}</span>
+              <div class="flex-grow"></div>
+              <button class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors flex items-center justify-center"
+                      title="Add an example phrase"
+                      (click)="addExample(category)">
+                <i class="bi bi-plus text-sm"></i>
+              </button>
+            </div>
+            <div class="flex flex-col gap-2">
+              @for (example of category.examples; track trackByIndex($index); let i = $index) {
+                <div class="flex items-center gap-2 group">
+                  <input
+                    type="text"
+                    class="flex-grow bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-xs text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    [(ngModel)]="category.examples[i]"
+                    (ngModelChange)="onExampleChanged()"
+                    placeholder="Example phrase..." />
+                  <button class="w-6 h-6 rounded-full text-slate-400 hover:text-red-500 bg-transparent border-none transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                          title="Remove"
+                          (click)="removeExample(category, i)">
+                    <i class="bi bi-x-lg text-xs"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

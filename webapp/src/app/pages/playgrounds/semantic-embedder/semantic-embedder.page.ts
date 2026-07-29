@@ -51,10 +51,11 @@ export class SemanticEmbedderPlaygroundPage implements OnInit, OnDestroy {
 
   taskTypes = [
     { value: '', label: 'None (let the browser decide)' },
-    { value: 'retrieval', label: 'retrieval' },
+    { value: 'semantic-similarity', label: 'semantic-similarity' },
+    { value: 'retrieval-query', label: 'retrieval-query' },
+    { value: 'retrieval-document', label: 'retrieval-document' },
     { value: 'classification', label: 'classification' },
-    { value: 'clustering', label: 'clustering' },
-    { value: 'similarity', label: 'similarity' }
+    { value: 'clustering', label: 'clustering' }
   ];
 
   private activeAbortController: AbortController | null = null;

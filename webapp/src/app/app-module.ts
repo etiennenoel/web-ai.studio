@@ -120,6 +120,15 @@ import { StructuredJsonDemoComponent } from './pages/demos/features/structured-j
 import { ExtractEntitiesDemoComponent } from './pages/demos/features/extract-entities-demo.component';
 import { ImageAudioQueryDemoComponent } from './pages/demos/features/image-audio-query-demo.component';
 import { ReceiptToJsonDemoComponent } from './pages/demos/features/receipt-to-json-demo.component';
+import { EmbedderStatusComponent } from './pages/demos/components/embedder-status/embedder-status.component';
+import { DocumentChatDemoComponent } from './pages/demos/features/document-chat-demo.component';
+import { SemanticSearchDemoComponent } from './pages/demos/features/semantic-search-demo.component';
+import { SmartTriageDemoComponent } from './pages/demos/features/smart-triage-demo.component';
+import { DuplicateDetectorDemoComponent } from './pages/demos/features/duplicate-detector-demo.component';
+import { ClusterLabelDemoComponent } from './pages/demos/features/cluster-label-demo.component';
+import { SemanticCacheDemoComponent } from './pages/demos/features/semantic-cache-demo.component';
+import { CommandPaletteDemoComponent } from './pages/demos/features/command-palette-demo.component';
+import { SemanticWordGameDemoComponent } from './pages/demos/features/semantic-word-game-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { TrackingDownloadPage } from './pages/docs/tracking-download/tracking-download.page';
@@ -216,6 +225,15 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     ExtractEntitiesDemoComponent,
     ImageAudioQueryDemoComponent,
     ReceiptToJsonDemoComponent,
+    EmbedderStatusComponent,
+    DocumentChatDemoComponent,
+    SemanticSearchDemoComponent,
+    SmartTriageDemoComponent,
+    DuplicateDetectorDemoComponent,
+    ClusterLabelDemoComponent,
+    SemanticCacheDemoComponent,
+    CommandPaletteDemoComponent,
+    SemanticWordGameDemoComponent,
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,

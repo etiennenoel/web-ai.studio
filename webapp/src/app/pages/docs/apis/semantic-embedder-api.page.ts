@@ -135,7 +135,7 @@ console.log(&quot;Semantic embedder created&quot;);"></app-code-snippet>
             <div class="mt-6 p-4 bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 rounded-xl text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex gap-3">
               <i class="bi bi-info-circle-fill text-lg mt-0.5 text-slate-400 dark:text-slate-500"></i>
               <div>
-                Advanced model parameters are explicitly out of scope for the initial proposal. One option under discussion is an optional <code class="text-xs font-mono text-pink-600 dark:text-pink-400">taskType</code> hint (e.g. retrieval or classification) that browsers may safely ignore if the underlying model does not support it.
+                Advanced model parameters are explicitly out of scope for the initial proposal. One option under discussion is an optional <code class="text-xs font-mono text-pink-600 dark:text-pink-400">taskType</code> hint that browsers may safely ignore if the underlying model does not support it. The proposed values are <code class="text-xs font-mono">"semantic-similarity"</code>, <code class="text-xs font-mono">"retrieval-query"</code>, <code class="text-xs font-mono">"retrieval-document"</code>, <code class="text-xs font-mono">"classification"</code>, and <code class="text-xs font-mono">"clustering"</code>. For retrieval, embed your corpus with <code class="text-xs font-mono">"retrieval-document"</code> and the user's query with <code class="text-xs font-mono">"retrieval-query"</code>.
               </div>
             </div>
           </section>
@@ -256,7 +256,10 @@ interface SemanticEmbedder &#123;
 dictionary SemanticEmbedderCreateOptions &#123;
   AbortSignal signal;
   CreateMonitorCallback monitor;
-  DOMString taskType;   // under discussion: optional hint browsers may ignore
+  // under discussion: optional hint browsers may ignore
+  // &quot;semantic-similarity&quot; | &quot;retrieval-query&quot; | &quot;retrieval-document&quot;
+  //   | &quot;classification&quot; | &quot;clustering&quot;
+  DOMString taskType;
 &#125;;
 
 dictionary EmbedderResult &#123;
@@ -323,7 +326,7 @@ dictionary EmbedderMetadata &#123;
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-amber-600 dark:text-amber-400">options.taskType</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Under discussion — optional quality hint (e.g. retrieval, classification) that browsers may ignore.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Under discussion — optional quality hint that browsers may ignore. Values: <code class="font-mono text-xs">"semantic-similarity"</code>, <code class="font-mono text-xs">"retrieval-query"</code>, <code class="font-mono text-xs">"retrieval-document"</code>, <code class="font-mono text-xs">"classification"</code>, <code class="font-mono text-xs">"clustering"</code>.</td>
                   </tr>
                 </tbody>
               </table>

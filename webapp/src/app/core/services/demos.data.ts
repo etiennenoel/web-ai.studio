@@ -2,6 +2,229 @@ import { DemoExample } from '../models/demo.interface';
 import { AttachmentTypeEnum } from '../enums/attachment-type.enum';
 
 export const DEMOS_DATA: DemoExample[] = [
+  // EMBEDDINGS
+  {
+    id: 'document-chat',
+    title: 'Chat With Your Document',
+    description: 'Fully local RAG: retrieve the relevant passages with embeddings, then answer with the Prompt API — citations included.',
+    category: 'Embeddings',
+    icon: 'bi-chat-left-quote',
+    onDeviceReason: 'The entire RAG pipeline — chunking, embedding, retrieval, and generation — runs on-device. Your document is never uploaded and no vector database is required.',
+    codeSnippet: `// 1. Index: chunk the document and embed every chunk in one batch
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const chunks = documentText.split(/\\n\\s*\\n/);
+const { embeddings } = await docEmbedder.embed(chunks);
+
+// 2. Retrieve: embed the question with the query task type, rank chunks by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed(question);
+const top3 = embeddings
+  .map((e, i) => ({ i, score: cosineSimilarity(query.embeddings[0].values, e.values) }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3);
+
+// 3. Generate: ground the Prompt API in the retrieved passages
+const session = await LanguageModel.create({
+  systemPrompt: "Answer using ONLY the provided context."
+});
+const context = top3.map(t => chunks[t.i]).join("\\n\\n");
+const stream = session.promptStreaming(\`Context:\\n\${context}\\n\\nQuestion: \${question}\`);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'semantic-search',
+    title: 'Semantic vs. Keyword Search',
+    description: 'Search a help center by meaning, side by side with keyword search — and watch keywords miss what embeddings find.',
+    category: 'Embeddings',
+    icon: 'bi-search-heart',
+    onDeviceReason: 'On-device embeddings cost nothing per query, so you can afford to search on every keystroke — no network round trip, no per-call billing, and queries stay private.',
+    codeSnippet: `// Index the help center once (a single batched call)
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(helpCenterEntries);
+
+// On every keystroke: embed the query with the query task type and rank by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const result = await queryEmbedder.embed(searchQuery);
+const queryVector = result.embeddings[0].values;
+
+const ranked = embeddings
+  .map((e, i) => ({ entry: helpCenterEntries[i], score: cosineSimilarity(queryVector, e.values) }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 5);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'smart-triage',
+    title: 'Smart Triage',
+    description: 'A zero-shot classifier: route incoming messages to categories defined only by a few example phrases.',
+    category: 'Embeddings',
+    icon: 'bi-signpost-split',
+    onDeviceReason: 'Classify support messages, feedback, or emails locally with no training step and no data leaving the device — and "retrain" instantly by editing the example phrases.',
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "classification" });
+
+// Each category is defined by a few example phrases
+const categories = {
+  "Billing": ["I was charged twice", "How do I update my card?"],
+  "Bug Report": ["The app crashes on launch", "Uploads fail with an error"]
+};
+
+// A category's centroid is the mean of its example vectors
+const centroids = {};
+for (const [name, examples] of Object.entries(categories)) {
+  const { embeddings } = await embedder.embed(examples);
+  centroids[name] = meanVector(embeddings.map(e => e.values));
+}
+
+// Classify: nearest centroid by cosine similarity
+const { embeddings: [msg] } = await embedder.embed(incomingMessage);
+const best = Object.entries(centroids)
+  .map(([name, c]) => ({ name, score: cosineSimilarity(msg.values, c) }))
+  .sort((a, b) => b.score - a.score)[0];`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'duplicate-detector',
+    title: 'Duplicate Detector',
+    description: 'Catch near-duplicate bug reports before they are filed, even when they share no words with the original.',
+    category: 'Embeddings',
+    icon: 'bi-files',
+    onDeviceReason: 'Deduplication runs while the user is still typing, because every similarity check is a local vector comparison — no server calls per keystroke.',
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
+
+// Embed the existing issues once
+const { embeddings } = await embedder.embed(existingIssueTitles);
+
+// As the user types a new issue, look for semantic near-duplicates
+const draft = await embedder.embed(newIssueTitle);
+const draftVector = draft.embeddings[0].values;
+
+const duplicates = embeddings
+  .map((e, i) => ({ title: existingIssueTitles[i], score: cosineSimilarity(draftVector, e.values) }))
+  .filter(d => d.score >= 0.60) // similarity threshold
+  .sort((a, b) => b.score - a.score);
+
+if (duplicates.length > 0) showWarning(duplicates);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'cluster-and-label',
+    title: 'Cluster & Label',
+    description: 'Group raw user feedback into themes with k-means over embeddings, then let the Prompt API name each cluster.',
+    category: 'Embeddings',
+    icon: 'bi-bounding-box-circles',
+    onDeviceReason: 'Topic discovery over private feedback, notes, or tickets happens entirely locally — the embeddings power the math, the Prompt API writes the labels.',
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "clustering" });
+
+// Embed all feedback items in one batch
+const { embeddings } = await embedder.embed(feedbackItems);
+const vectors = embeddings.map(e => e.values);
+
+// Standard k-means over the vectors
+const assignments = kMeans(vectors, 4);
+
+// Let the on-device LLM name each cluster
+const session = await LanguageModel.create();
+for (let c = 0; c < 4; c++) {
+  const members = feedbackItems.filter((_, i) => assignments[i] === c);
+  const label = await session.prompt(
+    "Reply with a 2-4 word theme label for this feedback:\\n- " + members.join("\\n- ")
+  );
+  console.log(\`Cluster \${c}: \${label}\`);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'semantic-cache',
+    title: 'Semantic Cache',
+    description: 'Serve instant answers for paraphrased questions by caching LLM responses under their embeddings.',
+    category: 'Embeddings',
+    icon: 'bi-lightning-charge',
+    onDeviceReason: 'A production pattern made visible: skip re-running the language model when a semantically equivalent question was already answered — saving seconds and tokens.',
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
+const cache = []; // { vector, question, answer }
+
+async function ask(question) {
+  const { embeddings: [q] } = await embedder.embed(question);
+
+  // Cache hit: a semantically equivalent question was already answered
+  const best = cache
+    .map(entry => ({ entry, score: cosineSimilarity(q.values, entry.vector) }))
+    .sort((a, b) => b.score - a.score)[0];
+  if (best && best.score >= 0.85) return best.entry.answer; // instant
+
+  // Cache miss: generate with the Prompt API, then store
+  const session = await LanguageModel.create();
+  const answer = await session.prompt(question);
+  cache.push({ vector: q.values, question, answer });
+  return answer;
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'command-palette',
+    title: 'Semantic Command Palette',
+    description: 'A ⌘K palette that understands intent: describe what you want in your own words and the right action lights up.',
+    category: 'Embeddings',
+    icon: 'bi-command',
+    onDeviceReason: 'Intent matching on every keystroke is only viable when embedding is free, instant, and private — exactly what an on-device embedder provides.',
+    codeSnippet: `const actions = [
+  { label: "Toggle dark mode", description: "Switch between light and dark appearance" },
+  { label: "Export as PDF", description: "Download the current page as a PDF file" },
+  { label: "Mute notifications", description: "Silence all alerts and badges" }
+];
+
+// Embed the action descriptions once
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(
+  actions.map(a => \`\${a.label} — \${a.description}\`)
+);
+
+// On every keystroke, rank actions against the typed intent
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed("make it easier on my eyes at night");
+const ranked = actions
+  .map((a, i) => ({ ...a, score: cosineSimilarity(query.embeddings[0].values, embeddings[i].values) }))
+  .sort((a, b) => b.score - a.score);
+// → "Toggle dark mode" wins with zero shared words`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'semantic-word-game',
+    title: 'Hot or Cold',
+    description: 'Guess the secret word: every guess is embedded on-device and scored by how semantically close it lands.',
+    category: 'Embeddings',
+    icon: 'bi-thermometer-half',
+    onDeviceReason: 'A whole word game with zero backend: scoring is a local cosine similarity, so it is instant, free to run, and works offline.',
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
+
+const secretWord = "volcano";
+const { embeddings: [secret] } = await embedder.embed(secretWord);
+
+async function guess(word) {
+  const { embeddings: [g] } = await embedder.embed(word);
+  const score = cosineSimilarity(secret.values, g.values);
+
+  if (word.toLowerCase() === secretWord) return "🎉 You got it!";
+  if (score >= 0.80) return "🔥 Scorching";
+  if (score >= 0.70) return "Hot";
+  if (score >= 0.60) return "Warm";
+  if (score >= 0.50) return "Cool";
+  return "🧊 Freezing";
+}
+
+await guess("mountain"); // Hot — semantically close to a volcano
+await guess("banana");   // Freezing`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+
   // TEXT INPUT
   {
     id: 'translation',

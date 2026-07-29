@@ -1,7 +1,7 @@
 import {PromptRunOptions} from './prompt-run.options';
 import {AttachmentTypeEnum} from '../enums/attachment-type.enum';
 
-export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match';
+export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings';
 
 export interface DemoExample {
   id: string;

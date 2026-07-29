@@ -1,0 +1,145 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-embedder-status
+      [embedderStatus]="embedderStatus"
+      [showPromptApi]="true"
+      [promptApiStatus]="languageModelAvailability"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress">
+    </app-embedder-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- Input -->
+      <div class="lg:flex-[2] bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden min-h-[420px]">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-chat-square-text text-indigo-500"></i> Raw Feedback
+          </span>
+          <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">{{ itemCount }} items, one per line</span>
+        </div>
+        <textarea
+          class="w-full flex-grow bg-transparent border-none outline-none focus:ring-0 text-slate-700 dark:text-slate-300 placeholder-slate-400 resize-none p-5 leading-relaxed text-sm min-h-[280px]"
+          [(ngModel)]="feedbackText"
+          placeholder="Paste feedback items, one per line..."></textarea>
+        <div class="p-4 border-t border-slate-100 dark:border-zinc-700/50 flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Clusters (k)</span>
+            <select [(ngModel)]="k"
+                    class="bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
+              @for (option of kOptions; track option) {
+                <option [ngValue]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+          <button
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all active:scale-95 disabled:opacity-50 border-none"
+            (click)="cluster()"
+            [disabled]="itemCount < k || isClustering || !embedderUsable">
+            @if (isClustering) {
+              <i class="bi bi-arrow-repeat animate-spin text-lg"></i> Clustering...
+            } @else {
+              <i class="bi bi-bounding-box-circles text-lg"></i> Cluster
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="lg:flex-[3] bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 flex flex-col overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-zinc-700/50 bg-slate-50/50 dark:bg-[#161616]/50 flex justify-between items-center gap-3 flex-wrap">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="bi bi-graph-up text-indigo-500"></i> Semantic Map
+          </span>
+          <div class="flex items-center gap-3">
+            @if (clusteringTimeMs !== null) {
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+                embedded + clustered in {{ clusteringTimeMs }}ms
+              </span>
+            }
+            @if (hasClustered && languageModelAvailability !== 'unavailable') {
+              <button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-95 border-none"
+                      (click)="labelClusters()">
+                <i class="bi bi-stars"></i> Name Clusters with AI
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex-grow flex flex-col p-4">
+          @if (!hasClustered) {
+            <div class="m-auto text-center p-8">
+              <i class="bi bi-bounding-box-circles text-4xl text-slate-200 dark:text-zinc-700"></i>
+              <p class="text-sm text-slate-400 dark:text-slate-500 mt-3 font-light max-w-xs mx-auto">
+                Each item becomes a point in embedding space, projected to 2D. Similar feedback lands close together.
+              </p>
+            </div>
+          } @else {
+            <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" class="w-full h-auto select-none">
+              <!-- Subtle grid -->
+              @for (line of [1, 2, 3]; track line) {
+                <line [attr.x1]="0" [attr.y1]="(height / 4) * line" [attr.x2]="width" [attr.y2]="(height / 4) * line"
+                      class="stroke-slate-100 dark:stroke-zinc-800" stroke-width="1" />
+                <line [attr.x1]="(width / 4) * line" [attr.y1]="0" [attr.x2]="(width / 4) * line" [attr.y2]="height"
+                      class="stroke-slate-100 dark:stroke-zinc-800" stroke-width="1" />
+              }
+              @for (point of points; track $index) {
+                <circle
+                  [attr.cx]="point.x"
+                  [attr.cy]="point.y"
+                  [attr.r]="hoveredIndex === $index ? 11 : 7"
+                  [attr.fill]="clusterColor(point.cluster)"
+                  [attr.fill-opacity]="hoveredIndex === null || hoveredIndex === $index ? 0.85 : 0.35"
+                  class="cursor-pointer transition-all duration-150 stroke-white dark:stroke-zinc-900"
+                  stroke-width="1.5"
+                  (mouseenter)="hoveredIndex = $index"
+                  (mouseleave)="hoveredIndex = null" />
+              }
+            </svg>
+
+            <!-- Hover caption -->
+            <div class="min-h-[44px] mt-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 flex items-center gap-2.5">
+              @if (hoveredPoint) {
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="clusterColor(hoveredPoint.cluster)"></span>
+                <span class="text-xs text-slate-700 dark:text-slate-300">{{ hoveredPoint.text }}</span>
+              } @else {
+                <span class="text-xs text-slate-400 dark:text-slate-500 font-light">Hover a point to read the feedback behind it.</span>
+              }
+            </div>
+
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-2 mt-3">
+              @for (cluster of clusters; track cluster.index) {
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700">
+                  <span class="w-2.5 h-2.5 rounded-full" [style.background]="cluster.color"></span>
+                  <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    @if (cluster.isLabeling) {
+                      <i class="bi bi-arrow-repeat animate-spin"></i> naming...
+                    } @else {
+                      {{ cluster.label }}
+                    }
+                  </span>
+                  <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500">{{ cluster.count }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-demo-layout>

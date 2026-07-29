@@ -13,7 +13,7 @@ import { DemoExample, DemoCategory } from '../../core/models/demo.interface';
 })
 export class DemosPage extends BasePage implements OnInit {
   demos: DemoExample[] = DEMOS_DATA;
-  categories: DemoCategory[] = ['Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
+  categories: DemoCategory[] = ['Embeddings', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
 
   constructor(
     @Inject(DOCUMENT) document: Document,
