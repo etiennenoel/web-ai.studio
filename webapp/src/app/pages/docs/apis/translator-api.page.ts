@@ -37,7 +37,7 @@ import { Component } from '@angular/core';
             </div>
           </div>
           <p class="text-base text-slate-600 dark:text-slate-400 mb-6">
-          The Translator API translates text between different languages completely on-device, preserving privacy and enabling offline usage.
+          The Translator API translates text between languages using the browser's built-in translation capabilities. In Chrome, translation runs on-device, preserving privacy and enabling offline usage.
         </p>
       </div>
 
@@ -210,7 +210,7 @@ console.log(result);"></app-code-snippet>
         <section id="translate-streaming" class="scroll-mt-6">
           <app-docs-section-header anchorId="translate-streaming" title="translator.translateStreaming()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 mb-4">
-            Returns a <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">ReadableStream</code> that yields the translated string in chunks as it's generated. Note that translation chunking requires building enough context, so stream chunks might arrive irregularly.
+            Returns a <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">ReadableStream</code> that yields the translated string in chunks as it's generated. Chunk timing is implementation-defined; chunks may not arrive at a steady rate.
           </p>
           <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
             <code class="text-sm text-slate-300 font-mono">
@@ -231,7 +231,7 @@ for await (const chunk of stream) &#123;
         <section id="measure-input" class="scroll-mt-6">
           <app-docs-section-header anchorId="measure-input" title="translator.measureInputUsage()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 mb-4">
-            Calculates how much quota the translation string would consume without executing the translation. If this returns a value greater than <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">inputQuota</code>, translating it will throw a <code class="text-sm font-mono">QuotaExceededError</code>.
+            Calculates how much quota the translation string would consume without executing the translation. If this returns a value greater than <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">inputQuota</code>, translating it will reject with a <code class="text-sm font-mono">QuotaExceededError</code> (whose <code class="text-sm font-mono">requested</code> and <code class="text-sm font-mono">quota</code> properties help you build UX around the limit).
           </p>
           <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
             <code class="text-sm text-slate-300 font-mono">
@@ -243,14 +243,14 @@ for await (const chunk of stream) &#123;
   targetLanguage: 'fr'
 &#125;);
 const usage = await translator.measureInputUsage(&quot;Some text&quot;);
-console.log(&quot;Tokens:&quot;, usage);"></app-code-snippet>
+console.log(&quot;Usage:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- destroy -->
         <section id="destroy" class="scroll-mt-6">
           <app-docs-section-header anchorId="destroy" title="translator.destroy()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 mb-4">
-            Destroys the translator instance, aborting any active requests and allowing the browser to unload the underlying machine learning models from memory if no other references exist.
+            Destroys the translator instance, rejecting any ongoing <code class="text-sm font-mono">translate()</code> calls, erroring any streams returned by <code class="text-sm font-mono">translateStreaming()</code>, and allowing the browser to unload the underlying models from memory.
           </p>
           <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
             <code class="text-sm text-slate-300 font-mono">
@@ -290,8 +290,8 @@ console.log(&quot;Translator destroyed.&quot;);"></app-code-snippet>
                 </tr>
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">inputQuota</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double (readonly)</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The maximum input usage allowed per translation operation. Can be <code class="font-mono text-xs">+Infinity</code> if the implementation uses iterative chunking.</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">unrestricted double (readonly)</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The maximum input usage allowed per translation operation. Can be <code class="font-mono text-xs">+Infinity</code> if the implementation imposes no input limit (e.g. because it processes input in chunks); in that case <code class="font-mono text-xs">measureInputUsage()</code> always returns 0.</td>
                 </tr>
               </tbody>
             </table>

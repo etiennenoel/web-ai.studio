@@ -20,7 +20,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
           <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Last updated: March 24, 2026</p>
           
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
-            Aborting operations is important. Both the <code>create</code> and inference methods support passing an <a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">AbortController</a>.
+            Aborting operations is important. Both the <code>create</code> and inference methods accept an <code>AbortSignal</code> (obtained from an <a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">AbortController</a>) via their <code>signal</code> option.
           </p>
         </div>
 
@@ -35,8 +35,8 @@ import { Component, ChangeDetectorRef } from '@angular/core';
   signal: abortController.signal,
 &#125;)
 
-<span class="text-zinc-500">// Passing Abort to "inference" methods</span>
-session.*(&#123;
+<span class="text-zinc-500">// Passing Abort to "inference" methods (options are the second argument, after the input)</span>
+session.*(input, &#123;
   signal: abortController.signal,
 &#125;)
 
@@ -64,8 +64,8 @@ abortController.abort();</code></pre>
 
 <span class="text-purple-400">const</span> sessionAbortController = <span class="text-purple-400">new</span> AbortController();
 
-<span class="text-zinc-500">// Passing Abort to "inference" methods</span>
-session.*(&#123;
+<span class="text-zinc-500">// Passing Abort to "inference" methods (options are the second argument, after the input)</span>
+session.*(input, &#123;
   signal: sessionAbortController.signal,
 &#125;)
 

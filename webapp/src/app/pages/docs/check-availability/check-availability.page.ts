@@ -77,7 +77,7 @@ declare const Proofreader: any;
                       <code class="font-mono text-amber-600 dark:text-amber-400">downloading</code>
                     </div>
                   </td>
-                  <td class="px-4 py-4 align-top leading-relaxed">The model is currently being downloaded by another process or tab.</td>
+                  <td class="px-4 py-4 align-top leading-relaxed">The model download is currently in progress (whether triggered by this page, another tab, or the browser itself).</td>
                   <td class="px-4 py-4 align-top leading-relaxed">Wait for the model to be available. You can safely call <code>create()</code> and it will resolve once the download finishes.</td>
                 </tr>
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">

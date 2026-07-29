@@ -49,7 +49,7 @@ import { Component } from '@angular/core';
           <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
             <div>
-              <strong>Developer Trial:</strong> This API is currently in active development. To use it, you must enable the <strong>#proofreader-api</strong> flag in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>.
+              <strong>Developer Trial:</strong> This API is currently in active development. To use it, you must enable the <strong>#proofreader-api</strong> flag in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>. Note that Chrome's current implementation does not yet support the <code class="text-xs font-mono">includeCorrectionTypes</code> and <code class="text-xs font-mono">includeCorrectionExplanations</code> options — results will omit <code class="text-xs font-mono">types</code> and <code class="text-xs font-mono">explanation</code> for now.
             </div>
           </div>
         </div>
@@ -85,12 +85,12 @@ import { Component } from '@angular/core';
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">includeCorrectionTypes</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">boolean</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, requires the model to provide specific error types (e.g. spelling, grammar).</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, requires the model to label each correction with a <code class="font-mono text-xs">CorrectionType</code>: <code class="font-mono text-xs">"spelling"</code>, <code class="font-mono text-xs">"punctuation"</code>, <code class="font-mono text-xs">"capitalization"</code>, <code class="font-mono text-xs">"preposition"</code>, <code class="font-mono text-xs">"missing-words"</code>, or <code class="font-mono text-xs">"grammar"</code> (the spec draft currently lists a subset without <code class="font-mono text-xs">"preposition"</code>/<code class="font-mono text-xs">"missing-words"</code>). Defaults to false.</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">includeCorrectionExplanations</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">boolean</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, requires the model to provide a short plain-language explanation for corrections.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, requires the model to provide a short plain-language explanation for corrections. Defaults to false.</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">expectedInputLanguages</td>
@@ -134,6 +134,7 @@ console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
             </div>
 
             <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Options parameter (ProofreaderCreateOptions)</h3>
+            <p class="text-xs text-slate-500 mb-3 italic">Inherits all properties from ProofreaderCreateCoreOptions (above) — including <code class="font-mono">includeCorrectionTypes</code>, <code class="font-mono">includeCorrectionExplanations</code>, <code class="font-mono">expectedInputLanguages</code>, and <code class="font-mono">correctionExplanationLanguage</code> — plus:</p>
             <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
               <table class="w-full text-left border-collapse">
                 <thead>
@@ -144,16 +145,6 @@ console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
-                  <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">includeCorrectionTypes</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">boolean</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, labels errors. Defaults to false.</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">includeCorrectionExplanations</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">boolean</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">If true, explains corrections. Defaults to false.</td>
-                  </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">signal</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">AbortSignal</td>
@@ -204,11 +195,14 @@ console.log(&quot;Proofreader created&quot;);"></app-code-snippet>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">corrections</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">sequence&lt;ProofreadCorrection&gt;</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Detailed list containing <code>startIndex</code>, <code>endIndex</code>, <code>correction</code>, and optional <code>types</code>/<code>explanation</code>.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Detailed list containing <code>startIndex</code>, <code>endIndex</code>, <code>correction</code>, and optional <code>types</code>/<code>explanation</code> (present only when the corresponding <code>include*</code> option was set at creation).</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <p class="text-slate-600 dark:text-slate-400 mb-4 text-sm">
+              The explainer additionally defines <code class="text-sm font-mono">proofreadStreaming(input, options)</code>, which returns a <code class="text-sm font-mono">ReadableStream</code> that delivers correction explanations as they become available. It is not yet part of the spec draft.
+            </p>
             <app-code-snippet code="const proofreader = await Proofreader.create(&#123;
   includeCorrectionTypes: true,
   includeCorrectionExplanations: true
@@ -255,6 +249,16 @@ console.log(&quot;Proofreader destroyed.&quot;);"></app-code-snippet>
                     <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">includeCorrectionExplanations</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">boolean (readonly)</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">True if the proofreader provides explanations.</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">expectedInputLanguages</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">FrozenArray&lt;DOMString&gt; | null (readonly)</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The expected input languages provided during creation.</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">correctionExplanationLanguage</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString | null (readonly)</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The language explanations are generated in, provided during creation.</td>
                   </tr>
                 </tbody>
               </table>

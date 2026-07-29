@@ -77,7 +77,7 @@ import { Component } from '@angular/core';
                 </div>
                 <h3 class="font-bold text-slate-900 dark:text-white mb-2 tracking-tight">RAG</h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                  A documentation site can build an offline-capable Q&#64;A bot that retrieves the most relevant passages before prompting a model.
+                  A documentation site can build an offline-capable Q&amp;A bot that retrieves the most relevant passages before prompting a model.
                 </p>
               </div>
               <div class="p-5 rounded-2xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 flex flex-col">
@@ -112,7 +112,7 @@ import { Component } from '@angular/core';
               <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'downloading'</code>, or
               <code class="text-sm font-mono text-slate-800 dark:text-slate-200">'unavailable'</code>.
             </p>
-            <app-code-snippet code="if (!SemanticEmbedder || (await SemanticEmbedder.availability()) === 'unavailable') &#123;
+            <app-code-snippet code="if (!('SemanticEmbedder' in self) || (await SemanticEmbedder.availability()) === 'unavailable') &#123;
   console.error(&quot;Embedding model is not available on this device.&quot;);
   return;
 &#125;"></app-code-snippet>
@@ -181,7 +181,7 @@ console.log(&quot;Semantic embedder created&quot;);"></app-code-snippet>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">metadata</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">EmbedderMetadata</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Model compatibility information, such as <code class="font-mono text-xs">embeddingSpace</code> and <code class="font-mono text-xs">maxInputTokens</code>.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Model compatibility information exposing the <code class="font-mono text-xs">embeddingSpace</code> identifier. A <code class="font-mono text-xs">maxInputTokens</code> field is proposed as future extensibility.</td>
                   </tr>
                 </tbody>
               </table>
@@ -189,16 +189,18 @@ console.log(&quot;Semantic embedder created&quot;);"></app-code-snippet>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
               A dictionary is returned rather than a raw array so the API can be extended later — with token consumption statistics, truncation warnings, or multi-modal metadata — without breaking backwards compatibility for early adopters.
             </p>
-            <app-code-snippet code="&#123;
+            <app-code-snippet [runnable]="false" code="&#123;
   embeddings: [
     &#123;
       values: Float32Array(300) [0.0023, -0.0093, ...],
-      statistics: &#123; tokenCount: 8, truncated: false &#125;
+      // Future extensibility (not committed surface):
+      // statistics: &#123; tokenCount: 8, truncated: false &#125;
     &#125;
   ],
   metadata: &#123;
     embeddingSpace: 'embeddinggemma-300m',
-    maxInputTokens: 2048
+    // Future extensibility (not committed surface):
+    // maxInputTokens: 2048
   &#125;
 &#125;"></app-code-snippet>
           </section>
@@ -273,8 +275,8 @@ dictionary EmbeddingStatistics &#123;   // under discussion
 &#125;;
 
 dictionary EmbedderMetadata &#123;
-  DOMString embeddingSpace;         // e.g. &quot;embeddinggemma-300m&quot;
-  unsigned long long maxInputTokens; // e.g. 2048
+  DOMString embeddingSpace;          // e.g. &quot;embeddinggemma-300m&quot;
+  // unsigned long long maxInputTokens; // under discussion: future extensibility
 &#125;;"></app-code-snippet>
 
             <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 mt-8">Members at a glance</h3>
@@ -393,7 +395,7 @@ for (let i = 0; i &lt; batchResult.embeddings.length; i++) &#123;
           <section id="chunking" class="scroll-mt-6">
             <app-docs-section-header anchorId="chunking" title="Chunking and truncation"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              The API does <strong>not</strong> automatically chunk large text inputs. You must pre-chunk documents yourself to stay within the model's input limit (2048 tokens for the prototype models) and pass the chunks as an array. Two practical strategies:
+              The API does <strong>not</strong> automatically chunk large text inputs. You must pre-chunk documents yourself to stay within the API's proposed 2048-token input limit and pass the chunks as an array. Two practical strategies:
             </p>
             <ul class="list-disc pl-6 space-y-2 text-slate-600 dark:text-slate-400 mb-4">
               <li><strong>Maximum efficiency:</strong> use an offline tokenizer to estimate a domain-specific character-to-token ratio, then chunk rapidly by character length in the browser.</li>

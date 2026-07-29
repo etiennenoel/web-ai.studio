@@ -49,7 +49,7 @@ import { Component } from '@angular/core';
           <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
             <div>
-              <strong>Developer Trial:</strong> This API is currently in active development. To use it, you must enable the <strong>#rewriter-api-for-gemini-nano</strong> flag in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>.
+              <strong>Developer Trial:</strong> This API is currently in active development. To use it locally, enable <strong>#writer-api-for-gemini-nano</strong> (a joint flag covering both Writer and Rewriter) and <strong>#optimization-guide-on-device-model</strong> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>. For production origins, register for the joint Writer/Rewriter origin trial (Chrome 137 to 148).
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ import { Component } from '@angular/core';
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200">expectedInputLanguages</td>
                   <td class="px-4 py-3 font-mono text-[10px]">sequence&lt;DOMString&gt;</td>
-                  <td class="px-4 py-3">BCP-47 language tags for the text you intend to use as prompt/context.</td>
+                  <td class="px-4 py-3">BCP-47 language tags for the input text you intend to rewrite.</td>
                 </tr>
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200">expectedContextLanguages</td>
@@ -116,7 +116,7 @@ console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         <section id="create" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="create" title="Rewriter.create()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Creates and returns a new rewriter <code>session</code>. If the model is downloadable, calling this method initiates the network download.
+            Creates and returns a new <code>Rewriter</code> instance. If the model is downloadable, calling this method initiates the network download — in that case the call must happen from a user gesture (it requires and consumes transient user activation) or it rejects with a <code>NotAllowedError</code>.
           </p>
           
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
@@ -156,7 +156,7 @@ console.log(&quot;Rewriter created&quot;);"></app-code-snippet>
 
         <!-- session.rewrite() -->
         <section id="rewrite" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="rewrite" title="session.rewrite()"></app-docs-section-header>
+          <app-docs-section-header anchorId="rewrite" title="rewriter.rewrite()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
             Executes inference and returns a single Promise resolving to the complete rewritten text.
           </p>
@@ -195,7 +195,7 @@ console.log(polishedText);"></app-code-snippet>
 
         <!-- session.rewriteStreaming() -->
         <section id="rewrite-streaming" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="rewrite-streaming" title="session.rewriteStreaming()"></app-docs-section-header>
+          <app-docs-section-header anchorId="rewrite-streaming" title="rewriter.rewriteStreaming()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
             Identical parameters to <code>rewrite()</code>, but returns a <code>ReadableStream</code> of string chunks as they are generated. 
           </p>
@@ -212,24 +212,24 @@ for await (const chunk of stream) &#123;
 
         <!-- session.measureInputUsage() -->
         <section id="measure-input" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="measure-input" title="session.measureInputUsage()"></app-docs-section-header>
+          <app-docs-section-header anchorId="measure-input" title="rewriter.measureInputUsage()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Calculates how many tokens the given input and context will consume. Returns a Promise resolving to a number.
+            Measures how much of the input quota the given input and context will consume (implementation-defined units, typically tokens). Returns a Promise resolving to a number.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureInputUsage(input: DOMString, options?: RewriterRewriteOptions): Promise&lt;double&gt;;</code></pre>
           </div>
         
           <app-code-snippet code="const rewriter = await Rewriter.create();
-const tokens = await rewriter.measureInputUsage(&quot;Text to rewrite...&quot;);
-console.log(&quot;Tokens:&quot;, tokens);"></app-code-snippet>
+const usage = await rewriter.measureInputUsage(&quot;Text to rewrite...&quot;);
+console.log(&quot;Usage:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
         <section id="destroy" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="destroy" title="session.destroy()"></app-docs-section-header>
+          <app-docs-section-header anchorId="destroy" title="rewriter.destroy()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Immediately unloads the session from memory. Any pending <code>rewrite()</code> calls are rejected with an <code>AbortError</code>.
+            Signals that the rewriter is no longer needed, allowing the browser to free the model resources. Any pending <code>rewrite()</code> calls are rejected with an <code>AbortError</code>.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
@@ -254,13 +254,12 @@ console.log(&quot;Rewriter destroyed.&quot;);"></app-code-snippet>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly expectedInputLanguages: FrozenArray&lt;DOMString&gt;?</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly expectedContextLanguages: FrozenArray&lt;DOMString&gt;?</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly outputLanguage: DOMString?</code></li>
-            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly inputQuota: double</code> - The absolute maximum token limit for this model instance.</li>
+            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly inputQuota: unrestricted double</code> - The maximum input usage this instance accepts (implementation-defined units; may be <code>Infinity</code> if unrestricted).</li>
           </ul>
-        
-          <app-code-snippet>const draft = await writer.write(
-  "An email to my boss asking for a deadline extension.",
-  &#123; context: "The project is Project Apollo." &#125;
-);</app-code-snippet>
+
+          <app-code-snippet code="const rewriter = await Rewriter.create(&#123; tone: 'more-formal' &#125;);
+console.log(rewriter.tone, rewriter.format, rewriter.length);
+console.log(&quot;Input quota:&quot;, rewriter.inputQuota);"></app-code-snippet>
         </section>
 
         <!-- Page Navigation -->
