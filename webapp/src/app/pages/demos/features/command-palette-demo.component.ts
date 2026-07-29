@@ -91,7 +91,7 @@ export class CommandPaletteDemoComponent extends BaseEmbedderDemoComponent imple
     this.errorMessage = '';
     try {
       const texts = this.actions.map(a => `${a.label} — ${a.description}`);
-      const vectors = await this.semanticEmbedder.embed(texts, 'retrieval', this.onDownloadProgress);
+      const vectors = await this.semanticEmbedder.embed(texts, 'retrieval-document', this.onDownloadProgress);
       this.actions.forEach((action, i) => (action.vector = vectors[i]));
       this.indexReady = true;
       if (this.query.trim()) this.rank(this.query);
@@ -153,7 +153,7 @@ export class CommandPaletteDemoComponent extends BaseEmbedderDemoComponent imple
     this.isRanking = true;
     try {
       const start = performance.now();
-      const queryVector = await this.semanticEmbedder.embedOne(query, 'retrieval');
+      const queryVector = await this.semanticEmbedder.embedOne(query, 'retrieval-query');
       const latency = Math.round(performance.now() - start);
       if (token !== this.rankToken) return;
 
@@ -178,21 +178,21 @@ export class CommandPaletteDemoComponent extends BaseEmbedderDemoComponent imple
   get dynamicCodeSnippet(): string {
     const q = this.query.trim() || this.sampleIntents[0];
     const top = this.ranked[0]?.action.label ?? 'Toggle dark mode';
-    return `const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
-
-const actions = [
+    return `const actions = [
   { label: "Toggle dark mode", description: "Switch between the light and dark appearance" },
   { label: "Export as PDF", description: "Download the current page as a PDF file" },
   // ... ${this.actions.length} actions total
 ];
 
 // Embed every action once
-const { embeddings } = await embedder.embed(
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(
   actions.map(a => \`\${a.label} — \${a.description}\`)
 );
 
 // On every keystroke, rank the actions against the typed intent
-const query = await embedder.embed(${JSON.stringify(q)});
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed(${JSON.stringify(q)});
 const queryVector = query.embeddings[0].values;
 
 const ranked = actions

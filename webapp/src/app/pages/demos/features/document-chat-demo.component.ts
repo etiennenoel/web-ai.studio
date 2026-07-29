@@ -95,7 +95,7 @@ export class DocumentChatDemoComponent extends BaseEmbedderDemoComponent impleme
     const start = performance.now();
 
     try {
-      const vectors = await this.semanticEmbedder.embed(parts, 'retrieval', this.onDownloadProgress);
+      const vectors = await this.semanticEmbedder.embed(parts, 'retrieval-document', this.onDownloadProgress);
       this.chunks = parts.map((text, i) => ({ text, vector: vectors[i] }));
       this.indexingTimeMs = Math.round(performance.now() - start);
       this.indexed = true;
@@ -135,7 +135,7 @@ export class DocumentChatDemoComponent extends BaseEmbedderDemoComponent impleme
 
     try {
       // Retrieval: embed the question and rank the chunks
-      const queryVector = await this.semanticEmbedder.embedOne(q, 'retrieval');
+      const queryVector = await this.semanticEmbedder.embedOne(q, 'retrieval-query');
       const top = this.semanticEmbedder.topK(queryVector, this.chunks.map(c => c.vector), 3);
       this.retrieved = top.map(r => ({ text: this.chunks[r.index].text, score: r.score }));
       this.retrievalTimeMs = Math.round(performance.now() - startTime);
@@ -173,12 +173,13 @@ export class DocumentChatDemoComponent extends BaseEmbedderDemoComponent impleme
   get dynamicCodeSnippet(): string {
     const q = this.question.trim() || 'How long does a full charge take?';
     return `// 1. Index: chunk the document and embed every chunk in one batch
-const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
 const chunks = documentText.split(/\\n\\s*\\n/); // ${this.chunks.length || 'N'} chunks
-const { embeddings } = await embedder.embed(chunks);
+const { embeddings } = await docEmbedder.embed(chunks);
 
-// 2. Retrieve: embed the question, rank chunks by cosine similarity
-const query = await embedder.embed(${JSON.stringify(q)});
+// 2. Retrieve: embed the question with the query task type, rank chunks by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed(${JSON.stringify(q)});
 const queryVector = query.embeddings[0].values;
 const top3 = embeddings
   .map((e, i) => ({ i, score: cosineSimilarity(queryVector, e.values) }))

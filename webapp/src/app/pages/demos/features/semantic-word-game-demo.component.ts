@@ -79,7 +79,7 @@ export class SemanticWordGameDemoComponent extends BaseEmbedderDemoComponent imp
         word = SECRET_WORDS[Math.floor(Math.random() * SECRET_WORDS.length)];
       }
       this.secretWord = word;
-      this.secretVector = await this.semanticEmbedder.embedOne(word, 'similarity');
+      this.secretVector = await this.semanticEmbedder.embedOne(word, 'semantic-similarity');
       this.guesses = [];
       this.guessCount = 0;
       this.won = false;
@@ -122,7 +122,7 @@ export class SemanticWordGameDemoComponent extends BaseEmbedderDemoComponent imp
     this.isGuessing = true;
     try {
       const start = performance.now();
-      const guessVector = await this.semanticEmbedder.embedOne(raw, 'similarity');
+      const guessVector = await this.semanticEmbedder.embedOne(raw, 'semantic-similarity');
       this.guessLatencyMs = Math.round(performance.now() - start);
 
       const score = this.semanticEmbedder.cosineSimilarity(this.secretVector!, guessVector);
@@ -156,7 +156,7 @@ export class SemanticWordGameDemoComponent extends BaseEmbedderDemoComponent imp
   }
 
   get dynamicCodeSnippet(): string {
-    return `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    return `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 
 // Pick and embed the secret word once
 const secretWord = pickRandom(WORDS);

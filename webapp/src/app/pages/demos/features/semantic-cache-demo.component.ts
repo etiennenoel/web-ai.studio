@@ -107,7 +107,7 @@ export class SemanticCacheDemoComponent extends BaseEmbedderDemoComponent implem
 
     try {
       // 1. Embed the question and look for a semantically equivalent cached one
-      const queryVector = await this.semanticEmbedder.embedOne(q, 'similarity');
+      const queryVector = await this.semanticEmbedder.embedOne(q, 'semantic-similarity');
 
       let best: { entry: CacheEntry; score: number } | null = null;
       for (const entry of this.cache) {
@@ -174,7 +174,7 @@ export class SemanticCacheDemoComponent extends BaseEmbedderDemoComponent implem
 
   get dynamicCodeSnippet(): string {
     const q = this.question.trim() || 'Which city is the capital of France?';
-    return `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    return `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 const cache = []; // { vector, question, answer }
 
 async function ask(question) {

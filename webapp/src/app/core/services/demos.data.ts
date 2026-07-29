@@ -11,12 +11,13 @@ export const DEMOS_DATA: DemoExample[] = [
     icon: 'bi-chat-left-quote',
     onDeviceReason: 'The entire RAG pipeline — chunking, embedding, retrieval, and generation — runs on-device. Your document is never uploaded and no vector database is required.',
     codeSnippet: `// 1. Index: chunk the document and embed every chunk in one batch
-const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
 const chunks = documentText.split(/\\n\\s*\\n/);
-const { embeddings } = await embedder.embed(chunks);
+const { embeddings } = await docEmbedder.embed(chunks);
 
-// 2. Retrieve: embed the question and rank chunks by cosine similarity
-const query = await embedder.embed(question);
+// 2. Retrieve: embed the question with the query task type, rank chunks by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed(question);
 const top3 = embeddings
   .map((e, i) => ({ i, score: cosineSimilarity(query.embeddings[0].values, e.values) }))
   .sort((a, b) => b.score - a.score)
@@ -38,13 +39,13 @@ const stream = session.promptStreaming(\`Context:\\n\${context}\\n\\nQuestion: \
     category: 'Embeddings',
     icon: 'bi-search-heart',
     onDeviceReason: 'On-device embeddings cost nothing per query, so you can afford to search on every keystroke — no network round trip, no per-call billing, and queries stay private.',
-    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
+    codeSnippet: `// Index the help center once (a single batched call)
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(helpCenterEntries);
 
-// Index the help center once (a single batched call)
-const { embeddings } = await embedder.embed(helpCenterEntries);
-
-// On every keystroke: embed the query and rank by cosine similarity
-const result = await embedder.embed(searchQuery);
+// On every keystroke: embed the query with the query task type and rank by cosine similarity
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const result = await queryEmbedder.embed(searchQuery);
 const queryVector = result.embeddings[0].values;
 
 const ranked = embeddings
@@ -91,7 +92,7 @@ const best = Object.entries(centroids)
     category: 'Embeddings',
     icon: 'bi-files',
     onDeviceReason: 'Deduplication runs while the user is still typing, because every similarity check is a local vector comparison — no server calls per keystroke.',
-    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 
 // Embed the existing issues once
 const { embeddings } = await embedder.embed(existingIssueTitles);
@@ -144,7 +145,7 @@ for (let c = 0; c < 4; c++) {
     category: 'Embeddings',
     icon: 'bi-lightning-charge',
     onDeviceReason: 'A production pattern made visible: skip re-running the language model when a semantically equivalent question was already answered — saving seconds and tokens.',
-    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 const cache = []; // { vector, question, answer }
 
 async function ask(question) {
@@ -172,21 +173,21 @@ async function ask(question) {
     category: 'Embeddings',
     icon: 'bi-command',
     onDeviceReason: 'Intent matching on every keystroke is only viable when embedding is free, instant, and private — exactly what an on-device embedder provides.',
-    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
-
-const actions = [
+    codeSnippet: `const actions = [
   { label: "Toggle dark mode", description: "Switch between light and dark appearance" },
   { label: "Export as PDF", description: "Download the current page as a PDF file" },
   { label: "Mute notifications", description: "Silence all alerts and badges" }
 ];
 
 // Embed the action descriptions once
-const { embeddings } = await embedder.embed(
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(
   actions.map(a => \`\${a.label} — \${a.description}\`)
 );
 
 // On every keystroke, rank actions against the typed intent
-const query = await embedder.embed("make it easier on my eyes at night");
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const query = await queryEmbedder.embed("make it easier on my eyes at night");
 const ranked = actions
   .map((a, i) => ({ ...a, score: cosineSimilarity(query.embeddings[0].values, embeddings[i].values) }))
   .sort((a, b) => b.score - a.score);
@@ -201,7 +202,7 @@ const ranked = actions
     category: 'Embeddings',
     icon: 'bi-thermometer-half',
     onDeviceReason: 'A whole word game with zero backend: scoring is a local cosine similarity, so it is instant, free to run, and works offline.',
-    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 
 const secretWord = "volcano";
 const { embeddings: [secret] } = await embedder.embed(secretWord);

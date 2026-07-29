@@ -136,7 +136,7 @@ export class SemanticSearchDemoComponent extends BaseEmbedderDemoComponent imple
     this.errorMessage = '';
     const start = performance.now();
     try {
-      this.corpusVectors = await this.semanticEmbedder.embed(this.corpus, 'retrieval', this.onDownloadProgress);
+      this.corpusVectors = await this.semanticEmbedder.embed(this.corpus, 'retrieval-document', this.onDownloadProgress);
       this.indexTimeMs = Math.round(performance.now() - start);
       this.indexReady = true;
       if (this.query.trim()) this.search(this.query);
@@ -192,7 +192,7 @@ export class SemanticSearchDemoComponent extends BaseEmbedderDemoComponent imple
     this.isSearching = true;
     try {
       const start = performance.now();
-      const queryVector = await this.semanticEmbedder.embedOne(query, 'retrieval');
+      const queryVector = await this.semanticEmbedder.embedOne(query, 'retrieval-query');
       const latency = Math.round(performance.now() - start);
       if (token !== this.searchToken) return; // a newer query superseded this one
 
@@ -214,13 +214,13 @@ export class SemanticSearchDemoComponent extends BaseEmbedderDemoComponent imple
 
   get dynamicCodeSnippet(): string {
     const q = this.query.trim() || 'my parcel never showed up';
-    return `const embedder = await SemanticEmbedder.create({ taskType: "retrieval" });
-
-// Index the ${this.corpus.length} help center entries once, in a single batched call
-const { embeddings } = await embedder.embed(helpCenterEntries);
+    return `// Index the ${this.corpus.length} help center entries once, in a single batched call
+const docEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-document" });
+const { embeddings } = await docEmbedder.embed(helpCenterEntries);
 
 // On every keystroke: embed the query on-device and rank by cosine similarity
-const result = await embedder.embed(${JSON.stringify(q)});
+const queryEmbedder = await SemanticEmbedder.create({ taskType: "retrieval-query" });
+const result = await queryEmbedder.embed(${JSON.stringify(q)});
 const queryVector = result.embeddings[0].values;
 
 const topResults = embeddings

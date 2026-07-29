@@ -95,7 +95,7 @@ export class DuplicateDetectorDemoComponent extends BaseEmbedderDemoComponent im
     this.isIndexing = true;
     this.errorMessage = '';
     try {
-      const vectors = await this.semanticEmbedder.embed(EXISTING_ISSUES, 'similarity', this.onDownloadProgress);
+      const vectors = await this.semanticEmbedder.embed(EXISTING_ISSUES, 'semantic-similarity', this.onDownloadProgress);
       this.issues = EXISTING_ISSUES.map((title, i) => ({
         id: this.nextIssueId++,
         title,
@@ -137,7 +137,7 @@ export class DuplicateDetectorDemoComponent extends BaseEmbedderDemoComponent im
     this.isChecking = true;
     try {
       const start = performance.now();
-      const draftVector = await this.semanticEmbedder.embedOne(title, 'similarity');
+      const draftVector = await this.semanticEmbedder.embedOne(title, 'semantic-similarity');
       const latency = Math.round(performance.now() - start);
       if (token !== this.checkToken) return;
 
@@ -160,7 +160,7 @@ export class DuplicateDetectorDemoComponent extends BaseEmbedderDemoComponent im
     if (!title || !this.indexReady) return;
 
     try {
-      const vector = await this.semanticEmbedder.embedOne(title, 'similarity');
+      const vector = await this.semanticEmbedder.embedOne(title, 'semantic-similarity');
       this.issues.forEach(i => (i.isNew = false));
       const issue: TrackedIssue = { id: this.nextIssueId++, title, vector, isNew: true };
       this.issues.unshift(issue);
@@ -175,7 +175,7 @@ export class DuplicateDetectorDemoComponent extends BaseEmbedderDemoComponent im
 
   get dynamicCodeSnippet(): string {
     const draft = this.draftTitle.trim() || this.sampleDrafts[0];
-    return `const embedder = await SemanticEmbedder.create({ taskType: "similarity" });
+    return `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
 
 // Embed the ${this.issues.length || EXISTING_ISSUES.length} existing issue titles once (single batched call)
 const { embeddings } = await embedder.embed(existingIssueTitles);

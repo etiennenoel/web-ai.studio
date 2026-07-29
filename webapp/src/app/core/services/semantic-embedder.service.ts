@@ -1,7 +1,12 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type SemanticEmbedderTaskType = 'retrieval' | 'classification' | 'clustering' | 'similarity';
+export type SemanticEmbedderTaskType =
+  | 'semantic-similarity'
+  | 'retrieval-query'
+  | 'retrieval-document'
+  | 'classification'
+  | 'clustering';
 
 export interface ScoredResult {
   index: number;
