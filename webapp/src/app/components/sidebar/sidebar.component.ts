@@ -17,7 +17,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   routeEnum!: RouteEnum;
   currentTheme$;
   isDocsExpanded = false;
-  isPlaygroundsExpanded = false;
+  isPlaygroundsExpanded = true;
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
