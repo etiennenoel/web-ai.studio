@@ -3,11 +3,14 @@ import {AttachmentTypeEnum} from '../enums/attachment-type.enum';
 
 export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings';
 
+export type DemoApi = 'Prompt API' | 'Semantic Embedder';
+
 export interface DemoExample {
   id: string;
   title: string;
   description: string;
   category: DemoCategory;
+  apis: DemoApi[];
   icon: string;
   onDeviceReason: string;
   codeSnippet: string;

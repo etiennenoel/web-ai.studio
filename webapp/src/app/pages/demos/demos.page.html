@@ -1,8 +1,8 @@
 <div class="flex flex-col h-full bg-slate-50 dark:bg-[#121212] transition-colors duration-200 overflow-y-auto">
   <!-- Hero Section -->
-  <div class="relative py-16 md:py-24 px-6 overflow-hidden shrink-0">
+  <div class="relative py-16 md:py-20 px-6 overflow-hidden shrink-0">
     <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 dark:from-[#121212] to-transparent"></div>
-    
+
     <div class="relative max-w-4xl mx-auto text-center z-10">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-wider mb-6 border border-slate-300/50 dark:border-zinc-700/50">
         <i class="bi bi-stars text-amber-500"></i> Chrome Built-in AI
@@ -11,14 +11,80 @@
         WebAI <span class="text-slate-400 dark:text-zinc-500">Demos</span>
       </h1>
       <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-        Explore what's possible with On-Device AI directly in the browser. 
+        Explore what's possible with On-Device AI directly in the browser.
         No API keys, no server costs, full privacy.
       </p>
     </div>
   </div>
 
+  <!-- Search & Filters -->
+  <div class="px-6 md:px-10 max-w-7xl mx-auto w-full relative z-20">
+    <div class="bg-[#ffffff] dark:bg-[#18181b] rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm p-5 md:p-6 flex flex-col gap-4">
+      <!-- Search input -->
+      <div class="relative">
+        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500"></i>
+        <input
+          type="search"
+          [ngModel]="searchQuery"
+          (ngModelChange)="onSearchChanged($event)"
+          placeholder="Search demos… (e.g. OCR, receipt, translate)"
+          class="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 dark:focus:border-indigo-500 transition-colors" />
+      </div>
+
+      <!-- Filter chips -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mr-1">Category</span>
+        @for (category of categories; track category) {
+          <button
+            type="button"
+            (click)="toggleCategory(category)"
+            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+            [ngClass]="selectedCategory === category
+              ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+              : 'bg-slate-50 dark:bg-zinc-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-zinc-700 hover:border-slate-400 dark:hover:border-zinc-500'">
+            {{ category }}
+          </button>
+        }
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mr-1">API</span>
+        @for (api of apis; track api) {
+          <button
+            type="button"
+            (click)="toggleApi(api)"
+            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+            [ngClass]="selectedApi === api
+              ? 'bg-indigo-600 text-white border-indigo-600'
+              : 'bg-slate-50 dark:bg-zinc-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-zinc-700 hover:border-indigo-400 dark:hover:border-indigo-500'">
+            {{ api }}
+          </button>
+        }
+
+        @if (hasActiveFilters) {
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="ml-auto px-3 py-1.5 rounded-full text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center gap-1.5">
+            <i class="bi bi-x-circle"></i> Clear filters
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
   <div class="p-6 md:px-10 pb-20 max-w-7xl mx-auto w-full relative z-20 mt-8">
-    @for (category of categories; track category) {
+    @if (filteredDemos.length === 0) {
+      <div class="text-center py-24">
+        <i class="bi bi-binoculars text-5xl text-slate-300 dark:text-zinc-700"></i>
+        <p class="mt-4 text-lg font-semibold text-slate-600 dark:text-slate-400">No demos match your filters.</p>
+        <button type="button" (click)="clearFilters()" class="mt-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+          Clear filters
+        </button>
+      </div>
+    }
+
+    @for (category of visibleCategories; track category) {
       <div class="mb-16">
         <div class="flex items-center gap-3 mb-8">
           <div class="h-px bg-slate-200 dark:bg-zinc-800 flex-grow"></div>
@@ -27,12 +93,14 @@
           </h2>
           <div class="h-px bg-slate-200 dark:bg-zinc-800 flex-grow"></div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
           @for (demo of getDemosByCategory(category); track demo.id) {
+            @let style = getCategoryStyle(demo.category);
+            @let demoAvailability = getDemoAvailability(demo);
             <a [routerLink]="['/demos', demo.id]" class="!no-underline group/card h-full block focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/50 rounded-3xl">
               <div class="relative h-full bg-[#ffffff] dark:bg-[#18181b] rounded-3xl p-7 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden flex flex-col">
-                
+
                 <!-- Sleek Top Gradient Bar -->
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
 
@@ -40,14 +108,54 @@
                 <div class="absolute -right-20 -top-20 w-48 h-48 bg-slate-100 dark:bg-zinc-800/50 rounded-full blur-3xl group-hover/card:bg-slate-200 dark:group-hover/card:bg-zinc-800 transition-colors duration-500"></div>
 
                 <div class="relative z-10 flex flex-col h-full">
-                  <!-- Icon Container -->
-                  <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 flex items-center justify-center mb-6 text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] group-hover/card:scale-110 transition-transform duration-500 ease-out">
-                    <i class="bi {{ demo.icon }}"></i>
+                  <div class="flex items-start justify-between mb-6">
+                    <!-- Icon Container -->
+                    <div class="w-14 h-14 rounded-2xl {{ style.iconContainer }} {{ style.icon }} flex items-center justify-center text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] group-hover/card:scale-110 transition-transform duration-500 ease-out">
+                      <i class="bi {{ demo.icon }}"></i>
+                    </div>
+
+                    <!-- Availability badge -->
+                    @switch (demoAvailability) {
+                      @case ('available') {
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
+                        </span>
+                      }
+                      @case ('downloadable') {
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Download needed
+                        </span>
+                      }
+                      @case ('downloading') {
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span> Downloading
+                        </span>
+                      }
+                      @case ('unavailable') {
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Unsupported
+                        </span>
+                      }
+                      @case ('checking') {
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse"></span> Checking
+                        </span>
+                      }
+                    }
                   </div>
-                  
+
                   <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight group-hover/card:text-slate-700 dark:group-hover/card:text-slate-300 transition-colors break-words">{{ demo.title }}</h3>
-                  
-                  <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-8 flex-grow font-medium">{{ demo.description }}</p>
+
+                  <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-6 flex-grow font-medium">{{ demo.description }}</p>
+
+                  <!-- API chips -->
+                  <div class="flex flex-wrap gap-1.5 mb-6">
+                    @for (api of demo.apis; track api) {
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/60">
+                        {{ api }}
+                      </span>
+                    }
+                  </div>
 
                   <div class="flex items-center justify-between mt-auto">
                     <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-zinc-800/80 group-hover/card:bg-slate-900 group-hover/card:text-white dark:group-hover/card:bg-[#ffffff] dark:group-hover/card:text-slate-900 transition-colors duration-300 shadow-sm border border-slate-200 dark:border-zinc-700/50 group-hover/card:border-transparent">

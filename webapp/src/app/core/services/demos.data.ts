@@ -8,6 +8,7 @@ export const DEMOS_DATA: DemoExample[] = [
     title: 'Chat With Your Document',
     description: 'Fully local RAG: retrieve the relevant passages with embeddings, then answer with the Prompt API — citations included.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder', 'Prompt API'],
     icon: 'bi-chat-left-quote',
     onDeviceReason: 'The entire RAG pipeline — chunking, embedding, retrieval, and generation — runs on-device. Your document is never uploaded and no vector database is required.',
     codeSnippet: `// 1. Index: chunk the document and embed every chunk in one batch
@@ -37,6 +38,7 @@ const stream = session.promptStreaming(\`Context:\\n\${context}\\n\\nQuestion: \
     title: 'Semantic vs. Keyword Search',
     description: 'Search a help center by meaning, side by side with keyword search — and watch keywords miss what embeddings find.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-search-heart',
     onDeviceReason: 'On-device embeddings cost nothing per query, so you can afford to search on every keystroke — no network round trip, no per-call billing, and queries stay private.',
     codeSnippet: `// Index the help center once (a single batched call)
@@ -60,6 +62,7 @@ const ranked = embeddings
     title: 'Smart Triage',
     description: 'A zero-shot classifier: route incoming messages to categories defined only by a few example phrases.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-signpost-split',
     onDeviceReason: 'Classify support messages, feedback, or emails locally with no training step and no data leaving the device — and "retrain" instantly by editing the example phrases.',
     codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "classification" });
@@ -90,6 +93,7 @@ const best = Object.entries(centroids)
     title: 'Duplicate Detector',
     description: 'Catch near-duplicate bug reports before they are filed, even when they share no words with the original.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-files',
     onDeviceReason: 'Deduplication runs while the user is still typing, because every similarity check is a local vector comparison — no server calls per keystroke.',
     codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
@@ -115,6 +119,7 @@ if (duplicates.length > 0) showWarning(duplicates);`,
     title: 'Cluster & Label',
     description: 'Group raw user feedback into themes with k-means over embeddings, then let the Prompt API name each cluster.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder', 'Prompt API'],
     icon: 'bi-bounding-box-circles',
     onDeviceReason: 'Topic discovery over private feedback, notes, or tickets happens entirely locally — the embeddings power the math, the Prompt API writes the labels.',
     codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "clustering" });
@@ -143,6 +148,7 @@ for (let c = 0; c < 4; c++) {
     title: 'Semantic Cache',
     description: 'Serve instant answers for paraphrased questions by caching LLM responses under their embeddings.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-lightning-charge',
     onDeviceReason: 'A production pattern made visible: skip re-running the language model when a semantically equivalent question was already answered — saving seconds and tokens.',
     codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
@@ -171,6 +177,7 @@ async function ask(question) {
     title: 'Semantic Command Palette',
     description: 'A ⌘K palette that understands intent: describe what you want in your own words and the right action lights up.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-command',
     onDeviceReason: 'Intent matching on every keystroke is only viable when embedding is free, instant, and private — exactly what an on-device embedder provides.',
     codeSnippet: `const actions = [
@@ -200,6 +207,7 @@ const ranked = actions
     title: 'Hot or Cold',
     description: 'Guess the secret word: every guess is embedded on-device and scored by how semantically close it lands.',
     category: 'Embeddings',
+    apis: ['Semantic Embedder'],
     icon: 'bi-thermometer-half',
     onDeviceReason: 'A whole word game with zero backend: scoring is a local cosine similarity, so it is instant, free to run, and works offline.',
     codeSnippet: `const embedder = await SemanticEmbedder.create({ taskType: "semantic-similarity" });
@@ -231,9 +239,10 @@ await guess("banana");   // Freezing`,
     title: 'Translation',
     description: 'Translate text from one language to another with native-like fluency.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-translate',
     onDeviceReason: 'Translations happen instantly without sending user content to external servers, preserving privacy and enabling offline use.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are an expert translator. Translate the following text into French."
 });
 const response = await session.prompt("Hello world! How are you doing today?");
@@ -250,9 +259,10 @@ console.log(response);`,
     title: 'Summarization',
     description: 'Condense long articles or text into concise, digestible bullet points.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-card-text',
     onDeviceReason: 'Summarize sensitive documents or personal emails locally, ensuring your private data never leaves your device.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Summarize the text into 3 concise bullet points."
 });
 const result = await session.prompt(longArticleText);`,
@@ -267,9 +277,10 @@ const result = await session.prompt(longArticleText);`,
     title: 'Proofreading & Grammar',
     description: 'Fix grammatical errors and improve sentence structure.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-spellcheck',
     onDeviceReason: 'Real-time text correction while typing without network latency, offering immediate feedback.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Proofread the text. Fix grammar, spelling, and punctuation errors. Only output the corrected text."
 });
 const result = await session.prompt("I has went to the store yesterday to buy some apples, but they was all out.");`,
@@ -284,9 +295,10 @@ const result = await session.prompt("I has went to the store yesterday to buy so
     title: 'Tone Changer',
     description: 'Rewrite casual text into a formal, professional tone.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-person-lines-fill',
     onDeviceReason: 'Fast local processing allows you to preview different tones seamlessly within your email or messaging client.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Rewrite the following text to sound highly professional and polite."
 });
 const result = await session.prompt("Hey boss, I can\\'t come in today, I feel super sick. Talk tomorrow.");`,
@@ -301,9 +313,10 @@ const result = await session.prompt("Hey boss, I can\\'t come in today, I feel s
     title: 'Brainstorming Ideas',
     description: 'Generate creative ideas for a given topic.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-lightbulb',
     onDeviceReason: 'Unbounded creativity anytime, anywhere, completely independent of your internet connection.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are a creative assistant. Generate 5 unique and innovative ideas for the user\\'s prompt."
 });
 const result = await session.prompt("I want to build a new mobile app that helps people learn gardening.");`,
@@ -318,9 +331,10 @@ const result = await session.prompt("I want to build a new mobile app that helps
     title: 'Write JavaScript',
     description: 'Generate functional JavaScript code from a description.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-filetype-js',
     onDeviceReason: 'Keep your proprietary codebase or ideas private by generating utility functions entirely locally.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are a senior software engineer. Write clean, modern, and efficient JavaScript code to solve the user\\'s request. Provide only the code block."
 });
 const code = await session.prompt("Write a function to debounce an input function, with a default delay of 300ms.");`,
@@ -335,9 +349,10 @@ const code = await session.prompt("Write a function to debounce an input functio
     title: 'Write HTML/CSS',
     description: 'Generate responsive UI components with HTML and Tailwind CSS.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-filetype-html',
     onDeviceReason: 'Rapid UI prototyping without hitting rate limits or paying cloud API costs.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Generate HTML structure styled with Tailwind CSS utility classes based on the user\\'s prompt."
 });
 const result = await session.prompt("Create a responsive pricing card component with a title, price, feature list, and a buy button.");`,
@@ -352,9 +367,10 @@ const result = await session.prompt("Create a responsive pricing card component 
     title: 'Explain Like I\'m 5',
     description: 'Simplify complex technical or scientific concepts.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-book-half',
     onDeviceReason: 'A quick, private tutor on your device that provides instant analogies and simplifications.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Explain the following complex concept as if the reader is a 5-year-old child. Use simple words and analogies."
 });
 const result = await session.prompt("Quantum entanglement");`,
@@ -369,9 +385,10 @@ const result = await session.prompt("Quantum entanglement");`,
     title: 'SQL Query Generator',
     description: 'Convert natural language questions into executable SQL queries.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-database-check',
     onDeviceReason: 'Generate queries for your database without sharing your internal database schema with the cloud.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are an expert database administrator. Generate a valid SQL query based on the user\\'s request. Table: users(id, name, age, city)."
 });
 const result = await session.prompt("Find the average age of users living in New York.");`,
@@ -386,9 +403,10 @@ const result = await session.prompt("Find the average age of users living in New
     title: 'Draft an Email',
     description: 'Quickly draft a polite email from a short description.',
     category: 'Text Input',
+    apis: ['Prompt API'],
     icon: 'bi-envelope-paper',
     onDeviceReason: 'Draft emails contextually within your mail app offline.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Draft a polite and professional email based on the user\\'s prompt."
 });
 const result = await session.prompt("Ask my client John if he is available for a meeting next Tuesday at 2pm.");`,
@@ -405,9 +423,10 @@ const result = await session.prompt("Ask my client John if he is available for a
     title: 'Image OCR',
     description: 'Extract raw text from images, receipts, or documents.',
     category: 'Image Input',
+    apis: ['Prompt API'],
     icon: 'bi-fonts',
     onDeviceReason: 'Processing images locally means your private photos (like receipts, IDs, or sensitive documents) never leave your device.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   expectedInputs: [{ type: "image", languages: ["en"] }]
 });
 const result = await session.prompt([{
@@ -428,9 +447,10 @@ const result = await session.prompt([{
     title: 'Image Description',
     description: 'Generate detailed alt-text or descriptions for images.',
     category: 'Image Input',
+    apis: ['Prompt API'],
     icon: 'bi-image',
     onDeviceReason: 'Quickly generate accessibility alt-tags for entire photo libraries locally without consuming immense bandwidth.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   expectedInputs: [{ type: "image" }]
 });
 const result = await session.prompt([{
@@ -451,9 +471,10 @@ const result = await session.prompt([{
     title: 'Explain a Meme',
     description: 'Understand the context, joke, or cultural reference in a meme.',
     category: 'Image Input',
+    apis: ['Prompt API'],
     icon: 'bi-emoji-laughing',
     onDeviceReason: 'On-device vision models can quickly analyze complex visual humor without sharing your browsing habits.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   expectedInputs: [{ type: "image" }]
 });
 const result = await session.prompt([{
@@ -474,9 +495,10 @@ const result = await session.prompt([{
     title: 'Recipe from Fridge',
     description: 'Take a photo of your fridge contents and get recipe ideas.',
     category: 'Image Input',
+    apis: ['Prompt API'],
     icon: 'bi-egg-fried',
     onDeviceReason: 'Zero-latency visual processing makes everyday utility apps feel like magic extensions of the camera.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are a master chef. Look at the ingredients in the image and suggest a creative recipe.",
   expectedInputs: [{ type: "image" }]
 });
@@ -499,9 +521,10 @@ const result = await session.prompt([{
     title: 'Image Categorization',
     description: 'Categorize photos for auto-organization.',
     category: 'Image Input',
+    apis: ['Prompt API'],
     icon: 'bi-tags',
     onDeviceReason: 'Sort your photo library purely locally without uploading your entire life to the cloud.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Categorize the provided image into one of: Nature, People, Urban, Pets, Document.",
   expectedInputs: [{ type: "image" }]
 });
@@ -526,9 +549,10 @@ const result = await session.prompt([{
     title: 'Audio Transcription',
     description: 'Transcribe spoken audio into accurate text.',
     category: 'Audio Input',
+    apis: ['Prompt API'],
     icon: 'bi-mic',
     onDeviceReason: 'Audio files are large. Processing them locally saves massive amounts of data transfer and protects voice privacy.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   expectedInputs: [{ type: "audio", languages: ["en"] }]
 });
 const result = await session.prompt([{
@@ -549,9 +573,10 @@ const result = await session.prompt([{
     title: 'Meeting Notes Extractor',
     description: 'Listen to meeting audio and generate action items.',
     category: 'Audio Input',
+    apis: ['Prompt API'],
     icon: 'bi-journal-check',
     onDeviceReason: 'Confidential corporate meetings can be securely transcribed and summarized directly on an employee\'s laptop.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "You are an executive assistant. Listen to the meeting and extract the top 3 action items.",
   expectedInputs: [{ type: "audio" }]
 });
@@ -574,9 +599,10 @@ const result = await session.prompt([{
     title: 'Audio Summarization',
     description: 'Get a quick summary of a long voice note.',
     category: 'Audio Input',
+    apis: ['Prompt API'],
     icon: 'bi-file-earmark-music',
     onDeviceReason: 'Save time by summarizing long personal voice notes locally without sending private thoughts to an API.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   systemPrompt: "Listen to the audio and provide a 2-sentence summary of the main points.",
   expectedInputs: [{ type: "audio" }]
 });
@@ -601,6 +627,7 @@ const result = await session.prompt([{
     title: 'Structured JSON Output',
     description: 'Force the model to output a strictly formatted JSON object.',
     category: 'Tools Calling',
+    apis: ['Prompt API'],
     icon: 'bi-braces',
     onDeviceReason: 'Perfect for local data parsing pipelines where data shouldn\'t leave the system, ensuring reliable programmatic ingestion.',
     codeSnippet: `const schema = {
@@ -612,7 +639,7 @@ const result = await session.prompt([{
   required: ["name", "age"]
 };
 
-const session = await ai.languageModel.create();
+const session = await LanguageModel.create();
 const result = await session.prompt(
   "My name is John Doe and I just turned 30 years old.",
   { responseConstraint: schema }
@@ -636,6 +663,7 @@ const result = await session.prompt(
     title: 'Extract Entities (NER)',
     description: 'Extract people, locations, and organizations into JSON.',
     category: 'Tools Calling',
+    apis: ['Prompt API'],
     icon: 'bi-box-seam',
     onDeviceReason: 'Safe, private local extraction of names and addresses from personal text.',
     codeSnippet: `const schema = {
@@ -645,7 +673,7 @@ const result = await session.prompt(
     locations: { type: "array", items: { type: "string" } }
   }
 };
-const session = await ai.languageModel.create();
+const session = await LanguageModel.create();
 const result = await session.prompt(
   "Yesterday, Alice and Bob traveled from Seattle to Tokyo.",
   { responseConstraint: schema }
@@ -671,9 +699,10 @@ const result = await session.prompt(
     title: 'Image + Audio Query',
     description: 'Ask a question about an image using your voice.',
     category: 'Mix-and-Match',
+    apis: ['Prompt API'],
     icon: 'bi-collection-play',
     onDeviceReason: 'Combining multiple heavy modalities (images and audio) locally avoids massive upload times and creates a seamless interactive experience.',
-    codeSnippet: `const session = await ai.languageModel.create({
+    codeSnippet: `const session = await LanguageModel.create({
   expectedInputs: [{ type: "image" }, { type: "audio" }]
 });
 const result = await session.prompt([{
@@ -694,6 +723,7 @@ const result = await session.prompt([{
     title: 'Receipt to JSON',
     description: 'Extract line items from a receipt image into structured JSON data.',
     category: 'Mix-and-Match',
+    apis: ['Prompt API'],
     icon: 'bi-receipt',
     onDeviceReason: 'Combines Vision processing and Structured JSON Output entirely locally, creating a private and powerful expense tracker.',
     codeSnippet: `const schema = {
@@ -704,7 +734,7 @@ const result = await session.prompt([{
     items: { type: "array", items: { type: "string" } }
   }
 };
-const session = await ai.languageModel.create({
+const session = await LanguageModel.create({
   expectedInputs: [{ type: "image" }]
 });
 const result = await session.prompt([
