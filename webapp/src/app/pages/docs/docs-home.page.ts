@@ -169,7 +169,7 @@ import { Component } from '@angular/core';
             </a>
 
             <!-- Proofreader -->
-            <a routerLink="/docs/proofreader" class="!no-underline group relative p-6 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-orange-300 dark:hover:border-orange-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full md:col-span-2 lg:col-span-1">
+            <a routerLink="/docs/proofreader" class="!no-underline group relative p-6 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-orange-300 dark:hover:border-orange-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full">
               <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity text-orange-500">
                 <i class="bi bi-arrow-right"></i>
               </div>
@@ -180,6 +180,21 @@ import { Component } from '@angular/core';
               <code class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded w-fit mb-4 border border-slate-200 dark:border-zinc-700">Proofreader</code>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-auto font-medium">
                 Deep syntactic analysis to natively find and correct grammar and spelling errors.
+              </p>
+            </a>
+
+            <!-- Semantic Embedder -->
+            <a routerLink="/docs/semantic-embedder" class="!no-underline group relative p-6 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full">
+              <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity text-violet-500">
+                <i class="bi bi-arrow-right"></i>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center text-2xl mb-5">
+                <i class="bi bi-diagram-3"></i>
+              </div>
+              <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-2 tracking-tight">Semantic Embedder</h3>
+              <code class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded w-fit mb-4 border border-slate-200 dark:border-zinc-700">SemanticEmbedder</code>
+              <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-auto font-medium">
+                Turn text into on-device vectors to power semantic search and local RAG.
               </p>
             </a>
           </div>

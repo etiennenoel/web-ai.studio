@@ -17,7 +17,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   routeEnum!: RouteEnum;
   currentTheme$;
   isDocsExpanded = false;
-  isPlaygroundsExpanded = false;
+  isPlaygroundsExpanded = true;
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
@@ -71,7 +71,8 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       RouteEnum.RewriterApi,
       RouteEnum.TranslatorApi,
       RouteEnum.LanguageDetectorApi,
-      RouteEnum.ProofreaderApi
+      RouteEnum.ProofreaderApi,
+      RouteEnum.SemanticEmbedderApi
     ].includes(this.routeEnum);
   }
 
@@ -198,6 +199,9 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         break;
       case "proofreader":
         this.routeEnum = RouteEnum.ProofreaderApi;
+        break;
+      case "semantic-embedder":
+        this.routeEnum = RouteEnum.SemanticEmbedderApi;
         break;
 
       default:

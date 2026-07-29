@@ -22,6 +22,7 @@ export enum RouteEnum {
   TranslatorApi = "/docs/translator",
   LanguageDetectorApi = "/docs/language-detector",
   ProofreaderApi = "/docs/proofreader",
+  SemanticEmbedderApi = "/docs/semantic-embedder",
   PrivacyPolicy = "/privacy-policy",
   TermsOfService = "/terms-of-service",
   Bugs = "/bugs",

@@ -270,7 +270,10 @@ console.log(&quot;Proofreader destroyed.&quot;);"></app-code-snippet>
             <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Language Detector API</span>
           </a>
 
-          <div></div>
+          <a routerLink="/docs/semantic-embedder" class="!no-underline group flex flex-col items-end px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+            <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">Next <i class="bi bi-chevron-right text-[10px]"></i></span>
+            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Semantic Embedder API</span>
+          </a>
         </div>
 
       </div>
