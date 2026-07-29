@@ -34,5 +34,6 @@ export enum RouteEnum {
   PlaygroundsTranslator = "/playgrounds/translator",
   PlaygroundsLanguageDetector = "/playgrounds/language-detector",
   PlaygroundsProofreader = "/playgrounds/proofreader",
+  PlaygroundsSemanticEmbedder = "/playgrounds/semantic-embedder",
   PlaygroundsWebSpeech = "/playgrounds/web-speech",
 }

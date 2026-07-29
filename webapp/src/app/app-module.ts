@@ -146,6 +146,7 @@ import { RewriterPlaygroundPage } from './pages/playgrounds/rewriter/rewriter.pa
 import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/translator.page';
 import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
+import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 
 @NgModule({
@@ -189,6 +190,7 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     TranslatorPlaygroundPage,
     LanguageDetectorPlaygroundPage,
     ProofreaderPlaygroundPage,
+    SemanticEmbedderPlaygroundPage,
     WebSpeechPlaygroundPage,
     DemoLayoutComponent,
     SafeHtmlPipe,

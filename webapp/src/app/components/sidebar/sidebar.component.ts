@@ -104,6 +104,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       RouteEnum.PlaygroundsTranslator,
       RouteEnum.PlaygroundsLanguageDetector,
       RouteEnum.PlaygroundsProofreader,
+      RouteEnum.PlaygroundsSemanticEmbedder,
       RouteEnum.PlaygroundsWebSpeech
     ].includes(this.routeEnum);
   }
@@ -129,6 +130,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       else if (pathname.includes('translator')) this.routeEnum = RouteEnum.PlaygroundsTranslator;
       else if (pathname.includes('language-detector')) this.routeEnum = RouteEnum.PlaygroundsLanguageDetector;
       else if (pathname.includes('proofreader')) this.routeEnum = RouteEnum.PlaygroundsProofreader;
+      else if (pathname.includes('semantic-embedder')) this.routeEnum = RouteEnum.PlaygroundsSemanticEmbedder;
       else if (pathname.includes('web-speech')) this.routeEnum = RouteEnum.PlaygroundsWebSpeech;
       return;
     }
