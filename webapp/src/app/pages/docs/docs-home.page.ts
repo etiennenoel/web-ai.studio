@@ -22,7 +22,7 @@ import { Component } from '@angular/core';
           </h1>
           
           <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed mb-10">
-            WebAI Studio is the premier developer environment and prototyping playground for <strong>Chrome's Built-in AI APIs</strong>. It empowers you to build, test, and benchmark entirely local, on-device AI capabilities directly within the browser—zero API keys, zero cloud costs, and infinite scalability.
+            WebAI Studio is the premier developer environment and prototyping playground for <strong>Chrome's Built-in AI APIs</strong>. It empowers you to build, test, and benchmark entirely local, on-device AI capabilities directly within the browser—zero API keys, zero cloud costs, and user data that never leaves the device.
           </p>
 
           <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -53,7 +53,7 @@ import { Component } from '@angular/core';
               </div>
               <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Implementation Guide</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                Learn the prerequisites, Origin Trials, and the standard implementation lifecycle for instantiating and running on-device models.
+                Learn the prerequisites and the standard implementation lifecycle — availability, creation, and inference — for running on-device models.
               </p>
             </a>
             <a routerLink="/docs/check-availability" class="!no-underline group block p-8 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -63,6 +63,24 @@ import { Component } from '@angular/core';
               <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Model Management</h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                 Understand how to check hardware support, trigger model weight downloads, and track network progress interactively.
+              </p>
+            </a>
+            <a routerLink="/docs/aborting-operations" class="!no-underline group block p-8 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-xl mb-6 group-hover:bg-indigo-50 group-hover:text-indigo-600 dark:group-hover:bg-indigo-500/10 dark:group-hover:text-indigo-400 transition-colors">
+                <i class="bi bi-stop-circle"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Aborting Operations</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                Cancel session creation, downloads, and in-flight inference cleanly with AbortSignal.
+              </p>
+            </a>
+            <a routerLink="/docs/errors" class="!no-underline group block p-8 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-xl mb-6 group-hover:bg-indigo-50 group-hover:text-indigo-600 dark:group-hover:bg-indigo-500/10 dark:group-hover:text-indigo-400 transition-colors">
+                <i class="bi bi-shield-exclamation"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Error Handling</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                Know every exception the APIs can throw and how to degrade gracefully when they do.
               </p>
             </a>
           </div>

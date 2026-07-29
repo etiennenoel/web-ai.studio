@@ -15,12 +15,12 @@ import { Component } from '@angular/core';
           </nav>
           
           <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
-            Built-In AI Documentation
+            Getting Started with Built-In AI
           </h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Last updated: March 24, 2026</p>
           
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
-            The Built-In AI APIs are a set of JS APIs, provided by the browser, that allows developers to run inference, on-device, without managing API Keys.
+            The Built-In AI APIs are a set of JS APIs, provided by the browser, that allow developers to run inference, on-device, without managing API Keys.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ import { Component } from '@angular/core';
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
                   <td class="px-4 py-3 align-top font-mono text-amber-600 dark:text-amber-400">downloading</td>
                   <td class="px-4 py-3 align-top">The model is currently being downloaded.</td>
-                  <td class="px-4 py-3 align-top">Wait for the model to be available. You can’t wait for the call to create to complete or continue polling availability.</td>
+                  <td class="px-4 py-3 align-top">Wait for the model to be available. You can either wait for the call to create to complete, or continue polling availability.</td>
                 </tr>
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
                   <td class="px-4 py-3 align-top font-mono text-emerald-600 dark:text-emerald-400">available</td>
@@ -121,12 +121,15 @@ import { Component } from '@angular/core';
             <div class="px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
               <span class="text-xs font-mono text-zinc-400">javascript</span>
             </div>
-            <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto"><code><span class="text-purple-400">const</span> result = <span class="text-purple-400">await</span> session.(promptStreaming|translateStreaming|summarizeStreaming|writeStreaming|rewriteStreaming|proofreadStreaming)();</code></pre>
+            <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto"><code><span class="text-purple-400">const</span> stream = session.(promptStreaming|translateStreaming|summarizeStreaming|writeStreaming|rewriteStreaming|proofreadStreaming)();</code></pre>
           </div>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-8 -mt-4">
+            The streaming methods return a <code>ReadableStream</code> synchronously (no <code>await</code> needed); consume it with <code>for await (const chunk of stream)</code>.
+          </p>
 
           <h3 class="text-lg font-bold text-slate-900 dark:text-slate-200 mb-2">Non-Streaming</h3>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Developers also have the option to use non-streaming methods. In some cases (e.g. when forcing a JSON response (Structured Output)), the streaming methods are not available (see individual API documentation for more information). You can revert to using the non-streaming methods:
+            Developers also have the option to use non-streaming methods when they want the complete result in a single value — for example when parsing a JSON response (Structured Output) as a whole:
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-4">
             <div class="px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">

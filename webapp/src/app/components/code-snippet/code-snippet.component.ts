@@ -3,15 +3,15 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
 @Component({
   selector: 'app-code-snippet',
   template: `
-    <details class="group rounded-xl overflow-hidden mt-6 mb-8 border border-slate-200 dark:border-zinc-800 bg-[#161616] shadow-sm open:bg-[#161616]" (toggle)="onToggle($event)">
+    <details class="group rounded-xl overflow-hidden mt-6 mb-8 border border-slate-200 dark:border-zinc-800 bg-[#161616] shadow-sm open:bg-[#161616]" [open]="expanded" (toggle)="onToggle($event)">
       <summary class="block w-full bg-slate-50 dark:bg-[#1e1e1e] border-b border-slate-200 dark:border-zinc-800 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800/80 m-0">
         <div class="flex justify-between items-center w-full px-4 py-2">
           <div class="flex items-center gap-2.5 h-full">
             <i class="bi bi-chevron-right text-[10px] text-slate-400 dark:text-zinc-500 transition-transform duration-200 group-open:rotate-90 flex-shrink-0"></i>
-            <span class="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider translate-y-[0.5px] whitespace-nowrap flex-shrink-0">Interactive Playground</span>
+            <span class="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider translate-y-[0.5px] whitespace-nowrap flex-shrink-0">{{ runnable ? 'Interactive Playground' : 'Example Output' }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <button *ngIf="isOpen" (click)="runCode($event)" 
+            <button *ngIf="isOpen && runnable" (click)="runCode($event)"
                     class="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 dark:bg-indigo-500/20 dark:text-indigo-400 dark:hover:bg-indigo-500/30 transition-colors m-0 flex-shrink-0" 
                     title="Execute Code">
               <i class="bi bi-play-fill text-[14px]"></i>
@@ -44,6 +44,8 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
       })
       export class CodeSnippetComponent implements OnInit {
       @Input() code: string = '';
+      @Input() expanded: boolean = true;
+      @Input() runnable: boolean = true;
       copied = false;
       isOpen = false;
       executionOutput = '';
@@ -52,6 +54,7 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
       constructor(private cdr: ChangeDetectorRef) {}
 
       ngOnInit() {
+      this.isOpen = this.expanded;
       this.calculateHeight();
       }
 
@@ -91,7 +94,7 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
   async runCode(event: Event) {
     event.preventDefault();
     event.stopPropagation();
-    this.executionOutput = 'Executing...\\n';
+    this.executionOutput = 'Executing...\n';
     this.cdr.detectChanges();
 
     const outputBuffer: string[] = [];
@@ -115,14 +118,12 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
       const wrapperCode = `
         return (async () => {
           const console = customConsole;
-          // Map window.ai to global if standard names are nested there (legacy support)
-          const LanguageModel = window.LanguageModel || (window.ai ? window.ai.languageModel : undefined);
-          const Translator = window.Translator || (window.ai ? window.ai.translator : undefined);
-          const LanguageDetector = window.LanguageDetector || (window.ai ? window.ai.languageDetector : undefined);
-          const Summarizer = window.Summarizer || (window.ai ? window.ai.summarizer : undefined);
-          const Writer = window.Writer || (window.ai ? window.ai.writer : undefined);
-          const Rewriter = window.Rewriter || (window.ai ? window.ai.rewriter : undefined);
-          
+          // Bind the Built-In AI globals locally so snippets referencing an API
+          // that this browser does not expose fail gracefully (undefined) instead
+          // of throwing a ReferenceError.
+          const { LanguageModel, Translator, LanguageDetector, Summarizer,
+                  Writer, Rewriter, Proofreader, SemanticEmbedder } = window;
+
           ${this.code}
         })();
       `;
@@ -137,7 +138,7 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
       outputBuffer.push('Exception: ' + (err.message || String(err)));
     }
 
-    this.executionOutput = outputBuffer.join('\\n');
+    this.executionOutput = outputBuffer.join('\n');
     this.cdr.detectChanges();
   }
 }

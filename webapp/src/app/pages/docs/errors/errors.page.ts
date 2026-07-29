@@ -246,17 +246,35 @@ import { Component } from '@angular/core';
                     <i class="bi bi-shield-exclamation text-teal-500"></i>
                     <code class="font-mono font-bold text-teal-700 dark:text-teal-400">SecurityError</code>
                   </div>
-                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Multimodal Data Errors</span>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Cross-Origin Media</span>
                 </td>
                 <td class="px-5 py-5 align-top">
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  <strong>SecurityError</strong> is thrown for cross-origin media violations (un-tainted canvas).<br><br>
-                  <strong>EncodingError</strong> is thrown if raw bytes cannot be decoded using standard browser sniffing rules.
+                  Thrown for cross-origin media violations in multimodal inputs — for example a canvas tainted by cross-origin content.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  Ensure media has <code>crossorigin="anonymous"</code> or is same-origin. Only use supported formats (JPEG, PNG, WebP).
+                  Ensure media has <code>crossorigin="anonymous"</code> or is same-origin so the source is not tainted.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-file-earmark-x text-teal-500"></i>
+                    <code class="font-mono font-bold text-teal-700 dark:text-teal-400">EncodingError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Undecodable Media</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">DOMException</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when raw media bytes passed as multimodal input cannot be decoded using standard browser sniffing rules.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Only pass media in formats the browser can decode (e.g. JPEG, PNG, WebP for images).
                 </td>
               </tr>
 
@@ -272,11 +290,29 @@ import { Component } from '@angular/core';
                   <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">JS Native</code>
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
-                  <strong>TypeError</strong>: Invalid option combinations (e.g. system role placement).<br><br>
-                  <strong>RangeError</strong>: Model params (temperature, topK) are set below minimum bounds.
+                  Thrown for invalid option combinations — for example an <code>initialPrompts</code> array where the <code>system</code> role is not at index 0.
                 </td>
                 <td class="px-5 py-5 align-top leading-relaxed">
                   Review your configuration code against the API specifications to ensure you are passing valid parameters.
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-5 py-5 align-top">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="bi bi-rulers text-blue-500"></i>
+                    <code class="font-mono font-bold text-blue-700 dark:text-blue-400">RangeError</code>
+                  </div>
+                  <span class="text-xs text-slate-500 dark:text-slate-500 block pl-6">Out-of-Bounds Params</span>
+                </td>
+                <td class="px-5 py-5 align-top">
+                  <code class="text-xs bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-700">JS Native</code>
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Thrown when model parameters (e.g. <code>temperature</code>, <code>topK</code>) are set outside their allowed bounds.
+                </td>
+                <td class="px-5 py-5 align-top leading-relaxed">
+                  Keep parameter values within the ranges documented for the API.
                 </td>
               </tr>
 
@@ -287,9 +323,9 @@ import { Component } from '@angular/core';
 
         <!-- Page Navigation -->
         <div class="mt-16 pt-8 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center max-w-4xl">
-          <a routerLink="/docs/check-availability" class="!no-underline group flex flex-col items-start px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+          <a routerLink="/docs/aborting-operations" class="!no-underline group flex flex-col items-start px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
             <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1"><i class="bi bi-chevron-left text-[10px]"></i> Previous</span>
-            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Check Availability</span>
+            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Aborting Operations</span>
           </a>
 
           <a routerLink="/docs/prompt-api" class="!no-underline group flex flex-col items-end px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700 text-right">

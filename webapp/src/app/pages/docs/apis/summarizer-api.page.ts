@@ -81,7 +81,7 @@ import { Component } from '@angular/core';
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200">preference</td>
                   <td class="px-4 py-3 font-mono text-[10px]">"auto" | "speed" | "capability"</td>
-                  <td class="px-4 py-3">Balancing latency vs depth. Default is <code>"auto"</code>.</td>
+                  <td class="px-4 py-3">Balances speed vs model capability. Default is <code>"auto"</code>. <span class="text-amber-600 dark:text-amber-400 font-semibold">Experimental</span> — only available in extension and experimental contexts.</td>
                 </tr>
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200">expectedInputLanguages</td>
@@ -96,7 +96,7 @@ import { Component } from '@angular/core';
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200">outputLanguage</td>
                   <td class="px-4 py-3 font-mono text-[10px]">DOMString</td>
-                  <td class="px-4 py-3">The language to translate the summary into.</td>
+                  <td class="px-4 py-3">The expected language of the generated summary (BCP-47). Defaults to matching the input language.</td>
                 </tr>
               </tbody>
             </table>
@@ -113,7 +113,7 @@ console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
         <section id="create" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="create" title="Summarizer.create()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Creates and returns a new summarizer <code>session</code>. If the model is downloadable, calling this method initiates the network download.
+            Creates and returns a new <code>Summarizer</code> instance. If the model is downloadable, calling this method initiates the network download — in that case the call must happen from a user gesture (it requires and consumes transient user activation) or it rejects with a <code>NotAllowedError</code>.
           </p>
           
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
@@ -157,7 +157,7 @@ console.log(&quot;Summarizer created&quot;);"></app-code-snippet>
 
         <!-- session.summarize() -->
         <section id="summarize" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="summarize" title="session.summarize()"></app-docs-section-header>
+          <app-docs-section-header anchorId="summarize" title="summarizer.summarize()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
             Executes inference and returns a single Promise resolving to the complete generated summary.
           </p>
@@ -190,14 +190,14 @@ console.log(&quot;Summarizer created&quot;);"></app-code-snippet>
           <app-code-snippet code="const summarizer = await Summarizer.create();
 const summary = await summarizer.summarize(
   &quot;Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to intelligence of humans and other animals. Example tasks in which this is done include speech recognition, computer vision, translation between (natural) languages, as well as other mappings of inputs.&quot;,
-  &#123; context: &quot;Keep it under 10 words.&quot; &#125;
+  &#123; context: &quot;This article is intended for a general, non-technical audience.&quot; &#125;
 );
 console.log(summary);"></app-code-snippet>
         </section>
 
         <!-- session.summarizeStreaming() -->
         <section id="summarize-streaming" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="summarize-streaming" title="session.summarizeStreaming()"></app-docs-section-header>
+          <app-docs-section-header anchorId="summarize-streaming" title="summarizer.summarizeStreaming()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
             Identical parameters to <code>summarize()</code>, but returns a <code>ReadableStream</code> of string chunks as they are generated. 
           </p>
@@ -214,24 +214,24 @@ for await (const chunk of stream) &#123;
 
         <!-- session.measureInputUsage() -->
         <section id="measure-input" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="measure-input" title="session.measureInputUsage()"></app-docs-section-header>
+          <app-docs-section-header anchorId="measure-input" title="summarizer.measureInputUsage()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Calculates how many tokens the given input and context will consume. Returns a Promise resolving to a number.
+            Measures how much of the input quota the given input and context will consume (implementation-defined units, typically tokens). Returns a Promise resolving to a number.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureInputUsage(input: DOMString, options?: SummarizerSummarizeOptions): Promise&lt;double&gt;;</code></pre>
           </div>
         
           <app-code-snippet code="const summarizer = await Summarizer.create();
-const tokens = await summarizer.measureInputUsage(&quot;Text to summarize...&quot;);
-console.log(&quot;Tokens:&quot;, tokens);"></app-code-snippet>
+const usage = await summarizer.measureInputUsage(&quot;Text to summarize...&quot;);
+console.log(&quot;Usage:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- session.destroy() -->
         <section id="destroy" class="mb-16 max-w-4xl scroll-mt-6">
-          <app-docs-section-header anchorId="destroy" title="session.destroy()"></app-docs-section-header>
+          <app-docs-section-header anchorId="destroy" title="summarizer.destroy()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Immediately unloads the session from memory. Any pending <code>summarize()</code> calls are rejected with an <code>AbortError</code>.
+            Signals that the summarizer is no longer needed, allowing the browser to free the model resources. Any pending <code>summarize()</code> calls are rejected with an <code>AbortError</code>.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>destroy(): undefined;</code></pre>
@@ -253,18 +253,16 @@ console.log(&quot;Summarizer destroyed.&quot;);"></app-code-snippet>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly type: SummarizerType</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly format: SummarizerFormat</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly length: SummarizerLength</code></li>
-            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly preference: PerformancePreference</code></li>
+            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly preference: PerformancePreference</code> - <span class="text-amber-600 dark:text-amber-400">Experimental</span>: extension/experimental contexts only.</li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly expectedInputLanguages: FrozenArray&lt;DOMString&gt;?</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly expectedContextLanguages: FrozenArray&lt;DOMString&gt;?</code></li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly outputLanguage: DOMString?</code></li>
-            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly inputQuota: double</code> - The absolute maximum token limit for this model instance.</li>
+            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly inputQuota: unrestricted double</code> - The maximum input usage this instance accepts (implementation-defined units; may be <code>Infinity</code> if unrestricted).</li>
           </ul>
-        
-          <app-code-snippet>const summary = await summarizer.summarize(
-  "A very long news article text...",
-  &#123; context: "Focus only on the financial aspects." &#125;
-);
-console.log(summary);</app-code-snippet>
+
+          <app-code-snippet code="const summarizer = await Summarizer.create(&#123; type: 'key-points', length: 'medium' &#125;);
+console.log(summarizer.type, summarizer.format, summarizer.length);
+console.log(&quot;Input quota:&quot;, summarizer.inputQuota);"></app-code-snippet>
         </section>
 
         <!-- Page Navigation -->

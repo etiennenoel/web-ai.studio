@@ -49,7 +49,7 @@ import { Component } from '@angular/core';
           <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-xl text-blue-800 dark:text-blue-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-info-circle-fill text-lg mt-0.5"></i>
             <div>
-              <strong>Origin Trial Active:</strong> This API is currently experimental. To use it in production without forcing your users to enable Chrome flags, you must register your domain for the Origin Trial.
+              <strong>Experimental:</strong> The Prompt API is stable for Chrome Extensions (Chrome 138+), while the version for web pages is still in development. An origin trial covering sampling parameters (<code>temperature</code> / <code>topK</code>) is running as of Chrome 148 — register your domain to use them without flags.
               <a href="https://developer.chrome.com/docs/web-platform/origin-trials" target="_blank" class="ml-1 text-blue-600 dark:text-blue-400 underline font-semibold hover:text-blue-700 dark:hover:text-blue-300">Register Here <i class="bi bi-box-arrow-up-right text-[10px]"></i></a>
             </div>
           </div>
@@ -61,7 +61,7 @@ import { Component } from '@angular/core';
         <section id="language-model-availability" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="language-model-availability" title="LanguageModel.availability()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            A static method that checks if the browser currently supports creating a language model session with the provided configuration. It returns a Promise resolving to an <code>Availability</code> string: <code>'readily' | 'after-download' | 'no'</code> (Legacy) or newer equivalents like <code>'available' | 'downloadable' | 'unavailable' | 'downloading'</code>.
+            A static method that checks if the browser currently supports creating a language model session with the provided configuration. It returns a Promise resolving to an <code>Availability</code> string: <code>'available' | 'downloadable' | 'downloading' | 'unavailable'</code>.
           </p>
           
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
@@ -89,6 +89,11 @@ import { Component } from '@angular/core';
                   <td class="px-4 py-3 font-mono text-xs">tools</td>
                   <td class="px-4 py-3 font-mono text-xs">sequence&lt;LanguageModelTool&gt;</td>
                   <td class="px-4 py-3">Array of tool definitions with <code>name</code>, <code>description</code>, <code>inputSchema</code>, and <code>execute</code> functions.</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
+                  <td class="px-4 py-3 font-mono text-xs">samplingMode</td>
+                  <td class="px-4 py-3 font-mono text-xs">LanguageModelSamplingMode</td>
+                  <td class="px-4 py-3">High-level control over output variety: <code>"most-predictable" | "predictable" | "balanced" | "creative" | "most-creative"</code>. Defaults to <code>"balanced"</code>. This is the web-page replacement for the deprecated <code>temperature</code>/<code>topK</code> parameters (see Deprecations below).</td>
                 </tr>
               </tbody>
             </table>
@@ -152,7 +157,7 @@ console.log(&quot;Session created:&quot;, session);"></app-code-snippet>
         <section id="session-prompt" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="session-prompt" title="session.prompt()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Executes inference and returns a single Promise resolving to the complete generated text. If the input exceeds the available context window, it evicts older conversation history (excluding the system prompt) or throws a <code>QuotaExceededError</code>.
+            Executes inference and returns a single Promise resolving to the complete generated text. If the input exceeds the available context window, it evicts older conversation history one prompt/response pair at a time (the <code>initialPrompts</code> are never evicted), and throws a <code>QuotaExceededError</code> only when eviction cannot free enough space.
           </p>
           
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
@@ -169,8 +174,8 @@ console.log(&quot;Session created:&quot;, session);"></app-code-snippet>
             &nbsp;&nbsp;&nbsp;&nbsp;role: "user" | "assistant",<br>
             &nbsp;&nbsp;&nbsp;&nbsp;content: "String content" | [<br>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; type: "text", value: "Hello" &#125;,<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; type: "image", value: ImageBitmapSource &#125;,<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; type: "audio", value: AudioBuffer &#125;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; type: "image", value: ImageBitmapSource | BufferSource &#125;,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; type: "audio", value: Blob | AudioBuffer | BufferSource &#125;<br>
             &nbsp;&nbsp;&nbsp;&nbsp;],<br>
             &nbsp;&nbsp;&nbsp;&nbsp;prefix: boolean // (If true, pre-fills the assistant response. Valid only on final assistant message)<br>
             &nbsp;&nbsp;&#125;<br>
@@ -220,7 +225,7 @@ console.log(response);"></app-code-snippet>
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>promptStreaming(input: LanguageModelPrompt, options?: LanguageModelPromptOptions): ReadableStream;</code></pre>
           </div>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-            Must be consumed using an async iterator (e.g., <code>for await (const chunk of stream)</code>). Highly recommended for improving perceived latency (TTFT).
+            Typically consumed with an async iterator (e.g., <code>for await (const chunk of stream)</code>), though <code>getReader()</code> works too. Highly recommended for improving perceived latency (TTFT).
           </p>
         
           <app-code-snippet code="const session = await LanguageModel.create();
@@ -255,7 +260,7 @@ console.log(response);"></app-code-snippet>
         <section id="session-measure-context" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="session-measure-context" title="session.measureContextUsage()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Calculates exactly how many tokens a given prompt will consume. Returns a Promise. Note: This does not add the prompt to the session history.
+            Measures how many tokens a given prompt will consume (implementations must include control tokens in the count). Returns a Promise. Note: This does not add the prompt to the session history.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>measureContextUsage(input: LanguageModelPrompt, options?: LanguageModelPromptOptions): Promise&lt;double&gt;;</code></pre>
@@ -278,7 +283,7 @@ console.log(&quot;Total usage: &quot; + session.contextUsage + &quot; / &quot; +
         <section id="session-clone" class="mb-16 max-w-4xl scroll-mt-6">
           <app-docs-section-header anchorId="session-clone" title="session.clone()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Deep copies the current session, including its entire conversational history (context) and parameters. Useful for branching conversations (e.g. Tree of Thoughts) without re-evaluating past tokens.
+            Creates a new session starting from this session's <code>initialPrompts</code> and configuration. Whether conversation history appended after creation is carried over is implementation-defined — the explainer's canonical use is running multiple unrelated continuations of the same initial setup without re-processing it.
           </p>
           <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-sm border border-zinc-800 mb-6">
             <pre class="p-4 text-sm text-zinc-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>clone(options?: LanguageModelCloneOptions): Promise&lt;LanguageModel&gt;;</code></pre>
@@ -320,7 +325,7 @@ console.log(&quot;Session destroyed.&quot;);"></app-code-snippet>
           <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
             <li class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20">
               <strong class="text-slate-900 dark:text-slate-200 block mb-1">Hyperparameters</strong>
-              <code>temperature</code> and <code>topK</code> inside <code>create()</code> options, as well as accessing <code>session.temperature</code>, will be ignored in standard web contexts.
+              <code>temperature</code> and <code>topK</code> inside <code>create()</code> options, as well as accessing <code>session.temperature</code>, will be ignored in standard web contexts. Use the <code>samplingMode</code> create option instead to control output variety on web pages. In extension contexts, passing both <code>samplingMode</code> and a raw parameter rejects <code>create()</code> with a <code>TypeError</code>.
             </li>
             <li class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20">
               <strong class="text-slate-900 dark:text-slate-200 block mb-1">LanguageModel.params()</strong>

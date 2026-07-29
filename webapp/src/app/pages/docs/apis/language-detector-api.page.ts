@@ -37,7 +37,7 @@ import { Component } from '@angular/core';
             </div>
           </div>
           <p class="text-base text-slate-600 dark:text-slate-400 mb-6">
-          The Language Detector API identifies the human languages used in a given text on-device, returning a list of probable BCP 47 language tags with confidence scores.
+          The Language Detector API identifies the most likely language a given text is written in, returning ranked BCP 47 language tags with confidence scores — on-device.
         </p>
       </div>
 
@@ -123,12 +123,18 @@ console.log(&quot;Availability:&quot;, availability);"></app-code-snippet>
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">signal</td>
                   <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">AbortSignal</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Allows aborting the creation and download process.</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-zinc-800 dark:text-slate-300 mb-1">Optional</span><br>
+                    Allows aborting the creation and download process.
+                  </td>
                 </tr>
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">monitor</td>
                   <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">CreateMonitorCallback</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Callback to listen to <code class="font-mono text-xs">downloadprogress</code> events.</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-zinc-800 dark:text-slate-300 mb-1">Optional</span><br>
+                    Callback to listen to <code class="font-mono text-xs">downloadprogress</code> events.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -141,7 +147,7 @@ console.log(&quot;Detector created&quot;);"></app-code-snippet>
         <section id="detect" class="scroll-mt-6">
           <app-docs-section-header anchorId="detect" title="detector.detect()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 mb-4">
-            Detects the languages in the input string. Returns an array of results ordered descendingly by confidence. Extremely low confidence results are excluded. The final entry in the array is always for the undetermined language (<code class="font-mono text-xs">'und'</code>).
+            Detects the language of the input string. Returns an array of candidate results sorted in descending order of confidence. Extremely low confidence results are excluded. The final entry in the array is always for the undetermined language (<code class="font-mono text-xs">'und'</code>).
           </p>
           <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
             <code class="text-sm text-slate-300 font-mono">
@@ -167,7 +173,10 @@ console.log(&quot;Detector created&quot;);"></app-code-snippet>
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">options.signal</td>
                   <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">AbortSignal</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Optional signal to abort the detection request.</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-zinc-800 dark:text-slate-300 mb-1">Optional</span><br>
+                    Signal to abort the detection request.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -189,7 +198,7 @@ for (const result of results) &#123;
         <section id="measure-input" class="scroll-mt-6">
           <app-docs-section-header anchorId="measure-input" title="detector.measureInputUsage()"></app-docs-section-header>
           <p class="text-slate-600 dark:text-slate-400 mb-4">
-            Calculates how much quota the string would consume without executing the detection. If this returns a value greater than <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">inputQuota</code>, running detection on it will throw a <code class="text-sm font-mono">QuotaExceededError</code>.
+            Calculates how much quota the string would consume without executing the detection. If this returns a value greater than <code class="text-sm bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-slate-800 dark:text-slate-200 font-mono">inputQuota</code>, the returned promise will reject with a <code class="text-sm font-mono">QuotaExceededError</code>.
           </p>
           <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
             <code class="text-sm text-slate-300 font-mono">
@@ -198,7 +207,7 @@ for (const result of results) &#123;
           </div>
           <app-code-snippet code="const detector = await LanguageDetector.create();
 const usage = await detector.measureInputUsage(&quot;Some large text&quot;);
-console.log(&quot;Tokens:&quot;, usage);"></app-code-snippet>
+console.log(&quot;Usage:&quot;, usage);"></app-code-snippet>
         </section>
 
         <!-- destroy -->
@@ -232,13 +241,13 @@ console.log(&quot;Detector destroyed.&quot;);"></app-code-snippet>
               <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">expectedInputLanguages</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">FrozenArray&lt;DOMString&gt; | null</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">FrozenArray&lt;DOMString&gt; | null (readonly)</td>
                   <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The array of languages expected to be detected, provided during creation.</td>
                 </tr>
                 <tr>
                   <td class="px-4 py-3 text-sm font-mono text-indigo-600 dark:text-indigo-400">inputQuota</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double (readonly)</td>
-                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The maximum input usage allowed per detection operation. Can be <code class="font-mono text-xs">+Infinity</code> if the implementation uses iterative chunking.</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">unrestricted double (readonly)</td>
+                  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The maximum input usage allowed per detection operation. Can be <code class="font-mono text-xs">+Infinity</code> if the implementation imposes no input limit (e.g. because it processes input in chunks); in that case <code class="font-mono text-xs">measureInputUsage()</code> always returns 0.</td>
                 </tr>
               </tbody>
             </table>
