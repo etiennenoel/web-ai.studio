@@ -19,6 +19,8 @@ export class ApiStatusComponent {
   @Input() apis: ApiStatusPill[] = [];
   @Input() showInstall = false;
   @Input() isInstalling = false;
+  @Input() isDownloading = false;
+  @Input() downloadProgress = 0;
   @Input() unavailableHint = '';
   @Output() install = new EventEmitter<void>();
 

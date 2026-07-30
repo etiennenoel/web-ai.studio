@@ -1,0 +1,113 @@
+<app-demo-layout
+  [title]="demo.title"
+  [description]="demo.description"
+  [icon]="demo.icon"
+  [category]="demo.category"
+  [onDeviceReason]="demo.onDeviceReason"
+  [codeSnippet]="dynamicCodeSnippet">
+  <div demo-ui>
+
+    <app-api-status
+      [apis]="statusPills"
+      [isDownloading]="isDownloading"
+      [downloadProgress]="downloadProgress"
+      unavailableHint="<span class='font-semibold'>Indexing needs the multimodal Prompt API and the Semantic Embedder.</span> Photos never leave the device — captions and vectors are computed locally.">
+    </app-api-status>
+
+    @if (errorMessage) {
+      <div class="mb-4 bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Controls -->
+    <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 p-5 mb-6">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <label class="flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium shadow-md cursor-pointer transition-all active:scale-95 whitespace-nowrap">
+          <i class="bi bi-images"></i> Add Photos
+          <input type="file" accept="image/*" multiple class="hidden" (change)="onFilesSelected($event)" />
+        </label>
+        <div class="relative flex-grow">
+          <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text"
+                 class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full pl-12 pr-32 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-violet-500/40"
+                 [(ngModel)]="query"
+                 (ngModelChange)="onQueryChanged($event)"
+                 [disabled]="readyPhotos.length === 0"
+                 placeholder="{{ readyPhotos.length > 0 ? 'Search your photos by meaning...' : 'Add photos first — they are indexed locally...' }}" />
+          @if (searchLatencyMs !== null && hasSearched) {
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-semibold px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">
+              {{ searchLatencyMs }}ms
+            </span>
+          }
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 mt-3">
+        @for (sample of sampleQueries; track sample) {
+          <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-40"
+                  [disabled]="readyPhotos.length === 0"
+                  (click)="useSample(sample)">
+            "{{ sample }}"
+          </button>
+        }
+        <div class="flex-grow"></div>
+        @if (isIndexing) {
+          <span class="text-xs font-semibold text-violet-600 dark:text-violet-400"><i class="bi bi-arrow-repeat animate-spin"></i> Captioning & embedding...</span>
+        } @else if (photos.length > 0) {
+          <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">{{ indexedCount }}/{{ photos.length }} indexed</span>
+        }
+      </div>
+    </div>
+
+    <!-- Photo grid -->
+    @if (photos.length === 0) {
+      <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-3xl shadow-sm border-2 border-dashed border-slate-300 dark:border-zinc-600 p-12 text-center">
+        <i class="bi bi-images text-5xl text-slate-200 dark:text-zinc-700"></i>
+        <p class="text-sm text-slate-400 dark:text-slate-500 mt-4 font-light max-w-md mx-auto m-0">
+          Add a handful of photos. Each one is captioned by the on-device vision model and embedded for search — nothing is uploaded, which is the whole point.
+        </p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        @for (photo of sortedPhotos; track photo.id; let i = $index) {
+          <div class="relative rounded-2xl overflow-hidden border shadow-sm group transition-all"
+               [ngClass]="hasSearched && i === 0 && photo.score !== null
+                 ? 'border-violet-400 dark:border-violet-600 ring-2 ring-violet-200 dark:ring-violet-900/60'
+                 : 'border-slate-200 dark:border-zinc-700'"
+               [style.opacity]="hasSearched && photo.score !== null && photo.score < 0.3 ? 0.45 : 1">
+            <img [src]="photo.url" alt="{{ photo.caption || 'Uploaded photo' }}" class="w-full h-36 object-cover block" />
+
+            <!-- Status / score -->
+            <div class="absolute top-2 right-2 flex gap-1.5">
+              @if (photo.status === 'captioning') {
+                <span class="px-2 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-semibold backdrop-blur"><i class="bi bi-arrow-repeat animate-spin"></i></span>
+              } @else if (photo.status === 'error') {
+                <span class="px-2 py-0.5 rounded-full bg-red-600/90 text-white text-[10px] font-semibold">error</span>
+              } @else if (hasSearched && photo.score !== null) {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold backdrop-blur"
+                      [ngClass]="i === 0 ? 'bg-violet-600/95 text-white' : 'bg-black/60 text-white'">
+                  {{ photo.score.toFixed(3) }}
+                </span>
+              }
+            </div>
+
+            <button class="absolute top-2 left-2 w-6 h-6 rounded-full bg-black/50 hover:bg-black/80 text-white text-xs border-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    title="Remove"
+                    (click)="removePhoto(photo)">
+              <i class="bi bi-x"></i>
+            </button>
+
+            @if (photo.caption) {
+              <div class="px-3 py-2 bg-[#ffffff] dark:bg-zinc-800/95 text-[10px] text-slate-500 dark:text-slate-400 leading-snug line-clamp-2" title="{{ photo.caption }}">
+                {{ photo.caption }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-3">
+        Captions shown under each photo are what the search actually matches against. Low-scoring photos fade when a query is active.
+      </p>
+    }
+  </div>
+</app-demo-layout>

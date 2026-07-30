@@ -65,6 +65,12 @@ import { RegexLabDemoComponent } from './pages/demos/features/regex-lab-demo.com
 import { CsvQaDemoComponent } from './pages/demos/features/csv-qa-demo.component';
 import { SessionBranchingDemoComponent } from './pages/demos/features/session-branching-demo.component';
 import { LocalizationQaDemoComponent } from './pages/demos/features/localization-qa-demo.component';
+import { OmniboxDemoComponent } from './pages/demos/features/omnibox-demo.component';
+import { ModerationCascadeDemoComponent } from './pages/demos/features/moderation-cascade-demo.component';
+import { StudyKitDemoComponent } from './pages/demos/features/study-kit-demo.component';
+import { PhotoSearchDemoComponent } from './pages/demos/features/photo-search-demo.component';
+import { TongueTwisterDemoComponent } from './pages/demos/features/tongue-twister-demo.component';
+import { MysteryLanguageDemoComponent } from './pages/demos/features/mystery-language-demo.component';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -672,6 +678,48 @@ const routes: Routes = [
       {
         path: "demos/localization-qa",
         component: LocalizationQaDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/omnibox",
+        component: OmniboxDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/moderation-cascade",
+        component: ModerationCascadeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/study-kit",
+        component: StudyKitDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/photo-search",
+        component: PhotoSearchDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/tongue-twister",
+        component: TongueTwisterDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/mystery-language",
+        component: MysteryLanguageDemoComponent,
         data: {
           route: RouteEnum.Demos
         }
