@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { afterNextRender, Component, Inject, OnInit } from '@angular/core';
 import { BasePage } from '../base-page';
 import { Title } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DEMOS_DATA } from '../../core/services/demos.data';
 import { DemoApi, DemoCategory, DemoExample } from '../../core/models/demo.interface';
 import { DemoApiAvailability, DemoAvailabilityService } from '../../core/services/demo-availability.service';
+import { DemoDiscoveryService } from '../../core/services/demo-discovery.service';
 
 interface CategoryStyle {
   icon: string;
@@ -26,6 +27,14 @@ export class DemosPage extends BasePage implements OnInit {
   searchQuery = '';
   selectedCategory: DemoCategory | null = null;
   selectedApi: DemoApi | null = null;
+  onlyUnexplored = false;
+
+  /** Flipped after hydration: everything below is derived from localStorage. */
+  personalized = false;
+
+  newDemos: DemoExample[] = [];
+  demoOfTheDay: DemoExample | null = null;
+  exploredCount = 0;
 
   availability: Record<DemoApi, DemoApiAvailability> = {
     'Prompt API': 'checking',
@@ -76,9 +85,21 @@ export class DemosPage extends BasePage implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly demoAvailabilityService: DemoAvailabilityService,
+    private readonly discoveryService: DemoDiscoveryService,
   ) {
     super(document, title);
     this.setTitle("Demos");
+
+    // Deferred one macrotask so zone.js schedules a change detection pass for the
+    // personalized state — afterNextRender itself runs after CD has already finished.
+    afterNextRender(() => setTimeout(() => this.refreshDiscovery()));
+  }
+
+  private refreshDiscovery(): void {
+    this.personalized = true;
+    this.newDemos = this.discoveryService.newDemos;
+    this.demoOfTheDay = this.discoveryService.getDemoOfTheDay();
+    this.exploredCount = this.discoveryService.visitedCount;
   }
 
   override ngOnInit(): void {
@@ -92,6 +113,8 @@ export class DemosPage extends BasePage implements OnInit {
 
       const api = params.get('api');
       this.selectedApi = this.apis.find(a => a === api) ?? null;
+
+      this.onlyUnexplored = params.get('unexplored') === '1';
     }));
 
     this.subscriptions.push(this.demoAvailabilityService.availability$.subscribe(availability => {
@@ -104,6 +127,11 @@ export class DemosPage extends BasePage implements OnInit {
 
     return this.demos.filter(demo => {
       if (this.selectedCategory && demo.category !== this.selectedCategory) {
+        return false;
+      }
+
+      // Gated on `personalized` so the pre-hydration render matches the server's.
+      if (this.onlyUnexplored && this.personalized && this.discoveryService.isVisited(demo.id)) {
         return false;
       }
 
@@ -146,15 +174,57 @@ export class DemosPage extends BasePage implements OnInit {
     this.syncQueryParams();
   }
 
+  toggleOnlyUnexplored(): void {
+    this.onlyUnexplored = !this.onlyUnexplored;
+    this.syncQueryParams();
+  }
+
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedCategory = null;
     this.selectedApi = null;
+    this.onlyUnexplored = false;
     this.syncQueryParams();
   }
 
   get hasActiveFilters(): boolean {
-    return this.searchQuery.trim() !== '' || this.selectedCategory !== null || this.selectedApi !== null;
+    return this.searchQuery.trim() !== ''
+      || this.selectedCategory !== null
+      || this.selectedApi !== null
+      || this.onlyUnexplored;
+  }
+
+  isNew(demo: DemoExample): boolean {
+    return this.personalized && this.discoveryService.isNew(demo.id);
+  }
+
+  isUnvisited(demo: DemoExample): boolean {
+    return this.personalized && !this.discoveryService.isVisited(demo.id);
+  }
+
+  get totalCount(): number {
+    return this.discoveryService.totalCount;
+  }
+
+  get unexploredCount(): number {
+    return this.totalCount - this.exploredCount;
+  }
+
+  get exploredPercent(): number {
+    return this.totalCount === 0 ? 0 : Math.round((this.exploredCount / this.totalCount) * 100);
+  }
+
+  surpriseMe(): void {
+    const demo = this.discoveryService.getSurpriseDemo();
+
+    if (demo) {
+      this.router.navigate(['/demos', demo.id]);
+    }
+  }
+
+  resetProgress(): void {
+    this.discoveryService.resetProgress();
+    this.refreshDiscovery();
   }
 
   getCategoryStyle(category: DemoCategory): CategoryStyle {
@@ -175,6 +245,7 @@ export class DemosPage extends BasePage implements OnInit {
         q: this.searchQuery.trim() || null,
         category: this.selectedCategory,
         api: this.selectedApi,
+        unexplored: this.onlyUnexplored ? '1' : null,
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,

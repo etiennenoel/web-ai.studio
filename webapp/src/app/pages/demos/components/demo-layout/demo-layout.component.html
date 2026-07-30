@@ -81,5 +81,91 @@
 
     </div>
 
+    <!-- Keep Exploring -->
+    @if (demo) {
+      <div class="mt-16 pt-10 border-t border-slate-200 dark:border-zinc-800">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 m-0">Keep exploring</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 m-0">
+              @if (personalized && exploredCount > 0) {
+                You've explored {{ exploredCount }} of {{ totalCount }} demos.
+              } @else {
+                {{ totalCount }} demos, all running on-device.
+              }
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="surpriseMe()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ffffff] hover:bg-slate-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all border border-slate-200 dark:border-zinc-700 shadow-sm group">
+            <i class="bi bi-shuffle transition-transform group-hover:rotate-12"></i>
+            <span>Surprise me</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          @for (related of relatedDemos; track related.id) {
+            <a [routerLink]="['/demos', related.id]" class="!no-underline group/related block h-full focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/50 rounded-2xl">
+              <div class="relative h-full bg-[#ffffff] dark:bg-[#18181b] rounded-2xl p-5 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex flex-col">
+                <div class="flex items-start justify-between gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-lg shrink-0 group-hover/related:scale-110 transition-transform duration-300">
+                    <i class="bi {{ related.icon }}"></i>
+                  </div>
+
+                  @if (isNew(related)) {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
+                      <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> New
+                    </span>
+                  } @else if (isUnvisited(related)) {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 text-[10px] font-bold uppercase tracking-wider">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Not explored
+                    </span>
+                  }
+                </div>
+
+                <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2 tracking-tight break-words">{{ related.title }}</h4>
+                <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed m-0 flex-grow">{{ related.description }}</p>
+
+                <div class="flex flex-wrap gap-1.5 mt-4">
+                  @for (api of related.apis; track api) {
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/60">
+                      {{ api }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+
+        <!-- Linear browsing within the category -->
+        @if (previousDemo || nextDemo) {
+          <div class="flex flex-col sm:flex-row items-stretch gap-4 mt-8">
+            @if (previousDemo) {
+              <a [routerLink]="['/demos', previousDemo.id]" class="!no-underline flex-1 group/nav flex items-center gap-3 px-5 py-4 rounded-2xl bg-[#ffffff] dark:bg-[#18181b] border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md transition-all">
+                <i class="bi bi-arrow-left text-slate-400 dark:text-zinc-500 transition-transform group-hover/nav:-translate-x-1"></i>
+                <div class="min-w-0">
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Previous in {{ category }}</div>
+                  <div class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ previousDemo.title }}</div>
+                </div>
+              </a>
+            }
+
+            @if (nextDemo) {
+              <a [routerLink]="['/demos', nextDemo.id]" class="!no-underline flex-1 group/nav flex items-center justify-end gap-3 px-5 py-4 rounded-2xl bg-[#ffffff] dark:bg-[#18181b] border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md transition-all text-right">
+                <div class="min-w-0">
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Next in {{ category }}</div>
+                  <div class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ nextDemo.title }}</div>
+                </div>
+                <i class="bi bi-arrow-right text-slate-400 dark:text-zinc-500 transition-transform group-hover/nav:translate-x-1"></i>
+              </a>
+            }
+          </div>
+        }
+      </div>
+    }
+
   </div>
 </div>
