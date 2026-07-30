@@ -90,6 +90,16 @@ export const DEMO_PREVIEWS: Record<string, DemoPreview> = {
     ],
   },
 
+  'tongue-twister': {
+    kind: 'list',
+    source: { icon: 'bi-mic-fill', label: '"she sells seashells by the seashore"' },
+    rows: [
+      { text: 'attempt 1', score: 0.62, meta: '4.8 s' },
+      { text: 'attempt 2', score: 0.81, meta: '3.4 s' },
+      { text: 'attempt 3', score: 0.94, meta: '3.1 s' },
+    ],
+  },
+
   // --------------------------------------------------------- Text / writing
   'polyglot-chat': {
     kind: 'chat',
@@ -267,6 +277,16 @@ WHERE city = 'New York';`,
     ],
   },
 
+  'mystery-language': {
+    kind: 'list',
+    query: '"Ik heb honger, maar de winkel is gesloten."',
+    rows: [
+      { text: 'Dutch', score: 0.94, meta: 'your guess ✓' },
+      { text: 'Afrikaans', score: 0.05 },
+      { text: 'German', score: 0.01 },
+    ],
+  },
+
   // ------------------------------------------------------------ Mix & match
   'localization-qa': {
     kind: 'list',
@@ -308,6 +328,16 @@ WHERE city = 'New York';`,
     { "name": "Latte", "price": 5.50 }
   ]
 }`,
+  },
+
+  'omnibox': {
+    kind: 'list',
+    query: '"pourriez-vous m\'aider avec ma commande ?"',
+    rows: [
+      { text: '→ Translator', score: 0.93, meta: 'fr detected' },
+      { text: '→ Prompt API', score: 0.31 },
+      { text: '→ Proofreader', score: 0.11 },
+    ],
   },
 
   // ------------------------------------------------------------- Embeddings
@@ -390,6 +420,16 @@ WHERE city = 'New York';`,
     ],
   },
 
+  'moderation-cascade': {
+    kind: 'list',
+    query: '2,044 comments through the cascade',
+    rows: [
+      { text: 'cleared instantly', score: 0.9 },
+      { text: 'escalated to the LLM', score: 0.06 },
+      { text: 'blocked instantly', score: 0.04 },
+    ],
+  },
+
   // ------------------------------------------------------------ Image input
   'camera-qa': {
     kind: 'chat',
@@ -462,6 +502,17 @@ WHERE city = 'New York';`,
 </header>`,
   },
 
+  'photo-search': {
+    kind: 'list',
+    source: { icon: 'bi-images', label: '128 local photos' },
+    query: 'food on a table',
+    rows: [
+      { text: 'brunch spread', score: 0.89 },
+      { text: 'birthday cake', score: 0.71 },
+      { text: 'dog on the beach', score: 0.09 },
+    ],
+  },
+
   // ------------------------------------------------------------ Audio input
   'audio-transcription': {
     kind: 'io',
@@ -485,6 +536,18 @@ WHERE city = 'New York';`,
     source: { icon: 'bi-soundwave', label: 'client-call.m4a · 4:12' },
     rows: [
       { role: 'out', text: 'Client wants launch pushed a week, budget is approved, and new mockups are due Monday.' },
+    ],
+  },
+
+  'study-kit': {
+    kind: 'chips',
+    source: { icon: 'bi-mortarboard-fill', label: 'lecture-week-4.m4a · 52:10' },
+    caption: 'Built from the recording:',
+    rows: [
+      { label: 'Transcript · 8,410 words' },
+      { label: '12 key points' },
+      { label: 'Q&A chat' },
+      { label: '34 flashcards' },
     ],
   },
 
