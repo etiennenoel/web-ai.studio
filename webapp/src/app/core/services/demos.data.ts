@@ -1,7 +1,8 @@
 import { DemoExample } from '../models/demo.interface';
 import { AttachmentTypeEnum } from '../enums/attachment-type.enum';
+import { DEMO_PREVIEWS } from './demo-previews.data';
 
-export const DEMOS_DATA: DemoExample[] = [
+const DEMOS: DemoExample[] = [
   // SPEECH
   {
     id: 'live-translated-captions',
@@ -1444,3 +1445,9 @@ const result = await session.prompt([
     requiredAttachmentTypes: [AttachmentTypeEnum.Image]
   }
 ];
+
+// Card previews live in their own file to keep this one readable; they are attached by id.
+export const DEMOS_DATA: DemoExample[] = DEMOS.map(demo => ({
+  ...demo,
+  preview: DEMO_PREVIEWS[demo.id],
+}));

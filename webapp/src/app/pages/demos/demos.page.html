@@ -146,7 +146,14 @@
 
                   <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight group-hover/card:text-slate-700 dark:group-hover/card:text-slate-300 transition-colors break-words">{{ demo.title }}</h3>
 
-                  <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-6 flex-grow font-medium">{{ demo.description }}</p>
+                  <!-- No flex-grow here: stretching the box lets a clipped extra line show past the clamp. -->
+                  <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 font-medium"
+                     [ngClass]="demo.preview ? 'line-clamp-2' : 'line-clamp-3'">{{ demo.description }}</p>
+
+                  <!-- Illustrative preview of the demo's output -->
+                  @if (demo.preview; as preview) {
+                    <app-demo-preview class="block mb-6" [preview]="preview" [accent]="style.icon"></app-demo-preview>
+                  }
 
                   <!-- API chips -->
                   <div class="flex flex-wrap gap-1.5 mb-6">

@@ -98,6 +98,7 @@ import {CameraModalComponent} from './components/prompt-input/camera-modal/camer
 import {AudioRecordingModalComponent} from './components/prompt-input/audio-recording-modal/audio-recording-modal.component';
 import {DemosPage} from './pages/demos/demos.page';
 import {DemoLayoutComponent} from './pages/demos/components/demo-layout/demo-layout.component';
+import {DemoPreviewComponent} from './pages/demos/components/demo-preview/demo-preview.component';
 import { TranslationDemoComponent } from './pages/demos/features/translation-demo.component';
 import { SummarizationDemoComponent } from './pages/demos/features/summarization-demo.component';
 import { ProofreadingDemoComponent } from './pages/demos/features/proofreading-demo.component';
@@ -223,6 +224,7 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     SemanticEmbedderPlaygroundPage,
     WebSpeechPlaygroundPage,
     DemoLayoutComponent,
+    DemoPreviewComponent,
     SafeHtmlPipe,
     TranslationDemoComponent,
     SummarizationDemoComponent,
