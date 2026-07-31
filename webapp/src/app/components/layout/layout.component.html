@@ -1,6 +1,32 @@
-<div class="flex h-screen w-full transition-colors duration-200">
-  <webai-studio-sidebar class="offcanvas offcanvas-start lg:block flex-shrink-0 border-r border-slate-200 dark:border-zinc-800"></webai-studio-sidebar>
-  <div class="flex-grow h-full overflow-hidden flex flex-col">
-    <router-outlet></router-outlet>
+<div class="flex h-dvh w-full transition-colors duration-200">
+  <!-- Backdrop, small screens only -->
+  @if (isSidebarOpen) {
+    <div class="lg:hidden fixed inset-0 z-40 bg-black/50" (click)="closeSidebar()" aria-hidden="true"></div>
+  }
+
+  <webai-studio-sidebar
+    class="fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-out
+           lg:static lg:z-auto
+           flex-shrink-0 border-r border-slate-200 dark:border-zinc-800"
+    [class.translate-x-0]="isSidebarOpen"
+    [class.-translate-x-full]="!isSidebarOpen"></webai-studio-sidebar>
+
+  <div class="flex-grow min-w-0 h-full overflow-hidden flex flex-col">
+    <!-- Mobile navigation bar -->
+    <div class="lg:hidden flex-shrink-0 flex items-center gap-3 px-3 h-14 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-zinc-800">
+      <button type="button"
+              class="p-2 -ml-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-zinc-800/60 transition-colors"
+              [attr.aria-expanded]="isSidebarOpen"
+              aria-label="Toggle navigation"
+              (click)="toggleSidebar()">
+        <i class="bi bi-list text-2xl leading-none"></i>
+      </button>
+      <img src="images/webai-logo.png" alt="" class="h-7 w-7 object-contain">
+      <span class="text-sm font-semibold text-slate-900 dark:text-white">WebAI Studio</span>
+    </div>
+
+    <div class="flex-grow min-h-0 overflow-hidden flex flex-col">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>
