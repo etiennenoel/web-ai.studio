@@ -9,6 +9,12 @@ export enum RouteEnum {
   CortexInsights = "/cortex-insights",
   Axon = "/cortex/axon",
   Demos = "/demos",
+  BestPractices = "/best-practices",
+  BestPracticesSessionManagement = "/best-practices/session-management",
+  BestPracticesPerformance = "/best-practices/performance",
+  BestPracticesStreaming = "/best-practices/streaming",
+  BestPracticesStructuredOutput = "/best-practices/structured-output",
+  BestPracticesUserExperience = "/best-practices/user-experience",
   Docs = "/docs",
   GetStarted = "/docs/get-started",
   CheckAvailability = "/docs/check-availability",
@@ -36,4 +42,5 @@ export enum RouteEnum {
   PlaygroundsProofreader = "/playgrounds/proofreader",
   PlaygroundsSemanticEmbedder = "/playgrounds/semantic-embedder",
   PlaygroundsWebSpeech = "/playgrounds/web-speech",
+  LabsNoteEditor = "/labs/note-editor",
 }

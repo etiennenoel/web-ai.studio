@@ -1,0 +1,147 @@
+<div class="flex h-full">
+  <!-- Note -->
+  <div class="flex-1 min-w-0 flex flex-col">
+    <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col px-8 pt-10 pb-8">
+      <input
+        #titleInput
+        type="text"
+        [value]="title"
+        (input)="onTitleInput($event)"
+        (keydown)="onTitleKeydown($event)"
+        placeholder="Title"
+        class="w-full bg-transparent border-0 outline-none text-3xl font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-600 mb-4"
+      />
+      <div class="relative flex-1 flex flex-col">
+        <div #editorHost class="note-editor-host flex-1 min-h-[300px] text-slate-800 dark:text-slate-200"></div>
+        @if (!content.trim()) {
+          <button
+            (click)="insertSampleText()"
+            class="absolute top-10 left-0 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border border-dashed border-slate-300 dark:border-zinc-700 text-slate-500 dark:text-slate-400 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400 bg-transparent transition-colors">
+            <i class="bi bi-file-earmark-text"></i>
+            Insert sample text (4 paragraphs)
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Timing panel -->
+  <div class="w-[420px] shrink-0 border-l border-slate-200 dark:border-zinc-800 flex flex-col overflow-y-auto">
+    <div class="p-5 border-b border-slate-200 dark:border-zinc-800">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Summarizer Timing</h2>
+        <button
+          (click)="onSummarizeClick()"
+          [disabled]="isSummarizing || !content.trim()"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed !text-white transition-colors">
+          @if (isSummarizing) {
+            <i class="bi bi-arrow-repeat animate-spin inline-block mr-1"></i>Summarizing…
+          } @else {
+            Summarize
+          }
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        A title is suggested automatically while you type ({{ '>' }}40 chars, 1.5s idle). Each run times
+        <code class="font-mono">availability()</code>, <code class="font-mono">create()</code> and
+        <code class="font-mono">summarize()</code> separately.
+      </p>
+
+      <label class="flex items-center gap-2 mt-3 text-xs text-slate-500 dark:text-slate-400 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          [checked]="autoRunOnLoad"
+          (change)="onAutoRunToggle($event)"
+          class="rounded border-slate-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500"
+        />
+        Auto-run on load
+        <span class="text-slate-400 dark:text-slate-500 font-mono text-[10px]">?autorun=true</span>
+      </label>
+
+      <div class="flex items-center gap-3 mt-3 text-xs">
+        <span class="text-slate-500 dark:text-slate-400">Availability:</span>
+        @if (availabilityStatus) {
+          <span class="px-1.5 py-0.5 rounded font-semibold"
+                [ngClass]="availabilityStatus === 'available' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400'">
+            {{ availabilityStatus }}
+          </span>
+        } @else {
+          <span class="text-slate-400 dark:text-slate-500">not checked yet</span>
+        }
+        <button (click)="destroySession()" class="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" title="Destroy the session so the next run measures a cold create()">
+          <i class="bi bi-trash3 mr-1"></i>Reset session
+        </button>
+      </div>
+
+      @if (errorMessage) {
+        <div class="mt-3 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-xs">
+          {{ errorMessage }}
+        </div>
+      }
+    </div>
+
+    <div class="flex-1 p-5">
+      @if (timings.length === 0) {
+        <div class="text-center text-slate-400 dark:text-slate-500 text-sm mt-8">
+          <i class="bi bi-stopwatch text-2xl block mb-2 opacity-60"></i>
+          No runs yet — start typing or click Summarize.
+        </div>
+      } @else {
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-left text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px]">
+              <th class="pb-2 pr-2 font-semibold">#</th>
+              <th class="pb-2 pr-2 font-semibold">Trigger</th>
+              <th class="pb-2 pr-2 font-semibold text-right">availability()</th>
+              <th class="pb-2 pr-2 font-semibold text-right">create()</th>
+              <th class="pb-2 pr-2 font-semibold text-right">summarize()</th>
+              <th class="pb-2 font-semibold text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of timings; track row.run) {
+              <tr class="border-t border-slate-100 dark:border-zinc-800/80 text-slate-700 dark:text-slate-300 align-top">
+                <td class="py-2 pr-2 font-mono text-slate-400 dark:text-slate-500">{{ row.run }}</td>
+                <td class="py-2 pr-2">
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                        [ngClass]="row.trigger === 'manual' ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400' : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400'">
+                    {{ row.trigger }}
+                  </span>
+                </td>
+                <td class="py-2 pr-2 text-right font-mono">
+                  {{ formatMs(row.availabilityMs) }}<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                </td>
+                <td class="py-2 pr-2 text-right font-mono">
+                  @if (row.sessionReused) {
+                    <span class="text-slate-400 dark:text-slate-500" title="Session reused from a previous run">reused</span>
+                  } @else {
+                    {{ formatMs(row.createMs) }}<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                  }
+                </td>
+                <td class="py-2 pr-2 text-right font-mono">
+                  {{ formatMs(row.summarizeMs) }}<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                </td>
+                <td class="py-2 text-right font-mono font-semibold">
+                  {{ formatMs(row.totalMs) }}<span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">ms</span>
+                </td>
+              </tr>
+              <tr class="text-slate-500 dark:text-slate-400">
+                <td></td>
+                <td colspan="5" class="pb-2 pr-2">
+                  @if (row.error) {
+                    <span class="text-red-600 dark:text-red-400"><i class="bi bi-exclamation-triangle mr-1"></i>{{ row.error }}</span>
+                  } @else if (row.title) {
+                    <span class="italic">“{{ row.title }}”</span>
+                    <span class="text-slate-400 dark:text-slate-500 ml-2">({{ row.inputChars }} chars in)</span>
+                  } @else {
+                    <span class="text-slate-400 dark:text-slate-500">running…</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </div>
+</div>

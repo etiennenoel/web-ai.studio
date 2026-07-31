@@ -173,6 +173,13 @@ import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api.page';
 import { CodeSnippetComponent } from './components/code-snippet/code-snippet.component';
 import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
+import { PracticeComparisonComponent } from './components/practice-comparison/practice-comparison.component';
+import { BestPracticesPage } from './pages/best-practices/best-practices.page';
+import { SessionManagementPage } from './pages/best-practices/session-management/session-management.page';
+import { PerformancePage } from './pages/best-practices/performance/performance.page';
+import { StreamingPage } from './pages/best-practices/streaming/streaming.page';
+import { StructuredOutputPage } from './pages/best-practices/structured-output/structured-output.page';
+import { UserExperiencePage } from './pages/best-practices/user-experience/user-experience.page';
 
 
 import { SafeHtmlPipe } from './shared/pipes/safe-html.pipe';
@@ -185,6 +192,7 @@ import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-det
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
+import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
 
 @NgModule({
   declarations: [
@@ -229,6 +237,7 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     ProofreaderPlaygroundPage,
     SemanticEmbedderPlaygroundPage,
     WebSpeechPlaygroundPage,
+    NoteEditorPage,
     DemoLayoutComponent,
     DemoPreviewComponent,
     SafeHtmlPipe,
@@ -299,6 +308,13 @@ import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-spee
     AxonTestStatusBadgeComponent,
     CodeSnippetComponent,
     DocsSectionHeaderComponent,
+    PracticeComparisonComponent,
+    BestPracticesPage,
+    SessionManagementPage,
+    PerformancePage,
+    StreamingPage,
+    StructuredOutputPage,
+    UserExperiencePage,
 
     // Modals
      CodeModal,

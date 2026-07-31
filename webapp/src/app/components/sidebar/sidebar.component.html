@@ -306,6 +306,76 @@
         }
       </div>
 
+      <!-- Best Practices Group -->
+      <div class="flex flex-col gap-1 mb-1">
+        <div (click)="toggleBestPractices($event); navigateToBestPractices()"
+             class="select-none px-3 py-2 text-sm font-medium flex justify-between items-center rounded-lg cursor-pointer transition-colors"
+             [ngClass]="isBestPracticesActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40'">
+          <div class="flex items-center">
+            <i class="bi bi-patch-check text-lg w-7 flex justify-start" [ngClass]="isBestPracticesActive ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'"></i>
+            <span class="mr-2">Best Practices</span>
+          </div>
+          <i class="bi text-xs transition-transform duration-200"
+             [ngClass]="[isBestPracticesExpanded ? 'bi-chevron-down' : 'bi-chevron-right', isBestPracticesActive ? 'text-indigo-400' : 'text-slate-400 dark:text-slate-500']"></i>
+        </div>
+
+        @if (isBestPracticesExpanded) {
+          <div class="flex flex-col gap-0.5 pl-7 relative before:content-[''] before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-200 dark:before:bg-zinc-700/80 mt-1">
+
+            <!-- Session Management -->
+            <a [routerLink]="getRouterLink(RouteEnum.BestPracticesSessionManagement)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.BestPracticesSessionManagement ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.BestPracticesSessionManagement) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Session Management</span>
+            </a>
+
+            <!-- Performance -->
+            <a [routerLink]="getRouterLink(RouteEnum.BestPracticesPerformance)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.BestPracticesPerformance ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.BestPracticesPerformance) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Performance</span>
+            </a>
+
+            <!-- Streaming & Rendering -->
+            <a [routerLink]="getRouterLink(RouteEnum.BestPracticesStreaming)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.BestPracticesStreaming ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.BestPracticesStreaming) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Streaming &amp; Rendering</span>
+            </a>
+
+            <!-- Structured Output -->
+            <a [routerLink]="getRouterLink(RouteEnum.BestPracticesStructuredOutput)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.BestPracticesStructuredOutput ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.BestPracticesStructuredOutput) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>Structured Output</span>
+            </a>
+
+            <!-- UX Patterns -->
+            <a [routerLink]="getRouterLink(RouteEnum.BestPracticesUserExperience)"
+               class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
+               [ngClass]="routeEnum === RouteEnum.BestPracticesUserExperience ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.BestPracticesUserExperience) {
+                <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
+              }
+              <span>UX Patterns</span>
+            </a>
+
+          </div>
+        }
+      </div>
+
       <!-- Playgrounds Group -->
       <div class="flex flex-col gap-1 mb-1">
         <div (click)="togglePlaygrounds($event)"
@@ -489,9 +559,21 @@
         </div>
       </a>
 
+      <div class="mt-4 mb-2 px-3 text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+        Labs
+      </div>
+
+      <!-- Note Editor -->
+      <a [routerLink]="getRouterLink(RouteEnum.LabsNoteEditor)"
+         class="!no-underline flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"
+         [ngClass]="routeEnum === RouteEnum.LabsNoteEditor ? 'bg-[#ffffff] dark:bg-zinc-800 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/60 dark:ring-zinc-700' : '!text-slate-600 dark:!text-slate-400 hover:bg-slate-200/60 dark:hover:bg-zinc-800/50 hover:!text-slate-900 dark:hover:!text-white'">
+        <i class="bi bi-journal-text text-lg w-7 flex justify-start"></i>
+        <span>Note Editor</span>
+      </a>
+
     </nav>
   </div>
-  
+
   <!-- Footer -->
   <div class="p-4 flex flex-col items-center gap-3 border-t border-slate-200/50 dark:border-zinc-800/50 bg-slate-50 dark:bg-[#121212]">
     

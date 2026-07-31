@@ -17,6 +17,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   routeEnum!: RouteEnum;
   currentTheme$;
   isDocsExpanded = false;
+  isBestPracticesExpanded = false;
   isPlaygroundsExpanded = true;
 
   constructor(@Inject(DOCUMENT) document: Document,
@@ -86,6 +87,27 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     this.router.navigate([this.RouteEnum.Docs]);
   }
 
+  get isBestPracticesActive(): boolean {
+    return [
+      RouteEnum.BestPractices,
+      RouteEnum.BestPracticesSessionManagement,
+      RouteEnum.BestPracticesPerformance,
+      RouteEnum.BestPracticesStreaming,
+      RouteEnum.BestPracticesStructuredOutput,
+      RouteEnum.BestPracticesUserExperience
+    ].includes(this.routeEnum);
+  }
+
+  toggleBestPractices(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isBestPracticesExpanded = !this.isBestPracticesExpanded;
+  }
+
+  navigateToBestPractices() {
+    this.router.navigate([this.RouteEnum.BestPractices]);
+  }
+
   scrollTo(elementId: string, event: Event) {
     event.preventDefault();
     event.stopPropagation();
@@ -118,6 +140,22 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   determineCurrentActiveRoute(pathname: string) {
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
+      return;
+    }
+
+    if (pathname.includes('/labs')) {
+      if (pathname.includes('note-editor')) this.routeEnum = RouteEnum.LabsNoteEditor;
+      return;
+    }
+
+    if (pathname.includes('/best-practices')) {
+      this.isBestPracticesExpanded = true;
+      if (pathname.includes('session-management')) this.routeEnum = RouteEnum.BestPracticesSessionManagement;
+      else if (pathname.includes('performance')) this.routeEnum = RouteEnum.BestPracticesPerformance;
+      else if (pathname.includes('streaming')) this.routeEnum = RouteEnum.BestPracticesStreaming;
+      else if (pathname.includes('structured-output')) this.routeEnum = RouteEnum.BestPracticesStructuredOutput;
+      else if (pathname.includes('user-experience')) this.routeEnum = RouteEnum.BestPracticesUserExperience;
+      else this.routeEnum = RouteEnum.BestPractices;
       return;
     }
 
