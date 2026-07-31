@@ -32,6 +32,11 @@ import { Component } from '@angular/core';
               Both sides below generate the same content, and the timing bars compare the <strong>time to first output</strong> — the moment your UI stops feeling frozen. (Overall wall-clock time is similar on both sides; perceived latency is what differs.)
             </p>
           </div>
+          <app-practice-mock
+            scenario="streaming"
+            doCaption="Stream tokens"
+            dontCaption="Wait for everything">
+          </app-practice-mock>
           <app-practice-comparison
             title="Streaming vs. waiting for the full response"
             doLabel="Stream"

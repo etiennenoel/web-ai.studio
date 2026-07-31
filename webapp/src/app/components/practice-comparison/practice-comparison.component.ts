@@ -66,7 +66,7 @@ interface ComparisonSideState {
             </div>
 
             <!-- Code -->
-            <div class="relative w-full flex-grow bg-[#161616]">
+            <div class="relative w-full flex-grow bg-[#ffffff] dark:bg-[#161616]">
               <app-code-editor [code]="state.code" (codeChange)="onCodeChange(side.key, $event)" [readOnly]="false" [height]="state.editorHeight"></app-code-editor>
             </div>
 

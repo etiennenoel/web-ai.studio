@@ -174,6 +174,7 @@ import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api
 import { CodeSnippetComponent } from './components/code-snippet/code-snippet.component';
 import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
 import { PracticeComparisonComponent } from './components/practice-comparison/practice-comparison.component';
+import { PracticeMockComponent } from './components/practice-mock/practice-mock.component';
 import { BestPracticesPage } from './pages/best-practices/best-practices.page';
 import { SessionManagementPage } from './pages/best-practices/session-management/session-management.page';
 import { PerformancePage } from './pages/best-practices/performance/performance.page';
@@ -309,6 +310,7 @@ import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
     CodeSnippetComponent,
     DocsSectionHeaderComponent,
     PracticeComparisonComponent,
+    PracticeMockComponent,
     BestPracticesPage,
     SessionManagementPage,
     PerformancePage,

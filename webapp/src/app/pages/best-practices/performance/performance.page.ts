@@ -31,6 +31,13 @@ import { Component } from '@angular/core';
             <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-2">
               <strong class="text-red-600 dark:text-red-400">Don't:</strong> send raw markup or unfiltered data. The model wastes time tokenizing angle brackets and attributes that carry no meaning for the task, and latency grows with every extra token.
             </p>
+          </div>
+          <app-practice-mock
+            scenario="input-hygiene"
+            doCaption="Send clean text"
+            dontCaption="Send raw markup">
+          </app-practice-mock>
+          <div class="max-w-4xl">
             <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed mb-2">
               The comparison below builds the same article both ways and summarizes it. Watch the input size in the output — the markup version is several times larger before the model even starts.
             </p>
@@ -52,6 +59,13 @@ import { Component } from '@angular/core';
             <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-2">
               <strong class="text-red-600 dark:text-red-400">Don't:</strong> re-run identical inference for a query you've already answered when variability isn't desirable — it wastes the user's battery and makes your UI feel slower than it needs to be.
             </p>
+          </div>
+          <app-practice-mock
+            scenario="cache"
+            doCaption="Cache + TTL"
+            dontCaption="Re-run every time">
+          </app-practice-mock>
+          <div class="max-w-4xl">
             <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed mb-2">
               Both sides below answer the same question twice. The cached side pays for inference once and answers the repeat in under a millisecond.
             </p>

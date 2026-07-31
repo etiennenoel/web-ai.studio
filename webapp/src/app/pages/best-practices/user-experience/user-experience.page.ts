@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-best-practices-user-experience',
@@ -25,23 +26,49 @@ import { Component } from '@angular/core';
         <div class="mb-16 max-w-4xl">
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Keep the user informed</h2>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            Match the feedback mechanism to the task's duration and shape — never update the UI without a visual cue.
+            Match the feedback mechanism to the task's duration and shape — never update the UI without a visual cue. Each card below demonstrates its own pattern:
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616]">
+            <!-- Stream long content: live word-by-word (token-sized chunks) demo -->
+            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] flex flex-col">
               <i class="bi bi-text-left text-sky-500 text-xl"></i>
               <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3 mb-1.5">Stream long content</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0">Summaries and chat get a per-token typewriter effect — the user reads while the model writes.</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0 mb-3">Summaries and chat arrive token by token — the user reads while the model writes.</p>
+              <div class="mt-auto p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed min-h-[64px]">
+                {{ typedWords(streamCardText, 0.4, 5.2) }}@if (on(0.4, 5.2)) {<span class="inline-block w-1 h-3 bg-sky-400 ml-0.5 align-middle animate-pulse"></span>}
+              </div>
             </div>
-            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616]">
+            <!-- Spinner for short tasks: live spinner → one polished result -->
+            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] flex flex-col">
               <i class="bi bi-hourglass-split text-amber-500 text-xl"></i>
               <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3 mb-1.5">Spinner for short tasks</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0">Alt-text or labels arrive in one polished piece; a brief indicator plus speculative prep of the next task works best.</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0 mb-3">Alt-text or labels arrive in one polished piece; a brief indicator is enough.</p>
+              <div class="mt-auto flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 min-h-[64px]">
+                <div class="w-9 h-9 rounded-md bg-gradient-to-br from-amber-200 to-orange-300 dark:from-amber-500/40 dark:to-orange-500/40 flex items-center justify-center flex-shrink-0">
+                  <i class="bi bi-image text-white/80 text-sm"></i>
+                </div>
+                <div class="text-[11px] leading-snug">
+                  @if (on(0.4, 3.6)) {
+                    <span class="flex items-center gap-1.5 text-slate-400 dark:text-zinc-500">
+                      <span class="inline-block w-3 h-3 border-2 border-slate-300 dark:border-zinc-600 border-t-amber-500 rounded-full animate-spin flex-shrink-0"></span>
+                      Writing alt text…
+                    </span>
+                  } @else {
+                    <span class="text-slate-600 dark:text-slate-300">“A tabby cat asleep on a laptop keyboard” <i class="bi bi-check-circle-fill text-emerald-500"></i></span>
+                  }
+                </div>
+              </div>
             </div>
-            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616]">
+            <!-- Transitions for edits: live crossfade between source and translation -->
+            <div class="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] flex flex-col">
               <i class="bi bi-magic text-violet-500 text-xl"></i>
               <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3 mb-1.5">Transitions for edits</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0">Translation and rewriting benefit from word-morphing or crossfade animations that show <em>what changed</em>.</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0 mb-3">Translation and rewriting benefit from crossfades that show <em>what changed</em>.</p>
+              <div class="mt-auto relative p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 min-h-[64px] text-[11px] leading-relaxed">
+                <span class="absolute inset-2.5 transition-opacity duration-500 text-slate-600 dark:text-slate-300" [style.opacity]="transitionShowsSource ? 1 : 0">The weather is beautiful today.</span>
+                <span class="absolute inset-2.5 transition-opacity duration-500 text-violet-600 dark:text-violet-400 italic" [style.opacity]="transitionShowsSource ? 0 : 1">Il fait très beau aujourd'hui.</span>
+                <span class="absolute bottom-1.5 right-2 text-[9px] font-bold text-slate-300 dark:text-zinc-600 uppercase tracking-wider"><i class="bi bi-translate"></i> en → fr</span>
+              </div>
             </div>
           </div>
         </div>
@@ -194,7 +221,70 @@ import { Component } from '@angular/core';
   standalone: false,
   host: { class: 'block h-full' },
 })
-export class UserExperiencePage {
+export class UserExperiencePage implements OnInit, OnDestroy {
+  // Shared 7 s loop clock driving the three "keep the user informed" card demos.
+  private static readonly LOOP_SECONDS = 7;
+  progress = 0;
+  private startTime = 0;
+  private intervalId: any = null;
+
+  readonly streamCardText =
+    'On-device summarization keeps the article local while the key points appear as they are generated.';
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.progress = 0.8; // freeze on a completed state
+      return;
+    }
+    this.startTime = performance.now();
+    this.intervalId = setInterval(() => {
+      const elapsed = (performance.now() - this.startTime) / 1000;
+      this.progress = (elapsed % UserExperiencePage.LOOP_SECONDS) / UserExperiencePage.LOOP_SECONDS;
+      this.cdr.markForCheck();
+    }, 80);
+  }
+
+  ngOnDestroy() {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+    }
+  }
+
+  private get elapsedSeconds(): number {
+    return this.progress * UserExperiencePage.LOOP_SECONDS;
+  }
+
+  on(startS: number, endS: number): boolean {
+    const t = this.elapsedSeconds;
+    return t >= startS && t < endS;
+  }
+
+  private frac(startS: number, endS: number): number {
+    const t = this.elapsedSeconds;
+    if (t <= startS) return 0;
+    if (t >= endS) return 1;
+    return (t - startS) / (endS - startS);
+  }
+
+  /** Word-by-word reveal — streamed model output arrives in token-sized chunks. */
+  typedWords(text: string, startS: number, endS: number): string {
+    const words = text.split(' ');
+    return words.slice(0, Math.round(words.length * this.frac(startS, endS))).join(' ');
+  }
+
+  /** Crossfade demo: source language for the first half of the loop, translation after. */
+  get transitionShowsSource(): boolean {
+    return this.elapsedSeconds < 3.5;
+  }
+
   pacedState: 'idle' | 'working' | 'done' = 'idle';
   instantDone = false;
 

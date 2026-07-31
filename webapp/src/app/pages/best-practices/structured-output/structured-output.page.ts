@@ -32,6 +32,11 @@ import { Component } from '@angular/core';
               <strong class="text-red-600 dark:text-red-400">Don't:</strong> rely on natural-language instructions like "reply with only JSON". Models add conversational filler ("Sure! Here's your JSON:") or Markdown fences, and your parser breaks in production on exactly the input you didn't test.
             </p>
           </div>
+          <app-practice-mock
+            scenario="schema"
+            doCaption="responseConstraint"
+            dontCaption="Ask nicely for JSON">
+          </app-practice-mock>
           <app-practice-comparison
             title="responseConstraint schema vs. 'please output JSON'"
             doLabel="Schema"

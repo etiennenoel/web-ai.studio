@@ -37,8 +37,15 @@ import { Component } from '@angular/core';
                 For the Prompt API, have your <code>initialPrompts</code> ready before calling <code>create()</code> — they can only be configured at session creation.
               </p>
             </div>
+          </div>
+          <app-practice-mock
+            scenario="prewarm"
+            doCaption="Pre-warm on intent"
+            dontCaption="Create on click">
+          </app-practice-mock>
+          <div class="max-w-4xl">
             <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed mb-2">
-              In the comparison below, the "Do" side simulates pre-warming: the session is created first (that cost happens on hover, before the click), so only the inference is on the user's critical path. The "Don't" side pays for everything after the click. Tip: run it twice — the first run also includes true cold-start loading.
+              Now run it for real. The "Do" side simulates pre-warming: the session is created first (that cost happens on hover, before the click), so only the inference is on the user's critical path. The "Don't" side pays for everything after the click. Tip: run it twice — the first run also includes true cold-start loading.
             </p>
           </div>
           <app-practice-comparison
@@ -83,6 +90,11 @@ import { Component } from '@angular/core';
               </p>
             </div>
           </div>
+          <app-practice-mock
+            scenario="clone"
+            doCaption="clone() the base session"
+            dontCaption="create() every time">
+          </app-practice-mock>
           <app-practice-comparison
             title="clone() a base session vs. create() per task"
             [doCode]="cloneDoCode"
