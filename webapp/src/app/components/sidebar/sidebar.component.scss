@@ -1,5 +1,12 @@
 :host {
   display: block;
   height: 100%;
-  width: 350px !important;
+  // Drawer width on small screens: never wider than the viewport.
+  width: min(85vw, 20rem);
+}
+
+@media screen and (min-width: 1024px) {
+  :host {
+    width: 350px;
+  }
 }
