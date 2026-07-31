@@ -1,5 +1,4 @@
 import {
-  ApplicationRef,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -82,7 +81,6 @@ export class NoteEditorPage implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly appRef: ApplicationRef,
     private readonly elementRef: ElementRef<HTMLElement>,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -96,9 +94,10 @@ export class NoteEditorPage implements OnInit, OnDestroy {
     const autorun = this.route.snapshot.queryParamMap.get('autorun');
     this.autoRunOnLoad = autorun === 'true' || autorun === '1';
 
-    // Mount only once the app is stable: hydration's cleanup pass strips DOM it does not
-    // recognize, so an editor mounted any earlier is silently wiped along with its text.
-    void this.appRef.whenStable().then(() => this.mountEditor());
+    // Mount as soon as the view exists. Anything that later re-creates the view DOM under us
+    // (HMR, hydration cleanup) is handled by the remount observer — waiting on whenStable() here
+    // was tried instead and stalls indefinitely when something keeps the zone busy.
+    setTimeout(() => void this.mountEditor(), 0);
   }
 
   onAutoRunToggle(event: Event): void {
@@ -150,6 +149,18 @@ export class NoteEditorPage implements OnInit, OnDestroy {
     });
 
     this.watchForDetachedEditor();
+
+    // The view may have been re-created while the CodeMirror chunk was loading — in that window the
+    // observer was not registered yet, so check once by hand and remount into the fresh host.
+    // Cast needed: TS narrows `this.editor` to null here because the assignment happens inside
+    // the runOutsideAngular closure above.
+    const mounted = this.editor as NoteEditor | null;
+    if (mounted && !mounted.view.dom.isConnected) {
+      mounted.destroy();
+      this.editor = null;
+      setTimeout(() => void this.mountEditor(), 0);
+      return;
+    }
 
     if (this.autoRunOnLoad && !this.autoRanOnLoad) {
       this.autoRanOnLoad = true;
@@ -230,10 +241,16 @@ export class NoteEditorPage implements OnInit, OnDestroy {
   }
 
   insertSampleText(): void {
-    // Goes through the editor so onDocChange fires: content updates and auto-suggest schedules,
-    // exactly as if the text had been typed.
-    this.editor?.setDoc(SAMPLE_TEXT, 0);
-    this.editor?.focus();
+    if (this.editor) {
+      // Goes through the editor so onDocChange fires: content updates and auto-suggest schedules,
+      // exactly as if the text had been typed.
+      this.editor.setDoc(SAMPLE_TEXT, 0);
+      this.editor.focus();
+      return;
+    }
+    // Editor not mounted yet — the mount uses `content` as its initial document, so nothing is lost.
+    this.content = SAMPLE_TEXT;
+    this.scheduleAutoSuggest();
   }
 
   onSummarizeClick(): void {
