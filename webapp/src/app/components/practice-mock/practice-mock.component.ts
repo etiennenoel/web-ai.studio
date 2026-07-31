@@ -88,7 +88,7 @@ export type PracticeMockScenario = 'prewarm' | 'clone' | 'input-hygiene' | 'cach
                     <!-- Result / waiting -->
                     <div class="rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 p-2.5 min-h-[52px]">
                       @if (side === 'do') {
-                        <span class="text-slate-700 dark:text-slate-300">{{ typedWords(prewarmResult, 4.7, 6.2) }}</span>
+                        <span class="text-slate-700 dark:text-slate-300">{{ typedWords(prewarmResult, 4.7, 5.5) }}</span>
                       } @else {
                         @if (on(4.5, 8.2)) {
                           <span class="flex items-center gap-2 text-slate-400 dark:text-zinc-500">
@@ -277,14 +277,16 @@ export type PracticeMockScenario = 'prewarm' | 'clone' | 'input-hygiene' | 'cach
                     <!-- Assistant bubble -->
                     <div class="flex mb-3">
                       <div class="max-w-[90%] px-3 py-2 rounded-2xl rounded-bl-sm bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-[11px] min-h-[60px] min-w-[120px] leading-relaxed">
+                        <!-- Generation finishes at 5.5 s on BOTH sides — streaming only
+                             changes when the user starts seeing it, not how long it takes. -->
                         @if (side === 'do') {
-                          {{ typedWords(streamingAnswer, 1, 7.5) }}@if (on(1, 7.5)) {<span class="inline-block w-1 h-3 bg-indigo-400 ml-0.5 align-middle animate-pulse"></span>}
+                          {{ typedWords(streamingAnswer, 1, 5.5) }}@if (on(1, 5.5)) {<span class="inline-block w-1 h-3 bg-indigo-400 ml-0.5 align-middle animate-pulse"></span>}
                         } @else {
-                          @if (on(0.8, 7.5)) {
+                          @if (on(0.8, 5.5)) {
                             <span class="flex items-center gap-2 text-slate-400 dark:text-zinc-500">
                               <span class="inline-block w-3 h-3 border-2 border-slate-300 dark:border-zinc-600 border-t-indigo-500 rounded-full animate-spin"></span> Generating…
                             </span>
-                          } @else if (on(7.5, 9)) {
+                          } @else if (on(5.5, 9)) {
                             {{ streamingAnswer }}
                           }
                         }
@@ -292,10 +294,10 @@ export type PracticeMockScenario = 'prewarm' | 'clone' | 'input-hygiene' | 'cach
                     </div>
                     <div class="h-7">
                       @if (side === 'do' && on(1.8, 9)) {
-                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold"><i class="bi bi-eye"></i> Reading since the 1st second</span>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold"><i class="bi bi-eye"></i> Reading since the 1st second (~20 tokens/s)</span>
                       }
-                      @if (side === 'dont' && on(5, 9)) {
-                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-bold"><i class="bi bi-hourglass-split"></i> {{ on(7.5, 9) ? 'Everything arrived at once' : 'Still nothing to read…' }}</span>
+                      @if (side === 'dont' && on(3.5, 9)) {
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-bold"><i class="bi bi-hourglass-split"></i> {{ on(5.5, 9) ? 'Everything arrived at once' : 'Still nothing to read…' }}</span>
                       }
                     </div>
                   }

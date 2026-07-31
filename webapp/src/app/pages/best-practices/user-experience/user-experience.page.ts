@@ -35,7 +35,7 @@ import { isPlatformBrowser } from '@angular/common';
               <h4 class="font-bold text-sm text-slate-900 dark:text-white mt-3 mb-1.5">Stream long content</h4>
               <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed m-0 mb-3">Summaries and chat arrive token by token — the user reads while the model writes.</p>
               <div class="mt-auto p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed min-h-[64px]">
-                {{ typedWords(streamCardText, 0.4, 5.2) }}@if (on(0.4, 5.2)) {<span class="inline-block w-1 h-3 bg-sky-400 ml-0.5 align-middle animate-pulse"></span>}
+                {{ typedWords(streamCardText, 0.4, 2.8) }}@if (on(0.4, 2.8)) {<span class="inline-block w-1 h-3 bg-sky-400 ml-0.5 align-middle animate-pulse"></span>}
               </div>
             </div>
             <!-- Spinner for short tasks: live spinner → one polished result -->
@@ -228,8 +228,9 @@ export class UserExperiencePage implements OnInit, OnDestroy {
   private startTime = 0;
   private intervalId: any = null;
 
+  // Streamed at ~13 words/s (~20 tokens/s) — matching real on-device generation speed.
   readonly streamCardText =
-    'On-device summarization keeps the article local while the key points appear as they are generated.';
+    'On-device summarization keeps the article local while the key points appear as they are generated — at twenty to thirty tokens per second, the panel fills faster than most people can read.';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
