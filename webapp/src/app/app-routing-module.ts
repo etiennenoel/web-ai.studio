@@ -71,6 +71,12 @@ import { StudyKitDemoComponent } from './pages/demos/features/study-kit-demo.com
 import { PhotoSearchDemoComponent } from './pages/demos/features/photo-search-demo.component';
 import { TongueTwisterDemoComponent } from './pages/demos/features/tongue-twister-demo.component';
 import { MysteryLanguageDemoComponent } from './pages/demos/features/mystery-language-demo.component';
+import { BestPracticesPage } from './pages/best-practices/best-practices.page';
+import { SessionManagementPage } from './pages/best-practices/session-management/session-management.page';
+import { PerformancePage } from './pages/best-practices/performance/performance.page';
+import { StreamingPage } from './pages/best-practices/streaming/streaming.page';
+import { StructuredOutputPage } from './pages/best-practices/structured-output/structured-output.page';
+import { UserExperiencePage } from './pages/best-practices/user-experience/user-experience.page';
 import { GetStartedPage } from './pages/docs/get-started/get-started.page';
 import { CheckAvailabilityPage } from './pages/docs/check-availability/check-availability.page';
 import { DocsErrorsPage } from './pages/docs/errors/errors.page';
@@ -94,6 +100,7 @@ import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-det
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
+import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
 
 const routes: Routes = [
   {
@@ -128,6 +135,48 @@ const routes: Routes = [
     path: "",
     component: LayoutComponent,
     children: [
+      {
+        path: "best-practices",
+        component: BestPracticesPage,
+        data: {
+          route: RouteEnum.BestPractices
+        }
+      },
+      {
+        path: "best-practices/session-management",
+        component: SessionManagementPage,
+        data: {
+          route: RouteEnum.BestPracticesSessionManagement
+        }
+      },
+      {
+        path: "best-practices/performance",
+        component: PerformancePage,
+        data: {
+          route: RouteEnum.BestPracticesPerformance
+        }
+      },
+      {
+        path: "best-practices/streaming",
+        component: StreamingPage,
+        data: {
+          route: RouteEnum.BestPracticesStreaming
+        }
+      },
+      {
+        path: "best-practices/structured-output",
+        component: StructuredOutputPage,
+        data: {
+          route: RouteEnum.BestPracticesStructuredOutput
+        }
+      },
+      {
+        path: "best-practices/user-experience",
+        component: UserExperiencePage,
+        data: {
+          route: RouteEnum.BestPracticesUserExperience
+        }
+      },
       {
         path: "docs",
         component: DocsHomePage,
@@ -287,6 +336,13 @@ const routes: Routes = [
         component: WebSpeechPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsWebSpeech
+        }
+      },
+      {
+        path: "labs/note-editor",
+        component: NoteEditorPage,
+        data: {
+          route: RouteEnum.LabsNoteEditor
         }
       },
       {

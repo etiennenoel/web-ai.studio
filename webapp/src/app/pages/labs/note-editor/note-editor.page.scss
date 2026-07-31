@@ -1,0 +1,65 @@
+/* CodeMirror renders outside Angular's view encapsulation, so style through ::ng-deep
+   scoped to the host element. */
+::ng-deep .note-editor-host {
+  --note-accent: #6366f1;
+  --note-muted: #64748b;
+  --note-subtle: #94a3b8;
+
+  .cm-editor {
+    height: 100%;
+  }
+
+  .cm-placeholder {
+    color: #cbd5e1;
+  }
+
+  /* Task checkboxes drawn in place of the [ ] / [x] markers. */
+  .nb-check {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.4em;
+    vertical-align: -0.15em;
+    border: 1.5px solid #94a3b8;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &.is-on {
+      background-color: #6366f1;
+      border-color: #6366f1;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0.28em;
+        top: 0.08em;
+        width: 0.3em;
+        height: 0.55em;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  .nb-bullet {
+    color: #94a3b8;
+  }
+
+  .nb-quote-line {
+    border-left: 3px solid #cbd5e1;
+    padding-left: 0.75em !important;
+  }
+}
+
+:host-context([data-bs-theme='dark']) ::ng-deep .note-editor-host {
+  .cm-placeholder {
+    color: #52525b;
+  }
+
+  .nb-quote-line {
+    border-left-color: #3f3f46;
+  }
+}
