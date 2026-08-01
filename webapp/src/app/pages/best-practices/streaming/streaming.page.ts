@@ -39,6 +39,7 @@ import { Component } from '@angular/core';
           </app-practice-mock>
           <app-practice-comparison
             title="Streaming vs. waiting for the full response"
+            metricLabel="Time to first visible output"
             doLabel="Stream"
             dontLabel="Block"
             [doCode]="streamDoCode"
@@ -62,6 +63,7 @@ import { Component } from '@angular/core';
           </div>
           <app-practice-comparison
             title="Sanitized combined output vs. innerHTML per chunk"
+            [timed]="false"
             doLabel="Sanitize"
             dontLabel="innerHTML"
             [doCode]="sanitizeDoCode"

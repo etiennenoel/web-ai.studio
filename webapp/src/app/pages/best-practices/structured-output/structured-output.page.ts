@@ -39,6 +39,7 @@ import { Component } from '@angular/core';
           </app-practice-mock>
           <app-practice-comparison
             title="responseConstraint schema vs. 'please output JSON'"
+            metricLabel="prompt() latency — session setup excluded"
             doLabel="Schema"
             dontLabel="Prose"
             [doCode]="schemaDoCode"
@@ -59,6 +60,7 @@ import { Component } from '@angular/core';
           </div>
           <app-practice-comparison
             title="Generate freely + truncate in UI vs. 'exactly 40 characters'"
+            [timed]="false"
             doLabel="Truncate"
             dontLabel="Constrain"
             [doCode]="lengthDoCode"
@@ -102,9 +104,12 @@ const schema = {
 };
 
 const post = 'My tabby knocked the router off the shelf again. No wifi, but look at him.';
+
+const start = performance.now(); // timed region: the prompt, not session setup
 const result = await session.prompt(\`Is this post about cats?\\n\\n\${post}\`, {
   responseConstraint: schema,
 });
+reportTiming(performance.now() - start);
 
 console.log('Raw output:', result);
 const parsed = JSON.parse(result); // guaranteed to parse
@@ -114,10 +119,12 @@ session.destroy();`;
   schemaDontCode = `const session = await LanguageModel.create();
 
 const post = 'My tabby knocked the router off the shelf again. No wifi, but look at him.';
+const start = performance.now(); // same timed region as the "do" side
 const result = await session.prompt(
   'Is this post about cats? Respond ONLY with JSON like ' +
   '{"isTopicCats": true}. No other text.\\n\\n' + post
 );
+reportTiming(performance.now() - start);
 
 console.log('Raw output:', result);
 try {
