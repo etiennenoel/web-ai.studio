@@ -17,6 +17,13 @@ import { Component } from '@angular/core';
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
             Creating a session is the most expensive step of using a built-in AI API — the browser may need to load model weights into memory before your first inference can run. When and how you create, reuse, and destroy sessions determines whether your feature feels instant or sluggish.
           </p>
+
+          <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-800 mt-6">
+            <i class="bi bi-rulers text-slate-400 dark:text-zinc-500 mt-0.5"></i>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed m-0">
+              <strong>Why there's no stopwatch on this page.</strong> These three practices all save session-setup cost, and the browser loads the model only once per page — after the first run it stays resident, so a warm <code>create()</code> costs tens of milliseconds. That's smaller than the natural run-to-run variance of on-device inference, where a slightly longer response can swing a measurement by a second. Timing these in-page would produce a number that flips between runs and teaches the wrong lesson, so the snippets below print their own numbers and the animations carry the comparison. The pages with effects that reliably beat the noise — <a routerLink="/best-practices/performance" class="text-indigo-600 dark:text-indigo-400 hover:underline">Performance</a>, <a routerLink="/best-practices/streaming" class="text-indigo-600 dark:text-indigo-400 hover:underline">Streaming</a>, <a routerLink="/best-practices/structured-output" class="text-indigo-600 dark:text-indigo-400 hover:underline">Structured Output</a> — do benchmark, with repeat runs and a noise floor.
+            </p>
+          </div>
         </div>
 
         <hr class="border-t border-slate-200 dark:border-zinc-800 mb-10 max-w-4xl">
@@ -45,10 +52,11 @@ import { Component } from '@angular/core';
           </app-practice-mock>
           <div class="max-w-4xl">
             <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed mb-2">
-              Now run it for real. The "Do" side simulates pre-warming: the session is created first (that cost happens on hover, before the click), so only the inference is on the user's critical path. The "Don't" side pays for everything after the click. Tip: run it twice — the first run also includes true cold-start loading.
+              Now run it for real. The "Do" side simulates pre-warming: the session is created first (that cost happens on hover, before the click), so only the inference is on the user's critical path. The "Don't" side pays for everything after the click. Each snippet prints its own user-perceived wait.
             </p>
           </div>
           <app-practice-comparison
+            [timed]="false"
             title="Pre-warm on intent vs. cold start on click"
             [doCode]="prewarmDoCode"
             [dontCode]="prewarmDontCode">
@@ -67,6 +75,7 @@ import { Component } from '@angular/core';
             </p>
           </div>
           <app-practice-comparison
+            [timed]="false"
             title="initialPrompts at create() vs. instructions in the first prompt"
             [doCode]="initialPromptsDoCode"
             [dontCode]="initialPromptsDontCode">
@@ -96,6 +105,7 @@ import { Component } from '@angular/core';
             dontCaption="create() every time">
           </app-practice-mock>
           <app-practice-comparison
+            [timed]="false"
             title="clone() a base session vs. create() per task"
             [doCode]="cloneDoCode"
             [dontCode]="cloneDontCode">
@@ -143,7 +153,6 @@ const result = await session.prompt(
 const wait = performance.now() - start;
 console.log(\`User-perceived wait: \${wait.toFixed(0)} ms\`);
 console.log(result);
-reportTiming(wait); // feeds the comparison bar below
 session.destroy();`;
 
   prewarmDontCode = `// Cold start: nothing happens until the user clicks "Generate".
@@ -157,7 +166,6 @@ const result = await session.prompt(
 const wait = performance.now() - start;
 console.log(\`User-perceived wait: \${wait.toFixed(0)} ms\`);
 console.log(result);
-reportTiming(wait); // feeds the comparison bar below
 session.destroy();`;
 
   initialPromptsDoCode = `// System instructions are pre-processed at creation time.
@@ -176,7 +184,6 @@ const review = await session.prompt(
 const firstPromptMs = performance.now() - start;
 console.log(\`First prompt: \${firstPromptMs.toFixed(0)} ms\`);
 console.log(review);
-reportTiming(firstPromptMs); // feeds the comparison bar below
 session.destroy();`;
 
   initialPromptsDontCode = `// Empty session: instructions travel with the first prompt,
@@ -192,7 +199,6 @@ const review = await session.prompt(
 const firstPromptMs = performance.now() - start;
 console.log(\`First prompt: \${firstPromptMs.toFixed(0)} ms\`);
 console.log(review);
-reportTiming(firstPromptMs); // feeds the comparison bar below
 session.destroy();`;
 
   cloneDoCode = `// One base session holds the instructions...

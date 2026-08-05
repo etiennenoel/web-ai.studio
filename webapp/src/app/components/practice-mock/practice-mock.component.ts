@@ -179,13 +179,13 @@ export type PracticeMockScenario = 'prewarm' | 'clone' | 'input-hygiene' | 'cach
                       @if (side === 'do') {
                         <div class="flex items-center justify-between mb-1">
                           <span class="font-sans font-bold text-[9px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400">element.innerText</span>
-                          <span class="px-1.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">~1,200 chars</span>
+                          <span class="px-1.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">~2,300 chars</span>
                         </div>
                         <div>On-device AI on the web. Built-in AI APIs let websites run inference locally…</div>
                       } @else {
                         <div class="flex items-center justify-between mb-1">
                           <span class="font-sans font-bold text-[9px] uppercase tracking-wider text-red-600 dark:text-red-400">element.innerHTML</span>
-                          <span class="px-1.5 rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-bold">~9,400 chars</span>
+                          <span class="px-1.5 rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-bold">~4,600 chars</span>
                         </div>
                         <div class="whitespace-nowrap">&lt;div class="wrapper" data-analytics-id="a-4821" style="margin:0"&gt;</div>
                         <div class="whitespace-nowrap">&nbsp;&nbsp;&lt;h1 class="title xl:text-4xl font-extrabold"&gt;On-device AI…&lt;/h1&gt;</div>
@@ -196,19 +196,19 @@ export type PracticeMockScenario = 'prewarm' | 'clone' | 'input-hygiene' | 'cach
                     <div class="flex items-center gap-2 mb-1 text-[10px] text-slate-500 dark:text-zinc-400">
                       <i class="bi bi-arrow-down"></i> tokenize + inference
                       @if (side === 'do' && on(4.6, 8)) { <span class="text-emerald-600 dark:text-emerald-400 font-bold">done in ~2 s</span> }
-                      @if (side === 'dont' && on(7.4, 8)) { <span class="text-red-600 dark:text-red-400 font-bold">~5 s — same summary</span> }
+                      @if (side === 'dont' && on(6.4, 8)) { <span class="text-red-600 dark:text-red-400 font-bold">~3.5 s — same summary</span> }
                     </div>
                     <div class="h-2 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden mb-3">
                       @if (side === 'do') {
                         <div class="h-full rounded-full bg-emerald-400 dark:bg-emerald-500 transition-[width] duration-150 ease-linear" [style.width.%]="frac(2, 4.5) * 100"></div>
                       } @else {
-                        <div class="h-full rounded-full bg-red-400 dark:bg-red-500/80 transition-[width] duration-150 ease-linear" [style.width.%]="frac(2, 7.4) * 100"></div>
+                        <div class="h-full rounded-full bg-red-400 dark:bg-red-500/80 transition-[width] duration-150 ease-linear" [style.width.%]="frac(2, 6.4) * 100"></div>
                       }
                     </div>
 
                     <div class="rounded-lg bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-800 p-2.5 min-h-[40px] text-slate-700 dark:text-slate-300">
                       @if (side === 'do' && on(4.6, 8)) { <i class="bi bi-card-text text-emerald-500 mr-1"></i> TL;DR: Built-in AI runs privately, on-device. }
-                      @if (side === 'dont' && on(7.4, 8)) { <i class="bi bi-card-text text-emerald-500 mr-1"></i> TL;DR: Built-in AI runs privately, on-device. }
+                      @if (side === 'dont' && on(6.4, 8)) { <i class="bi bi-card-text text-emerald-500 mr-1"></i> TL;DR: Built-in AI runs privately, on-device. }
                     </div>
                   }
 
