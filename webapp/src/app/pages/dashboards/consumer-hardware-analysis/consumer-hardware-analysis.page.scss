@@ -1,0 +1,316 @@
+/*
+ * Two colour scales, and they never borrow each other's meaning:
+ *
+ *   [data-speed]     five semantic bands, green → red. On this page green-to-red always
+ *                    and only means speed, whether as a cell fill or as a stripe behind
+ *                    the Horizon lines. Identical in both themes, because the scale is
+ *                    the vocabulary — every cell also prints its band name, so hue is
+ *                    never the only channel.
+ *   [data-category]  hardware identity: cool hues only, so a line can never be mistaken
+ *                    for a speed stripe, alternating dark and light down the stacking
+ *                    order so neighbouring lines separate.
+ *
+ * Both were fitted with the dataviz validator against this page's own surfaces
+ * (#ffffff light, #161616 dark). Speed bands: worst adjacent CVD ΔE 11.3, normal 15.7,
+ * ink on fill ≥ 4.8:1. Categories: worst adjacent CVD ΔE 20.1 light / 17.7 dark,
+ * normal 22.2 / 20.9; three light-mode steps sit below 3:1 on the surface, relieved by
+ * the direct label every line carries.
+ */
+
+:host {
+  color-scheme: light;
+
+  --chw-label-width: 208px;
+  --chw-surface: light-dark(#ffffff, #161616);
+  --chw-ink: light-dark(#0f172a, #f1f5f9);
+  --chw-ink-2: light-dark(#475569, #94a3b8);
+  --chw-ink-3: light-dark(#94a3b8, #64748b);
+  --chw-grid: light-dark(#e2e8f0, #27272a);
+  --chw-axis: light-dark(#cbd5e1, #3f3f46);
+  --chw-empty: light-dark(#f1f5f9, #1f1f22);
+  --chw-accent: light-dark(#2563eb, #3b82f6);
+
+  /* ink used inside a coloured fill, picked per fill by luminance */
+  --chw-on-dark: #f7f9fb;
+  --chw-on-light: #12161c;
+
+  @media (max-width: 900px) {
+    --chw-label-width: 148px;
+  }
+}
+
+:host-context([data-bs-theme="dark"]) {
+  color-scheme: dark;
+}
+
+/* ── speed: the one green→red scale, shared by both themes ─────────────────── */
+
+[data-speed="4"] { --chw-fill: #1e7a4c; --chw-fill-ink: var(--chw-on-dark); }   /* instant */
+[data-speed="3"] { --chw-fill: #7fb069; --chw-fill-ink: var(--chw-on-light); }  /* conversational */
+[data-speed="2"] { --chw-fill: #efca6f; --chw-fill-ink: var(--chw-on-light); }  /* readable */
+[data-speed="1"] { --chw-fill: #d48e4e; --chw-fill-ink: var(--chw-on-light); }  /* slow */
+[data-speed="0"] { --chw-fill: #b44e43; --chw-fill-ink: var(--chw-on-dark); }   /* crawling */
+
+/* ── hardware identity on the Horizon chart ───────────────────────────────────
+   Cool hues only: the green→red scale means speed on this page and is painted behind
+   these lines as stripes, so a line must never wear a band colour. Dark and light
+   alternate down the stacking order, which is what separates neighbouring lines.
+   Worst adjacent pair: CVD ΔE 20.1 light / 17.7 dark, normal 22.2 / 20.9. */
+
+[data-category="0"] { --chw-mark: light-dark(#22319b, #4e6ad7); --chw-mark-ink: light-dark(var(--chw-on-dark), var(--chw-on-dark)); }  /* flagship card */
+[data-category="1"] { --chw-mark: light-dark(#698bf3, #a2bcff); --chw-mark-ink: light-dark(var(--chw-on-light), var(--chw-on-light)); }  /* mid-range card */
+[data-category="2"] { --chw-mark: light-dark(#6331a0, #9163d5); --chw-mark-ink: light-dark(var(--chw-on-dark), var(--chw-on-light)); }  /* pro laptop */
+[data-category="3"] { --chw-mark: light-dark(#b585e2, #dcb9ff); --chw-mark-ink: light-dark(var(--chw-on-light), var(--chw-on-light)); }  /* apple desktop */
+[data-category="4"] { --chw-mark: light-dark(#a02e7d, #d661ae); --chw-mark-ink: light-dark(var(--chw-on-dark), var(--chw-on-light)); }  /* mini AI desktop */
+[data-category="5"] { --chw-mark: light-dark(#49b1e4, #9adbff); --chw-mark-ink: light-dark(var(--chw-on-light), var(--chw-on-light)); }  /* mainstream laptop */
+[data-category="6"] { --chw-mark: light-dark(#635c57, #867f79); --chw-mark-ink: light-dark(var(--chw-on-dark), var(--chw-on-light)); }  /* desktop CPU */
+[data-category="7"] { --chw-mark: light-dark(#aba39d, #cac2bd); --chw-mark-ink: light-dark(var(--chw-on-light), var(--chw-on-light)); }  /* board or phone */
+
+.chw-category-on {
+  background-color: var(--chw-mark);
+  color: var(--chw-mark-ink);
+}
+
+.chw-category-dot { background-color: var(--chw-mark); }
+
+/* ── chart chrome ─────────────────────────────────────────────────────────── */
+
+.chw-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chw-grid-line { stroke: var(--chw-grid); }
+
+.chw-axis-line,
+.chw-today-line { stroke: var(--chw-axis); }
+
+/* Axis ticks, row sub-labels and in-chart years all read as quiet tabular figures. */
+.chw-mark-label-strong {
+  fill: var(--chw-ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Speed bands behind the lines: a wash, so a line always reads on top of one. */
+.chw-band-stripe {
+  fill: var(--chw-fill);
+  opacity: 0.16;
+}
+
+/* Named at both edges with a halo, because the lines cross the middle. */
+.chw-band-name {
+  fill: var(--chw-ink-2);
+  font-size: 9.5px;
+  font-weight: 500;
+  stroke: var(--chw-surface);
+  stroke-width: 3.5;
+  paint-order: stroke;
+}
+
+.chw-projected-region {
+  fill: var(--chw-ink);
+  opacity: 0.035;
+}
+
+.chw-tick-projected { fill: var(--chw-ink-3); opacity: 0.7; }
+
+.chw-axis-label,
+.chw-row-detail,
+.chw-mark-label-muted {
+  fill: var(--chw-ink-3);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chw-mark-label-muted { font-size: 9.5px; }
+
+
+.chw-today-label {
+  fill: var(--chw-ink-2);
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+
+/* ── lines & dots ─────────────────────────────────────────────────────────── */
+
+.chw-dot {
+  fill: var(--chw-mark);
+  stroke: var(--chw-surface);
+  stroke-width: 1.5;
+}
+
+.chw-series-line {
+  fill: none;
+  stroke: var(--chw-mark);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chw-series-projection {
+  fill: none;
+  stroke: var(--chw-mark);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  opacity: 0.8;
+}
+
+.chw-hit-layer { fill: transparent; }
+
+.chw-fill-swatch { background-color: var(--chw-fill); }
+
+/* ── value cells ──────────────────────────────────────────────────────────── */
+
+.chw-value-cell {
+  background-color: var(--chw-fill);
+  color: var(--chw-fill-ink);
+}
+
+/* A modelled figure keeps its band's exact fill and ink; the dashed inset is the
+   only difference, so the colour never lies about what the number means. */
+.chw-modelled {
+  outline: 1.5px dashed currentColor;
+  outline-offset: -4px;
+}
+
+.chw-cell-empty {
+  background-color: var(--chw-empty);
+  color: var(--chw-ink-3);
+}
+
+/* Not a value — the absence of one. 45° only, so it never reads as a gridline. */
+.chw-cell-hatched {
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, var(--chw-axis) 4px 5px);
+  color: var(--chw-ink-3);
+}
+
+.chw-matrix-row {
+  display: grid;
+  grid-template-columns: var(--chw-label-width) repeat(8, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.chw-tabular { font-variant-numeric: tabular-nums; }
+
+.chw-range { accent-color: var(--chw-accent); }
+
+/* A four-digit year needs the whole box: the spinner buttons were eating the last
+   character, and nobody steps a year one arrow-click at a time here anyway. */
+.chw-year-input {
+  appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
+/* ── band interval controls ───────────────────────────────────────────────── */
+
+.chw-dual {
+  position: relative;
+  height: 24px;
+  color: var(--chw-fill);
+}
+
+.chw-dual .chw-track,
+.chw-dual .chw-fill-bar {
+  position: absolute;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.chw-dual .chw-track {
+  left: 0;
+  right: 0;
+  background: var(--chw-grid);
+}
+
+.chw-dual .chw-fill-bar { background: var(--chw-fill); }
+
+/* Two ranges stacked on one track: the track and fill are ordinary divs, and only
+   the thumbs take pointer events, so either handle can be grabbed. */
+.chw-dual input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  appearance: none;
+  pointer-events: none;
+
+  /* One thumb spec, written twice because a browser drops the whole rule if it does
+     not recognise the pseudo-element. 16px clears a touch target with the row's
+     padding around it. */
+  &::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    margin-top: 4px;
+    border-radius: 50%;
+    background: var(--chw-surface);
+    border: 2.5px solid currentColor;
+    cursor: ew-resize;
+  }
+  &::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--chw-surface);
+    border: 2.5px solid currentColor;
+    cursor: ew-resize;
+  }
+
+  /* A pinned edge (zero, or no ceiling) still shows a handle, greyed and inert. */
+  &:disabled { color: var(--chw-axis); }
+}
+
+/* ── hero timeline ────────────────────────────────────────────────────────── */
+
+.chw-year-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 10px;
+  white-space: nowrap;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--chw-ink-3);
+
+  i {
+    display: block;
+    width: 1px;
+    height: 5px;
+    background: var(--chw-axis);
+  }
+
+  &:hover { color: var(--chw-ink); }
+
+  &.chw-year-on {
+    color: var(--chw-ink);
+    font-weight: 600;
+
+    i { background: var(--chw-ink); height: 8px; margin-top: -3px; width: 1.5px; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

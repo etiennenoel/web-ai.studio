@@ -148,6 +148,11 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       return;
     }
 
+    if (pathname.includes('/dashboards')) {
+      if (pathname.includes('consumer-hardware-analysis')) this.routeEnum = RouteEnum.DashboardsConsumerHardware;
+      return;
+    }
+
     if (pathname.includes('/best-practices')) {
       this.isBestPracticesExpanded = true;
       if (pathname.includes('session-management')) this.routeEnum = RouteEnum.BestPracticesSessionManagement;

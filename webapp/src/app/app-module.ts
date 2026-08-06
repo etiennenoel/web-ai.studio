@@ -194,6 +194,7 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
+import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardware-analysis/consumer-hardware-analysis.page';
 
 @NgModule({
   declarations: [
@@ -239,6 +240,7 @@ import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
     SemanticEmbedderPlaygroundPage,
     WebSpeechPlaygroundPage,
     NoteEditorPage,
+    ConsumerHardwareAnalysisPage,
     DemoLayoutComponent,
     DemoPreviewComponent,
     SafeHtmlPipe,
