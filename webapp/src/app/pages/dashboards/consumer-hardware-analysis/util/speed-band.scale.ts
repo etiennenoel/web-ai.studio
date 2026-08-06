@@ -98,6 +98,28 @@ export class SpeedBandScale {
     }
   }
 
+  /** The movable lower edges: every band's floor but the slowest, which is pinned to zero. */
+  get lowEdges(): number[] {
+    return this.low.slice(1);
+  }
+
+  /** The movable upper edges: every band's ceiling but the fastest, which has none. */
+  get highEdges(): number[] {
+    return this.high.slice(0, this.topIndex);
+  }
+
+  /**
+   * Restores both sets of edges at once — how a shared URL puts the scale back, including
+   * a scale the sender left deliberately in conflict.
+   */
+  setEdges(lows: number[], highs: number[]) {
+    if (lows.length !== this.topIndex || highs.length !== this.topIndex) {
+      return;
+    }
+    this.low = [0, ...lows.map(value => Math.max(0, value))];
+    this.high = [...highs.map(value => Math.max(0, value)), Number.POSITIVE_INFINITY];
+  }
+
   /** Everything the reader's edges currently disagree about. */
   conflicts(): BandConflictInterface[] {
     const found: BandConflictInterface[] = [];
