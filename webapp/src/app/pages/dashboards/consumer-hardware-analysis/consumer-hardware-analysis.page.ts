@@ -1,5 +1,8 @@
-import {Component, DOCUMENT, Inject, OnInit} from '@angular/core';
+import {Component, DOCUMENT, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
 import {Title} from '@angular/platform-browser';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Subject, debounceTime} from 'rxjs';
 
 import {BasePage} from '../../base-page';
 import {
@@ -24,9 +27,13 @@ import {
 } from './constants/speed-bands.constant';
 import {
   CONTEXT_STEPS,
+  DEFAULT_CONTEXT_TOKENS,
+  DEFAULT_REALISED_BANDWIDTH,
+  DEFAULT_TOKEN_OVERHEAD_MS,
   REALISED_BANDWIDTH_RANGE,
   TOKEN_OVERHEAD_RANGE,
 } from './constants/throughput-model.constant';
+import {DEFAULT_BAND_EDGES} from './constants/speed-bands.constant';
 import {
   HARDWARE_SEGMENT_LABELS as SEGMENT_LABELS,
 } from './constants/hardware-segments.constant';
@@ -39,12 +46,14 @@ import {ModelClassEnum} from './enums/model-class.enum';
 import {ThroughputSourceEnum} from './enums/throughput-source.enum';
 import {BandConflictInterface} from './interfaces/band-conflict.interface';
 import {HardwareDatasetInterface} from './interfaces/hardware-dataset.interface';
+import {DashboardViewStateInterface} from './interfaces/dashboard-view-state.interface';
 import {HardwareDeviceInterface} from './interfaces/hardware-device.interface';
 import {LogTrendInterface} from './interfaces/log-trend.interface';
 import {ModelClassInterface} from './interfaces/model-class.interface';
 import {SpeedBandInterface} from './interfaces/speed-band.interface';
 import {HardwareDatasetService} from './services/hardware-dataset.service';
 import {BandwidthLawCalculator} from './util/bandwidth-law.calculator';
+import {DashboardUrlSerialiser} from './util/dashboard-url.serialiser';
 import {LogTrendCalculator} from './util/log-trend.calculator';
 import {ThroughputModel} from './util/throughput-model';
 import {SpeedBandScale} from './util/speed-band.scale';
@@ -165,6 +174,9 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
 
   hoverCard?: HoverCardViewModel;
 
+  /** Coalesces URL writes: a slider drag fires input events far faster than history. */
+  private readonly urlSync = new Subject<void>();
+
   // hero
   heroRows: HeroRowViewModel[] = [];
   yearTicks: YearTickViewModel[] = [];
@@ -211,6 +223,9 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
 
   constructor(@Inject(DOCUMENT) document: Document,
               title: Title,
+              @Inject(PLATFORM_ID) private readonly platformId: Object,
+              private readonly router: Router,
+              private readonly route: ActivatedRoute,
               private readonly datasetService: HardwareDatasetService) {
     super(document, title);
     this.setTitle('Consumer Hardware Analysis');
@@ -219,14 +234,144 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   override ngOnInit() {
     super.ngOnInit();
 
+    // Read the shared view before the data lands, so the first paint is already the view
+    // the link described rather than the default flashing past.
+    this.applyUrlState();
+
+    this.subscriptions.push(this.urlSync.pipe(debounceTime(200)).subscribe(() => this.writeUrlState()));
+
     this.subscriptions.push(this.datasetService.load().subscribe({
       next: dataset => {
         this.dataset = dataset;
-        this.year = dataset.years[dataset.years.length - 1] ?? this.currentYear;
+        this.year = this.clampYear(this.requestedYear ?? dataset.years[dataset.years.length - 1] ?? this.currentYear);
         this.rebuildAll();
       },
       error: () => this.loadFailed = true,
     }));
+  }
+
+  // ── shareable view ──────────────────────────────────────────────────────────
+
+  /** A year asked for by the URL, held until the dataset says which years exist. */
+  private requestedYear: number | null = null;
+
+  /** The view as it would be with nothing changed. The year's default is the dataset's
+   *  newest, so it is only known once the file has loaded. */
+  private get defaultState(): DashboardViewStateInterface {
+    return {
+      tab: ConsumerHardwareTabEnum.Horizon,
+      year: this.dataset?.years[this.dataset.years.length - 1] ?? this.currentYear,
+      showModelledValues: true,
+      advancedOpen: false,
+      bandLows: [...DEFAULT_BAND_EDGES],
+      bandHighs: [...DEFAULT_BAND_EDGES],
+      contextTokens: DEFAULT_CONTEXT_TOKENS,
+      realisedBandwidth: this.asPercent(DEFAULT_REALISED_BANDWIDTH),
+      overheadMsPerToken: {...DEFAULT_TOKEN_OVERHEAD_MS},
+      matrixGrouping: MatrixGroupingEnum.Type,
+      matrixFilter: 'all',
+      matrixSearch: '',
+      explorerSearch: '',
+      sortColumn: 'bandwidth',
+      sortDirection: -1,
+      horizonClass: ModelClassEnum.Nano2B,
+      horizonYears: HORIZON_HORIZONS[HORIZON_HORIZONS.length - 1],
+      horizonCategories: [...HORIZON_DEFAULT_CATEGORIES],
+    };
+  }
+
+  private get currentState(): DashboardViewStateInterface {
+    return {
+      tab: this.activeTab,
+      year: this.year,
+      showModelledValues: this.showModelledValues,
+      advancedOpen: this.advancedOpen,
+      bandLows: this.scale.lowEdges,
+      bandHighs: this.scale.highEdges,
+      contextTokens: this.model.contextTokens,
+      realisedBandwidth: this.asPercent(this.model.realisedBandwidth),
+      overheadMsPerToken: {...this.model.overheadMsPerToken},
+      matrixGrouping: this.matrixGrouping,
+      matrixFilter: this.matrixFilter,
+      matrixSearch: this.matrixSearch,
+      explorerSearch: this.explorerSearch,
+      sortColumn: this.sortColumn,
+      sortDirection: this.sortDirection,
+      horizonClass: this.horizonClass,
+      horizonYears: this.horizonYears,
+      horizonCategories: [...this.horizonCategories],
+    };
+  }
+
+  private applyUrlState() {
+    const params: Record<string, string> = {};
+    for (const key of this.route.snapshot.queryParamMap.keys) {
+      params[key] = this.route.snapshot.queryParamMap.get(key) ?? '';
+    }
+    if (!Object.keys(params).length) {
+      return;
+    }
+
+    const state = DashboardUrlSerialiser.fromParams(params, this.defaultState);
+
+    this.activeTab = state.tab;
+    this.requestedYear = state.year;
+    this.showModelledValues = state.showModelledValues;
+    this.advancedOpen = state.advancedOpen;
+    this.scale.setEdges(state.bandLows, state.bandHighs);
+    this.model.contextTokens = state.contextTokens;
+    this.model.realisedBandwidth = this.asFraction(state.realisedBandwidth);
+    this.model.overheadMsPerToken = {...state.overheadMsPerToken};
+    this.matrixGrouping = state.matrixGrouping;
+    this.matrixFilter = state.matrixFilter;
+    this.matrixSearch = state.matrixSearch;
+    this.explorerSearch = state.explorerSearch;
+    this.sortColumn = state.sortColumn;
+    this.sortDirection = state.sortDirection;
+    this.horizonClass = state.horizonClass;
+    this.horizonYears = state.horizonYears;
+    this.horizonCategories = new Set(state.horizonCategories);
+  }
+
+  /** Queues the address bar to catch up with the view. */
+  private queueUrlSync() {
+    this.urlSync.next();
+  }
+
+  private writeUrlState() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    // A whole object replaces the query string, so returning a control to its default
+    // removes its parameter rather than leaving a stale one behind.
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: DashboardUrlSerialiser.toParams(this.currentState, this.defaultState),
+      replaceUrl: true,
+    });
+  }
+
+  private clampYear(year: number): number {
+    if (!this.dataset?.years.length) {
+      return year;
+    }
+    const first = this.dataset.years[0];
+    const last = this.dataset.years[this.dataset.years.length - 1];
+    return Math.min(last, Math.max(first, Math.round(year)));
+  }
+
+  private asPercent(bySegment: Record<HardwareSegmentEnum, number>): Record<HardwareSegmentEnum, number> {
+    return HARDWARE_SEGMENT_ORDER.reduce((map, segment) => {
+      map[segment] = Math.round(bySegment[segment] * 100);
+      return map;
+    }, {} as Record<HardwareSegmentEnum, number>);
+  }
+
+  private asFraction(bySegment: Record<HardwareSegmentEnum, number>): Record<HardwareSegmentEnum, number> {
+    return HARDWARE_SEGMENT_ORDER.reduce((map, segment) => {
+      map[segment] = bySegment[segment] / 100;
+      return map;
+    }, {} as Record<HardwareSegmentEnum, number>);
   }
 
   // ── reader controls ─────────────────────────────────────────────────────────
@@ -234,10 +379,12 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   onTabChange(tab: ConsumerHardwareTabEnum) {
     this.activeTab = tab;
     this.hideHoverCard();
+    this.queueUrlSync();
   }
 
   toggleAdvanced() {
     this.advancedOpen = !this.advancedOpen;
+    this.queueUrlSync();
   }
 
   onYearInput(event: Event) {
@@ -255,6 +402,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     const last = this.dataset.years[this.dataset.years.length - 1];
     this.year = Math.min(last, Math.max(first, Math.round(year)));
     this.buildHero();
+    this.queueUrlSync();
   }
 
   get yearFloor(): number {
@@ -314,11 +462,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
 
   /** Every view reads the adjusted figures, so all of them rebuild. */
   private onModelChanged() {
-    this.buildHeadlines();
-    this.buildHero();
-    this.buildMatrix();
-    this.buildExplorer();
-    this.buildHorizonChart();
+    this.onBandsChanged();
   }
 
   onModelledToggle(event: Event) {
@@ -327,16 +471,19 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     this.buildMatrix();
     this.buildExplorer();
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   onHorizonClass(modelClass: ModelClassEnum) {
     this.horizonClass = modelClass;
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   onHorizonYears(years: number) {
     this.horizonYears = years;
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   toggleCategory(type: ConsumerTypeEnum) {
@@ -346,42 +493,50 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       this.horizonCategories.add(type);
     }
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   showAllCategories() {
     this.horizonCategories = new Set(HORIZON_CATEGORY_ORDER);
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   clearCategories() {
     this.horizonCategories = new Set();
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   resetCategories() {
     this.horizonCategories = new Set(HORIZON_DEFAULT_CATEGORIES);
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   onGroupingChange(grouping: MatrixGroupingEnum) {
     this.matrixGrouping = grouping;
     this.matrixFilter = 'all';
     this.buildMatrix();
+    this.queueUrlSync();
   }
 
   onMatrixFilter(key: string) {
     this.matrixFilter = key;
     this.buildMatrix();
+    this.queueUrlSync();
   }
 
   onMatrixSearch(event: Event) {
     this.matrixSearch = (event.target as HTMLInputElement).value;
     this.buildMatrix();
+    this.queueUrlSync();
   }
 
   onExplorerSearch(event: Event) {
     this.explorerSearch = (event.target as HTMLInputElement).value;
     this.buildExplorer();
+    this.queueUrlSync();
   }
 
   sortBy(column: ExplorerColumnViewModel) {
@@ -392,6 +547,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       this.sortDirection = column.numeric ? -1 : 1;
     }
     this.buildExplorer();
+    this.queueUrlSync();
   }
 
   sortDirectionFor(column: ExplorerColumnViewModel): 'ascending' | 'descending' | 'none' {
@@ -401,12 +557,15 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     return this.sortDirection === 1 ? 'ascending' : 'descending';
   }
 
+  /** Rebuilds every view that reads the bands or the loss model, then queues the URL. */
   private onBandsChanged() {
     this.buildBandSliders();
+    this.buildHeadlines();
     this.buildHero();
     this.buildMatrix();
     this.buildExplorer();
     this.buildHorizonChart();
+    this.queueUrlSync();
   }
 
   // ── hover card ──────────────────────────────────────────────────────────────
