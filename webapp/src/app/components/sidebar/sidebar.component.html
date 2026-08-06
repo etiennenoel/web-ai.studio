@@ -652,6 +652,18 @@
         <span>Note Editor</span>
       </a>
 
+      <div class="mt-4 mb-2 px-3 text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+        Dashboards
+      </div>
+
+      <!-- Consumer Hardware Analysis -->
+      <a [routerLink]="getRouterLink(RouteEnum.DashboardsConsumerHardware)"
+         class="!no-underline flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"
+         [ngClass]="routeEnum === RouteEnum.DashboardsConsumerHardware ? 'bg-[#ffffff] dark:bg-zinc-800 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/60 dark:ring-zinc-700' : '!text-slate-600 dark:!text-slate-400 hover:bg-slate-200/60 dark:hover:bg-zinc-800/50 hover:!text-slate-900 dark:hover:!text-white'">
+        <i class="bi bi-cpu text-lg w-7 flex justify-start"></i>
+        <span>Consumer Hardware Analysis</span>
+      </a>
+
     </nav>
   </div>
 

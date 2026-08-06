@@ -63,6 +63,7 @@ src/app/
     demos/            # 21+ feature demonstrations
     evals/            # Evaluation/testing
     bugs/             # Bug tracking
+    dashboards/       # Data dashboards built from CSV datasets in public/data/
   components/         # Reusable UI components (chat, sidebar, header, etc.)
   core/
     services/         # Business logic services
