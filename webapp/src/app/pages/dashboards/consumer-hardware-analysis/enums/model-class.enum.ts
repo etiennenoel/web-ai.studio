@@ -12,4 +12,11 @@ export enum ModelClassEnum {
   Mid = 'mid',
   Large = 'large',
   Xl = 'xl',
+
+  /** Speech models, by the Whisper size they are named for. */
+  WhisperTiny = 'whisper-tiny',
+  WhisperBase = 'whisper-base',
+  WhisperSmall = 'whisper-small',
+  WhisperMedium = 'whisper-medium',
+  WhisperLarge = 'whisper-large',
 }

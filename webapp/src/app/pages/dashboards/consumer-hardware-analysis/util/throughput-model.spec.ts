@@ -1,4 +1,5 @@
 import {MODEL_CLASS_BY_KEY} from '../constants/model-classes.constant';
+import {SPEECH_DECODER_EFFICIENCY} from '../constants/speech-model.constant';
 import {
   DEFAULT_REALISED_BANDWIDTH,
   DEFAULT_TOKEN_OVERHEAD_MS,
@@ -139,5 +140,78 @@ describe('ThroughputModel', () => {
     expect(model.overheadMsPerToken[gpu]).toBe(DEFAULT_TOKEN_OVERHEAD_MS[gpu]);
     expect(model.realisedBandwidth[gpu]).toBe(DEFAULT_REALISED_BANDWIDTH[gpu]);
     expect(model.contextTokens).toBe(4096);
+  });
+
+  describe('transcribing', () => {
+
+    const whisperLarge = MODEL_CLASS_BY_KEY[ModelClassEnum.WhisperLarge];
+    const whisperSmall = MODEL_CLASS_BY_KEY[ModelClassEnum.WhisperSmall];
+
+    /** The decode half is stated, not fitted: the same share every text size settles at. */
+    const speechSlope = SPEECH_DECODER_EFFICIENCY / whisperLarge.quantisedWeightsGb;
+
+    it('caps the cache at the model\'s own window, however wide the context asked for', () => {
+      model.contextTokens = 32768;
+
+      // 448 tokens is the 30-second window, not the 32K the reader dragged to
+      expect(model.contextGb(whisperLarge)).toBeCloseTo(448 * 24 / 1048576, 6);
+      expect(model.contextGb(whisperLarge)).toBeLessThan(model.contextGb(light));
+    });
+
+    it('spends a second of audio on an encoder pass and a few decode steps', () => {
+      const bandwidth = 1008;
+      const tokensPerSecond = model.adjust(bandwidth * speechSlope, whisperLarge, gpu, SPEECH_DECODER_EFFICIENCY);
+
+      const encoder = model.encoderMilliseconds(whisperLarge, gpu, bandwidth);
+      const decoder = model.decoderMilliseconds(tokensPerSecond);
+
+      expect(model.realtimeFactor(bandwidth * speechSlope, whisperLarge, gpu, SPEECH_DECODER_EFFICIENCY, bandwidth))
+        .toBeCloseTo(1000 / (encoder + decoder), 6);
+    });
+
+    it('puts a graphics card far above realtime and a small board just above it', () => {
+      const card = model.realtimeFactor(
+        1008 * speechSlope, whisperLarge, gpu, SPEECH_DECODER_EFFICIENCY, 1008);
+      const board = model.realtimeFactor(
+        17 * SPEECH_DECODER_EFFICIENCY / whisperSmall.quantisedWeightsGb,
+        whisperSmall, HardwareSegmentEnum.Edge, SPEECH_DECODER_EFFICIENCY, 17);
+
+      expect(card).toBeGreaterThan(20);
+      expect(board).toBeGreaterThan(1);
+      expect(board).toBeLessThan(card);
+    });
+
+    it('charges the encoder nothing but compute: halving the assumed FLOP per byte doubles its cost', () => {
+      const before = model.encoderMilliseconds(whisperLarge, gpu, 1008);
+
+      model.flopPerByte[gpu] = model.flopPerByte[gpu] / 2;
+
+      expect(model.encoderMilliseconds(whisperLarge, gpu, 1008)).toBeCloseTo(before * 2, 6);
+    });
+
+    it('counts a longer transcript as more decode steps', () => {
+      const bandwidth = 546;
+      const raw = bandwidth * speechSlope;
+      const atFive = model.realtimeFactor(raw, whisperLarge, gpu, SPEECH_DECODER_EFFICIENCY, bandwidth);
+
+      model.tokensPerSecondOfAudio = 10;
+
+      expect(model.realtimeFactor(raw, whisperLarge, gpu, SPEECH_DECODER_EFFICIENCY, bandwidth))
+        .toBeLessThan(atFive);
+    });
+
+    it('counts either speech figure as a tuned model', () => {
+      expect(model.isTuned).toBeFalse();
+
+      model.tokensPerSecondOfAudio = 3;
+      expect(model.isTuned).toBeTrue();
+
+      model.reset();
+      model.flopPerByte[gpu] = 12;
+      expect(model.isTuned).toBeTrue();
+
+      model.reset();
+      expect(model.isTuned).toBeFalse();
+    });
   });
 });

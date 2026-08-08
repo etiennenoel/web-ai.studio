@@ -14,27 +14,58 @@
 
         <p class="text-[11px] font-mono uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500 mb-3">
           @if (dataset) {
-            {{ dataset.devices.length }} machines · {{ yearRangeLabel }} · eight model sizes
+            {{ dataset.devices.length }} machines · {{ yearRangeLabel }} · {{ taskCopy.sizesLabel }}
           } @else {
             Consumer hardware · local inference
           }
         </p>
 
-        <h1 class="text-3xl md:text-4xl xl:text-[2.9rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-4">
-          Local models run at the speed of the
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">memory bus</span>.
-        </h1>
+        <!-- Two different questions of the same machines, not two filters on one answer:
+             each task has its own model sizes, its own arithmetic and its own unit. -->
+        <div class="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 mb-4"
+             role="group" aria-label="What the hardware is being asked to do">
+          @for (option of [modeEnum.Text, modeEnum.Audio]; track option) {
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 border-none"
+                    [attr.aria-pressed]="mode === option"
+                    [ngClass]="mode === option
+                      ? 'bg-[#ffffff] dark:bg-zinc-700 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/60 dark:ring-zinc-600/50'
+                      : 'bg-transparent !text-slate-500 dark:!text-slate-400 hover:!text-slate-800 dark:hover:!text-slate-200'"
+                    (click)="onModeChange(option)">{{ taskCopyFor(option).switchLabel }}</button>
+          }
+        </div>
 
-        <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-5">
-          Generating a token means reading the whole model out of memory, so how fast a machine answers comes down to
-          how fast its memory bus is. Two things stand between the spec sheet and reality: a machine only
-          <strong class="text-slate-900 dark:text-slate-100">realises part of its rated peak</strong>
-          @if (realisedRangeLabel) { ({{ realisedRangeLabel }} here) },
-          and the engine only keeps part of what it gets
-          @if (engineShareRangeLabel) { — <strong class="text-slate-900 dark:text-slate-100">{{ engineShareRangeLabel }}</strong> of a token goes on streaming weights, least on the smallest models },
-          because fixed per-token overhead swamps a small model's streaming time. Both are tunable in Advanced
-          settings. Pick a year to see what each kind of consumer hardware averaged on each size of model.
-        </p>
+        @if (isAudio) {
+          <h1 class="text-3xl md:text-4xl xl:text-[2.9rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-4">
+            Transcription is a
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">compute</span>
+            problem with a memory tail.
+          </h1>
+
+          <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-5">
+            A Whisper-style model does two different jobs for every second of audio: an encoder pass over 50 frames,
+            which is pure compute and never autoregressive, then a handful of decoder tokens, which stream weights out
+            of memory like any other model. The encoder dominates on slow machines and the decoder's per-token
+            overhead on fast ones. Everything below is speed against realtime —
+            <strong class="text-slate-900 dark:text-slate-100">1× transcribes an hour of audio in an hour</strong>.
+            Pick a year to see what each kind of consumer hardware managed.
+          </p>
+        } @else {
+          <h1 class="text-3xl md:text-4xl xl:text-[2.9rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.05] mb-4">
+            Local models run at the speed of the
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">memory bus</span>.
+          </h1>
+
+          <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mb-5">
+            Generating a token means reading the whole model out of memory, so how fast a machine answers comes down to
+            how fast its memory bus is. Two things stand between the spec sheet and reality: a machine only
+            <strong class="text-slate-900 dark:text-slate-100">realises part of its rated peak</strong>
+            @if (realisedRangeLabel) { ({{ realisedRangeLabel }} here) },
+            and the engine only keeps part of what it gets
+            @if (engineShareRangeLabel) { — <strong class="text-slate-900 dark:text-slate-100">{{ engineShareRangeLabel }}</strong> of a token goes on streaming weights, least on the smallest models },
+            because fixed per-token overhead swamps a small model's streaming time. Both are tunable in Advanced
+            settings. Pick a year to see what each kind of consumer hardware averaged on each size of model.
+          </p>
+        }
 
         @if (efficiencyItems.length) {
           <ul class="flex flex-wrap gap-x-4 gap-y-1.5 list-none p-0 m-0 font-mono text-[11px] text-slate-400 dark:text-slate-500">
@@ -81,7 +112,7 @@
           <p class="font-mono text-[10.5px] text-slate-400 dark:text-slate-500 mt-3 mb-2.5">{{ yearHint }}</p>
 
           <div class="overflow-x-auto">
-            <div class="min-w-[600px]" style="--chw-label-width: 104px">
+            <div class="min-w-[600px]" [style]="{'--chw-label-width': '104px', '--chw-columns': modelClasses.length}">
               <div class="chw-matrix-row mb-1">
                 <div></div>
                 @for (modelClass of modelClasses; track modelClass.key) {
@@ -123,14 +154,20 @@
             @for (band of bandsFastestFirst; track band.key) {
               <span class="flex items-center gap-1.5">
                 <span class="w-3 h-3 rounded-sm chw-fill-swatch" [attr.data-speed]="band.index"></span>
-                {{ band.name }} · {{ band.rangeLabel }}
+                {{ band.name }} · {{ withUnit(band.rangeLabel) }}
               </span>
             }
             <span class="flex items-center gap-1.5">
               <span class="w-3 h-3 rounded-sm chw-cell-hatched border border-slate-200 dark:border-zinc-800"></span>
               won't fit
             </span>
-            <span class="ml-auto font-mono text-[10px] text-slate-400 dark:text-slate-500">{{ model.contextLabel }} context · hover any cell for tok/s</span>
+            <span class="ml-auto font-mono text-[10px] text-slate-400 dark:text-slate-500">
+              @if (isAudio) {
+                {{ audioContextCap }}-token window · hover any cell for {{ unitLong }}
+              } @else {
+                {{ model.contextLabel }} context · hover any cell for {{ unit }}
+              }
+            </span>
           </div>
         } @else {
           <div class="h-72 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 animate-pulse"></div>
@@ -153,13 +190,21 @@
         <span class="font-mono text-[10px] opacity-60">{{ advancedSummary }}</span>
       </button>
 
-      <label class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer select-none">
-        <input type="checkbox" class="chw-range w-4 h-4" [checked]="showModelledValues" (change)="onModelledToggle($event)">
+      <!-- Nothing in the file was benchmarked on transcription, so there are no gaps to
+           fill in there and the switch has nothing to act on. It keeps its label either
+           way: it is the same control, not a different one. -->
+      <label class="flex items-center gap-2 text-xs select-none"
+             [ngClass]="isAudio
+               ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+               : 'text-slate-500 dark:text-slate-400 cursor-pointer'"
+             [attr.title]="isAudio ? 'Every transcription figure is modelled — there is nothing measured to fall back to' : null">
+        <input type="checkbox" class="chw-range w-4 h-4" [checked]="showModelledValues" [disabled]="isAudio"
+               (change)="onModelledToggle($event)">
         Fill gaps with modelled values
       </label>
 
       <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800/80 ml-auto" role="tablist" aria-label="Dashboard views">
-        @for (tab of [tabEnum.Horizon, tabEnum.Matrix, tabEnum.Explorer]; track tab) {
+        @for (tab of [tabEnum.Horizon, tabEnum.Matrix, tabEnum.Explorer, tabEnum.Notes]; track tab) {
           <button type="button" role="tab" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all duration-150 border-none"
                   [id]="'chw-tab-' + tab"
                   [attr.aria-controls]="'chw-panel-' + tab"
@@ -167,7 +212,7 @@
                   [ngClass]="activeTab === tab
                     ? 'bg-[#ffffff] dark:bg-zinc-700 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/60 dark:ring-zinc-600/50'
                     : 'bg-transparent !text-slate-500 dark:!text-slate-400 hover:!text-slate-800 dark:hover:!text-slate-200'"
-                  (click)="onTabChange(tab)">{{ tab === tabEnum.Explorer ? 'Data Explorer' : tab }}</button>
+                  (click)="onTabChange(tab)">{{ tabLabel(tab) }}</button>
         }
       </div>
     </div>
@@ -175,7 +220,7 @@
     @if (advancedOpen) {
       <div id="chw-advanced" class="max-w-7xl mx-auto px-6 pb-3 pt-1 border-t border-slate-100 dark:border-zinc-800/70 flex flex-wrap items-start gap-x-5 gap-y-3">
         <span class="font-mono text-[10px] uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500 whitespace-nowrap pt-2">
-          Speed bands · tok/s
+          Speed bands · {{ unitLong }}
         </span>
 
         <!-- Five bands, five columns, so the scale reads left to right as one strip. -->
@@ -199,11 +244,11 @@
                 <div class="chw-fill-bar" [style.left.%]="slider.fillLeftPercent" [style.right.%]="slider.fillRightPercent"></div>
                 <input type="range" min="0" [max]="sliderMax" step="1" [value]="slider.lowPosition"
                        [disabled]="slider.lowLocked"
-                       [attr.aria-label]="slider.lowLocked ? slider.name + ' starts at zero' : slider.name + ' starts at, tokens per second'"
+                       [attr.aria-label]="slider.lowLocked ? slider.name + ' starts at zero' : slider.name + ' starts at, ' + unitLong"
                        (input)="onBandEdgeInput(slider.index, 'low', $event)">
                 <input type="range" min="0" [max]="sliderMax" step="1" [value]="slider.highPosition"
                        [disabled]="slider.highLocked"
-                       [attr.aria-label]="slider.highLocked ? slider.name + ' has no ceiling' : slider.name + ' ends at, tokens per second'"
+                       [attr.aria-label]="slider.highLocked ? slider.name + ' has no ceiling' : slider.name + ' ends at, ' + unitLong"
                        (input)="onBandEdgeInput(slider.index, 'high', $event)">
               </div>
             </div>
@@ -225,6 +270,39 @@
             <span class="font-mono text-xs font-semibold text-slate-900 dark:text-white min-w-[96px]">{{ contextValueLabel }}</span>
             <span class="font-mono text-[10.5px] text-slate-400 dark:text-slate-500">{{ contextCostHint }}</span>
           </div>
+
+          @if (isAudio) {
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono text-[10.5px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 min-w-[132px]">Transcription</span>
+
+              <label class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] pl-2.5 pr-1.5 py-1 text-[11.5px] text-slate-600 dark:text-slate-400">
+                <span>Text tokens / s of audio</span>
+                <input type="number" class="w-[52px] text-right font-mono text-[11.5px] px-1 py-0.5 rounded border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-slate-100"
+                       [min]="audioTokensRange.min" [max]="audioTokensRange.max" [step]="audioTokensRange.step"
+                       [value]="model.tokensPerSecondOfAudio"
+                       aria-label="Text tokens per second of audio"
+                       (input)="onAudioTokens($event)">
+              </label>
+
+              @for (segment of segments; track segment) {
+                <label class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#161616] pl-2.5 pr-1.5 py-1 text-[11.5px] text-slate-600 dark:text-slate-400">
+                  <span>{{ segmentLabels[segment] }}</span>
+                  <input type="number" class="w-[52px] text-right font-mono text-[11.5px] px-1 py-0.5 rounded border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-slate-100"
+                         [min]="flopPerByteRange.min" [max]="flopPerByteRange.max" [step]="flopPerByteRange.step"
+                         [value]="model.flopPerByte[segment]"
+                         [attr.aria-label]="segmentLabels[segment] + ' compute, FLOP per byte of bandwidth'"
+                         (input)="onFlopPerByte(segment, $event)">
+                  <span class="text-[10px] text-slate-400 dark:text-slate-500">FLOP/B</span>
+                </label>
+              }
+
+              <span class="basis-full font-mono text-[10.5px] text-slate-400 dark:text-slate-500">
+                the encoder is compute-bound and this dataset only carries bandwidth, so compute is estimated as FLOP
+                per byte of bandwidth — the one figure here not derived from the data. Token rate covers beam search
+                and timestamps; greedy decoding is nearer 2.
+              </span>
+            </div>
+          }
 
           <div class="flex flex-wrap items-center gap-2">
             <span class="font-mono text-[10.5px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 min-w-[132px]">Realised bandwidth</span>
@@ -344,7 +422,7 @@
                while the rows go by. Capped short of the viewport so the page around it
                stays obviously scrollable. -->
           <div class="overflow-auto lg:max-h-[620px] rounded-lg">
-            <div class="min-w-[980px]">
+            <div class="min-w-[980px]" [style]="{'--chw-columns': modelClasses.length}">
 
               <div class="chw-matrix-row sticky top-0 z-10 bg-[#ffffff] dark:bg-[#121212] pb-1.5 pt-1">
                 <div></div>
@@ -408,7 +486,7 @@
             @for (band of bandsFastestFirst; track band.key) {
               <span class="flex items-center gap-1.5">
                 <span class="w-3 h-3 rounded-sm chw-fill-swatch" [attr.data-speed]="band.index"></span>
-                {{ band.name }} · {{ band.rangeLabel }}
+                {{ band.name }} · {{ withUnit(band.rangeLabel) }}
               </span>
             }
             <span class="flex items-center gap-1.5">
@@ -500,9 +578,15 @@
                 Where each kind of hardware is heading
               </h2>
               <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-                The table at the top of the page shows one year at a time. This is every year at once — the average
-                speed each category of machine manages on a given size of model, from {{ yearRangeLabel }}, and where
-                its own trend points next.
+                @if (isAudio) {
+                  The table at the top of the page shows one year at a time. This is every year at once — how fast each
+                  category of machine transcribes at a given model size, from {{ yearRangeLabel }}, and where its own
+                  trend points next.
+                } @else {
+                  The table at the top of the page shows one year at a time. This is every year at once — the average
+                  speed each category of machine manages on a given size of model, from {{ yearRangeLabel }}, and where
+                  its own trend points next.
+                }
               </p>
               <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Each line is fitted from that category's own history and nothing else. It is not a roadmap or a leak;
@@ -518,14 +602,25 @@
                   The solid line is measured hardware, averaged per year. Dashed beyond it is extrapolation, on the
                   shaded side of the chart.
                 </li>
-                <li>
-                  Background stripes are the speed bands you set in Advanced settings, named down both edges. A line
-                  entering the green stripe is a category that has become <em>fast enough</em> for that model size.
-                </li>
-                <li>
-                  Where a line stops or never starts, either the machines of that category cannot hold the model, or
-                  the source has no figure for it — the Tiny row is measured only, never modelled.
-                </li>
+                @if (isAudio) {
+                  <li>
+                    Background stripes are the speed bands you set in Advanced settings, named down both edges. A line
+                    above the 1× stripe transcribes <em>faster than the audio plays</em>.
+                  </li>
+                  <li>
+                    Every figure here is modelled — no machine in this dataset was benchmarked on transcription. The
+                    encoder half rests on a compute estimate, which is the least certain thing on the page.
+                  </li>
+                } @else {
+                  <li>
+                    Background stripes are the speed bands you set in Advanced settings, named down both edges. A line
+                    entering the green stripe is a category that has become <em>fast enough</em> for that model size.
+                  </li>
+                  <li>
+                    Where a line stops or never starts, either the machines of that category cannot hold the model, or
+                    the source has no figure for it — the Tiny row is measured only, never modelled.
+                  </li>
+                }
               </ol>
             </div>
           </div>
@@ -617,7 +712,7 @@
                           [attr.y1]="horizonChart.plotTop" [attr.y2]="horizonChart.plotBottom"></line>
                     <line class="chw-axis-line" [attr.x1]="horizonChart.plotLeft" [attr.x2]="horizonChart.plotRight"
                           [attr.y1]="horizonChart.plotBottom" [attr.y2]="horizonChart.plotBottom"></line>
-                    <text class="chw-mark-label-strong" text-anchor="end" [attr.x]="horizonChart.plotLeft - 8" [attr.y]="horizonChart.plotTop - 14">tok/s</text>
+                    <text class="chw-mark-label-strong" text-anchor="end" [attr.x]="horizonChart.plotLeft - 8" [attr.y]="horizonChart.plotTop - 14">{{ unitLong }}</text>
 
                     @for (series of horizonChart.series; track series.type) {
                       @if (series.projectedPoints) {
@@ -690,15 +785,294 @@
         </section>
       }
 
+      <!-- ── How it works ──────────────────────────────────────────────────── -->
+      @if (activeTab === tabEnum.Notes) {
+        <section id="chw-panel-notes" role="tabpanel" aria-labelledby="chw-tab-notes" tabindex="0"
+                 class="chw-article max-w-[72ch]">
+
+          @if (isAudio) {
+            <h2>How transcription spends its time</h2>
+            <p class="chw-standfirst">
+              Speech recognition looks like a language model and behaves like something else entirely. Half of the work
+              is a compute-bound pass that never generates a token, and the half that does generate tokens only needs a
+              handful of them per second of audio. Both halves matter, and which one is holding you up depends on what
+              you are running it on.
+            </p>
+
+            <h3>What actually happens to a second of audio</h3>
+            <p>A Whisper-style model runs a fixed pipeline on a 30-second window.</p>
+            <p>
+              The audio becomes a <b>log-Mel spectrogram</b>, 3000 frames for those 30 seconds. Two strided convolutions
+              halve that to 1500 positions — <b>50 for every second of audio</b>, regardless of how fast anybody is
+              speaking.
+            </p>
+            <p>
+              The <b>encoder</b> then processes all 1500 positions in a single forward pass. There is no autoregression
+              here and nothing to wait for: it is a stack of large dense matrix multiplications with high arithmetic
+              intensity, which is to say it is compute-bound in the ordinary way that training is compute-bound. It does
+              not care much about memory bandwidth.
+            </p>
+            <p>
+              The <b>decoder</b> then writes text, one token at a time, cross-attending to what the encoder produced.
+              This half <em>is</em> memory-bound and behaves exactly like a small language model. But speech is only
+              about 2.5 words a second, so a second of audio needs roughly three text tokens — call it five once
+              timestamps and beam search are included. Compare that with the 50 encoder positions and the shape of the
+              problem becomes clear.
+            </p>
+
+            <h3>The two costs of a second of audio</h3>
+            <p class="chw-calc">
+              encoder = 2 × encoder params × 50 frames ÷ effective FLOPS<br>
+              decoder = tokens × [ (decoder weights + cache) ÷ (bandwidth × realised) + overhead ]<br>
+              × realtime = 1000 ÷ (encoder ms + decoder ms)
+            </p>
+            <p>
+              For whisper-large-v3 the encoder is 635M of the 1.55B parameters, so it costs about
+              <b>63.5 GFLOP per second of audio</b> — a fixed toll that does not depend on how fast your memory is. The
+              decoder's 915M parameters at 4-bit are only 0.46 GB, and it reads them about five times a second. Memory
+              capacity is essentially never the constraint here: the entire model fits in under a gigabyte.
+            </p>
+            <p>
+              This page has bandwidth figures for every machine but no compute figures, so effective FLOPS are estimated
+              as a fixed ratio of FLOP per byte of bandwidth — around 30 for graphics cards, 4 for laptop chips. It is
+              the least certain assumption on the site, it is tunable in Advanced settings, and it is calibrated against
+              published whisper-large throughput.
+            </p>
+
+            <h3>Four machines, worked through</h3>
+            <div class="overflow-x-auto">
+              <table class="chw-worked">
+                <thead>
+                  <tr><th>Machine</th><th>Model</th><th>Compute</th><th>Encoder</th><th>Decoder</th><th>Result</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>RTX 4090</td><td>large-v3</td><td>25.7 TFLOPS</td><td>2.5 ms</td><td>12.7 ms</td><td><b>66× realtime</b></td></tr>
+                  <tr><td>M4 Max</td><td>large-v3</td><td>4.6 TFLOPS</td><td>13.7 ms</td><td>55.1 ms</td><td><b>15×</b></td></tr>
+                  <tr><td>Lunar Lake laptop</td><td>large-v3</td><td>0.27 TFLOPS</td><td>231.8 ms</td><td>259.3 ms</td><td><b>2.0×</b></td></tr>
+                  <tr><td>Raspberry Pi 5</td><td>small</td><td>0.02 TFLOPS</td><td>460.1 ms</td><td>453.2 ms</td><td><b>1.1×</b></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The interesting column is the split. On a 4090 the decoder costs five times the encoder — the machine is
+              fast enough that the fixed per-token overhead of five decoder steps outweighs a 63 GFLOP matmul. On the
+              laptop and the Pi the two halves are nearly equal. Different machines are bottlenecked at different ends
+              of the same model, and an optimisation that transforms one will do nothing for the other.
+            </p>
+            <p>
+              Note also what transcription makes possible. A Raspberry Pi 5 cannot hold a conversation with any text
+              model on this page — it crawls on everything. It transcribes with whisper-small faster than the audio
+              plays.
+            </p>
+
+            <h3>Where software makes the difference</h3>
+            <p>
+              <b>Silence is free if you remove it.</b> Voice activity detection is usually the largest single win on
+              real recordings, and it is not an optimisation of the model at all. Meetings, interviews and voice notes
+              are commonly 20–50% silence; cutting it removes that share of the work outright. Nothing else on this list
+              is so cheap.
+            </p>
+            <p>
+              <b>Batch the encoder.</b> Long audio is a sequence of independent 30-second windows, and the encoder is
+              compute-bound, so pushing several windows through together fills the machine properly. Batched pipelines
+              routinely give 3–5× on long files. This is the opposite of the text case, where batching does nothing for
+              a single user.
+            </p>
+            <p>
+              <b>Beam size is a direct multiplier on the decoder half.</b> Going from beam 5 to greedy cuts decoder work
+              by most of that factor. On a 4090, where the decoder is 84% of the time, that is transformative; on a Pi
+              it is worth about half. Accuracy loss is small on clean audio and more noticeable on hard audio.
+            </p>
+            <p>
+              <b>Distilled models attack the same half structurally.</b> distil-large-v3 keeps the full encoder but
+              replaces the 32-layer decoder with 2, so the decoder term nearly vanishes while accuracy stays within
+              about a point of the original. On decoder-bound hardware this is close to a free 3–5×.
+            </p>
+            <p>
+              <b>The runtime is worth more here than in text.</b> CTranslate2 and whisper.cpp are typically several
+              times faster than the reference PyTorch implementation at identical output, because the reference was
+              written to be readable. Very few workloads on this page have that much headroom sitting in the engine
+              choice.
+            </p>
+            <p>
+              <b>Consider leaving the architecture behind.</b> CTC and transducer models — Parakeet, Canary — have no
+              autoregressive decoder at all. They emit the whole transcript in one pass, deleting the entire second half
+              of this article's arithmetic, and reach thousands of times realtime on a graphics card. The trade is less
+              robust formatting, weaker punctuation and no free translation.
+            </p>
+            <p>
+              <b>Quantisation helps less than it does for text.</b> The decoder half responds the same way, but the
+              encoder is compute-bound, so shrinking its weights does not speed it up unless the hardware has genuinely
+              faster low-precision matmul to exploit.
+            </p>
+
+            <h3>What this model does not capture</h3>
+            <p>
+              No machine in this dataset was benchmarked on transcription, so every figure here is modelled, and the
+              encoder half rests on a compute estimate rather than a measurement. Accuracy is ignored entirely — a model
+              that runs at 40× and mangles names is not better than one at 10× that does not. Long-form scheduling, VAD,
+              and chunking strategy can move real throughput by more than the hardware differences shown here. And
+              streaming transcription, where latency matters more than throughput, is a different problem with a
+              different answer.
+            </p>
+          } @else {
+            <h2>How text generation spends its time</h2>
+            <p class="chw-standfirst">
+              Every number on this page comes out of one observation: to produce a single token, a language model has to
+              read all of its weights. That one fact decides which hardware matters, which upgrades are wasted, and why
+              a laptop that benchmarks well feels slow.
+            </p>
+
+            <h3>Two phases, two different machines</h3>
+            <p>Answering a prompt is not one workload but two, and they stress opposite parts of a computer.</p>
+            <p>
+              <b>Prefill</b> reads your prompt. Every prompt token is processed at once, in parallel, as a few very
+              large matrix multiplications. There is plenty of arithmetic per byte fetched, so the compute units stay
+              busy and the memory bus is not the limit. Prefill decides your <em>time to first token</em>, and it is why
+              a long document takes a moment before anything appears.
+            </p>
+            <p>
+              <b>Decode</b> writes the answer, one token at a time. Each token depends on the one before it, so there is
+              nothing to parallelise. To produce it, the machine reads every weight in the model, does about two
+              floating-point operations per byte it fetched, and throws the weights away — then does it again for the
+              next token. Decode decides your <em>tokens per second</em>, and it is the phase this page models.
+            </p>
+            <p>
+              At batch size one, decode has an arithmetic intensity of roughly 1 FLOP per byte. A modern GPU can sustain
+              a hundred or more. The compute units spend almost all of their time waiting for memory, which is why a
+              graphics card's advertised TFLOPS tell you very little about how fast it will chat with you, and its GB/s
+              tell you almost everything.
+            </p>
+
+            <h3>The three costs of a token</h3>
+            <p>Every generated token pays for three things:</p>
+            <ol>
+              <li><b>The weights.</b> An 8B model at 4-bit is about 4.7 GB. All of it moves, every token.</li>
+              <li>
+                <b>The KV cache.</b> Attention re-reads the key and value vectors of every previous token. The cache
+                grows with the conversation, and at 4K context on an 8B model it adds about 0.5 GB to each token's
+                traffic.
+              </li>
+              <li>
+                <b>A fixed overhead.</b> Kernel launches, sampling, attention bookkeeping, framework dispatch. It is
+                roughly constant — a few milliseconds — and does not shrink when the model does. This is the term most
+                people leave out, and it is the one that explains the odd results.
+              </li>
+            </ol>
+            <p class="chw-calc">
+              time per token = (weights + cache) ÷ (bandwidth × realised) + overhead<br>
+              tokens per second = 1000 ÷ time per token
+            </p>
+            <p>
+              <em>Realised</em> matters. No machine moves data at its rated peak. A graphics card gets close to 85%; a
+              laptop running on system RAM manages about half that, partly because it has two memory channels instead of
+              a wide GDDR bus, and partly because dequantising 4-bit weights costs enough compute that the CPU cannot
+              even issue memory requests fast enough to saturate what it has.
+            </p>
+
+            <h3>Three machines, worked through</h3>
+            <div class="overflow-x-auto">
+              <table class="chw-worked">
+                <thead>
+                  <tr><th>Machine</th><th>Model</th><th>Bandwidth</th><th>Stream</th><th>Overhead</th><th>Result</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>RTX 4090</td><td>8B</td><td>1008 × 85% = 857 GB/s</td><td>5.2 GB ÷ 857 = 5.6 ms</td><td>2 ms</td><td><b>132 tok/s</b></td></tr>
+                  <tr><td>M4 Max</td><td>14B</td><td>546 × 85% = 464 GB/s</td><td>9.3 GB ÷ 464 = 20.2 ms</td><td>10 ms</td><td><b>33 tok/s</b></td></tr>
+                  <tr><td>Lunar Lake laptop</td><td>4B</td><td>137 × 50% = 68 GB/s</td><td>2.9 GB ÷ 68 = 42.0 ms</td><td>45 ms</td><td><b>11 tok/s</b></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Look at the last row. The laptop spends more time on fixed overhead than on reading the model. Doubling
+              its memory bandwidth would take it from 11 to about 15 tokens per second — not to 22. That is the single
+              most useful thing this model tells you, and it is invisible if you think of throughput as bandwidth
+              divided by model size.
+            </p>
+
+            <h3>Where the bottleneck actually sits</h3>
+            <p>There are three regimes, and they want different things from you.</p>
+            <p>
+              <b>Below about 2B, overhead rules.</b> The weights stream in a millisecond or two and then the machine
+              sits in per-token bookkeeping. This is why an 819 GB/s M3 Ultra and a 120 GB/s M4 land in the same place
+              on a 4B model in real benchmarks — seven times the bandwidth, no faster, because bandwidth was never what
+              they were waiting for. If you run small models, buy a better engine, not a better bus.
+            </p>
+            <p>
+              <b>Between roughly 7B and 30B, bandwidth rules.</b> Streaming dominates the token, and throughput tracks
+              GB/s almost linearly. This is the range where the spec sheet means what you think it means.
+            </p>
+            <p>
+              <b>Above 30B, capacity rules.</b> Speed stops being the question. A model that does not fit is not slow,
+              it is absent; and a model that half-fits, spilling layers to system memory or disk, is ten to a hundred
+              times slower than one that fits. This is why a 512 GB Mac Studio is interesting despite unremarkable
+              bandwidth, and why a 16 GB graphics card with twice the bandwidth is not.
+            </p>
+
+            <h3>Where software makes the difference</h3>
+            <p>
+              <b>Quantisation is the largest single lever.</b> It is not a compression trick that happens to save disk —
+              it directly divides the number that this whole page is about. FP16 to 4-bit is four times less to read,
+              therefore close to four times faster, and the quality cost on a well-made 4-bit quant is small. Going
+              below 4 bits buys progressively less speed for progressively more damage.
+            </p>
+            <p>
+              <b>Quantising the KV cache</b> is the same trick applied to the second term. It does nothing at short
+              context and a great deal at long context: on an 8B model at 32K tokens the cache is larger than the
+              weights, so halving it to 8-bit is worth 20–30%.
+            </p>
+            <p>
+              <b>Batching multiplies throughput but not latency.</b> Weights read once serve every sequence in the
+              batch, so eight concurrent users cost barely more than one. This is decisive for a server and irrelevant
+              to a single chat window — which is exactly why server benchmarks look nothing like what you get at home.
+            </p>
+            <p>
+              <b>Speculative decoding attacks the sequential dependency itself.</b> A small draft model proposes several
+              tokens; the large model checks them all in one pass, keeping the ones it agrees with. When the draft is
+              good, several tokens cost one read of the big model, for 1.5–3× with no change in output quality. It is
+              the rare optimisation that improves single-user latency.
+            </p>
+            <p>
+              <b>The engine matters most where overhead matters most.</b> llama.cpp, MLX, vLLM and ExLlama differ mainly
+              in kernel quality and dispatch cost — the third term. On a 70B model they land within a few percent of
+              each other because all of them are waiting for the same bus. On a 1B model the choice of engine can be the
+              whole result.
+            </p>
+            <p>
+              <b>Things that help less than expected:</b> more CPU cores, higher clocks, a faster GPU sharing the same
+              memory, and faster storage after the first load. If the bus is saturated, none of them are the constraint.
+            </p>
+
+            <h3>What this model does not capture</h3>
+            <p>
+              Fixed overhead is treated as one number per hardware family, when it really varies by engine, by runtime,
+              and by how warm the machine is. Prefill is not modelled at all, so a workload dominated by long documents
+              will behave differently from these figures. Sustained performance on a laptop drifts downward as it heats.
+              And the source dataset's own figures are a mix of measurements and estimates — treat single-digit
+              precision as decorative.
+            </p>
+          }
+        </section>
+      }
+
       <footer class="mt-14 pt-6 border-t border-slate-200 dark:border-zinc-800 text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
         Built from <span class="font-mono">llm-hardware-inference-table.csv</span> — {{ dataset.devices.length }} machines
         released {{ yearRangeLabel }}, carrying {{ dataset.figureCountAtOneBillionPlus }} measured throughput figures at
-        1B and above and {{ dataset.figureCountSubBillion }} below it. The 1B and 2B columns are scaled from the source's
-        single 1–4B figure; everything else not measured is modelled from memory bandwidth. Every figure is charged for a
-        {{ model.contextLabel }} context, a realised bandwidth of {{ realisedRangeLabel }} of rated peak depending on the
-        machine, and a fixed per-token overhead of
-        {{ model.overheadMsPerToken[segments[0]] }}–{{ model.overheadMsPerToken[segments[segments.length - 1]] }} ms —
-        all tunable in Advanced settings. Figures marked [E] in the source are estimates; treat single-digit precision as
+        1B and above and {{ dataset.figureCountSubBillion }} below it.
+        @if (isAudio) {
+          None of them is a transcription figure: the speech numbers here are modelled throughout — the decoder from
+          memory bandwidth, the encoder from a compute estimate of FLOP per byte of bandwidth, calibrated against
+          published whisper-large throughput. Both are tunable in Advanced settings, as is the number of text tokens a
+          second of speech is taken to be worth.
+        } @else {
+          The 1B and 2B columns are scaled from the source's
+          single 1–4B figure; everything else not measured is modelled from memory bandwidth. Every figure is charged for a
+          {{ model.contextLabel }} context, a realised bandwidth of {{ realisedRangeLabel }} of rated peak depending on the
+          machine, and a fixed per-token overhead of
+          {{ model.overheadMsPerToken[segments[0]] }}–{{ model.overheadMsPerToken[segments[segments.length - 1]] }} ms —
+          all tunable in Advanced settings.
+        }
+        Figures marked [E] in the source are estimates; treat single-digit precision as
         decorative. The Horizon projections are trend extrapolation, not roadmap knowledge.
         @if (dataset.foldedDevices.length) {
           <span class="block mt-1.5">
