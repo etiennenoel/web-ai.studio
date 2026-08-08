@@ -1,5 +1,12 @@
 import {BandConflictKindEnum} from '../enums/band-conflict-kind.enum';
-import {DEFAULT_BAND_EDGES, SPEED_BAND_META} from '../constants/speed-bands.constant';
+import {
+  BAND_EDGES_BY_MODE,
+  BAND_SLIDER_MAX_BY_MODE,
+  BAND_UNIT_BY_MODE,
+  BAND_UNIT_LONG_BY_MODE,
+  SPEED_BAND_META,
+} from '../constants/speed-bands.constant';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 import {BandConflictInterface} from '../interfaces/band-conflict.interface';
 import {SpeedBandInterface} from '../interfaces/speed-band.interface';
 
@@ -9,6 +16,9 @@ import {SpeedBandInterface} from '../interfaces/speed-band.interface';
  * Each band owns *both* ends of its interval, so neighbours are allowed to disagree.
  * Nothing is auto-corrected: an overlap or a gap is reported, and only reconciled when
  * the reader asks. That way dragging one handle never silently moves another.
+ *
+ * The bands keep their names whatever the task; only the scale behind them moves, because
+ * "fast enough" means 50 tokens a second when reading and 30× realtime when transcribing.
  */
 export class SpeedBandScale {
 
@@ -18,8 +28,35 @@ export class SpeedBandScale {
   /** Exclusive upper edge per band. The top band is pinned to Infinity. */
   private high: number[] = [];
 
-  constructor(edges: number[] = DEFAULT_BAND_EDGES) {
-    this.applyEdges(edges);
+  private mode = TaskModeEnum.Text;
+
+  constructor(mode: TaskModeEnum = TaskModeEnum.Text) {
+    this.useMode(mode);
+  }
+
+  /** The task's own defaults, replacing whatever the reader had set for the other one. */
+  useMode(mode: TaskModeEnum) {
+    this.mode = mode;
+    this.applyEdges(this.defaultEdges);
+  }
+
+  /** What a figure on this scale is counted in — "tok/s", or "×" for realtime. */
+  get unit(): string {
+    return BAND_UNIT_BY_MODE[this.mode];
+  }
+
+  /** The same unit written out, for a legend or an axis. */
+  get unitLong(): string {
+    return BAND_UNIT_LONG_BY_MODE[this.mode];
+  }
+
+  /** Top of the slider range, in this task's unit. */
+  get sliderMax(): number {
+    return BAND_SLIDER_MAX_BY_MODE[this.mode];
+  }
+
+  private get defaultEdges(): number[] {
+    return BAND_EDGES_BY_MODE[this.mode];
   }
 
   /** Index of the fastest band. */
@@ -142,7 +179,7 @@ export class SpeedBandScale {
           kind: BandConflictKindEnum.Gap,
           index,
           neighbourIndex: index + 1,
-          message: `${SpeedBandScale.format(upper)}–${SpeedBandScale.format(nextLower)} tok/s belongs to no band`,
+          message: `${SpeedBandScale.format(upper)}–${SpeedBandScale.format(nextLower)} ${this.unit} belongs to no band`,
         });
       } else if (upper > nextLower) {
         found.push({
@@ -181,12 +218,13 @@ export class SpeedBandScale {
   }
 
   reset() {
-    this.applyEdges(DEFAULT_BAND_EDGES);
+    this.applyEdges(this.defaultEdges);
   }
 
   get isDefault(): boolean {
-    return this.low.slice(1).every((value, index) => value === DEFAULT_BAND_EDGES[index])
-      && this.high.slice(0, this.topIndex).every((value, index) => value === DEFAULT_BAND_EDGES[index]);
+    const edges = this.defaultEdges;
+    return this.low.slice(1).every((value, index) => value === edges[index])
+      && this.high.slice(0, this.topIndex).every((value, index) => value === edges[index]);
   }
 
   private applyEdges(edges: number[]) {

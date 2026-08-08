@@ -8,8 +8,9 @@ import {SourceColumnEnum} from '../enums/source-column.enum';
 export interface ModelClassFitInterface {
   modelClass: ModelClassEnum;
 
-  /** The column the fit was made on. Three sizes share one column. */
-  sourceColumn: SourceColumnEnum;
+  /** The column the fit was made on. Three sizes share one column, and a size with no
+   *  column has no fit of its own — its law is stated rather than measured. */
+  sourceColumn?: SourceColumnEnum;
 
   /** True when this size is scaled off its column rather than measured directly. */
   derived: boolean;
@@ -20,8 +21,9 @@ export interface ModelClassFitInterface {
   /** Tokens per second per GB/s of memory bandwidth. */
   tokensPerGbps: number;
 
-  /** Coefficient of determination of the through-origin fit on the source column. */
-  rSquared: number;
+  /** Coefficient of determination of the through-origin fit on the source column, or null
+   *  where there was nothing to fit. */
+  rSquared: number | null;
 
   /** Bytes moved per generated token, in GB — the reciprocal of the slope. */
   gbPerToken: number;

@@ -3,6 +3,7 @@ import {ConsumerTypeEnum} from '../enums/consumer-type.enum';
 import {HardwareSegmentEnum} from '../enums/hardware-segment.enum';
 import {MatrixGroupingEnum} from '../enums/matrix-grouping.enum';
 import {ModelClassEnum} from '../enums/model-class.enum';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 
 /**
  * Everything a reader can change about the view. This is the whole contract for the
@@ -10,6 +11,10 @@ import {ModelClassEnum} from '../enums/model-class.enum';
  * parameter, and anything absent from the URL falls back to the default.
  */
 export interface DashboardViewStateInterface {
+  /** Which task the page is describing. It moves several other defaults with it, so it is
+   *  read out of the URL before anything else. */
+  mode: TaskModeEnum;
+
   tab: ConsumerHardwareTabEnum;
 
   /** The hero's "as of" year. Its default depends on the dataset, not on the page. */
@@ -33,6 +38,12 @@ export interface DashboardViewStateInterface {
 
   /** Milliseconds per token, per hardware family. */
   overheadMsPerToken: Record<HardwareSegmentEnum, number>;
+
+  /** Text tokens a second of speech is worth. Speech mode only. */
+  tokensPerSecondOfAudio: number;
+
+  /** Compute per byte of bandwidth, per hardware family. Speech mode only. */
+  flopPerByte: Record<HardwareSegmentEnum, number>;
 
   matrixGrouping: MatrixGroupingEnum;
 

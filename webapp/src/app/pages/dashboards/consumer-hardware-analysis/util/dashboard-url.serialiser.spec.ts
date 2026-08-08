@@ -1,4 +1,5 @@
-import {DEFAULT_BAND_EDGES} from '../constants/speed-bands.constant';
+import {DEFAULT_AUDIO_BAND_EDGES, DEFAULT_BAND_EDGES} from '../constants/speed-bands.constant';
+import {DEFAULT_FLOP_PER_BYTE, DEFAULT_TOKENS_PER_SECOND_OF_AUDIO} from '../constants/speech-model.constant';
 import {
   DEFAULT_CONTEXT_TOKENS,
   DEFAULT_REALISED_BANDWIDTH,
@@ -9,12 +10,14 @@ import {ConsumerTypeEnum} from '../enums/consumer-type.enum';
 import {HardwareSegmentEnum} from '../enums/hardware-segment.enum';
 import {MatrixGroupingEnum} from '../enums/matrix-grouping.enum';
 import {ModelClassEnum} from '../enums/model-class.enum';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 import {DashboardViewStateInterface} from '../interfaces/dashboard-view-state.interface';
 import {DashboardUrlSerialiser} from './dashboard-url.serialiser';
 
 describe('DashboardUrlSerialiser', () => {
 
   const defaults: DashboardViewStateInterface = {
+    mode: TaskModeEnum.Text,
     tab: ConsumerHardwareTabEnum.Horizon,
     year: 2025,
     showModelledValues: true,
@@ -29,6 +32,8 @@ describe('DashboardUrlSerialiser', () => {
       [HardwareSegmentEnum.Edge]: DEFAULT_REALISED_BANDWIDTH[HardwareSegmentEnum.Edge] * 100,
     },
     overheadMsPerToken: {...DEFAULT_TOKEN_OVERHEAD_MS},
+    tokensPerSecondOfAudio: DEFAULT_TOKENS_PER_SECOND_OF_AUDIO,
+    flopPerByte: {...DEFAULT_FLOP_PER_BYTE},
     matrixGrouping: MatrixGroupingEnum.Type,
     matrixFilter: 'all',
     matrixSearch: '',
@@ -119,6 +124,23 @@ describe('DashboardUrlSerialiser', () => {
       expect(back.overheadMsPerToken[HardwareSegmentEnum.Edge]).toBe(120);
     });
 
+    it('the task, and the two figures only transcription uses', () => {
+      const back = roundTrip({
+        mode: TaskModeEnum.Audio,
+        tokensPerSecondOfAudio: 2.5,
+        flopPerByte: {
+          [HardwareSegmentEnum.DiscreteGpu]: 40,
+          [HardwareSegmentEnum.AppleSoc]: 12,
+          [HardwareSegmentEnum.CpuIntegrated]: 3,
+          [HardwareSegmentEnum.Edge]: 1.5,
+        },
+      });
+
+      expect(back.mode).toBe(TaskModeEnum.Audio);
+      expect(back.tokensPerSecondOfAudio).toBe(2.5);
+      expect(back.flopPerByte[HardwareSegmentEnum.Edge]).toBe(1.5);
+    });
+
     it('the matrix controls and the table sort', () => {
       const back = roundTrip({
         matrixGrouping: MatrixGroupingEnum.Family,
@@ -160,6 +182,40 @@ describe('DashboardUrlSerialiser', () => {
     });
   });
 
+  describe('when the task moves the baseline', () => {
+
+    /** The defaults the page hands over once it has read the task out of the URL. */
+    const audioDefaults: DashboardViewStateInterface = {
+      ...defaults,
+      bandLows: [...DEFAULT_AUDIO_BAND_EDGES],
+      bandHighs: [...DEFAULT_AUDIO_BAND_EDGES],
+      horizonClass: ModelClassEnum.WhisperSmall,
+    };
+
+    it('writes only the task when a speech view is otherwise untouched', () => {
+      const params = DashboardUrlSerialiser.toParams(
+        {...audioDefaults, mode: TaskModeEnum.Audio}, audioDefaults);
+
+      expect(params).toEqual({task: TaskModeEnum.Audio});
+    });
+
+    it('reads speech band edges back against the speech defaults', () => {
+      const params = DashboardUrlSerialiser.toParams(
+        {...audioDefaults, mode: TaskModeEnum.Audio, bandLows: [0.5, 2, 8, 25], bandHighs: [0.5, 2, 8, 25]},
+        audioDefaults);
+
+      expect(params['bands']).toBe('0.5,2,8,25');
+      expect(DashboardUrlSerialiser.fromParams(params, audioDefaults).bandLows).toEqual([0.5, 2, 8, 25]);
+    });
+
+    it('accepts a sort on a speech column', () => {
+      const state = DashboardUrlSerialiser.fromParams({sort: '-class:whisper-large'}, audioDefaults);
+
+      expect(state.sortColumn).toBe('class:whisper-large');
+      expect(state.sortDirection).toBe(-1);
+    });
+  });
+
   describe('when the URL cannot be trusted', () => {
 
     it('falls back to the default for an unknown enum value', () => {
@@ -184,6 +240,19 @@ describe('DashboardUrlSerialiser', () => {
     it('rejects a context length that is not one of the steps', () => {
       expect(DashboardUrlSerialiser.fromParams({ctx: '3000'}, defaults).contextTokens).toBe(defaults.contextTokens);
       expect(DashboardUrlSerialiser.fromParams({ctx: '8192'}, defaults).contextTokens).toBe(8192);
+    });
+
+    it('rejects a task that is not one of the two', () => {
+      expect(DashboardUrlSerialiser.fromParams({task: 'video'}, defaults).mode).toBe(defaults.mode);
+    });
+
+    it('rejects speech figures outside their range', () => {
+      expect(DashboardUrlSerialiser.fromParams({asrTok: '400'}, defaults).tokensPerSecondOfAudio)
+        .toBe(defaults.tokensPerSecondOfAudio);
+      expect(DashboardUrlSerialiser.fromParams({flopByte: '30,10,4'}, defaults).flopPerByte)
+        .toEqual(defaults.flopPerByte);
+      expect(DashboardUrlSerialiser.fromParams({flopByte: '30,10,4,2.5'}, defaults)
+        .flopPerByte[HardwareSegmentEnum.Edge]).toBe(2.5);
     });
 
     it('rejects a sort on a column that does not exist', () => {

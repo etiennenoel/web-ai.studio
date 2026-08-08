@@ -1,4 +1,9 @@
 import {
+  DEFAULT_FLOP_PER_BYTE,
+  DEFAULT_TOKENS_PER_SECOND_OF_AUDIO,
+  ENCODER_FRAMES_PER_SECOND,
+} from '../constants/speech-model.constant';
+import {
   CONTEXT_STEPS,
   DEFAULT_CONTEXT_TOKENS,
   DEFAULT_REALISED_BANDWIDTH,
@@ -33,9 +38,20 @@ export class ThroughputModel {
 
   overheadMsPerToken: Record<HardwareSegmentEnum, number> = {...DEFAULT_TOKEN_OVERHEAD_MS};
 
-  /** KV cache held at the current context, in GB. */
+  /** Text tokens a second of speech turns into — the length of the decode half. */
+  tokensPerSecondOfAudio = DEFAULT_TOKENS_PER_SECOND_OF_AUDIO;
+
+  /** Compute per byte of bandwidth, the stand-in for the FLOPS this dataset does not carry. */
+  flopPerByte: Record<HardwareSegmentEnum, number> = {...DEFAULT_FLOP_PER_BYTE};
+
+  /**
+   * KV cache held at the current context, in GB. A model's own window is the ceiling: a
+   * speech model works in 30-second slices and cannot hold a 32K conversation whatever
+   * context the reader asks for.
+   */
   contextGb(modelClass: ModelClassInterface): number {
-    return this.contextTokens * modelClass.kvCacheKbPerToken / 1048576;
+    const tokens = Math.min(this.contextTokens, modelClass.contextCapTokens ?? this.contextTokens);
+    return tokens * modelClass.kvCacheKbPerToken / 1048576;
   }
 
   /**
@@ -86,6 +102,52 @@ export class ThroughputModel {
     return 1000 / (streaming + this.overheadMsPerToken[segment]);
   }
 
+  /**
+   * Effective compute, in GFLOP/s, estimated from the memory bandwidth this dataset does
+   * carry. It is the one figure on the page derived from neither the file nor the fit.
+   */
+  effectiveGflops(segment: HardwareSegmentEnum, bandwidthGbps: number): number {
+    return bandwidthGbps * this.realisedBandwidth[segment] * this.flopPerByte[segment];
+  }
+
+  /**
+   * Milliseconds the encoder spends on one second of audio. It runs once over a fixed
+   * number of frames, in a single forward pass, so it costs the same whatever the machine
+   * is doing afterwards — and nothing about it depends on memory bandwidth.
+   */
+  encoderMilliseconds(modelClass: ModelClassInterface,
+                      segment: HardwareSegmentEnum,
+                      bandwidthGbps: number): number {
+    const gflops = this.effectiveGflops(segment, bandwidthGbps);
+    if (gflops <= 0) {
+      return Number.POSITIVE_INFINITY;
+    }
+    // two floating-point operations per parameter per position
+    return 2 * (modelClass.encoderParamsB ?? 0) * ENCODER_FRAMES_PER_SECOND / gflops * 1000;
+  }
+
+  /** Milliseconds the decoder spends on one second of audio, at a given token rate. */
+  decoderMilliseconds(tokensPerSecond: number): number {
+    return tokensPerSecond > 0
+      ? this.tokensPerSecondOfAudio / tokensPerSecond * 1000
+      : Number.POSITIVE_INFINITY;
+  }
+
+  /**
+   * How many times faster than the recording a machine transcribes: a compute-bound
+   * encoder pass over one second of audio, then the handful of memory-bound decode steps
+   * that second is worth. 1× keeps up with the speaker.
+   */
+  realtimeFactor(tokensPerSecond: number,
+                 modelClass: ModelClassInterface,
+                 segment: HardwareSegmentEnum,
+                 sourceEfficiency: number,
+                 bandwidthGbps: number): number {
+    const decoding = this.decoderMilliseconds(
+      this.adjust(tokensPerSecond, modelClass, segment, sourceEfficiency));
+    return 1000 / (this.encoderMilliseconds(modelClass, segment, bandwidthGbps) + decoding);
+  }
+
   /** "4K", "512", or "no" when the cache is switched off. */
   get contextLabel(): string {
     if (this.contextTokens === 0) {
@@ -102,16 +164,20 @@ export class ThroughputModel {
     this.contextTokens = CONTEXT_STEPS[Math.min(Math.max(index, 0), CONTEXT_STEPS.length - 1)];
   }
 
-  /** True once the reader has moved either loss away from its default. */
+  /** True once the reader has moved any of the losses away from its default. */
   get isTuned(): boolean {
-    return Object.values(HardwareSegmentEnum).some(segment =>
-      this.realisedBandwidth[segment] !== DEFAULT_REALISED_BANDWIDTH[segment]
-      || this.overheadMsPerToken[segment] !== DEFAULT_TOKEN_OVERHEAD_MS[segment]);
+    return this.tokensPerSecondOfAudio !== DEFAULT_TOKENS_PER_SECOND_OF_AUDIO
+      || Object.values(HardwareSegmentEnum).some(segment =>
+        this.realisedBandwidth[segment] !== DEFAULT_REALISED_BANDWIDTH[segment]
+        || this.overheadMsPerToken[segment] !== DEFAULT_TOKEN_OVERHEAD_MS[segment]
+        || this.flopPerByte[segment] !== DEFAULT_FLOP_PER_BYTE[segment]);
   }
 
   reset() {
     this.contextTokens = DEFAULT_CONTEXT_TOKENS;
     this.realisedBandwidth = {...DEFAULT_REALISED_BANDWIDTH};
     this.overheadMsPerToken = {...DEFAULT_TOKEN_OVERHEAD_MS};
+    this.tokensPerSecondOfAudio = DEFAULT_TOKENS_PER_SECOND_OF_AUDIO;
+    this.flopPerByte = {...DEFAULT_FLOP_PER_BYTE};
   }
 }

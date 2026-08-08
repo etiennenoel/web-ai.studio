@@ -10,8 +10,12 @@ export interface ModelClassInterface {
   /** Parameter range the size covers, e.g. "7–9B". */
   sizeLabel: string;
 
-  /** Which column of the source this size reads from. */
-  sourceColumn: SourceColumnEnum;
+  /**
+   * Which column of the source this size reads from. Absent when no column measures it —
+   * nothing in the file was benchmarked on transcription — in which case every figure the
+   * page shows for the size is modelled.
+   */
+  sourceColumn?: SourceColumnEnum;
 
   /**
    * How the source figure scales to this size. 1 means the column *is* this size; 2 and
@@ -42,4 +46,21 @@ export interface ModelClassInterface {
    * source measured it and never modelled or projected from bandwidth.
    */
   followsBandwidthLaw: boolean;
+
+  /**
+   * Encoder parameters in billions, for a speech model. The encoder runs once over a fixed
+   * number of frames per second of audio and never generates a token, so it is compute-bound
+   * rather than memory-bound — the half of transcription the bandwidth law does not describe.
+   * Absent on a text size.
+   */
+  encoderParamsB?: number;
+
+  /**
+   * The model's own context window, in tokens. A speech model's cache cannot grow past the
+   * 30-second slice it works in, however wide a context the reader asks for.
+   */
+  contextCapTokens?: number;
+
+  /** A model a reader would recognise at this size. */
+  exampleName?: string;
 }

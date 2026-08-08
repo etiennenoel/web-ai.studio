@@ -1,7 +1,8 @@
 import {URL_PARAMS} from '../constants/url-params.constant';
 import {CONSUMER_TYPE_ORDER} from '../constants/consumer-types.constant';
 import {HARDWARE_SEGMENT_ORDER} from '../constants/hardware-segments.constant';
-import {MODEL_CLASSES} from '../constants/model-classes.constant';
+import {ALL_MODEL_CLASSES} from '../constants/model-classes.constant';
+import {FLOP_PER_BYTE_RANGE, TOKENS_PER_SECOND_RANGE} from '../constants/speech-model.constant';
 import {
   CONTEXT_STEPS,
   REALISED_BANDWIDTH_RANGE,
@@ -12,6 +13,7 @@ import {ConsumerTypeEnum} from '../enums/consumer-type.enum';
 import {HardwareSegmentEnum} from '../enums/hardware-segment.enum';
 import {MatrixGroupingEnum} from '../enums/matrix-grouping.enum';
 import {ModelClassEnum} from '../enums/model-class.enum';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 import {DashboardViewStateInterface} from '../interfaces/dashboard-view-state.interface';
 
 /** Highest speed a band edge may be set to, matching the sliders. */
@@ -20,7 +22,7 @@ const MAX_BAND_EDGE = 1000;
 /**
  * Turns the view into query parameters and back.
  *
- * Two rules shape the whole thing:
+ * Three rules shape the whole thing:
  *
  *  - **Only differences travel.** A parameter appears only when its value differs from
  *    the default, so a default view has a clean URL and a shared one carries exactly
@@ -28,6 +30,9 @@ const MAX_BAND_EDGE = 1000;
  *  - **The URL is untrusted input.** Every value is checked against the enum, list
  *    length or numeric range it belongs to; anything unparseable is dropped in favour of
  *    the default rather than allowed to produce a broken view.
+ *  - **The task sets the baseline.** Speed bands and the starting model size mean
+ *    different things when transcribing, so the defaults handed in here are the defaults
+ *    *for the task in the URL* — the caller reads the task first and builds them.
  */
 export class DashboardUrlSerialiser {
 
@@ -37,6 +42,9 @@ export class DashboardUrlSerialiser {
     const params: Record<string, string> = {};
     const put = (name: string, value: string) => params[name] = value;
 
+    if (state.mode !== defaults.mode) {
+      put(URL_PARAMS.mode, state.mode);
+    }
     if (state.tab !== defaults.tab) {
       put(URL_PARAMS.tab, state.tab);
     }
@@ -69,6 +77,14 @@ export class DashboardUrlSerialiser {
     const overhead = this.segmentValues(state.overheadMsPerToken);
     if (!this.sameNumbers(overhead, this.segmentValues(defaults.overheadMsPerToken))) {
       put(URL_PARAMS.overhead, this.joinNumbers(overhead));
+    }
+
+    if (state.tokensPerSecondOfAudio !== defaults.tokensPerSecondOfAudio) {
+      put(URL_PARAMS.audioTokens, String(state.tokensPerSecondOfAudio));
+    }
+    const flopPerByte = this.segmentValues(state.flopPerByte);
+    if (!this.sameNumbers(flopPerByte, this.segmentValues(defaults.flopPerByte))) {
+      put(URL_PARAMS.flopPerByte, this.joinNumbers(flopPerByte));
     }
 
     if (state.matrixGrouping !== defaults.matrixGrouping) {
@@ -114,8 +130,16 @@ export class DashboardUrlSerialiser {
       bandHighs: [...defaults.bandHighs],
       realisedBandwidth: {...defaults.realisedBandwidth},
       overheadMsPerToken: {...defaults.overheadMsPerToken},
+      flopPerByte: {...defaults.flopPerByte},
       horizonCategories: [...defaults.horizonCategories],
     };
+
+    // The caller has already read the task out of the parameters to build these defaults,
+    // since the task decides what several of them are; this only confirms it.
+    const mode = this.oneOf(params[URL_PARAMS.mode], Object.values(TaskModeEnum));
+    if (mode) {
+      state.mode = mode;
+    }
 
     const tab = this.oneOf(params[URL_PARAMS.tab], Object.values(ConsumerHardwareTabEnum));
     if (tab) {
@@ -163,6 +187,18 @@ export class DashboardUrlSerialiser {
       TOKEN_OVERHEAD_RANGE.min, TOKEN_OVERHEAD_RANGE.max);
     if (overhead) {
       state.overheadMsPerToken = this.bySegment(overhead);
+    }
+
+    const audioTokens = this.decimal(
+      params[URL_PARAMS.audioTokens], TOKENS_PER_SECOND_RANGE.min, TOKENS_PER_SECOND_RANGE.max);
+    if (audioTokens !== null) {
+      state.tokensPerSecondOfAudio = audioTokens;
+    }
+    const flopPerByte = this.numberList(
+      params[URL_PARAMS.flopPerByte], HARDWARE_SEGMENT_ORDER.length,
+      FLOP_PER_BYTE_RANGE.min, FLOP_PER_BYTE_RANGE.max);
+    if (flopPerByte) {
+      state.flopPerByte = this.bySegment(flopPerByte);
     }
 
     const grouping = this.oneOf(params[URL_PARAMS.grouping], Object.values(MatrixGroupingEnum));
@@ -239,6 +275,11 @@ export class DashboardUrlSerialiser {
     return null;
   }
 
+  private static decimal(value: string | null | undefined, min: number, max: number): number | null {
+    const parsed = Number.parseFloat((value ?? '').trim());
+    return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : null;
+  }
+
   private static integer(value: string | null | undefined, min: number, max: number): number | null {
     const candidate = (value ?? '').trim();
     if (!/^-?\d+$/.test(candidate)) {
@@ -278,7 +319,7 @@ export class DashboardUrlSerialiser {
   private static isSortableColumn(column: string): boolean {
     const fixed = ['manufacturer', 'name', 'type', 'year', 'memory', 'memoryType', 'bandwidth'];
     return fixed.includes(column)
-      || MODEL_CLASSES.some(modelClass => `class:${modelClass.key}` === column);
+      || ALL_MODEL_CLASSES.some(modelClass => `class:${modelClass.key}` === column);
   }
 
   private static segmentValues(bySegment: Record<HardwareSegmentEnum, number>): number[] {

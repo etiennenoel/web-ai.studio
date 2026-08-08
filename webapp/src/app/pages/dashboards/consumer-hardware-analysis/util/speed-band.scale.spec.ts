@@ -1,12 +1,14 @@
 import {BandConflictKindEnum} from '../enums/band-conflict-kind.enum';
 import {SpeedBandEnum} from '../enums/speed-band.enum';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 import {SpeedBandScale} from './speed-band.scale';
 
 describe('SpeedBandScale', () => {
 
   let scale: SpeedBandScale;
 
-  beforeEach(() => scale = new SpeedBandScale([10, 20, 35, 50]));
+  // the text task's own defaults: 10 · 20 · 35 · 50 tok/s
+  beforeEach(() => scale = new SpeedBandScale());
 
   it('pins the slowest band to zero and leaves the fastest open-ended', () => {
     expect(scale.bandAt(0).low).toBe(0);
@@ -110,5 +112,38 @@ describe('SpeedBandScale', () => {
     scale.reset();
     expect(scale.edgeSummary).toBe('10 · 20 · 35 · 50');
     expect(scale.isDefault).toBeTrue();
+  });
+
+  describe('when the task changes', () => {
+
+    it('takes the new task\'s edges and unit, dropping the old ones', () => {
+      scale.setEdges([8, 16, 30, 44], [8, 16, 30, 44]);
+
+      scale.useMode(TaskModeEnum.Audio);
+
+      expect(scale.lowEdges).toEqual([1, 3, 10, 30]);
+      expect(scale.unit).toBe('\u00d7');
+      expect(scale.unitLong).toBe('\u00d7 realtime');
+      expect(scale.sliderMax).toBe(60);
+      expect(scale.isDefault).toBeTrue();
+    });
+
+    it('measures "default" against the task it is in', () => {
+      scale.useMode(TaskModeEnum.Audio);
+      scale.setEdges([10, 20, 35, 50], [10, 20, 35, 50]);
+
+      // the text defaults, which are not the speech ones
+      expect(scale.isDefault).toBeFalse();
+
+      scale.reset();
+      expect(scale.lowEdges).toEqual([1, 3, 10, 30]);
+    });
+
+    it('names a gap in the unit the task counts in', () => {
+      scale.useMode(TaskModeEnum.Audio);
+      scale.setHigh(1, 2);
+
+      expect(scale.conflicts()[0].message).toContain('\u00d7 belongs to no band');
+    });
   });
 });

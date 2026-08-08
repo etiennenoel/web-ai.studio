@@ -10,8 +10,10 @@ import {
   CSV_TINY_MIN_COLUMN,
   HARDWARE_DATASET_URL,
 } from '../constants/csv-columns.constant';
+import {AUDIO_MODEL_CLASSES} from '../constants/audio-model-classes.constant';
 import {FOLDED_DEVICE_NAMES} from '../constants/folded-devices.constant';
 import {MODEL_CLASSES} from '../constants/model-classes.constant';
+import {SPEECH_DECODER_EFFICIENCY} from '../constants/speech-model.constant';
 import {ModelClassEnum} from '../enums/model-class.enum';
 import {SourceColumnEnum} from '../enums/source-column.enum';
 import {HardwareDatasetInterface} from '../interfaces/hardware-dataset.interface';
@@ -152,7 +154,7 @@ export class HardwareDatasetService {
   private fitModelClasses(devices: HardwareDeviceInterface[]): Record<ModelClassEnum, ModelClassFitInterface> {
     const columnFits = new Map<SourceColumnEnum, {slope: number, rSquared: number, sampleCount: number}>();
 
-    for (const sourceColumn of new Set(MODEL_CLASSES.map(modelClass => modelClass.sourceColumn))) {
+    for (const sourceColumn of new Set(MODEL_CLASSES.map(modelClass => modelClass.sourceColumn!))) {
       const points = devices
         .filter(device => device.bandwidthGbps !== null && device.throughput[sourceColumn].tokensPerSecond !== null)
         .map(device => ({x: device.bandwidthGbps as number, y: device.throughput[sourceColumn].tokensPerSecond as number}));
@@ -168,7 +170,7 @@ export class HardwareDatasetService {
     const fits = {} as Record<ModelClassEnum, ModelClassFitInterface>;
 
     for (const modelClass of MODEL_CLASSES) {
-      const columnFit = columnFits.get(modelClass.sourceColumn)!;
+      const columnFit = columnFits.get(modelClass.sourceColumn!)!;
       const tokensPerGbps = columnFit.slope * modelClass.multiplier;
       const gbPerToken = tokensPerGbps > 0 ? 1 / tokensPerGbps : 0;
 
@@ -181,6 +183,24 @@ export class HardwareDatasetService {
         rSquared: columnFit.rSquared,
         gbPerToken,
         bandwidthEfficiency: gbPerToken > 0 ? modelClass.quantisedWeightsGb / gbPerToken : 0,
+      };
+    }
+
+    // No source measures a speech model, so there is no fit to make: the decode half is
+    // stated to convert the same share of realised bandwidth the text sizes settle at,
+    // divided by the weights it has to stream. Nothing here is evidence, and the sample
+    // count of zero is what says so.
+    for (const modelClass of AUDIO_MODEL_CLASSES) {
+      const tokensPerGbps = SPEECH_DECODER_EFFICIENCY / modelClass.quantisedWeightsGb;
+
+      fits[modelClass.key] = {
+        modelClass: modelClass.key,
+        derived: true,
+        sampleCount: 0,
+        tokensPerGbps,
+        rSquared: null,
+        gbPerToken: 1 / tokensPerGbps,
+        bandwidthEfficiency: SPEECH_DECODER_EFFICIENCY,
       };
     }
 

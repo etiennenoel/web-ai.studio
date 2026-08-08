@@ -3,6 +3,7 @@
  * lists, and stable, because they end up in URLs people paste to each other.
  */
 export const URL_PARAMS = {
+  mode: 'task',
   tab: 'view',
   year: 'year',
   modelled: 'modelled',
@@ -13,6 +14,8 @@ export const URL_PARAMS = {
   context: 'ctx',
   realised: 'realised',
   overhead: 'overhead',
+  audioTokens: 'asrTok',
+  flopPerByte: 'flopByte',
   grouping: 'group',
   matrixFilter: 'only',
   matrixSearch: 'q',

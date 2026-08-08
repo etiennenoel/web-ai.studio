@@ -16,15 +16,18 @@ import {
   HARDWARE_SEGMENT_ORDER,
 } from './constants/hardware-segments.constant';
 import {
-  MODEL_CLASSES,
+  DEFAULT_HORIZON_CLASS_BY_MODE,
+  MODEL_CLASSES_BY_MODE,
   MODEL_CLASS_BY_KEY,
   PROJECTED_MODEL_CLASSES,
   isDerivedModelClass,
 } from './constants/model-classes.constant';
 import {
-  BAND_SLIDER_MAX,
-  DEFAULT_REFERENCE_BAND_INDEX,
-} from './constants/speed-bands.constant';
+  DEFAULT_FLOP_PER_BYTE,
+  DEFAULT_TOKENS_PER_SECOND_OF_AUDIO,
+  FLOP_PER_BYTE_RANGE,
+  TOKENS_PER_SECOND_RANGE,
+} from './constants/speech-model.constant';
 import {
   CONTEXT_STEPS,
   DEFAULT_CONTEXT_TOKENS,
@@ -33,7 +36,8 @@ import {
   REALISED_BANDWIDTH_RANGE,
   TOKEN_OVERHEAD_RANGE,
 } from './constants/throughput-model.constant';
-import {DEFAULT_BAND_EDGES} from './constants/speed-bands.constant';
+import {BAND_EDGES_BY_MODE, DEFAULT_REFERENCE_BAND_INDEX} from './constants/speed-bands.constant';
+import {TASK_COPY, TaskCopyInterface} from './constants/task-copy.constant';
 import {
   HARDWARE_SEGMENT_LABELS as SEGMENT_LABELS,
 } from './constants/hardware-segments.constant';
@@ -43,6 +47,7 @@ import {ConsumerTypeEnum} from './enums/consumer-type.enum';
 import {HardwareSegmentEnum} from './enums/hardware-segment.enum';
 import {MatrixGroupingEnum} from './enums/matrix-grouping.enum';
 import {ModelClassEnum} from './enums/model-class.enum';
+import {TaskModeEnum} from './enums/task-mode.enum';
 import {ThroughputSourceEnum} from './enums/throughput-source.enum';
 import {BandConflictInterface} from './interfaces/band-conflict.interface';
 import {HardwareDatasetInterface} from './interfaces/hardware-dataset.interface';
@@ -123,7 +128,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   readonly tabEnum = ConsumerHardwareTabEnum;
   readonly sourceEnum = ThroughputSourceEnum;
   readonly groupingEnum = MatrixGroupingEnum;
-  readonly modelClasses = MODEL_CLASSES;
+  readonly modeEnum = TaskModeEnum;
   readonly horizonHorizons = HORIZON_HORIZONS;
   readonly projectedClasses = PROJECTED_MODEL_CLASSES;
   readonly sliderMax = SLIDER_POSITIONS;
@@ -132,6 +137,12 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   loadFailed = false;
 
   activeTab = ConsumerHardwareTabEnum.Horizon;
+
+  /**
+   * Which task the page describes. It is not a filter over the same numbers: transcription
+   * has its own model sizes, its own arithmetic, its own unit and its own idea of fast.
+   */
+  mode = TaskModeEnum.Text;
 
   /** The five speed bands and the four edges the reader can drag. */
   readonly scale = new SpeedBandScale();
@@ -142,6 +153,8 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   readonly contextSteps = CONTEXT_STEPS;
   readonly realisedRange = REALISED_BANDWIDTH_RANGE;
   readonly overheadRange = TOKEN_OVERHEAD_RANGE;
+  readonly audioTokensRange = TOKENS_PER_SECOND_RANGE;
+  readonly flopPerByteRange = FLOP_PER_BYTE_RANGE;
   readonly segments = HARDWARE_SEGMENT_ORDER;
   readonly segmentLabels = SEGMENT_LABELS;
 
@@ -168,7 +181,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   sortDirection: 1 | -1 = -1;
 
   /** Horizon: which model size the lines describe, and how far the trend is drawn. */
-  horizonClass = ModelClassEnum.Nano2B;
+  horizonClass = DEFAULT_HORIZON_CLASS_BY_MODE[TaskModeEnum.Text];
   horizonYears = HORIZON_HORIZONS[HORIZON_HORIZONS.length - 1];
   horizonCategories = new Set<ConsumerTypeEnum>(HORIZON_DEFAULT_CATEGORIES);
 
@@ -255,33 +268,47 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   /** A year asked for by the URL, held until the dataset says which years exist. */
   private requestedYear: number | null = null;
 
-  /** The view as it would be with nothing changed. The year's default is the dataset's
-   *  newest, so it is only known once the file has loaded. */
-  private get defaultState(): DashboardViewStateInterface {
+  /**
+   * The view as it would be with nothing changed.
+   *
+   * Two of these defaults are not constants. The year's is the dataset's newest, so it is
+   * only known once the file has loaded; and the bands and the starting model size belong
+   * to the task, so they are the defaults *for the task the reader is currently in*. That
+   * keeps a shared URL carrying only what its sender actually changed.
+   */
+  private defaultStateFor(mode: TaskModeEnum): DashboardViewStateInterface {
     return {
+      mode: TaskModeEnum.Text,
       tab: ConsumerHardwareTabEnum.Horizon,
       year: this.dataset?.years[this.dataset.years.length - 1] ?? this.currentYear,
       showModelledValues: true,
       advancedOpen: false,
-      bandLows: [...DEFAULT_BAND_EDGES],
-      bandHighs: [...DEFAULT_BAND_EDGES],
+      bandLows: [...BAND_EDGES_BY_MODE[mode]],
+      bandHighs: [...BAND_EDGES_BY_MODE[mode]],
       contextTokens: DEFAULT_CONTEXT_TOKENS,
       realisedBandwidth: this.asPercent(DEFAULT_REALISED_BANDWIDTH),
       overheadMsPerToken: {...DEFAULT_TOKEN_OVERHEAD_MS},
+      tokensPerSecondOfAudio: DEFAULT_TOKENS_PER_SECOND_OF_AUDIO,
+      flopPerByte: {...DEFAULT_FLOP_PER_BYTE},
       matrixGrouping: MatrixGroupingEnum.Type,
       matrixFilter: 'all',
       matrixSearch: '',
       explorerSearch: '',
       sortColumn: 'bandwidth',
       sortDirection: -1,
-      horizonClass: ModelClassEnum.Nano2B,
+      horizonClass: DEFAULT_HORIZON_CLASS_BY_MODE[mode],
       horizonYears: HORIZON_HORIZONS[HORIZON_HORIZONS.length - 1],
       horizonCategories: [...HORIZON_DEFAULT_CATEGORIES],
     };
   }
 
+  private get defaultState(): DashboardViewStateInterface {
+    return this.defaultStateFor(this.mode);
+  }
+
   private get currentState(): DashboardViewStateInterface {
     return {
+      mode: this.mode,
       tab: this.activeTab,
       year: this.year,
       showModelledValues: this.showModelledValues,
@@ -291,6 +318,8 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       contextTokens: this.model.contextTokens,
       realisedBandwidth: this.asPercent(this.model.realisedBandwidth),
       overheadMsPerToken: {...this.model.overheadMsPerToken},
+      tokensPerSecondOfAudio: this.model.tokensPerSecondOfAudio,
+      flopPerByte: {...this.model.flopPerByte},
       matrixGrouping: this.matrixGrouping,
       matrixFilter: this.matrixFilter,
       matrixSearch: this.matrixSearch,
@@ -312,7 +341,13 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       return;
     }
 
-    const state = DashboardUrlSerialiser.fromParams(params, this.defaultState);
+    // The task has to be settled first: it decides what the band edges and the starting
+    // model size are measured against, so everything else is parsed relative to it.
+    const requestedMode = DashboardUrlSerialiser
+      .fromParams(params, this.defaultStateFor(TaskModeEnum.Text)).mode;
+    const state = DashboardUrlSerialiser.fromParams(params, this.defaultStateFor(requestedMode));
+
+    this.applyMode(state.mode);
 
     this.activeTab = state.tab;
     this.requestedYear = state.year;
@@ -322,6 +357,8 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     this.model.contextTokens = state.contextTokens;
     this.model.realisedBandwidth = this.asFraction(state.realisedBandwidth);
     this.model.overheadMsPerToken = {...state.overheadMsPerToken};
+    this.model.tokensPerSecondOfAudio = state.tokensPerSecondOfAudio;
+    this.model.flopPerByte = {...state.flopPerByte};
     this.matrixGrouping = state.matrixGrouping;
     this.matrixFilter = state.matrixFilter;
     this.matrixSearch = state.matrixSearch;
@@ -331,6 +368,10 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     this.horizonClass = state.horizonClass;
     this.horizonYears = state.horizonYears;
     this.horizonCategories = new Set(state.horizonCategories);
+
+    // A link may name a size or a column belonging to the other task; the task in the URL
+    // wins, and anything that does not exist under it falls back rather than blanking.
+    this.settleSelectionsForMode();
   }
 
   /** Queues the address bar to catch up with the view. */
@@ -374,7 +415,89 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     }, {} as Record<HardwareSegmentEnum, number>);
   }
 
+  // ── the task ────────────────────────────────────────────────────────────────
+
+  /** The sizes this task is shown in, in column order. */
+  get modelClasses(): ModelClassInterface[] {
+    return MODEL_CLASSES_BY_MODE[this.mode];
+  }
+
+  get isAudio(): boolean {
+    return this.mode === TaskModeEnum.Audio;
+  }
+
+  /** What a figure is counted in: "tok/s" reading, "×" transcribing. */
+  get unit(): string {
+    return this.scale.unit;
+  }
+
+  get unitLong(): string {
+    return this.scale.unitLong;
+  }
+
+  get taskCopy(): TaskCopyInterface {
+    return TASK_COPY[this.mode];
+  }
+
+  taskCopyFor(mode: TaskModeEnum): TaskCopyInterface {
+    return TASK_COPY[mode];
+  }
+
+  onModeChange(mode: TaskModeEnum) {
+    if (mode === this.mode) {
+      return;
+    }
+    if (!this.isAudio) {
+      this.modelledValuesInText = this.showModelledValues;
+    }
+    this.applyMode(mode);
+    this.showModelledValues = this.modelledValuesInText;
+    this.settleSelectionsForMode();
+    this.hideHoverCard();
+    this.rebuildAll();
+    this.queueUrlSync();
+  }
+
+  /**
+   * Switches the task itself. The bands go back to that task's own defaults rather than
+   * carrying across: 50 tok/s and 50× realtime are not the same request, and keeping the
+   * numbers would silently reinterpret them.
+   */
+  private applyMode(mode: TaskModeEnum) {
+    this.mode = mode;
+    this.scale.useMode(mode);
+  }
+
+  /** What the reader chose for text, kept while speech has the switch held down. */
+  private modelledValuesInText = true;
+
+  /**
+   * Drops any selection that belonged to the task the reader just left: a size that does
+   * not exist here, a sort on a column that is gone, and the gap-filling switch, which
+   * has nothing to act on when nothing was measured in the first place.
+   */
+  private settleSelectionsForMode() {
+    if (this.isAudio) {
+      this.showModelledValues = true;
+    }
+    if (!this.modelClasses.some(modelClass => modelClass.key === this.horizonClass)) {
+      this.horizonClass = DEFAULT_HORIZON_CLASS_BY_MODE[this.mode];
+    }
+    if (this.sortColumn.startsWith('class:')
+      && !this.modelClasses.some(modelClass => `class:${modelClass.key}` === this.sortColumn)) {
+      this.sortColumn = 'bandwidth';
+      this.sortDirection = -1;
+    }
+  }
+
   // ── reader controls ─────────────────────────────────────────────────────────
+
+  tabLabel(tab: ConsumerHardwareTabEnum): string {
+    if (tab === ConsumerHardwareTabEnum.Explorer) {
+      return 'Data Explorer';
+    }
+    return tab === ConsumerHardwareTabEnum.Notes ? 'How it works' : tab;
+  }
 
   onTabChange(tab: ConsumerHardwareTabEnum) {
     this.activeTab = tab;
@@ -451,6 +574,22 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     const milliseconds = Number.parseFloat((event.target as HTMLInputElement).value);
     if (milliseconds >= this.overheadRange.min && milliseconds <= this.overheadRange.max) {
       this.model.overheadMsPerToken[segment] = milliseconds;
+      this.onModelChanged();
+    }
+  }
+
+  onAudioTokens(event: Event) {
+    const tokens = Number.parseFloat((event.target as HTMLInputElement).value);
+    if (tokens >= this.audioTokensRange.min && tokens <= this.audioTokensRange.max) {
+      this.model.tokensPerSecondOfAudio = tokens;
+      this.onModelChanged();
+    }
+  }
+
+  onFlopPerByte(segment: HardwareSegmentEnum, event: Event) {
+    const flopPerByte = Number.parseFloat((event.target as HTMLInputElement).value);
+    if (flopPerByte >= this.flopPerByteRange.min && flopPerByte <= this.flopPerByteRange.max) {
+      this.model.flopPerByte[segment] = flopPerByte;
       this.onModelChanged();
     }
   }
@@ -618,6 +757,16 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     return `${(value * 100).toFixed(digits)}%`;
   }
 
+  /** A figure with its unit attached the way that unit reads: "12 tok/s", "66×". */
+  formatValue(value: number): string {
+    return this.withUnit(this.formatRate(value));
+  }
+
+  /** The same, for something already formatted — a band's range, say. */
+  withUnit(label: string): string {
+    return this.isAudio ? `${label}${this.unit}` : `${label} ${this.unit}`;
+  }
+
   get bands(): SpeedBandInterface[] {
     return this.scale.bands;
   }
@@ -636,7 +785,15 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
 
   /** Footnote for the value legends: what every figure in the view is charged for. */
   get chargedNote(): string {
-    return `Q4 weights · ${this.model.contextLabel} context${this.model.isTuned ? ' · losses tuned' : ''}`;
+    const charged = this.isAudio
+      ? `Q4 decoder · estimated compute · ${this.audioContextCap}-token window`
+      : `Q4 weights · ${this.model.contextLabel} context`;
+    return `${charged}${this.model.isTuned ? ' · losses tuned' : ''}`;
+  }
+
+  /** The window a speech model actually works in, whatever context the reader asks for. */
+  get audioContextCap(): number {
+    return this.modelClasses[0]?.contextCapTokens ?? 0;
   }
 
   /** How much of its no-context speed each size keeps at the current context. */
@@ -644,7 +801,16 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     if (this.model.contextTokens === 0) {
       return 'no KV cache charged — the figures as the source reports them';
     }
+
     const at = (key: ModelClassEnum) => this.model.contextCostPercent(MODEL_CLASS_BY_KEY[key]);
+
+    if (this.isAudio) {
+      // A speech model cannot be asked to hold more than its own 30-second window, so the
+      // slider stops mattering here long before it runs out.
+      return `capped at ${this.audioContextCap} tokens, the window these models work in — `
+        + `costs ${at(ModelClassEnum.WhisperTiny)}% at Tiny, ${at(ModelClassEnum.WhisperLarge)}% at Large`;
+    }
+
     return `costs ${at(ModelClassEnum.Nano1B)}% at 1B, ${at(ModelClassEnum.Light)}% at 8B, `
       + `${at(ModelClassEnum.Xl)}% at 70B`;
   }
@@ -658,11 +824,12 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   }
 
   private positionToValue(position: number): number {
-    return Math.round(Math.pow(position / SLIDER_POSITIONS, 2) * BAND_SLIDER_MAX * 2) / 2;
+    return Math.round(Math.pow(position / SLIDER_POSITIONS, 2) * this.scale.sliderMax * 2) / 2;
   }
 
   private valueToPosition(value: number): number {
-    return Math.round(Math.sqrt(Math.min(value, BAND_SLIDER_MAX) / BAND_SLIDER_MAX) * SLIDER_POSITIONS);
+    const max = this.scale.sliderMax;
+    return Math.round(Math.sqrt(Math.min(value, max) / max) * SLIDER_POSITIONS);
   }
 
   /**
@@ -674,11 +841,23 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
   private throughputFor(device: HardwareDeviceInterface,
                         modelClass: ModelClassInterface,
                         allowModelled = this.showModelledValues): Throughput {
-    const figure = device.throughput[modelClass.sourceColumn];
     // The requirement moves with the context the reader chose, so a machine that held a
     // model at no context can fall out of range at 32K.
     const fitsInMemory = device.maxMemoryGb === null
       || device.maxMemoryGb >= this.model.memoryNeededGb(modelClass);
+
+    // A size with no column in the file has nothing to read: transcription is modelled
+    // from bandwidth and compute, every machine, every size.
+    if (!modelClass.sourceColumn) {
+      if (device.bandwidthGbps === null) {
+        return null;
+      }
+      return fitsInMemory
+        ? this.adjusted(device.bandwidthGbps * this.dataset!.fits[modelClass.key].tokensPerGbps, modelClass, device)
+        : 'wont-fit';
+    }
+
+    const figure = device.throughput[modelClass.sourceColumn];
 
     if (figure.tokensPerSecond !== null) {
       // Half the weights, twice the tokens, for a size scaled off the shared bucket.
@@ -699,27 +878,35 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     return this.adjusted(device.bandwidthGbps * this.dataset!.fits[modelClass.key].tokensPerGbps, modelClass, device);
   }
 
-  /** Charges a raw figure for realised bandwidth, KV cache and per-token overhead. */
+  /**
+   * Charges a raw figure for realised bandwidth, KV cache and per-token overhead — and,
+   * when transcribing, spends the resulting token rate on the handful of decode steps a
+   * second of audio needs, after the encoder has taken its fixed share of that second.
+   */
   private adjusted(tokensPerSecond: number,
                    modelClass: ModelClassInterface,
                    device: HardwareDeviceInterface): number {
-    return this.model.adjust(
-      tokensPerSecond,
-      modelClass,
-      device.segment,
-      this.dataset!.fits[modelClass.key].bandwidthEfficiency,
-    );
+    const sourceEfficiency = this.dataset!.fits[modelClass.key].bandwidthEfficiency;
+
+    if (this.isAudio) {
+      return this.model.realtimeFactor(
+        tokensPerSecond, modelClass, device.segment, sourceEfficiency, device.bandwidthGbps ?? 0);
+    }
+
+    return this.model.adjust(tokensPerSecond, modelClass, device.segment, sourceEfficiency);
   }
 
   /** True only when the number comes straight from the source, at its own size. */
   private isMeasured(device: HardwareDeviceInterface, modelClass: ModelClassInterface): boolean {
-    return modelClass.multiplier === 1
+    return modelClass.sourceColumn !== undefined
+      && modelClass.multiplier === 1
       && device.throughput[modelClass.sourceColumn].tokensPerSecond !== null;
   }
 
   /** True when the figure was read off the 1–4B bucket and scaled to this size. */
   private isScaledFromBucket(device: HardwareDeviceInterface, modelClass: ModelClassInterface): boolean {
-    return modelClass.multiplier !== 1
+    return modelClass.sourceColumn !== undefined
+      && modelClass.multiplier !== 1
       && device.throughput[modelClass.sourceColumn].tokensPerSecond !== null;
   }
 
@@ -741,7 +928,9 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     }
 
     const lawful = PROJECTED_MODEL_CLASSES.map(modelClass => this.dataset!.fits[modelClass.key]);
-    const rSquaredValues = lawful.map(fit => fit.rSquared);
+    const rSquaredValues = lawful
+      .map(fit => fit.rSquared)
+      .filter((rSquared): rSquared is number => rSquared !== null);
     this.rSquaredRangeLabel = `${Math.min(...rSquaredValues).toFixed(2)}–${Math.max(...rSquaredValues).toFixed(2)}`;
 
     const years = this.dataset.years;
@@ -790,7 +979,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     this.bandSliders = this.scale.bands.map(band => {
       const conflicted = this.bandConflicts.some(conflict =>
         conflict.index === band.index || conflict.neighbourIndex === band.index);
-      const highValue = band.index === this.scale.topIndex ? BAND_SLIDER_MAX : band.high;
+      const highValue = band.index === this.scale.topIndex ? this.scale.sliderMax : band.high;
 
       return {
         index: band.index,
@@ -805,7 +994,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
         conflicted,
         tooltipTitle: band.name,
         tooltipLines: [
-          `${band.rangeLabel} tok/s`,
+          this.withUnit(band.rangeLabel),
           ...(band.index === 0 ? ['starts at zero — drag the right handle'] : []),
           ...(band.index === this.scale.topIndex ? ['no upper limit — drag the left handle'] : []),
         ],
@@ -895,7 +1084,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       if (!this.isMeasured(device, modelClass)) {
         modelledCount++;
       }
-      sources.push(`${device.name} ${this.formatRate(value)}`);
+      sources.push(`${device.name} ${this.formatValue(value)}`);
     }
 
     return {
@@ -927,7 +1116,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
           label,
           detail: 'none yet',
           present: false,
-          cells: MODEL_CLASSES.map(() => ({
+          cells: this.modelClasses.map(() => ({
             rampStep: null, display: '', modelled: false, wontFit: false,
             tooltipTitle: label, tooltipLines: [`nothing of this kind in the dataset by ${this.year}`],
           })),
@@ -944,7 +1133,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
         label,
         detail: `${bucket.year} · ${bucket.devices.length} machine${bucket.devices.length > 1 ? 's' : ''}`,
         present: true,
-        cells: MODEL_CLASSES.map(modelClass => this.buildHeroCell(bucket, modelClass, label)),
+        cells: this.modelClasses.map(modelClass => this.buildHeroCell(bucket, modelClass, label)),
         tooltipTitle: label,
         tooltipLines: [
           CONSUMER_TYPE_BLURBS[type],
@@ -993,7 +1182,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       wontFit: false,
       tooltipTitle: title,
       tooltipLines: [
-        `${this.formatRate(summary.mean)} tok/s — ${band.name}`,
+        `${this.formatValue(summary.mean)} — ${band.name}`,
         ...(summary.values.length > 1
           ? [`mean of ${summary.values.length} machines (${this.formatRate(Math.min(...summary.values))}–${this.formatRate(Math.max(...summary.values))})`]
           : []),
@@ -1093,7 +1282,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       bandwidthLabel: device.bandwidthGbps !== null ? `${this.formatNumber(device.bandwidthGbps)} GB/s` : 'bus n/a',
       memoryLabel: this.memoryLabelFor(device),
       bandwidthBarPercent: Math.round(100 * (device.bandwidthGbps ?? 0) / widestBus),
-      cells: MODEL_CLASSES.map(modelClass => this.buildMatrixCell(device, modelClass)),
+      cells: this.modelClasses.map(modelClass => this.buildMatrixCell(device, modelClass)),
       tooltipTitle: device.name,
       tooltipLines: [
         `${device.manufacturer} · ${device.year ?? 'year not listed'}`,
@@ -1105,10 +1294,43 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
     };
   }
 
+  /**
+   * The line that says where the time went: streaming versus overhead for a token, and
+   * encoder versus decoder for a second of audio. It is the whole point of the model, so
+   * every cell carries it.
+   */
+  private costBreakdownLines(device: HardwareDeviceInterface,
+                             modelClass: ModelClassInterface,
+                             measured: boolean,
+                             scaled: boolean): string[] {
+    if (!modelClass.followsBandwidthLaw || device.bandwidthGbps === null) {
+      return [];
+    }
+
+    const fit = this.dataset!.fits[modelClass.key];
+    const raw = (measured || scaled) && modelClass.sourceColumn
+      ? (device.throughput[modelClass.sourceColumn].tokensPerSecond as number) * modelClass.multiplier
+      : device.bandwidthGbps * fit.tokensPerGbps;
+    const streaming = this.model.streamMilliseconds(raw, modelClass, device.segment, fit.bandwidthEfficiency);
+    const overhead = this.model.overheadMsPerToken[device.segment];
+
+    if (!this.isAudio) {
+      return [`${this.formatRate(streaming)} ms streaming + ${overhead} ms overhead`];
+    }
+
+    const encoder = this.model.encoderMilliseconds(modelClass, device.segment, device.bandwidthGbps);
+    const decoder = this.model.decoderMilliseconds(1000 / (streaming + overhead));
+    return [
+      `per second of audio: ${this.formatRate(encoder)} ms encoder + ${this.formatRate(decoder)} ms decoder`,
+      `${this.formatRate(this.model.effectiveGflops(device.segment, device.bandwidthGbps) / 1000)} TFLOPS assumed`
+        + ` (${this.model.flopPerByte[device.segment]} FLOP per byte of bandwidth)`,
+    ];
+  }
+
   private buildMatrixCell(device: HardwareDeviceInterface, modelClass: ModelClassInterface): MatrixCellViewModel {
     const title = `${device.name} · ${modelClass.name} ${modelClass.sizeLabel}`;
     const value = this.throughputFor(device, modelClass);
-    const figure = device.throughput[modelClass.sourceColumn];
+    const figure = modelClass.sourceColumn ? device.throughput[modelClass.sourceColumn] : null;
 
     if (value === 'wont-fit') {
       return {
@@ -1154,25 +1376,20 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       source: measured ? ThroughputSourceEnum.Measured : ThroughputSourceEnum.Modelled,
       tokensPerSecond: value,
       display: band.name,
-      detail: `${this.formatRate(value)} tok/s`,
+      detail: this.formatValue(value),
       rampStep: band.index,
       tooltipTitle: title,
       tooltipLines: [
-        `${this.formatRate(value)} tok/s — ${band.name} (${band.rangeLabel})`,
+        `${this.formatValue(value)} — ${band.name} (${this.withUnit(band.rangeLabel)})`,
         measured
           ? 'measured figure from the source dataset'
           : scaled
             ? `scaled from this machine's 1–4B figure (×${modelClass.multiplier})`
-            : `modelled: ${this.formatNumber(device.bandwidthGbps as number)} GB/s × ${fit.tokensPerGbps.toFixed(3)} tok/s per GB/s`,
-        ...(modelClass.followsBandwidthLaw && device.bandwidthGbps !== null
-          ? [`${this.formatRate(this.model.streamMilliseconds(
-              measured || scaled
-                ? (device.throughput[modelClass.sourceColumn].tokensPerSecond as number) * modelClass.multiplier
-                : device.bandwidthGbps * fit.tokensPerGbps,
-              modelClass, device.segment, fit.bandwidthEfficiency))} ms streaming`
-            + ` + ${this.model.overheadMsPerToken[device.segment]} ms overhead`]
-          : []),
-        ...(figure.sourceRange
+            : this.isAudio
+              ? 'modelled — nothing in the source was benchmarked on transcription'
+              : `modelled: ${this.formatNumber(device.bandwidthGbps as number)} GB/s × ${fit.tokensPerGbps.toFixed(3)} tok/s per GB/s`,
+        ...this.costBreakdownLines(device, modelClass, measured, scaled),
+        ...(figure?.sourceRange
           ? [`source publishes a ${this.formatRate(figure.sourceRange[0])}–${this.formatRate(figure.sourceRange[1])} tok/s spread`]
           : []),
       ],
@@ -1204,7 +1421,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       {key: 'memory', label: 'Memory GB', numeric: true, throughput: false},
       {key: 'memoryType', label: 'Memory type', numeric: false, throughput: false},
       {key: 'bandwidth', label: 'GB/s', numeric: true, throughput: false},
-      ...MODEL_CLASSES.map(modelClass => ({
+      ...this.modelClasses.map(modelClass => ({
         key: `class:${modelClass.key}`,
         label: `${modelClass.name} ${modelClass.sizeLabel}`,
         numeric: true,
@@ -1312,12 +1529,12 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       const scaled = this.isScaledFromBucket(device, modelClass);
       return {
         columnKey: column.key,
-        display: `${band.name} ${this.formatRate(value)}`,
+        display: `${band.name} ${this.isAudio ? this.formatValue(value) : this.formatRate(value)}`,
         numeric: true,
         rampStep: band.index,
         muted: false,
         modelled: !measured,
-        title: `${this.formatRate(value)} tok/s — ${band.name}`
+        title: `${this.formatValue(value)} — ${band.name}`
           + (measured ? '' : scaled ? `, scaled ×${modelClass.multiplier} from the 1–4B figure` : ', modelled from bandwidth'),
       };
     }
@@ -1484,7 +1701,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
         cy: y(measured.value),
         tooltipTitle: `${measured.year} · ${entry.label}`,
         tooltipLines: [
-          `${this.formatRate(measured.value)} tok/s — ${this.scale.bandFor(measured.value).name}`,
+          `${this.formatValue(measured.value)} — ${this.scale.bandFor(measured.value).name}`,
           `mean of ${measured.machineCount} machine${measured.machineCount > 1 ? 's' : ''}`
             + (measured.spread ? ` (${measured.spread})` : ''),
           ...(measured.modelled
@@ -1514,7 +1731,7 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
         points,
         labelX: HORIZON.width - HORIZON.rightMargin + 9,
         labelY: y(Math.min(endValue, high)),
-        labelDetail: `${this.formatRate(endValue)} tok/s${rate ? ' · ' + rate : ''}`,
+        labelDetail: `${this.formatValue(endValue)}${rate ? ' · ' + rate : ''}`,
       };
     });
 
@@ -1587,10 +1804,13 @@ export class ConsumerHardwareAnalysisPage extends BasePage implements OnInit {
       notYet.length ? `Not by ${endYear} — ${notYet.join(', ')}.` : '',
     ].filter(Boolean).join(' ');
 
-    this.horizonCaveat = !modelClass.followsBandwidthLaw
-      ? 'Measured figures only — models this small do not follow the bandwidth law, so nothing here is modelled and the lines are sparser.'
-      : isDerivedModelClass(modelClass)
-        ? `Derived: the source measures the 1–4B bucket as a whole, and this size is scaled from it by weight (×${modelClass.multiplier}).`
-        : '';
+    this.horizonCaveat = this.isAudio
+      ? 'Modelled throughout — no machine in this dataset was benchmarked on transcription, and the '
+        + 'encoder half rests on a compute estimate rather than a measurement.'
+      : !modelClass.followsBandwidthLaw
+        ? 'Measured figures only — models this small do not follow the bandwidth law, so nothing here is modelled and the lines are sparser.'
+        : isDerivedModelClass(modelClass)
+          ? `Derived: the source measures the 1–4B bucket as a whole, and this size is scaled from it by weight (×${modelClass.multiplier}).`
+          : '';
   }
 }

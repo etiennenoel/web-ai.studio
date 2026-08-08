@@ -1,5 +1,7 @@
 import {ModelClassEnum} from '../enums/model-class.enum';
+import {TaskModeEnum} from '../enums/task-mode.enum';
 import {SourceColumnEnum} from '../enums/source-column.enum';
+import {AUDIO_MODEL_CLASSES} from './audio-model-classes.constant';
 import {ModelClassInterface} from '../interfaces/model-class.interface';
 
 /**
@@ -70,8 +72,23 @@ export const MODEL_CLASSES: ModelClassInterface[] = [
 export const PROJECTED_MODEL_CLASSES: ModelClassInterface[] =
   MODEL_CLASSES.filter(modelClass => modelClass.followsBandwidthLaw);
 
+/** Every size the page can show, across both tasks. */
+export const ALL_MODEL_CLASSES: ModelClassInterface[] = [...MODEL_CLASSES, ...AUDIO_MODEL_CLASSES];
+
+/** The sizes shown for each task, in the order their columns appear. */
+export const MODEL_CLASSES_BY_MODE: Record<TaskModeEnum, ModelClassInterface[]> = {
+  [TaskModeEnum.Text]: MODEL_CLASSES,
+  [TaskModeEnum.Audio]: AUDIO_MODEL_CLASSES,
+};
+
+/** Where the Horizon chart starts in each task: the size most readers are choosing about. */
+export const DEFAULT_HORIZON_CLASS_BY_MODE: Record<TaskModeEnum, ModelClassEnum> = {
+  [TaskModeEnum.Text]: ModelClassEnum.Nano2B,
+  [TaskModeEnum.Audio]: ModelClassEnum.WhisperSmall,
+};
+
 /** Model sizes indexed by key, for the many lookups the views do. */
-export const MODEL_CLASS_BY_KEY: Record<ModelClassEnum, ModelClassInterface> = MODEL_CLASSES
+export const MODEL_CLASS_BY_KEY: Record<ModelClassEnum, ModelClassInterface> = ALL_MODEL_CLASSES
   .reduce((map, modelClass) => {
     map[modelClass.key] = modelClass;
     return map;
