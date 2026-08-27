@@ -39,6 +39,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   }
 
   progress: number = 0;
+  downloadError: string | null = null;
 
   defaultTemperature = 1; // Default fallback
   maxTemperature = 2;
@@ -238,18 +239,25 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   async triggerDownload() {
     const self = this;
+    this.downloadError = null;
+    this.progress = 0;
 
-    const session = await LanguageModel.create({
-      expectedInputs: this.options.expectedInputs || [{ type: "text", languages: ["en"] }],
-      monitor(m: any) {
-        m.addEventListener("downloadprogress", (e: any) => {
-          console.log(`Downloaded ${e.loaded * 100}%`);
-          self.progress = e.loaded;
+    try {
+      await LanguageModel.create({
+        expectedInputs: this.options.expectedInputs || [{ type: "text", languages: ["en"] }],
+        monitor(m: any) {
+          m.addEventListener("downloadprogress", (e: any) => {
+            console.log(`Downloaded ${e.loaded * 100}%`);
+            self.progress = e.loaded;
 
-          self.checkAvailability();
-        });
-      },
-    })
+            self.checkAvailability();
+          });
+        },
+      });
+    } catch (error: unknown) {
+      this.downloadError = error instanceof Error ? error.message : String(error);
+      console.error("Local LLM download failed", error);
+    }
 
     await this.checkAvailability();
   }
