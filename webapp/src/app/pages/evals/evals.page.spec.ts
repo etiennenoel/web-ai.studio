@@ -226,6 +226,47 @@ describe('EvalsPage', () => {
       expect(row.warnings.length).toBe(0);
     });
 
+    it('should ask Google for the full-size original before falling back', async () => {
+      const png = new Blob([new Uint8Array([1, 2, 3])], { type: 'image/png' });
+      const requested: string[] = [];
+      spyOn(window, 'fetch').and.callFake((input: any) => {
+        requested.push(String(input));
+        return Promise.resolve(new Response(png, { status: 200, headers: { 'Content-Type': 'image/png' } }));
+      });
+
+      await paste(`
+        <table>
+          <tr><td>Context</td><td>Input (Images)</td></tr>
+          <tr><td></td><td><img src="https://lh7-rt.googleusercontent.com/docsz/AD_4nX=w624-h351-rw"></td></tr>
+        </table>`);
+
+      expect(requested[0]).toBe('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=s0');
+      expect(component.rows.at(0).value.images.length).toBe(1);
+    });
+
+    it('should fall back to the thumbnail URL when the original is not served', async () => {
+      const png = new Blob([new Uint8Array([1, 2, 3])], { type: 'image/png' });
+      const requested: string[] = [];
+      spyOn(window, 'fetch').and.callFake((input: any) => {
+        const url = String(input);
+        requested.push(url);
+        return Promise.resolve(url.endsWith('=s0')
+          ? new Response('', { status: 404 })
+          : new Response(png, { status: 200, headers: { 'Content-Type': 'image/png' } }));
+      });
+
+      await paste(`
+        <table>
+          <tr><td>Context</td><td>Input (Images)</td></tr>
+          <tr><td></td><td><img src="https://lh3.googleusercontent.com/abc=s220"></td></tr>
+        </table>`);
+
+      expect(requested.length).toBe(2);
+      const row = component.rows.at(0).value;
+      expect(row.images[0].startsWith('data:image/png;base64,')).toBeTrue();
+      expect(row.warnings.length).toBe(0);
+    });
+
     it('should keep a remote image that cannot be downloaded and warn about it', async () => {
       spyOn(window, 'fetch').and.rejectWith(new TypeError('Failed to fetch'));
 

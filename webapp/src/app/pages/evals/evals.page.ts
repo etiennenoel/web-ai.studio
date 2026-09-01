@@ -89,6 +89,8 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   previewImageSrc: string | null = null;
 
+  previewLoaded: boolean = false;
+
   showResetConfirmation: boolean = false;
 
   showAudioImport: boolean = false;
@@ -679,11 +681,13 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   public previewImage(imageSrc: string) {
+    this.previewLoaded = false;
     this.previewImageSrc = imageSrc;
   }
 
   public closePreview() {
     this.previewImageSrc = null;
+    this.previewLoaded = false;
   }
 
   public removeRow(index: number) {
@@ -967,22 +971,31 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       return source;
     }
 
-    try {
-      const blob = await MediaSourceUtils.fetchBlob(source);
+    // A picture in a sheet cell arrives as a downscaled thumbnail, so ask the CDN for the
+    // original first and fall back to the URL as written when that variant is not served.
+    const upgraded = kind === 'image' ? MediaSourceUtils.upgradeGoogleImageUrl(source) : null;
+    const candidates = upgraded && upgraded !== source ? [upgraded, source] : [source];
 
-      if (!blob.type.startsWith(`${kind}/`)) {
-        warnings.push(`"${MediaSourceUtils.describe(source)}" is not ${kind === 'image' ? 'an image' : 'an audio'} file.`);
-        return source;
-      }
+    let wrongType = false;
 
-      return await MediaSourceUtils.blobToDataUrl(blob);
-    } catch {
-      warnings.push(
-        `"${MediaSourceUtils.describe(source)}" could not be downloaded — check the link is publicly reachable, ` +
-        `or drop the file into this row instead.`
-      );
-      return source;
+    for (const candidate of candidates) {
+      try {
+        const blob = await MediaSourceUtils.fetchBlob(candidate);
+
+        if (blob.type.startsWith(`${kind}/`)) {
+          return await MediaSourceUtils.blobToDataUrl(blob);
+        }
+
+        wrongType = true;
+      } catch {}
     }
+
+    warnings.push(wrongType
+      ? `"${MediaSourceUtils.describe(source)}" is not ${kind === 'image' ? 'an image' : 'an audio'} file.`
+      : `"${MediaSourceUtils.describe(source)}" could not be downloaded — check the link is publicly reachable, ` +
+        `or drop the file into this row instead.`);
+
+    return source;
   }
 
   normalizeApi(value: string): ApiEnum {
