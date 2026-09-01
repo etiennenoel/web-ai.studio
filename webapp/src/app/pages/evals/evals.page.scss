@@ -1,0 +1,8 @@
+// The row inputs grow with what you type instead of reserving a fixed block of height, so a
+// one-line question makes a one-line row. field-sizing is Chrome-only for now; rows="2" in the
+// template is the fallback, and max-height keeps a pasted schema from swallowing the page.
+.eval-input {
+  field-sizing: content;
+  min-height: 2.5rem;
+  max-height: 11rem;
+}

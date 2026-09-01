@@ -49,12 +49,21 @@
       <div class="text-sm text-amber-800 dark:text-amber-400">
         The Browser's LLM is not installed. Click here to trigger the download and installation in your browser.
       </div>
+      @if (downloadError) {
+      <div class="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 text-sm text-red-800 dark:text-red-400" role="alert">
+        <span class="font-medium">Download failed:</span> {{ downloadError }}
+      </div>
+      }
       <div class="mt-3">
         <button class="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium !rounded-xl transition-colors shadow-sm border-none" (click)="triggerDownload()">
-          Trigger Local LLM Download
+          @if (downloadError) {
+            <i class="bi bi-arrow-clockwise"></i> Retry Download
+          } @else {
+            Trigger Local LLM Download
+          }
         </button>
       </div>
-      @if (languageModelAvailability === "downloading" || progress !== 0) {
+      @if (!downloadError && (languageModelAvailability === "downloading" || progress !== 0)) {
       <div class="mt-4">
         <div class="text-xs font-medium text-amber-700 dark:text-amber-500 mb-2">Download in progress...</div>
         <div class="w-full bg-amber-200/50 dark:bg-amber-900/50 rounded-full h-2.5 overflow-hidden">

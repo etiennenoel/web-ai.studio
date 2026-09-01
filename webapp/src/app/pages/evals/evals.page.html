@@ -7,33 +7,146 @@
   <!-- Main Area -->
   <div class="flex-grow flex flex-col mx-auto w-full px-4 sm:px-6 lg:px-8 overflow-hidden h-[calc(100vh-120px)]">
     <div class="flex-grow overflow-y-auto pb-4 pt-6">
-    
+
     <!-- How to Use Card -->
     <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 !rounded-2xl p-5 mb-6 shadow-sm">
-      <h2 class="text-xl font-semibold text-indigo-900 dark:text-indigo-300 mb-3 flex items-center gap-2">
-        <i class="bi bi-info-circle"></i> How to Use
-      </h2>
-      <h5 class="text-sm font-semibold text-indigo-800 dark:text-indigo-400 mb-2 flex items-center gap-2">
+      <h2 class="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
         <i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets
-      </h5>
-      <ol class="list-decimal list-inside text-sm text-indigo-800/80 dark:text-indigo-300/80 space-y-1.5 ml-1">
-        <li>(Optional) Drop audio files to create new rows.</li>
-        <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline hover:text-indigo-600 dark:hover:text-indigo-200">Copy the template</a></li>
-        <li>Fill the rows in the spreadsheet.</li>
-        <li>Copy your spreadsheet (without the header columns) and paste it in the first input in the first row, named "Context". It will merge with existing rows (e.g. created from audio files).</li>
+      </h2>
+      <ol class="list-decimal list-inside text-sm text-indigo-800/80 dark:text-indigo-300/80 space-y-1 ml-1">
+        <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline hover:text-indigo-600 dark:hover:text-indigo-200">Copy the template</a> and fill in your rows.</li>
+        <li>Copy the sheet — <span class="font-semibold">including the header row</span> — and paste it into the Context cell of the first row below.</li>
       </ol>
+      <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-3 mb-0">
+        Headers are matched by name in any order:
+        <code>Context</code>, <code>Input (Text)</code>, <code>Input (Images)</code>, <code>Input (Audio)</code>,
+        <code>Schema</code>, <code>API</code>. Columns you leave out are simply not imported, and any column the
+        page does not recognise is ignored.
+      </p>
+      <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-2 mb-0">
+        Put pictures straight into the <code>Input (Images)</code> cells — they come across with the paste and are
+        downloaded into the row. An <code>Input (Audio)</code> cell takes a full URL, for example
+        <code>https://web-ai.studio/images/cortex/speeches/spontaneous-speech-en-46.mp3</code>. A
+        <code>Schema</code> cell takes a JSON Schema or a <code>/regex/flags</code> literal, and applies to
+        Prompt rows only.
+      </p>
     </div>
 
-    <!-- Actions & Status -->
-    <div class="mb-6 flex flex-col gap-4">
-      <button class="w-full py-4 !rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2" (click)="run()">
-        <i class="bi bi-lightning-charge-fill"></i> Run Evals
-      </button>
+    <form [formGroup]="form">
 
-      <div class="border-2 border-dashed border-slate-300 dark:border-zinc-700 !rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-100 dark:bg-[#161616]/30 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
-        <i class="bi bi-mic text-4xl text-slate-400 dark:text-slate-500 mb-3 block"></i>
-        <p class="text-lg font-medium text-slate-600 dark:text-slate-400 m-0">Drop audio files here to create rows</p>
+    <!-- Actions & Status -->
+    <div class="mb-6 flex flex-col gap-4" formGroupName="settings">
+      @if (isRunning) {
+        <button type="button" class="w-full py-4 !rounded-2xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2" (click)="stop()">
+          <i class="bi bi-stop-circle-fill"></i> Stop
+        </button>
+      } @else {
+        <button type="button" class="w-full py-4 !rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2" (click)="run()">
+          <i class="bi bi-lightning-charge-fill"></i> Run Evals
+        </button>
+      }
+
+      <!-- Toolbar: optional columns + bulk audio import -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-1">Columns</span>
+
+        @for (column of optionalColumns; track column.field) {
+          <button type="button"
+                  class="flex items-center gap-1.5 px-3 py-1.5 !rounded-full text-xs font-medium border transition-colors"
+                  [class]="showColumn(column.field)
+                    ? 'bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-900/30 dark:border-indigo-700 dark:text-indigo-300'
+                    : 'bg-[#ffffff] border-slate-300 text-slate-600 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-600 dark:text-slate-400 dark:hover:bg-zinc-700'"
+                  [disabled]="hasColumnData(column.field)"
+                  [title]="hasColumnData(column.field) ? column.label + ' is in use and cannot be hidden' : 'Show or hide the ' + column.label + ' column'"
+                  (click)="toggleColumn(column.field)">
+            <i class="bi" [ngClass]="showColumn(column.field) ? 'bi-check2' : 'bi-plus-lg'"></i>
+            {{ column.label }}
+          </button>
+        }
+
+        <span class="flex-grow"></span>
+
+        <button type="button"
+                class="flex items-center gap-1.5 px-3 py-1.5 !rounded-full text-xs font-medium border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors"
+                (click)="showAudioImport = !showAudioImport">
+          <i class="bi" [ngClass]="showAudioImport ? 'bi-chevron-up' : 'bi-plus-lg'"></i> Add rows from audio
+        </button>
       </div>
+
+      @if (showAudioImport) {
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 border border-slate-200 dark:border-zinc-700 !rounded-2xl p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="border-2 border-dashed border-slate-300 dark:border-zinc-700 !rounded-xl p-6 text-center bg-slate-50/50 hover:bg-slate-100 dark:bg-[#161616]/30 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors flex flex-col items-center justify-center" (drop)="onAudioFilesDropped($event)" (dragover)="onDragOver($event)">
+            <i class="bi bi-file-earmark-music text-3xl text-slate-400 dark:text-slate-500 mb-2"></i>
+            <p class="text-sm font-medium text-slate-600 dark:text-slate-400 m-0">Drop audio files here — one row per file</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Or paste URLs / paths, one per line</label>
+            <textarea class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[72px]"
+                      formControlName="audioPaths"
+                      placeholder="images/cortex/speeches/spontaneous-speech-en-46.mp3&#10;https://example.com/clip.wav"></textarea>
+            <button type="button" class="mt-2 flex items-center gap-2 px-4 py-2 !rounded-xl border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-sm font-medium transition-all" (click)="addRowsFromAudioPaths()">
+              <i class="bi bi-list-ul"></i> Create a row per clip
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Web Speech settings: only when a row actually uses it -->
+      @if (usesWebSpeech) {
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 border border-slate-200 dark:border-zinc-700 !rounded-2xl p-4 flex flex-col gap-3">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100 m-0 mb-1 flex items-center gap-2">
+              <i class="bi bi-soundwave"></i> Web Speech settings
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 m-0">
+              Web Speech rows transcribe their audio files with the on-device speech model. Playback is real time,
+              so a 60s clip takes about 60s.
+            </p>
+          </div>
+
+          <app-api-status
+            [apis]="speechPills"
+            [showInstall]="true"
+            [isInstalling]="isInstallingSpeechModel"
+            [unavailableHint]="speechHint"
+            (install)="installSpeechModel()">
+          </app-api-status>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Language</label>
+              <input type="text" formControlName="speechLang" placeholder="en-US"
+                     class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-2.5">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Quality tier</label>
+              <select formControlName="speechQuality"
+                      class="form-select w-full bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5">
+                @for (quality of qualityLevels; track quality.value) {
+                  <option [value]="quality.value" [title]="quality.hint">{{ quality.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Prompt API structured output: only when a row carries a schema -->
+      @if (usesSchema) {
+        <div class="bg-[#ffffff] dark:bg-zinc-800/90 border border-slate-200 dark:border-zinc-700 !rounded-2xl p-4">
+          <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100 m-0 mb-2 flex items-center gap-2">
+            <i class="bi bi-braces"></i> Prompt API structured output
+          </h3>
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" formControlName="omitResponseConstraintInput" class="mt-0.5 rounded border-slate-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+            <span>
+              <span class="block text-sm font-medium text-slate-700 dark:text-slate-300">Omit the schema from the model input</span>
+              <span class="block text-xs text-slate-500 dark:text-slate-400">The output is still constrained to the schema, but the schema text is not appended to the prompt — it saves input tokens at the cost of the model not knowing what the fields mean.</span>
+            </span>
+          </label>
+        </div>
+      }
 
       @if(status !== EvalsExecutionEnum.Idle) {
         <div class="p-4 !rounded-xl border flex items-center gap-3"
@@ -49,7 +162,7 @@
           } @else if (status === EvalsExecutionEnum.Error) {
             <i class="bi bi-exclamation-triangle-fill text-xl"></i>
           }
-          
+
           <div class="font-medium">
             @if(status === EvalsExecutionEnum.InProgress) {
               {{ statusMessage || 'Running evaluations...' }}
@@ -66,70 +179,111 @@
     <!-- Evals Table -->
     <div class="bg-[#ffffff] dark:bg-zinc-800/90 !rounded-3xl shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden mb-8">
       <div class="overflow-x-auto w-full p-4">
-        <form [formGroup]="form">
-          <table class="w-full text-left border-collapse min-w-[1200px]">
+          <table class="w-full text-left border-collapse min-w-[820px]">
             <thead>
               <tr class="border-b border-slate-200 dark:border-zinc-700">
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Context</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[20%]">Input</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Images</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[15%]">Audio</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[10%]">API</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[8%]">Status</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[10%]">Output</th>
-                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-[2%] text-center">Act</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">API</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Context</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Input</th>
+                @if (showColumn('images')) {
+                  <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Images</th>
+                }
+                @if (showColumn('audio')) {
+                  <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Audio</th>
+                }
+                @if (showColumn('schema')) {
+                  <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Schema</th>
+                }
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Act</th>
               </tr>
             </thead>
-            <tbody formArrayName="rows" class="divide-y divide-slate-100 dark:divide-zinc-700/50">
-              @for (formRow of rows.controls; track $index) {
-                <tr [formGroupName]="$index" class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/50 transition-colors align-top">
-                  <td class="p-3">
-                    <textarea class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="context" (paste)="onPaste($event, $index)" placeholder="Paste spreadsheet here..."></textarea>
-                  </td>
-                  <td class="p-3">
-                    <textarea class="w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 resize-y min-h-[120px]" formControlName="input" placeholder="Paste text or drag & drop image"></textarea>
-                  </td>
-                  <td class="p-3" (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
-                    <div class="border border-dashed border-slate-300 dark:border-zinc-600 !rounded-xl p-3 text-center mb-3 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" (click)="fileInput.click()">
-                      <i class="bi bi-cloud-upload text-2xl text-slate-400 dark:text-slate-500"></i>
-                      <p class="m-0 text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Click or Drag</p>
-                      <input #fileInput type="file" multiple accept="image/*" class="hidden" (change)="selectImage($event, $index)">
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                      @for (image of formRow.value.images; track $index) {
-                        <div class="relative inline-block group">
-                          <img [src]="image" class="w-16 h-16 object-cover !rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity" (click)="previewImage(image)">
-                          <button class="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full shadow-sm text-[10px] transition-transform scale-0 group-hover:scale-100" (click)="removeImage($index, $index); $event.stopPropagation()">
-                            <i class="bi bi-x"></i>
-                          </button>
-                        </div>
+            <tbody formArrayName="rows">
+              @for (formRow of rows.controls; track $index; let rowIndex = $index) {
+                @let api = formRow.value.api;
+
+                <tr [formGroupName]="rowIndex"
+                    class="align-top hover:bg-slate-50/40 dark:hover:bg-zinc-800/40 transition-colors"
+                    [ngClass]="{'border-t border-slate-200 dark:border-zinc-700': !$first}">
+
+                  <td class="py-2.5 px-3 min-w-[170px]">
+                    <select class="form-select w-full pr-8 bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg text-sm font-medium py-1.5 focus:ring-indigo-500 focus:border-indigo-500" formControlName="api">
+                      @for (option of apiOptions; track option) {
+                        <option [value]="option">{{ option }}</option>
                       }
-                    </div>
-                  </td>
-                  <td class="p-3" (drop)="onFileDropped($event, $index)" (dragover)="onDragOver($event)">
-                    <div class="border border-dashed border-slate-300 dark:border-zinc-600 !rounded-xl p-3 text-center mb-3 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors" (click)="audioInput.click()">
-                      <i class="bi bi-mic text-2xl text-slate-400 dark:text-slate-500"></i>
-                      <p class="m-0 text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Click or Drag</p>
-                      <input #audioInput type="file" multiple accept="audio/*" class="hidden" (change)="selectAudio($event, $index)">
-                    </div>
-                    <div class="flex flex-col gap-2">
-                      @for (audio of formRow.value.audio; track $index) {
-                        <div class="relative border border-slate-200 dark:border-zinc-700 !rounded-lg p-1.5 flex items-center bg-slate-50 dark:bg-[#161616] shadow-sm group">
-                          <audio [src]="audio" controls class="w-full h-8 max-w-[200px]"></audio>
-                          <button class="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full shadow-sm text-[10px] transition-transform scale-0 group-hover:scale-100" (click)="removeAudio($index, $index)">
-                            <i class="bi bi-x"></i>
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  </td>
-                  <td class="p-3">
-                    <select class="form-select w-full bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500" formControlName="api">
-                      <option [value]="'Summarizer'">Summarizer</option>
-                      <option [value]="'Prompt'">Prompt</option>
                     </select>
                   </td>
-                  <td class="p-3">
+
+                  <td class="py-2.5 px-3 min-w-[170px]">
+                    @if (usesField(api, 'context')) {
+                      <textarea rows="2" class="eval-input w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 px-2.5 py-1.5 resize-y"
+                                formControlName="context"
+                                (paste)="onPaste($event, rowIndex)"
+                                [placeholder]="$first ? 'System prompt — or paste your sheet' : 'System prompt'"
+                                title="Paste your spreadsheet here to import every row at once"></textarea>
+                    }
+                  </td>
+
+                  <td class="py-2.5 px-3 min-w-[170px]">
+                    @if (usesField(api, 'input')) {
+                      <textarea rows="2" class="eval-input w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 px-2.5 py-1.5 resize-y" formControlName="input" placeholder="What to ask the model"></textarea>
+                    }
+                  </td>
+
+                  @if (showColumn('images')) {
+                    <td class="py-2.5 px-3 min-w-[120px]" (drop)="onFileDropped($event, rowIndex)" (dragover)="onDragOver($event)">
+                      @if (usesField(api, 'images')) {
+                        <div class="flex flex-wrap items-center gap-1.5">
+                          @for (image of formRow.value.images; track $index) {
+                            <div class="relative group">
+                              <img [src]="image" class="w-11 h-11 object-cover !rounded-md border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" (click)="previewImage(image)">
+                              <button type="button" class="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-[9px] transition-transform scale-0 group-hover:scale-100" (click)="removeImage(rowIndex, $index); $event.stopPropagation()">
+                                <i class="bi bi-x"></i>
+                              </button>
+                            </div>
+                          }
+                          <button type="button" class="w-11 h-11 flex items-center justify-center !rounded-md border border-dashed border-slate-300 dark:border-zinc-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" (click)="fileInput.click()" title="Add images — or drop them on this cell">
+                            <i class="bi bi-plus-lg"></i>
+                          </button>
+                          <input #fileInput type="file" multiple accept="image/*" class="hidden" (change)="selectImage($event, rowIndex)">
+                        </div>
+                      }
+                    </td>
+                  }
+
+                  @if (showColumn('audio')) {
+                    <td class="py-2.5 px-3 min-w-[190px]" (drop)="onFileDropped($event, rowIndex)" (dragover)="onDragOver($event)">
+                      @if (usesField(api, 'audio')) {
+                        <div class="flex flex-col gap-1.5">
+                          @for (audio of formRow.value.audio; track $index) {
+                            <div class="relative group w-fit">
+                              <audio [src]="audio" controls class="block h-8 w-[168px]"></audio>
+                              <button type="button" class="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-[9px] transition-transform scale-0 group-hover:scale-100" (click)="removeAudio(rowIndex, $index)">
+                                <i class="bi bi-x"></i>
+                              </button>
+                            </div>
+                          }
+                          <button type="button" class="h-8 w-[168px] gap-1.5 text-xs font-medium flex items-center justify-center !rounded-md border border-dashed border-slate-300 dark:border-zinc-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" (click)="audioInput.click()" title="Add audio — or drop it on this cell">
+                            <i class="bi bi-plus-lg"></i> Audio
+                          </button>
+                          <input #audioInput type="file" multiple accept="audio/*" class="hidden" (change)="selectAudio($event, rowIndex)">
+                        </div>
+                      }
+                    </td>
+                  }
+
+                  @if (showColumn('schema')) {
+                    <td class="py-2.5 px-3 min-w-[170px]">
+                      @if (usesField(api, 'schema')) {
+                        <textarea rows="2" class="eval-input w-full bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 !rounded-lg text-[11px] font-mono leading-snug text-slate-800 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500 px-2.5 py-1.5 resize-y"
+                                  formControlName="schema"
+                                  placeholder='{"type":"object"}'
+                                  title="A JSON Schema document, or a /regex/flags literal"></textarea>
+                      }
+                    </td>
+                  }
+
+                  <td class="py-2.5 px-3 min-w-[86px]">
                     <span class="inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-md border"
                           [ngClass]="{
                             'bg-slate-100 text-slate-600 border-slate-200 dark:bg-zinc-800 dark:text-slate-300 dark:border-zinc-700': formRow.value.status === InferenceStatusEnum.Idle,
@@ -140,30 +294,56 @@
                       {{ formRow.value.status }}
                     </span>
                   </td>
-                  <td class="p-3">
-                    <div class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap w-full min-w-[200px]">
-                      {{ formRow.value.output }}
-                    </div>
-                  </td>
-                  <td class="p-3 text-center">
-                    <button class="w-8 h-8 flex items-center justify-center !rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors border-none" (click)="removeRow($index)" title="Remove Row">
+
+                  <td class="py-2.5 px-3 text-center">
+                    <button type="button" class="w-8 h-8 flex items-center justify-center !rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors border-none" (click)="removeRow(rowIndex)" title="Remove Row">
                       <i class="bi bi-trash3"></i>
                     </button>
                   </td>
                 </tr>
+
+                @if (formRow.value.output) {
+                  <tr class="bg-slate-50/70 dark:bg-[#161616]/40">
+                    <td [attr.colspan]="columnCount" class="px-4 pt-0 pb-3">
+                      <div class="flex items-start gap-3">
+                        <span class="shrink-0 w-14 pt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Output</span>
+                        <div class="flex-grow text-xs font-mono leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-200 max-h-56 overflow-y-auto">{{ formRow.value.output }}</div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+
+                @if (formRow.value.warnings.length) {
+                  <tr class="bg-amber-50/60 dark:bg-amber-900/10">
+                    <td [attr.colspan]="columnCount" class="px-4 py-2">
+                      <div class="flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
+                        <i class="bi bi-exclamation-triangle-fill mt-0.5"></i>
+                        <ul class="list-disc list-inside m-0 flex-grow">
+                          @for (warning of formRow.value.warnings; track $index) {
+                            <li>{{ warning }}</li>
+                          }
+                        </ul>
+                        <button type="button" class="text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 border-none bg-transparent" (click)="dismissWarnings(rowIndex)" title="Dismiss">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>
-        </form>
       </div>
-      
+
       <!-- Add Row Footer -->
       <div class="bg-slate-50 dark:bg-[#161616]/50 border-t border-slate-200 dark:border-zinc-700 p-4 flex justify-center">
-        <button class="flex items-center gap-2 px-5 py-2 !rounded-xl border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" (click)="addRow()">
+        <button type="button" class="flex items-center gap-2 px-5 py-2 !rounded-xl border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" (click)="addRow()">
           <i class="bi bi-plus-lg"></i> Add Row
         </button>
       </div>
     </div>
+
+    </form>
     </div>
   </div>
 
@@ -178,11 +358,11 @@
         </button>
       </div>
       <div class="p-6">
-        <p class="text-slate-600 dark:text-slate-300 mb-0">Dropping audio files will reset the existing rows. Are you sure you want to continue?</p>
+        <p class="text-slate-600 dark:text-slate-300 mb-0">This will replace the existing rows with one row per audio clip. Are you sure you want to continue?</p>
       </div>
       <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-[#161616]/50 flex justify-end gap-3">
         <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-[#ffffff] dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors focus:outline-none" (click)="cancelReset()">Cancel</button>
-        <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-red-600 hover:bg-red-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="processAudioFiles()">Reset</button>
+        <button type="button" class="px-4 py-2 !rounded-xl text-sm font-medium bg-red-600 hover:bg-red-700 text-white border-none transition-colors shadow-sm focus:outline-none" (click)="applyPendingAudioSources()">Reset</button>
       </div>
     </div>
   </div>
@@ -193,7 +373,7 @@
   <div class="fixed inset-0 z-[1060] flex items-center justify-center bg-slate-900/90 dark:bg-black/90 backdrop-blur-md p-4" (click)="closePreview()">
     <div class="relative max-w-5xl w-full h-full flex items-center justify-center">
       <img [src]="previewImageSrc" class="max-w-full max-h-[90vh] !rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
-      <button class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-[#ffffff]/20 hover:bg-[#ffffff]/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
+      <button type="button" class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-[#ffffff]/20 hover:bg-[#ffffff]/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
