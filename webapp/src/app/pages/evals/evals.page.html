@@ -236,13 +236,16 @@
                         <div class="flex flex-wrap items-center gap-1.5">
                           @for (image of formRow.value.images; track $index) {
                             <div class="relative group">
-                              <img [src]="image" class="w-11 h-11 object-cover !rounded-md border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" (click)="previewImage(image)">
+                              <img [src]="image" class="w-14 h-14 object-cover !rounded-md border border-slate-200 dark:border-zinc-700 cursor-zoom-in" (click)="previewImage(image)" title="Click to view full size">
+                              <div class="absolute inset-0 flex items-center justify-center !rounded-md bg-slate-900/0 group-hover:bg-slate-900/45 transition-colors pointer-events-none">
+                                <i class="bi bi-arrows-fullscreen text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                              </div>
                               <button type="button" class="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full text-[9px] transition-transform scale-0 group-hover:scale-100" (click)="removeImage(rowIndex, $index); $event.stopPropagation()">
                                 <i class="bi bi-x"></i>
                               </button>
                             </div>
                           }
-                          <button type="button" class="w-11 h-11 flex items-center justify-center !rounded-md border border-dashed border-slate-300 dark:border-zinc-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" (click)="fileInput.click()" title="Add images — or drop them on this cell">
+                          <button type="button" class="w-14 h-14 flex items-center justify-center !rounded-md border border-dashed border-slate-300 dark:border-zinc-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" (click)="fileInput.click()" title="Add images — or drop them on this cell">
                             <i class="bi bi-plus-lg"></i>
                           </button>
                           <input #fileInput type="file" multiple accept="image/*" class="hidden" (change)="selectImage($event, rowIndex)">
