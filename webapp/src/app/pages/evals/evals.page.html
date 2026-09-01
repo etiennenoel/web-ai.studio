@@ -375,7 +375,12 @@
 @if (previewImageSrc) {
   <div class="fixed inset-0 z-[1060] flex items-center justify-center bg-slate-900/90 dark:bg-black/90 backdrop-blur-md p-4" (click)="closePreview()">
     <div class="relative max-w-5xl w-full h-full flex items-center justify-center">
-      <img [src]="previewImageSrc" class="max-w-full max-h-[90vh] !rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
+      <img #preview [src]="previewImageSrc" class="max-w-full max-h-[90vh] !rounded-2xl shadow-2xl" (click)="$event.stopPropagation()" (load)="previewLoaded = true">
+      @if (previewLoaded) {
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/60 text-white text-xs font-mono backdrop-blur-sm border border-white/10">
+          {{ preview.naturalWidth }} &times; {{ preview.naturalHeight }} px
+        </div>
+      }
       <button type="button" class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center bg-[#ffffff]/20 hover:bg-[#ffffff]/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/10" (click)="closePreview()">
         <i class="bi bi-x-lg"></i>
       </button>

@@ -36,6 +36,24 @@ export class MediaSourceUtils {
     return /^https?:\/\//i.test(source);
   }
 
+  /**
+   * Google's image CDN encodes the size it should serve at the end of the URL — `=s220`,
+   * `=w624-h351-rw`. A picture sitting in a sheet cell therefore comes across the clipboard as
+   * a downscaled, re-compressed thumbnail of whatever was uploaded. `=s0` asks for the
+   * original instead.
+   *
+   * Returns null when the URL is not one of those, so the caller can skip the extra request.
+   */
+  static upgradeGoogleImageUrl(source: string): string | null {
+    if (!/^https?:\/\/[^/]*\.googleusercontent\.com\//i.test(source)) {
+      return null;
+    }
+
+    const upgraded = source.replace(/=[\w-]*$/, '=s0');
+
+    return upgraded === source ? `${source}=s0` : upgraded;
+  }
+
   /** A bare path or URL that looks like it points at a media file of the given kind. */
   static looksLikePath(source: string, kind: 'image' | 'audio'): boolean {
     const extensions = kind === 'image'

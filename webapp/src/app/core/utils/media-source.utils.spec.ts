@@ -27,6 +27,25 @@ describe('MediaSourceUtils', () => {
     });
   });
 
+  describe('upgradeGoogleImageUrl', () => {
+    it('should swap a size directive for the original', () => {
+      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh3.googleusercontent.com/abc=s220'))
+        .toBe('https://lh3.googleusercontent.com/abc=s0');
+      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=w624-h351-rw'))
+        .toBe('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=s0');
+    });
+
+    it('should append one when the URL carries no size', () => {
+      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh3.googleusercontent.com/abc'))
+        .toBe('https://lh3.googleusercontent.com/abc=s0');
+    });
+
+    it('should leave other hosts alone', () => {
+      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://example.com/cat=s220')).toBeNull();
+      expect(MediaSourceUtils.upgradeGoogleImageUrl('images/cortex/cat.png')).toBeNull();
+    });
+  });
+
   describe('describe', () => {
     it('should not dump a whole data URL into an error message', () => {
       const label = MediaSourceUtils.describe(`data:image/png;base64,${'A'.repeat(5000)}`);
