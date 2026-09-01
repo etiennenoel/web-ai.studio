@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EvalsPage } from './evals.page';
 import { ApiEnum } from './api.enum';
+import { MediaSourceUtils } from '../../core/utils/media-source.utils';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -265,6 +266,39 @@ describe('EvalsPage', () => {
       const row = component.rows.at(0).value;
       expect(row.images[0].startsWith('data:image/png;base64,')).toBeTrue();
       expect(row.warnings.length).toBe(0);
+    });
+
+    it('should warn when the sheet only carried a cell-sized preview', async () => {
+      // A 216x122 PNG - the size Google Sheets renders into a cell.
+      const tiny = 'data:image/png;base64,' + btoa(
+        String.fromCharCode(...[137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,216,0,0,0,122,8,6,0,0,0]));
+      spyOn(MediaSourceUtils, 'imageSize').and.resolveTo({ width: 216, height: 122 });
+
+      await paste(`
+        <table>
+          <tr><td>Context</td><td>Input (Images)</td></tr>
+          <tr><td></td><td><img src="${tiny}"></td></tr>
+        </table>`);
+
+      const row = component.rows.at(0).value;
+      expect(row.images[0]).toBe(tiny);
+      expect(row.warnings.length).toBe(1);
+      expect(row.warnings[0]).toContain('216x122 preview');
+      expect(row.warnings[0]).toContain('=IMAGE(');
+    });
+
+    it('should not warn about an image that is already big enough', async () => {
+      const png = new Blob([new Uint8Array([1, 2, 3])], { type: 'image/png' });
+      spyOn(window, 'fetch').and.resolveTo(new Response(png, { status: 200, headers: { 'Content-Type': 'image/png' } }));
+      spyOn(MediaSourceUtils, 'imageSize').and.resolveTo({ width: 1600, height: 900 });
+
+      await paste(`
+        <table>
+          <tr><td>Context</td><td>Input (Images)</td></tr>
+          <tr><td></td><td><img src="https://lh3.googleusercontent.com/abc=s220"></td></tr>
+        </table>`);
+
+      expect(component.rows.at(0).value.warnings.length).toBe(0);
     });
 
     it('should keep a remote image that cannot be downloaded and warn about it', async () => {

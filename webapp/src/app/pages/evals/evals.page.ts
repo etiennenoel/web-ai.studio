@@ -34,6 +34,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   /** Anything bigger than this is almost certainly a mistake in an eval sheet. */
   private static readonly maxMediaBytes = 25 * 1024 * 1024;
 
+  /** The Prompt API squares images to this, so a smaller one has already lost detail. */
+  private static readonly minUsefulImageEdge = 768;
+
   private static readonly apiAliases: Record<string, ApiEnum> = {
     'summarizer': ApiEnum.Summarizer,
     'summariser': ApiEnum.Summarizer,
@@ -967,14 +970,24 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    * URL is kept: the preview still renders it and the run fetches it again.
    */
   private async resolveMediaSource(source: string, kind: MediaKind, warnings: string[]): Promise<string> {
-    if (MediaSourceUtils.isDataUrl(source) || !MediaSourceUtils.isAbsoluteUrl(source)) {
+    // A data URL is already the bytes the clipboard carried — there is nothing better to fetch,
+    // but it is worth saying so when those bytes are only a cell-sized preview.
+    if (MediaSourceUtils.isDataUrl(source)) {
+      if (kind === 'image') {
+        await this.warnIfUnderSized(source, source, warnings, true);
+      }
+      return source;
+    }
+
+    if (!MediaSourceUtils.isAbsoluteUrl(source)) {
       return source;
     }
 
     // A picture in a sheet cell arrives as a downscaled thumbnail, so ask the CDN for the
-    // original first and fall back to the URL as written when that variant is not served.
-    const upgraded = kind === 'image' ? MediaSourceUtils.upgradeGoogleImageUrl(source) : null;
-    const candidates = upgraded && upgraded !== source ? [upgraded, source] : [source];
+    // original first and fall back to the URL as written when no variant is served.
+    const candidates = kind === 'image'
+      ? [...MediaSourceUtils.googleFullSizeVariants(source), source]
+      : [source];
 
     let wrongType = false;
 
@@ -983,6 +996,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
         const blob = await MediaSourceUtils.fetchBlob(candidate);
 
         if (blob.type.startsWith(`${kind}/`)) {
+          if (kind === 'image') {
+            await this.warnIfUnderSized(blob, source, warnings, false);
+          }
+
           return await MediaSourceUtils.blobToDataUrl(blob);
         }
 
@@ -996,6 +1013,30 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
         `or drop the file into this row instead.`);
 
     return source;
+  }
+
+  /**
+   * The model squares images to 768x768, so anything arriving smaller has already lost detail
+   * before it is ever prompted. Saying so is the whole point: the old importer took a cell
+   * thumbnail without a word, and the row looked fine.
+   */
+  private async warnIfUnderSized(
+    image: string | Blob,
+    source: string,
+    warnings: string[],
+    fromClipboard: boolean,
+  ): Promise<void> {
+    const size = await MediaSourceUtils.imageSize(image);
+
+    if (!size || Math.max(size.width, size.height) >= EvalsPage.minUsefulImageEdge) {
+      return;
+    }
+
+    warnings.push(fromClipboard
+      ? `The sheet carried only a ${size.width}x${size.height} preview of this picture, not the original. `
+        + `Use =IMAGE("https://...") in the cell so the paste carries a link, or drop the file on this row.`
+      : `This picture came back ${size.width}x${size.height} from ${MediaSourceUtils.describe(source)}. `
+        + `The model squares images to ${EvalsPage.minUsefulImageEdge}x${EvalsPage.minUsefulImageEdge}, so detail is being lost.`);
   }
 
   normalizeApi(value: string): ApiEnum {

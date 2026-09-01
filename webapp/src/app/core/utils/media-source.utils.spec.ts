@@ -27,22 +27,34 @@ describe('MediaSourceUtils', () => {
     });
   });
 
-  describe('upgradeGoogleImageUrl', () => {
-    it('should swap a size directive for the original', () => {
-      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh3.googleusercontent.com/abc=s220'))
+  describe('googleFullSizeVariants', () => {
+    it('should swap a trailing size directive for the original', () => {
+      expect(MediaSourceUtils.googleFullSizeVariants('https://lh3.googleusercontent.com/abc=s220')[0])
         .toBe('https://lh3.googleusercontent.com/abc=s0');
-      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=w624-h351-rw'))
+      expect(MediaSourceUtils.googleFullSizeVariants('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=w624-h351-rw')[0])
         .toBe('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=s0');
     });
 
     it('should append one when the URL carries no size', () => {
-      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://lh3.googleusercontent.com/abc'))
-        .toBe('https://lh3.googleusercontent.com/abc=s0');
+      expect(MediaSourceUtils.googleFullSizeVariants('https://lh3.googleusercontent.com/abc'))
+        .toContain('https://lh3.googleusercontent.com/abc=s0');
+    });
+
+    it('should also try replacing a newer comma-parameter segment', () => {
+      const variants = MediaSourceUtils.googleFullSizeVariants(
+        'https://lh7-rt.googleusercontent.com/docsz/AD_4nX/w=624,h=351,f=jpg,q=85');
+      expect(variants).toContain('https://lh7-rt.googleusercontent.com/docsz/AD_4nX=s0');
+      expect(variants).toContain('https://lh7-rt.googleusercontent.com/docsz/AD_4nX/s0');
+    });
+
+    it('should never return the URL it was given', () => {
+      const source = 'https://lh3.googleusercontent.com/abc=s0';
+      expect(MediaSourceUtils.googleFullSizeVariants(source)).not.toContain(source);
     });
 
     it('should leave other hosts alone', () => {
-      expect(MediaSourceUtils.upgradeGoogleImageUrl('https://example.com/cat=s220')).toBeNull();
-      expect(MediaSourceUtils.upgradeGoogleImageUrl('images/cortex/cat.png')).toBeNull();
+      expect(MediaSourceUtils.googleFullSizeVariants('https://example.com/cat=s220')).toEqual([]);
+      expect(MediaSourceUtils.googleFullSizeVariants('images/cortex/cat.png')).toEqual([]);
     });
   });
 

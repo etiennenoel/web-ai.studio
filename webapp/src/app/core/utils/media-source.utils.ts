@@ -37,21 +37,58 @@ export class MediaSourceUtils {
   }
 
   /**
-   * Google's image CDN encodes the size it should serve at the end of the URL — `=s220`,
-   * `=w624-h351-rw`. A picture sitting in a sheet cell therefore comes across the clipboard as
-   * a downscaled, re-compressed thumbnail of whatever was uploaded. `=s0` asks for the
-   * original instead.
+   * Google's image CDN encodes the size it should serve in the URL, so a picture sitting in a
+   * sheet cell arrives as a downscaled thumbnail of whatever was uploaded. Two encodings are in
+   * the wild — a trailing directive (`=s220`, `=w624-h351-rw`) and a newer parameter segment
+   * (`/w=624,h=351,f=jpg,q=85`) — and `s0` asks either of them for the original.
    *
-   * Returns null when the URL is not one of those, so the caller can skip the extra request.
+   * Returns every plausible full-size variant, most likely first; empty when the host is not
+   * Google's, so the caller can skip the extra requests.
    */
-  static upgradeGoogleImageUrl(source: string): string | null {
+  static googleFullSizeVariants(source: string): string[] {
     if (!/^https?:\/\/[^/]*\.googleusercontent\.com\//i.test(source)) {
-      return null;
+      return [];
     }
 
-    const upgraded = source.replace(/=[\w-]*$/, '=s0');
+    const variants: string[] = [];
+    const add = (candidate: string) => {
+      if (candidate !== source && !variants.includes(candidate)) {
+        variants.push(candidate);
+      }
+    };
 
-    return upgraded === source ? `${source}=s0` : upgraded;
+    if (/=[\w-]*$/.test(source)) {
+      add(source.replace(/=[\w-]*$/, '=s0'));
+    } else {
+      add(`${source}=s0`);
+    }
+
+    // Newer docs form: the whole trailing segment is a parameter list, so replace it wholesale.
+    // It must look like one (`w=624,h=351,f=jpg`), or every URL would spawn junk variants.
+    const cut = source.lastIndexOf('/');
+    const tail = source.slice(cut + 1);
+
+    if (cut > 8 && tail.includes(',') && tail.includes('=')) {
+      add(`${source.slice(0, cut)}=s0`);
+      add(`${source.slice(0, cut)}/s0`);
+    }
+
+    return variants;
+  }
+
+  /** Reads an image's real pixel size, or null when it cannot be decoded. */
+  static async imageSize(source: string | Blob): Promise<{width: number, height: number} | null> {
+    try {
+      const blob = typeof source === 'string' ? await MediaSourceUtils.fetchBlob(source) : source;
+      const bitmap = await createImageBitmap(blob);
+      const size = {width: bitmap.width, height: bitmap.height};
+
+      bitmap.close();
+
+      return size;
+    } catch {
+      return null;
+    }
   }
 
   /** A bare path or URL that looks like it points at a media file of the given kind. */
