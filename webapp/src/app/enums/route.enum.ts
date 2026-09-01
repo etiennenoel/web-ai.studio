@@ -43,4 +43,5 @@ export enum RouteEnum {
   PlaygroundsSemanticEmbedder = "/playgrounds/semantic-embedder",
   PlaygroundsWebSpeech = "/playgrounds/web-speech",
   LabsNoteEditor = "/labs/note-editor",
+  DashboardsConsumerHardware = "/dashboards/consumer-hardware-analysis",
 }

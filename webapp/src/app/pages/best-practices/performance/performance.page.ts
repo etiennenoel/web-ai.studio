@@ -39,11 +39,12 @@ import { Component } from '@angular/core';
           </app-practice-mock>
           <div class="max-w-4xl">
             <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed mb-2">
-              The comparison below builds the same article both ways and summarizes it. Watch the input size in the output — the markup version is several times larger before the model even starts.
+              The benchmark below builds the same article both ways and summarizes it. Watch the input size printed in the output — the markup version is about twice as large before the model even starts. It runs a discarded warm-up, then three measured samples per side, and only claims a winner when the gap beats the run-to-run spread.
             </p>
           </div>
           <app-practice-comparison
             title="Clean text input vs. raw HTML input"
+            metricLabel="summarize() inference time — summarizer creation excluded"
             [doCode]="inputDoCode"
             [dontCode]="inputDontCode">
           </app-practice-comparison>
@@ -72,6 +73,7 @@ import { Component } from '@angular/core';
           </div>
           <app-practice-comparison
             title="Cached repeat query vs. re-running inference"
+            metricLabel="Time to answer the question twice — session setup excluded"
             [doCode]="cacheDoCode"
             [dontCode]="cacheDontCode">
           </app-practice-comparison>
@@ -96,46 +98,61 @@ import { Component } from '@angular/core';
   host: { class: 'block h-full' },
 })
 export class PerformancePage {
-  inputDoCode = `// Same article, but only the text the model actually needs.
+  inputDoCode = `// A realistically sized article — one section repeated to article length.
 const article = document.createElement('article');
-article.innerHTML = \`
-  <div class="wrapper" data-analytics-id="a-4821" style="margin:0;padding:16px">
-    <h1 class="title xl:text-4xl font-extrabold">On-device AI on the web</h1>
-    <p class="lead" data-track="impression">Built-in AI APIs let websites run
-    inference locally: no API keys, no server round-trips, and user data
-    never leaves the device.</p>
-    <p><a href="/pricing?utm_source=x&utm_campaign=y">The Summarizer, Writer and
-    Rewriter APIs</a> share one lifecycle: availability, create, inference.</p>
-  </div>\`;
+article.innerHTML = Array.from({ length: 6 }, (_, i) => \`
+  <section class="prose-block" data-analytics-id="sec-\${i}" data-track="impression">
+    <h2 class="title xl:text-3xl font-extrabold tracking-tight">On-device AI, part \${i + 1}</h2>
+    <p class="lead text-slate-600" data-testid="lead-\${i}">Built-in AI APIs let websites run
+    inference locally: no API keys, no server round-trips, and user data never
+    leaves the device.</p>
+    <p class="body" style="margin:0 0 16px 0;line-height:1.6">The Summarizer, Writer and
+    Rewriter APIs share one lifecycle — availability, create, inference — so the code you
+    write for one transfers directly to the others.</p>
+    <p><a class="link underline" href="/docs?utm_source=x&utm_campaign=y">Read the guide</a>
+    for hardware requirements and download tracking.</p>
+  </section>\`).join('');
 
 const cleanText = article.innerText; // markup stripped
 console.log(\`Input size: \${cleanText.length} characters\`);
 
 const summarizer = await Summarizer.create({ type: 'tldr', length: 'short' });
+
+// Timed region: summarize() only. Creating the summarizer is identical on
+// both sides, so including it would just add shared noise.
 const start = performance.now();
 console.log(await summarizer.summarize(cleanText));
-console.log(\`Inference: \${(performance.now() - start).toFixed(0)} ms\`);
+const inference = performance.now() - start;
+console.log(\`Inference: \${inference.toFixed(0)} ms\`);
+reportTiming(inference);
 summarizer.destroy();`;
 
-  inputDontCode = `// Raw innerHTML: tags, classes and tracking attributes all become tokens.
+  inputDontCode = `// Identical article — but the raw markup is handed to the model.
 const article = document.createElement('article');
-article.innerHTML = \`
-  <div class="wrapper" data-analytics-id="a-4821" style="margin:0;padding:16px">
-    <h1 class="title xl:text-4xl font-extrabold">On-device AI on the web</h1>
-    <p class="lead" data-track="impression">Built-in AI APIs let websites run
-    inference locally: no API keys, no server round-trips, and user data
-    never leaves the device.</p>
-    <p><a href="/pricing?utm_source=x&utm_campaign=y">The Summarizer, Writer and
-    Rewriter APIs</a> share one lifecycle: availability, create, inference.</p>
-  </div>\`;
+article.innerHTML = Array.from({ length: 6 }, (_, i) => \`
+  <section class="prose-block" data-analytics-id="sec-\${i}" data-track="impression">
+    <h2 class="title xl:text-3xl font-extrabold tracking-tight">On-device AI, part \${i + 1}</h2>
+    <p class="lead text-slate-600" data-testid="lead-\${i}">Built-in AI APIs let websites run
+    inference locally: no API keys, no server round-trips, and user data never
+    leaves the device.</p>
+    <p class="body" style="margin:0 0 16px 0;line-height:1.6">The Summarizer, Writer and
+    Rewriter APIs share one lifecycle — availability, create, inference — so the code you
+    write for one transfers directly to the others.</p>
+    <p><a class="link underline" href="/docs?utm_source=x&utm_campaign=y">Read the guide</a>
+    for hardware requirements and download tracking.</p>
+  </section>\`).join('');
 
 const dirtyText = article.innerHTML; // markup included
 console.log(\`Input size: \${dirtyText.length} characters\`);
 
 const summarizer = await Summarizer.create({ type: 'tldr', length: 'short' });
+
+// Same timed region as the "do" side: summarize() only.
 const start = performance.now();
 console.log(await summarizer.summarize(dirtyText));
-console.log(\`Inference: \${(performance.now() - start).toFixed(0)} ms\`);
+const inference = performance.now() - start;
+console.log(\`Inference: \${inference.toFixed(0)} ms\`);
+reportTiming(inference);
 summarizer.destroy();`;
 
   cacheDoCode = `const TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -162,6 +179,7 @@ const question = 'In one sentence, what is WebGPU?';
 
 // Note: the cache lives in sessionStorage, so if you re-run this snippet
 // BOTH attempts will be cache hits. Pass forceRefresh = true to bypass.
+const totalStart = performance.now(); // timed region: the two asks, not setup
 for (const attempt of [1, 2]) {
   const start = performance.now();
   const { value, cached } = await getAiResponse(session, question);
@@ -169,12 +187,14 @@ for (const attempt of [1, 2]) {
               \`\${(performance.now() - start).toFixed(1)} ms\`);
   console.log(value);
 }
+reportTiming(performance.now() - totalStart);
 session.destroy();`;
 
   cacheDontCode = `// Same question asked twice, full inference both times.
 const session = await LanguageModel.create();
 const question = 'In one sentence, what is WebGPU?';
 
+const totalStart = performance.now(); // same timed region as the "do" side
 for (const attempt of [1, 2]) {
   const start = performance.now();
   const value = await session.prompt(question);
@@ -182,5 +202,6 @@ for (const attempt of [1, 2]) {
               \`\${(performance.now() - start).toFixed(1)} ms\`);
   console.log(value);
 }
+reportTiming(performance.now() - totalStart);
 session.destroy();`;
 }

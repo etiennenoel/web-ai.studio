@@ -101,6 +101,7 @@ import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proof
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
+import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardware-analysis/consumer-hardware-analysis.page';
 
 const routes: Routes = [
   {
@@ -343,6 +344,13 @@ const routes: Routes = [
         component: NoteEditorPage,
         data: {
           route: RouteEnum.LabsNoteEditor
+        }
+      },
+      {
+        path: "dashboards/consumer-hardware-analysis",
+        component: ConsumerHardwareAnalysisPage,
+        data: {
+          route: RouteEnum.DashboardsConsumerHardware
         }
       },
       {
