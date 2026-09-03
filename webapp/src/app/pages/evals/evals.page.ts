@@ -106,6 +106,11 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   isInstallingSpeechModel: boolean = false;
 
+  /** Feedback for the copy button: cleared again after a short delay. */
+  copyFeedback: 'copied' | 'failed' | null = null;
+
+  private copyFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+
   readonly apiOptions: ApiEnum[] = Object.values(ApiEnum);
 
   readonly optionalColumns: {field: 'images' | 'audio' | 'schema', label: string, icon: string}[] = [
@@ -169,6 +174,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   override ngOnDestroy() {
     this.stop();
+    if (this.copyFeedbackTimer) {
+      clearTimeout(this.copyFeedbackTimer);
+    }
     super.ngOnDestroy();
   }
 
@@ -194,6 +202,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   get usesSchema(): boolean {
     return this.hasColumnData('schema');
+  }
+
+  get hasOutputs(): boolean {
+    return this.rows.controls.some(control => !!control.value.output);
   }
 
   /** A column is shown once something fills it, or once the user asks for it. */
@@ -326,6 +338,51 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     this.statusMessage = failed === total
       ? 'Every row failed.'
       : `${failed} of ${total} rows failed.`;
+  }
+
+  // ====================================================
+  // COPYING OUTPUTS
+  // ====================================================
+
+  /**
+   * One line per row, in table order, so the text pastes straight back into the sheet as a
+   * column that lines up with the inputs. Cells that would break that alignment are quoted
+   * the way a spreadsheet exports them.
+   */
+  buildOutputsClipboardText(): string {
+    return this.rows.controls
+      .map(control => EvalsPage.toSpreadsheetCell(String(control.value.output ?? '')))
+      .join('\n');
+  }
+
+  /** Copies every row's output to the clipboard. Resolves to whether the copy succeeded. */
+  async copyOutputs(): Promise<boolean> {
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(this.buildOutputsClipboardText());
+      copied = true;
+    } catch (error) {
+      console.error('Could not copy the outputs to the clipboard.', error);
+    }
+
+    this.showCopyFeedback(copied ? 'copied' : 'failed');
+    return copied;
+  }
+
+  private showCopyFeedback(feedback: 'copied' | 'failed') {
+    this.copyFeedback = feedback;
+    if (this.copyFeedbackTimer) {
+      clearTimeout(this.copyFeedbackTimer);
+    }
+    this.copyFeedbackTimer = setTimeout(() => this.copyFeedback = null, 2500);
+  }
+
+  /** Quotes a cell when it holds a tab, a line break or a quote, as TSV requires. */
+  static toSpreadsheetCell(value: string): string {
+    if (!/[\t\r\n"]/.test(value)) {
+      return value;
+    }
+    return `"${value.replace(/"/g, '""')}"`;
   }
 
   private async runSummarizer(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {

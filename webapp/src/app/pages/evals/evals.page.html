@@ -67,6 +67,25 @@
         <span class="flex-grow"></span>
 
         <button type="button"
+                class="flex items-center gap-1.5 px-3 py-1.5 !rounded-full text-xs font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                [class]="copyFeedback === 'copied'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-300'
+                  : copyFeedback === 'failed'
+                    ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300'
+                    : 'bg-[#ffffff] border-slate-300 text-slate-600 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-600 dark:text-slate-400 dark:hover:bg-zinc-700'"
+                [disabled]="!hasOutputs"
+                title="Copy every row's output, one line per row, to paste into a sheet column"
+                (click)="copyOutputs()">
+          @if (copyFeedback === 'copied') {
+            <i class="bi bi-check2"></i> Copied
+          } @else if (copyFeedback === 'failed') {
+            <i class="bi bi-x-lg"></i> Copy failed
+          } @else {
+            <i class="bi bi-clipboard"></i> Copy outputs
+          }
+        </button>
+
+        <button type="button"
                 class="flex items-center gap-1.5 px-3 py-1.5 !rounded-full text-xs font-medium border border-slate-300 dark:border-zinc-600 bg-[#ffffff] dark:bg-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors"
                 (click)="showAudioImport = !showAudioImport">
           <i class="bi" [ngClass]="showAudioImport ? 'bi-chevron-up' : 'bi-plus-lg'"></i> Add rows from audio

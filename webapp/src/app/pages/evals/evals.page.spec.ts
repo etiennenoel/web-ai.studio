@@ -346,6 +346,55 @@ describe('EvalsPage', () => {
     });
   });
 
+  describe('copy outputs', () => {
+    it('should put one output per line in row order', () => {
+      component.rows.at(0).patchValue({ output: 'first' });
+      component.addRow();
+      component.rows.at(1).patchValue({ output: 'second' });
+
+      expect(component.buildOutputsClipboardText()).toBe('first\nsecond');
+    });
+
+    it('should keep an empty line for rows without output so the column stays aligned', () => {
+      component.rows.at(0).patchValue({ output: '' });
+      component.addRow();
+      component.rows.at(1).patchValue({ output: 'second' });
+
+      expect(component.buildOutputsClipboardText()).toBe('\nsecond');
+    });
+
+    it('should quote outputs that hold line breaks, tabs or quotes', () => {
+      expect(EvalsPage.toSpreadsheetCell('a\nb')).toBe('"a\nb"');
+      expect(EvalsPage.toSpreadsheetCell('a\tb')).toBe('"a\tb"');
+      expect(EvalsPage.toSpreadsheetCell('say "hi"')).toBe('"say ""hi""' + '"');
+      expect(EvalsPage.toSpreadsheetCell('plain')).toBe('plain');
+    });
+
+    it('should write the text to the clipboard and report success', async () => {
+      const writeText = spyOn(navigator.clipboard, 'writeText').and.resolveTo();
+      component.rows.at(0).patchValue({ output: 'hello' });
+
+      await expectAsync(component.copyOutputs()).toBeResolvedTo(true);
+      expect(writeText).toHaveBeenCalledWith('hello');
+      expect(component.copyFeedback).toBe('copied');
+    });
+
+    it('should report a failed copy without throwing', async () => {
+      spyOn(navigator.clipboard, 'writeText').and.rejectWith(new Error('denied'));
+      spyOn(console, 'error');
+      component.rows.at(0).patchValue({ output: 'hello' });
+
+      await expectAsync(component.copyOutputs()).toBeResolvedTo(false);
+      expect(component.copyFeedback).toBe('failed');
+    });
+
+    it('should only enable the button once a row has output', () => {
+      expect(component.hasOutputs).toBeFalse();
+      component.rows.at(0).patchValue({ output: 'x' });
+      expect(component.hasOutputs).toBeTrue();
+    });
+  });
+
   describe('column visibility', () => {
     it('should hide the optional columns until something fills them', () => {
       expect(component.showColumn('images')).toBeFalse();
