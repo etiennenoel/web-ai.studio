@@ -20,8 +20,9 @@
       <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-3 mb-0">
         Headers are matched by name in any order:
         <code>Context</code>, <code>Input (Text)</code>, <code>Input (Images)</code>, <code>Input (Audio)</code>,
-        <code>Schema</code>, <code>API</code>. Columns you leave out are simply not imported, and any column the
-        page does not recognise is ignored.
+        <code>Schema</code>, <code>API</code>, <code>Summarizer Length</code>, <code>Summarizer Type</code>,
+        <code>Summarizer Speed Preference</code>. Columns you leave out are simply not imported, and any column
+        the page does not recognise is ignored.
       </p>
       <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-2 mb-0">
         Put pictures straight into the <code>Input (Images)</code> cells — they come across with the paste and are
@@ -29,6 +30,11 @@
         <code>https://web-ai.studio/images/cortex/speeches/spontaneous-speech-en-46.mp3</code>. A
         <code>Schema</code> cell takes a JSON Schema or a <code>/regex/flags</code> literal, and applies to
         Prompt rows only.
+      </p>
+      <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-2 mb-0">
+        The three <code>Summarizer</code> columns set the create options on Summarizer rows:
+        <code>short</code>/<code>medium</code>/<code>long</code>, <code>key-points</code>/<code>tl;dr</code>/<code>teaser</code>/<code>headline</code>,
+        and <code>auto</code>/<code>speed</code>/<code>capability</code>. Leave a cell blank to keep the model default.
       </p>
     </div>
 
@@ -194,6 +200,9 @@
                 @if (showColumn('schema')) {
                   <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Schema</th>
                 }
+                @if (showColumn('summarizer')) {
+                  <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Summarizer</th>
+                }
                 <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                 <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Act</th>
               </tr>
@@ -279,6 +288,28 @@
                                   formControlName="schema"
                                   placeholder='{"type":"object"}'
                                   title="A JSON Schema document, or a /regex/flags literal"></textarea>
+                      }
+                    </td>
+                  }
+
+                  @if (showColumn('summarizer')) {
+                    <td class="py-2.5 px-3 min-w-[150px]">
+                      @if (usesField(api, 'summarizer')) {
+                        <div class="flex flex-col gap-1.5">
+                          @for (option of summarizerOptions; track option.field) {
+                            <label class="block">
+                              <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">{{ option.label }}</span>
+                              <select class="form-select w-full pr-8 bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 !rounded-lg text-xs py-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                      [formControlName]="option.field"
+                                      [title]="'Summarizer ' + option.label.toLowerCase() + ' — blank keeps the model default'">
+                                <option value="">Default</option>
+                                @for (choice of option.choices; track choice) {
+                                  <option [value]="choice">{{ choice }}</option>
+                                }
+                              </select>
+                            </label>
+                          }
+                        </div>
                       }
                     </td>
                   }
