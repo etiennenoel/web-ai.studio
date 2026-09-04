@@ -12,6 +12,7 @@ import {EvalsExecutionEnum} from '../../enums/evals-execution.enum';
 import {SpeechQuality, WebSpeechService} from '../../core/services/web-speech.service';
 import {MediaSourceUtils} from '../../core/utils/media-source.utils';
 import {ApiStatusPill} from '../demos/components/api-status/api-status.component';
+import {SummarizerOption} from './summarizer-option.interface';
 
 type MediaKind = 'image' | 'audio';
 
@@ -57,8 +58,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    */
   private static readonly headerVocabulary = new Set([
     'api', 'audio', 'clip', 'clips', 'constraint', 'context', 'expected', 'file', 'files',
-    'image', 'images', 'input', 'output', 'prompt', 'response', 'schema', 'sound',
-    'structured', 'system', 'text',
+    'image', 'images', 'input', 'length', 'optional', 'output', 'preference', 'prompt',
+    'response', 'schema', 'sound', 'speed', 'structured', 'summariser', 'summarizer',
+    'system', 'text', 'type',
   ]);
 
   /**
@@ -69,6 +71,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     [/image/, 'images'],
     [/audio|sound|clip/, 'audio'],
     [/schema|constraint|structured/, 'schema'],
+    [/length/, 'summarizerLength'],
+    [/type/, 'summarizerType'],
+    [/preference|speed/, 'summarizerPreference'],
     [/api/, 'api'],
     [/context|system/, 'context'],
     [/input|prompt|text/, 'input'],
@@ -80,7 +85,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   /** Which cells each API actually reads. Everything else is dimmed out on that row. */
   private static readonly apiFields: Record<string, readonly string[]> = {
     [ApiEnum.Prompt]: ['context', 'input', 'images', 'audio', 'schema'],
-    [ApiEnum.Summarizer]: ['context', 'input'],
+    [ApiEnum.Summarizer]: ['context', 'input', 'summarizer'],
     [ApiEnum.WebSpeech]: ['audio'],
   };
 
@@ -113,10 +118,18 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   readonly apiOptions: ApiEnum[] = Object.values(ApiEnum);
 
-  readonly optionalColumns: {field: 'images' | 'audio' | 'schema', label: string, icon: string}[] = [
+  readonly optionalColumns: {field: 'images' | 'audio' | 'schema' | 'summarizer', label: string, icon: string}[] = [
     {field: 'images', label: 'Images', icon: 'bi-image'},
     {field: 'audio', label: 'Audio', icon: 'bi-file-earmark-music'},
     {field: 'schema', label: 'Schema', icon: 'bi-braces'},
+    {field: 'summarizer', label: 'Summarizer', icon: 'bi-sliders'},
+  ];
+
+  /** The three Summarizer create options a row can set, in the order the column shows them. */
+  readonly summarizerOptions: SummarizerOption[] = [
+    {field: 'summarizerLength', option: 'length', label: 'Length', choices: ['short', 'medium', 'long']},
+    {field: 'summarizerType', option: 'type', label: 'Type', choices: ['key-points', 'tl;dr', 'teaser', 'headline']},
+    {field: 'summarizerPreference', option: 'preference', label: 'Speed preference', choices: ['auto', 'speed', 'capability']},
   ];
 
   /** Optional columns the user asked for even though no row fills them yet. */
@@ -196,6 +209,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     return [{name: 'Web Speech (on-device)', status: this.speechStatus}];
   }
 
+  get usesSummarizer(): boolean {
+    return this.rows.controls.some(control => control.value.api === ApiEnum.Summarizer);
+  }
+
   get usesWebSpeech(): boolean {
     return this.rows.controls.some(control => control.value.api === ApiEnum.WebSpeech);
   }
@@ -214,6 +231,13 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   hasColumnData(field: string): boolean {
+    // The Summarizer column holds three options rather than one value, and it belongs to the
+    // rows that summarise — so it stays on show for as long as one of them does.
+    if (field === 'summarizer') {
+      return this.usesSummarizer
+        || this.summarizerOptions.some(option => this.hasColumnData(option.field));
+    }
+
     return this.rows.controls.some(control => {
       const value = control.value[field];
       return Array.isArray(value) ? value.length > 0 : !!String(value ?? '').trim();
@@ -246,6 +270,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       images: [data?.images || []],
       audio: [data?.audio || []],
       schema: [data?.schema || ''],
+      summarizerLength: [data?.summarizerLength || ''],
+      summarizerType: [data?.summarizerType || ''],
+      summarizerPreference: [data?.summarizerPreference || ''],
       status: [InferenceStatusEnum.Idle],
       output: [''],
       warnings: [data?.warnings || []],
@@ -396,12 +423,14 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       this.addWarning(formRow, 'The Summarizer API has no structured output — the schema was ignored.');
     }
 
-    if (await Summarizer.availability() === 'unavailable') {
-      throw new Error('The Summarizer API is unavailable on this device.');
+    const createOptions = this.buildSummarizerOptions(formRow.value);
+
+    if (await Summarizer.availability(createOptions as any) === 'unavailable') {
+      throw new Error('The Summarizer API is unavailable with these options on this device.');
     }
 
     const signal = this.abortController?.signal;
-    const session = await Summarizer.create({signal} as any);
+    const session = await Summarizer.create({...createOptions, signal} as any);
 
     try {
       let fullResponse = '';
@@ -415,8 +444,35 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * The create options a row asks for. A blank dropdown is left out so the model keeps its own
+   * default, and so is a preference of 'auto' — that is the default, so sending it says nothing.
+   */
+  buildSummarizerOptions(row: Partial<EvalsRow>): Record<string, string> {
+    const options: Record<string, string> = {};
+
+    for (const {field, option} of this.summarizerOptions) {
+      const value = row[field];
+
+      if (value && !(option === 'preference' && value === 'auto')) {
+        options[option] = value;
+      }
+    }
+
+    return options;
+  }
+
+  /** Whether a row carries a Summarizer option, which only Summarizer rows can use. */
+  private hasSummarizerOptions(row: Partial<EvalsRow>): boolean {
+    return this.summarizerOptions.some(option => !!row[option.field]);
+  }
+
   private async runPrompt(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {
     const {context, input, images, audio, schema} = formRow.value;
+
+    if (this.hasSummarizerOptions(formRow.value)) {
+      this.addWarning(formRow, 'The Summarizer options apply to Summarizer rows only — they were ignored.');
+    }
 
     const expectedInputs = this.buildExpectedInputs(images, audio);
     const responseConstraint = this.buildResponseConstraint(schema);
@@ -474,6 +530,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
     if (schema?.trim()) {
       this.addWarning(formRow, 'Web Speech has no structured output — the schema was ignored.');
+    }
+
+    if (this.hasSummarizerOptions(formRow.value)) {
+      this.addWarning(formRow, 'The Summarizer options apply to Summarizer rows only — they were ignored.');
     }
 
     if (!audio?.length) {
@@ -988,6 +1048,22 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           data.api = this.normalizeApi(cell.textContent ?? '');
           break;
 
+        case 'summarizerLength':
+        case 'summarizerType':
+        case 'summarizerPreference': {
+          const option = this.summarizerOptions.find(candidate => candidate.field === field)!;
+          const written = (cell.textContent ?? '').trim();
+          const value = this.normalizeSummarizerValue(option, written);
+
+          if (value === null) {
+            warnings.push(`The Summarizer ${option.label.toLowerCase()} "${written}" is not a value the API takes — it was ignored. Use ${option.choices.join(', ')}.`);
+          } else {
+            data[field] = value;
+          }
+
+          break;
+        }
+
         default:
           (data as any)[field] = (cell.textContent ?? '').trim();
           break;
@@ -997,6 +1073,23 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     data.warnings = warnings;
 
     return data;
+  }
+
+  /**
+   * Matches a cell such as "Short", "Key Points" or "TL;DR" to the value the API expects.
+   * Returns an empty string for an empty cell, and null for a value the API does not take.
+   */
+  normalizeSummarizerValue(option: SummarizerOption, written: string): string | null {
+    const cleaned = written.trim().toLowerCase();
+
+    if (!cleaned) {
+      return '';
+    }
+
+    // Letters alone, so "Key Points", "key-points" and "keypoints" all land on the same choice.
+    const key = cleaned.replace(/[^a-z]/g, '');
+
+    return option.choices.find(choice => choice.replace(/[^a-z]/g, '') === key) ?? null;
   }
 
   private async readMediaCell(cell: Element, kind: MediaKind, warnings: string[]): Promise<string[]> {

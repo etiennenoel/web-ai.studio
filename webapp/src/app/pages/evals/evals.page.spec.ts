@@ -197,6 +197,34 @@ describe('EvalsPage', () => {
       expect(row.api).toBe(ApiEnum.Summarizer);
     });
 
+    it('should import the summarizer columns and normalise their values', async () => {
+      await paste(`
+        <table>
+          <tr><td>API</td><td>Input (Text)</td><td>Summarizer Length (Optional)</td><td>Summarizer Type (Optional)</td><td>Summarizer Speed Preference</td></tr>
+          <tr><td>Summarizer</td><td>summarise this</td><td>Medium</td><td>Key Points</td><td>speed</td></tr>
+        </table>`);
+
+      const row = component.rows.at(0).value;
+      expect(row.api).toBe(ApiEnum.Summarizer);
+      expect(row.summarizerLength).toBe('medium');
+      expect(row.summarizerType).toBe('key-points');
+      expect(row.summarizerPreference).toBe('speed');
+      expect(row.warnings).toEqual([]);
+    });
+
+    it('should warn and skip a summarizer value the API does not take', async () => {
+      await paste(`
+        <table>
+          <tr><td>API</td><td>Input (Text)</td><td>Summarizer Length (Optional)</td></tr>
+          <tr><td>Summarizer</td><td>summarise this</td><td>enormous</td></tr>
+        </table>`);
+
+      const row = component.rows.at(0).value;
+      expect(row.summarizerLength).toBe('');
+      expect(row.warnings.length).toBe(1);
+      expect(row.warnings[0]).toContain('enormous');
+    });
+
     it('should read an audio path written as text', async () => {
       await paste(`
         <table>
@@ -414,6 +442,59 @@ describe('EvalsPage', () => {
 
       component.toggleColumn('schema');
       expect(component.showColumn('schema')).toBeFalse();
+    });
+  });
+
+  describe('summarizer options', () => {
+    const option = (field: string) => component.summarizerOptions.find(o => o.field === field)!;
+
+    it('should match the sheet headers, parentheses and all', () => {
+      expect(component.matchColumn('Summarizer Length (Optional)')).toBe('summarizerLength');
+      expect(component.matchColumn('Summarizer Type (Optional)')).toBe('summarizerType');
+      expect(component.matchColumn('Summarizer Speed Preference')).toBe('summarizerPreference');
+    });
+
+    it('should take a value however the sheet spells it', () => {
+      expect(component.normalizeSummarizerValue(option('summarizerLength'), 'Short')).toBe('short');
+      expect(component.normalizeSummarizerValue(option('summarizerType'), 'Key Points')).toBe('key-points');
+      expect(component.normalizeSummarizerValue(option('summarizerType'), 'TL;DR')).toBe('tl;dr');
+      expect(component.normalizeSummarizerValue(option('summarizerPreference'), 'capability')).toBe('capability');
+    });
+
+    it('should read an empty cell as no choice and reject a value the API does not take', () => {
+      expect(component.normalizeSummarizerValue(option('summarizerLength'), '  ')).toBe('');
+      expect(component.normalizeSummarizerValue(option('summarizerLength'), 'extra long')).toBeNull();
+    });
+
+    it('should build the create options from the row', () => {
+      component.rows.at(0).patchValue({
+        summarizerLength: 'short',
+        summarizerType: 'headline',
+        summarizerPreference: 'speed',
+      });
+
+      expect(component.buildSummarizerOptions(component.rows.at(0).value))
+        .toEqual({ length: 'short', type: 'headline', preference: 'speed' });
+    });
+
+    it('should leave out a blank choice and an auto preference', () => {
+      component.rows.at(0).patchValue({ summarizerLength: 'long', summarizerPreference: 'auto' });
+
+      expect(component.buildSummarizerOptions(component.rows.at(0).value)).toEqual({ length: 'long' });
+    });
+
+    it('should show the column for a Summarizer row and keep it for the other APIs off', () => {
+      expect(component.showColumn('summarizer')).toBeFalse();
+
+      component.rows.at(0).patchValue({ api: ApiEnum.Summarizer });
+      expect(component.showColumn('summarizer')).toBeTrue();
+      expect(component.usesField(ApiEnum.Summarizer, 'summarizer')).toBeTrue();
+      expect(component.usesField(ApiEnum.Prompt, 'summarizer')).toBeFalse();
+    });
+
+    it('should keep showing the column while an option is set on any row', () => {
+      component.rows.at(0).patchValue({ api: ApiEnum.Prompt, summarizerType: 'teaser' });
+      expect(component.hasColumnData('summarizer')).toBeTrue();
     });
   });
 
