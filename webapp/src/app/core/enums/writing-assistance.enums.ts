@@ -1,7 +1,7 @@
 export enum SummarizerTypeEnum {
   Teaser = 'teaser',
   KeyPoints = 'key-points',
-  TlDr = 'tl-dr',
+  TlDr = 'tldr',
   Headline = 'headline'
 }
 

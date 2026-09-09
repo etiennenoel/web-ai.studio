@@ -16,7 +16,7 @@ export class SummarizationDemoComponent extends BaseDemoComponent implements OnI
   demo = DEMOS_DATA.find(d => d.id === 'summarization')!;
   
   _apiChoice: 'summarizer' | 'prompt' = 'summarizer';
-  summaryType: 'key-points' | 'tl;dr' | 'teaser' | 'headline' = 'key-points';
+  summaryType: 'key-points' | 'tldr' | 'teaser' | 'headline' = 'key-points';
   preference: 'auto' | 'speed' | 'capability' = 'auto';
   
   get apiChoice() { return this._apiChoice; }
