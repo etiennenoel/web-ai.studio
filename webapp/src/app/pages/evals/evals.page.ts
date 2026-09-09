@@ -447,6 +447,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   /**
    * The create options a row asks for. A blank dropdown is left out so the model keeps its own
    * default, and so is a preference of 'auto' — that is the default, so sending it says nothing.
+   *
+   * A preference of 'speed' runs the small model, which writes English only and refuses a request
+   * that does not say so. The row has no language column, so the output language is set here.
    */
   buildSummarizerOptions(row: Partial<EvalsRow>): Record<string, string> {
     const options: Record<string, string> = {};
@@ -457,6 +460,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       if (value && !(option === 'preference' && value === 'auto')) {
         options[option] = value;
       }
+    }
+
+    if (options['preference'] === 'speed') {
+      options['outputLanguage'] = 'en';
     }
 
     return options;
