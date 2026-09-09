@@ -474,7 +474,21 @@ describe('EvalsPage', () => {
       });
 
       expect(component.buildSummarizerOptions(component.rows.at(0).value))
-        .toEqual({ length: 'short', type: 'headline', preference: 'speed' });
+        .toEqual({ length: 'short', type: 'headline', preference: 'speed', outputLanguage: 'en' });
+    });
+
+    it('should ask for English output when the speed preference runs the small model', () => {
+      component.rows.at(0).patchValue({ summarizerPreference: 'speed' });
+
+      expect(component.buildSummarizerOptions(component.rows.at(0).value))
+        .toEqual({ preference: 'speed', outputLanguage: 'en' });
+    });
+
+    it('should leave the output language out for the other preferences', () => {
+      component.rows.at(0).patchValue({ summarizerPreference: 'capability' });
+
+      expect(component.buildSummarizerOptions(component.rows.at(0).value))
+        .toEqual({ preference: 'capability' });
     });
 
     it('should leave out a blank choice and an auto preference', () => {
