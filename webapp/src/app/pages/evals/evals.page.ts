@@ -128,7 +128,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   /** The three Summarizer create options a row can set, in the order the column shows them. */
   readonly summarizerOptions: SummarizerOption[] = [
     {field: 'summarizerLength', option: 'length', label: 'Length', choices: ['short', 'medium', 'long']},
-    {field: 'summarizerType', option: 'type', label: 'Type', choices: ['key-points', 'tl;dr', 'teaser', 'headline']},
+    {field: 'summarizerType', option: 'type', label: 'Type', choices: ['key-points', 'tldr', 'teaser', 'headline']},
     {field: 'summarizerPreference', option: 'preference', label: 'Speed preference', choices: ['auto', 'speed', 'capability']},
   ];
 

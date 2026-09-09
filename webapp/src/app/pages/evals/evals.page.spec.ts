@@ -457,7 +457,7 @@ describe('EvalsPage', () => {
     it('should take a value however the sheet spells it', () => {
       expect(component.normalizeSummarizerValue(option('summarizerLength'), 'Short')).toBe('short');
       expect(component.normalizeSummarizerValue(option('summarizerType'), 'Key Points')).toBe('key-points');
-      expect(component.normalizeSummarizerValue(option('summarizerType'), 'TL;DR')).toBe('tl;dr');
+      expect(component.normalizeSummarizerValue(option('summarizerType'), 'TL;DR')).toBe('tldr');
       expect(component.normalizeSummarizerValue(option('summarizerPreference'), 'capability')).toBe('capability');
     });
 
