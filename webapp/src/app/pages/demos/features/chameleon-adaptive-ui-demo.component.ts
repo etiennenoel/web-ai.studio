@@ -170,9 +170,6 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
     await this.checkSummarizerAvailability();
-    if (this.classifierStatus !== 'unavailable') {
-      await this.adaptArticle();
-    }
   }
 
   selectScenario(text: string) {
@@ -193,6 +190,7 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
       this.errorMessage = e.message || 'Failed to adapt article.';
     } finally {
       this.isAdapting = false;
+      this.cdr.detectChanges();
     }
   }
 

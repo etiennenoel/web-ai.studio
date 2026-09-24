@@ -151,9 +151,6 @@ export class SmartClipboardPasteDemoComponent extends BaseClassifierDemoComponen
     this.setTitle(`Demo: ${this.demo.title}`);
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
-    if (this.classifierStatus !== 'unavailable') {
-      await this.analyzePaste();
-    }
   }
 
   useSample(text: string) {
@@ -175,6 +172,7 @@ export class SmartClipboardPasteDemoComponent extends BaseClassifierDemoComponen
       this.errorMessage = e.message || 'Classification failed.';
     } finally {
       this.isAnalyzing = false;
+      this.cdr.detectChanges();
     }
   }
 

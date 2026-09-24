@@ -186,9 +186,6 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
     await this.checkWriterAvailability();
-    if (this.classifierStatus !== 'unavailable') {
-      await this.evaluateTicket();
-    }
   }
 
   onTextChanged() {
@@ -213,6 +210,8 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
       });
     } catch (e: any) {
       this.errorMessage = e.message || 'Classification failed.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
