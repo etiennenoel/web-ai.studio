@@ -2,10 +2,11 @@ import {PromptRunOptions} from './prompt-run.options';
 import {AttachmentTypeEnum} from '../enums/attachment-type.enum';
 import {DemoPreview} from './demo-preview.interface';
 
-export type DemoCategory = 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings' | 'Speech';
+export type DemoCategory = 'Classification' | 'Text Input' | 'Image Input' | 'Audio Input' | 'Tools Calling' | 'Mix-and-Match' | 'Embeddings' | 'Speech';
 
 export type DemoApi =
   | 'Prompt API'
+  | 'Classifier'
   | 'Semantic Embedder'
   | 'Web Speech'
   | 'Translator'

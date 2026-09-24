@@ -1655,6 +1655,275 @@ const result = await session.prompt([
     },
     initialPrompt: 'Extract the receipt details into JSON.',
     requiredAttachmentTypes: [AttachmentTypeEnum.Image]
+  },
+
+  // CLASSIFIER API
+  {
+    id: 'system1-ticket-router',
+    title: 'One-Click Support Responder',
+    description: 'Open a customer email and get the exact one-click resolution button plus a tailored reply drafted with the Writer API.',
+    category: 'Classification',
+    apis: ['Classifier', 'Writer'],
+    icon: 'bi-envelope-check',
+    onDeviceReason: 'Classifier silently identifies what action the customer needs so the right resolution tool and Writer prompt are ready before the agent even finishes reading.',
+    codeSnippet: `// 1. Silently understand what action the customer needs (window.Classifier)
+const classifier = await Classifier.create({
+  context: "Customer support action assistant.",
+  questions: [
+    {
+      id: "recommended_action",
+      type: "categorical",
+      prompt: "Which one-click resolution action should be offered to the support agent?",
+      options: [
+        { label: "issue_refund", description: "Refund a duplicate charge or billing error" },
+        { label: "page_oncall", description: "Escalate a production crash or outage to engineering" },
+        { label: "log_feature", description: "Add a customer feature request to the product roadmap" }
+      ]
+    },
+    { id: "is_urgent", type: "binary", prompt: "Is the customer blocked right now?" }
+  ]
+});
+const decision = await classifier.classify(customerEmail);
+
+// 2. Draft a tailored response for that exact action (window.Writer)
+const writer = await Writer.create({ tone: "formal", length: "short" });
+const reply = await writer.write(
+  \`Write a helpful support reply confirming action "\${decision.byId.recommended_action.label}" for: \${customerEmail}\`
+);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'live-draft-guardrails',
+    title: 'Kind Reply Coach',
+    description: 'Write a message in peace — if your draft sounds harsh or leaks an API key, get a gentle nudge to soften it with the Rewriter API.',
+    category: 'Classification',
+    apis: ['Classifier', 'Rewriter'],
+    icon: 'bi-chat-heart',
+    onDeviceReason: 'Half-typed messages and accidental API keys never leave your browser. Classifier checks your draft locally on every pause, and Rewriter softens harsh phrasing in one click.',
+    codeSnippet: `// 1. Silently check the draft locally as the user types (window.Classifier)
+const classifier = await Classifier.create({
+  context: "Friendly writing coach and secret shield.",
+  questions: [
+    { id: "contains_secret", type: "binary", prompt: "Does this draft contain an API key, token, or phone number?" },
+    { id: "sounds_harsh", type: "binary", prompt: "Does the draft sound harsh, insulting, or passive-aggressive?" }
+  ]
+});
+const check = await classifier.classify(draftText);
+
+// 2. If it sounds harsh, offer a one-click polite rewrite (window.Rewriter)
+if (check.byId.sounds_harsh.label === "true") {
+  const rewriter = await Rewriter.create({ tone: "more-formal" });
+  draftText = await rewriter.rewrite(draftText, {
+    context: "Make this reply constructive, polite, and collaborative."
+  });
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'chameleon-adaptive-ui',
+    title: 'Adaptive Article Reader',
+    description: 'Tell the reader how much time you have ("I have 30 seconds" or "Just the technical takeaways") and watch the article adapt with the Summarizer API.',
+    category: 'Classification',
+    apis: ['Classifier', 'Summarizer'],
+    icon: 'bi-book-half',
+    onDeviceReason: 'Classifier maps a reader\'s natural sentence to the ideal Summarizer configuration (tldr vs. key-points, short vs. long) and reading layout in a single local pass.',
+    codeSnippet: `// 1. Map the user's reading preference to Summarizer settings (window.Classifier)
+const classifier = await Classifier.create({
+  context: "Adaptive article reader controller.",
+  questions: [
+    {
+      id: "reading_mode",
+      type: "categorical",
+      prompt: "How would the user like to read this article?",
+      options: [
+        { label: "quick_tldr", description: "30-second executive TL;DR summary" },
+        { label: "key_takeaways", description: "Bulleted key takeaways and action items" },
+        { label: "full_article", description: "Full distraction-free article text" }
+      ]
+    }
+  ]
+});
+const { byId } = await classifier.classify(userPreference);
+
+// 2. Transform the article automatically (window.Summarizer)
+if (byId.reading_mode.label !== "full_article") {
+  const summarizer = await Summarizer.create({
+    type: byId.reading_mode.label === "quick_tldr" ? "tldr" : "key-points",
+    length: "short"
+  });
+  displayedContent = await summarizer.summarize(articleBody);
+}`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'nl-catalog-matcher',
+    title: 'Plain-English Gear Finder',
+    description: 'Skip the 10 filter dropdowns: describe what you need in plain English and watch the storefront filter pills toggle themselves.',
+    category: 'Classification',
+    apis: ['Classifier'],
+    icon: 'bi-sliders',
+    onDeviceReason: 'Turns a shopper\'s natural sentence into structured storefront filter toggles (Category, Price Tier, Waterproof) locally.',
+    codeSnippet: `const classifier = await Classifier.create({
+  context: "Outdoor gear storefront filter assistant.",
+  questions: [
+    {
+      id: "category",
+      type: "categorical",
+      prompt: "Which gear category matches the shopper query?",
+      options: [
+        { label: "outerwear", description: "Jackets, parkas, rain shells" },
+        { label: "footwear", description: "Hiking boots and trail shoes" },
+        { label: "packs", description: "Backpacks and daypacks" },
+        { label: "camping", description: "Tents and sleeping bags" }
+      ]
+    },
+    {
+      id: "budget_tier",
+      type: "categorical",
+      prompt: "Select the target budget tier.",
+      options: [
+        { label: "under_150", description: "Under $150" },
+        { label: "premium", description: "$150 and above" }
+      ]
+    },
+    { id: "waterproof", type: "binary", prompt: "Does the shopper specifically want waterproof gear?" }
+  ]
+});
+
+const filters = await classifier.classify(searchQuery);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'smart-clipboard-paste',
+    title: 'Smart Clipboard Paste',
+    description: 'Paste a meeting snippet, a cURL command, a receipt, or a tracking number and immediately get the right one-click action card.',
+    category: 'Classification',
+    apis: ['Classifier'],
+    icon: 'bi-clipboard-check',
+    onDeviceReason: 'Clipboard contents are highly private. Classifier detects what kind of snippet you pasted locally without uploading your clipboard.',
+    codeSnippet: `const classifier = await Classifier.create({
+  context: "Smart clipboard paste action detector.",
+  questions: [
+    {
+      id: "paste_type",
+      type: "categorical",
+      prompt: "What kind of content did the user paste from their clipboard?",
+      options: [
+        { label: "calendar_invite", description: "Meeting time, date, or call scheduling note" },
+        { label: "curl_command", description: "cURL request, API endpoint, or terminal snippet" },
+        { label: "expense_receipt", description: "Flight, hotel, meal, or taxi receipt amount" },
+        { label: "shipping_update", description: "Package tracking number or delivery status" }
+      ]
+    }
+  ]
+});
+
+const { byId } = await classifier.classify(clipboardText);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'focus-notification-shield',
+    title: 'Focus Mode Notification Shield',
+    description: 'Stay in deep work: Classifier screens incoming pings so only true emergencies ring now while routine updates wait for your 5 PM digest.',
+    category: 'Classification',
+    apis: ['Classifier'],
+    icon: 'bi-bell-slash-fill',
+    onDeviceReason: 'Private DMs and work alerts are screened locally on your device so your notification filter works offline and never exposes messages to a third party.',
+    codeSnippet: `const shield = await Classifier.create({
+  context: "Deep-work focus mode notification filter.",
+  questions: [
+    {
+      id: "delivery_mode",
+      type: "categorical",
+      prompt: "Should this notification interrupt the user during Deep Work or wait for their 5 PM digest?",
+      options: [
+        { label: "break_through", description: "Critical production emergency or urgent personal safety alert" },
+        { label: "digest_5pm", description: "Routine work update, newsletter, or non-urgent question" }
+      ]
+    }
+  ]
+});
+
+const decision = await shield.classify(notificationText);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'instant-form-autofill',
+    title: 'One-Sentence Expense Filler',
+    description: 'Describe a travel or software expense in one plain sentence and watch the accounting dropdowns and toggles select themselves.',
+    category: 'Classification',
+    apis: ['Classifier'],
+    icon: 'bi-ui-checks',
+    onDeviceReason: 'Maps an unstructured one-line expense note to structured dropdown options (Category, Approval Tier, Client Billable) in a single local pass.',
+    codeSnippet: `const filler = await Classifier.create({
+  context: "Corporate expense report form dropdown filler.",
+  questions: [
+    {
+      id: "expense_category",
+      type: "categorical",
+      prompt: "Which accounting category fits this expense?",
+      options: [
+        { label: "ground_transport", description: "Uber, Lyft, taxi, train, or parking" },
+        { label: "airfare_lodging", description: "Airline flight ticket or hotel stay" },
+        { label: "client_meals", description: "Lunch, dinner, or coffee with clients" },
+        { label: "software_saas", description: "Developer tool, cloud hosting, or software license" }
+      ]
+    },
+    { id: "client_billable", type: "binary", prompt: "Was this expense incurred directly for a client meeting?" }
+  ]
+});
+
+const fields = await filler.classify(userNote);`,
+    promptRunOptions: {},
+    initialPrompt: ''
+  },
+  {
+    id: 'system1-system2-cascade',
+    title: 'Fast-Path Comment Moderator',
+    description: 'Clear obvious community comments with Classifier, and only wake the Prompt API judge when a comment is sarcastic or borderline.',
+    category: 'Classification',
+    apis: ['Classifier', 'Prompt API'],
+    icon: 'bi-lightning-charge-fill',
+    onDeviceReason: 'Combining a fast classifier pass with a generative LLM judge gives you both low latency on clear-cut cases and nuanced explanations on borderline cases.',
+    codeSnippet: `// Stage 1: Fast Classifier pass
+const classifier = await Classifier.create({
+  context: "Community comment moderator.",
+  questions: [
+    {
+      id: "verdict",
+      type: "categorical",
+      prompt: "Classify this community comment.",
+      options: [
+        { label: "benign", description: "Helpful, friendly, or constructive comment" },
+        { label: "toxic", description: "Insulting, hostile, or harassing comment" },
+        { label: "spam", description: "Promotional link or scam" }
+      ]
+    }
+  ]
+});
+
+const s1 = await classifier.classify(comment.text);
+if (s1.byId.verdict.confidence >= 0.80) {
+  return { verdict: s1.byId.verdict.label, stage: "Classifier" };
+}
+
+// Stage 2: Borderline confidence -> escalate to Prompt API judge
+const judge = await LanguageModel.create();
+const raw = await judge.prompt(\`Classify as benign, toxic, or spam: "\${comment.text}"\`, {
+  responseConstraint: {
+    type: "object",
+    properties: { verdict: { type: "string" }, reason: { type: "string" } },
+    required: ["verdict", "reason"]
+  }
+});`,
+    promptRunOptions: {},
+    initialPrompt: ''
   }
 ];
 

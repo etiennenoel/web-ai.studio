@@ -1,0 +1,480 @@
+<div class="w-full font-sans pb-24 bg-slate-50 dark:bg-[#0a0a0a] min-h-full">
+  <!-- Hero Header -->
+  <div class="h-28 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-8 sticky top-0 z-20 flex-shrink-0 shadow-sm">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 w-full">
+      <div class="flex items-center gap-3 text-left">
+        <div class="rounded-md w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <i class="bi bi-ui-checks-grid text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Classifier</h1>
+          <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Evaluate binary, categorical, and ordinal decisions in a single on-device forward pass.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="sharePlayground()" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-200 dark:border-indigo-500/30 shrink-0">
+          <i class="bi" [ngClass]="shareText === 'Copied!' ? 'bi-check2' : 'bi-share'"></i> {{shareText}}
+        </button>
+        <a routerLink="/docs/classifier" class="rounded-lg hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-indigo-600 dark:text-indigo-400 text-sm font-bold shadow-sm transition-colors border border-indigo-100 dark:border-indigo-500/30 shrink-0" style="text-decoration: none;">
+          <i class="bi bi-book"></i> Read the docs
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto p-8 space-y-8">
+
+    <!-- Flag notice -->
+    <div class="p-4 bg-violet-50 dark:bg-violet-900/10 border border-violet-200 dark:border-violet-900/30 rounded-xl text-violet-800 dark:text-violet-300 text-sm leading-relaxed flex gap-3">
+      <i class="bi bi-flag-fill text-lg mt-0.5"></i>
+      <div>
+        Enable <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">#classifier-api</code> in <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
+      </div>
+    </div>
+
+    <!-- 1. Configuration -->
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">1</div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Configuration</h2>
+        </div>
+
+        <div class="inline-flex rounded-lg p-0.5 bg-slate-200/70 dark:bg-zinc-800 border border-slate-300/60 dark:border-zinc-700">
+          <button type="button" (click)="schemaEditorMode = 'visual'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-colors"
+                  [ngClass]="schemaEditorMode === 'visual' ? 'bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'">
+            Visual Builder
+          </button>
+          <button type="button" (click)="schemaEditorMode = 'json'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-colors"
+                  [ngClass]="schemaEditorMode === 'json' ? 'bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'">
+            JSON Schema
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6 space-y-6">
+        @if (schemaEditorMode === 'visual') {
+          <!-- Global Context -->
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 pl-1">Shared Context</label>
+            <input type="text" [(ngModel)]="schema.context" (ngModelChange)="syncJsonFromVisual()"
+                   class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                   placeholder="e.g. Enterprise customer support ticket router." />
+          </div>
+
+          <!-- Questions -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">
+                Questions ({{ schema.questions.length }})
+              </label>
+              <button type="button" (click)="addQuestion()" class="rounded-lg px-3.5 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 border border-slate-200 dark:border-zinc-700">
+                <i class="bi bi-plus-lg"></i> Add question
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              @for (q of schema.questions; track $index; let qi = $index) {
+                <div class="p-5 rounded-xl bg-slate-50/60 dark:bg-zinc-900/40 border border-slate-200 dark:border-zinc-800 space-y-4">
+                  <!-- Question ID & Type Row -->
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div class="sm:col-span-5">
+                      <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Question ID</label>
+                      <input type="text" [(ngModel)]="q.id" (ngModelChange)="syncJsonFromVisual()"
+                             class="w-full font-mono text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                             placeholder="question_id" />
+                    </div>
+
+                    <div class="sm:col-span-6">
+                      <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Question Type</label>
+                      <select [(ngModel)]="q.type" (ngModelChange)="onQuestionTypeChanged(q)"
+                              class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        <option value="binary">Binary — P(true)</option>
+                        <option value="categorical">Categorical — Option distribution</option>
+                        <option value="ordinal">Ordinal — Expected score E[S]</option>
+                      </select>
+                    </div>
+
+                    <div class="sm:col-span-1 flex justify-end">
+                      <button type="button" (click)="removeQuestion(qi)" [disabled]="schema.questions.length <= 1"
+                              class="rounded-lg px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all disabled:opacity-30 disabled:pointer-events-none shadow-sm"
+                              title="Remove question">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Question Prompt -->
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Prompt</label>
+                    <input type="text" [(ngModel)]="q.prompt" (ngModelChange)="syncJsonFromVisual()"
+                           class="w-full text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                           placeholder="Question prompt..." />
+                  </div>
+
+                  <!-- Options List (Single clean row per option) -->
+                  @if (q.type !== 'binary' && q.type !== 'boolean') {
+                    <div class="pt-2 border-t border-slate-200/70 dark:border-zinc-800 space-y-2.5">
+                      <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          Options ({{ q.options?.length || 0 }})
+                        </label>
+                        <button type="button" (click)="addOption(q)"
+                                class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline bg-transparent border-none">
+                          + Add option
+                        </button>
+                      </div>
+
+                      <div class="space-y-2">
+                        @for (opt of q.options; track $index; let oi = $index) {
+                          <div class="flex items-center gap-2.5">
+                            <input type="text" [(ngModel)]="opt.label" (ngModelChange)="syncJsonFromVisual()"
+                                   class="w-36 shrink-0 font-mono text-xs font-semibold bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                                   placeholder="Label" />
+                            <input type="text" [(ngModel)]="opt.description" (ngModelChange)="syncJsonFromVisual()"
+                                   class="flex-1 text-sm bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                                   placeholder="Description..." />
+                            <button type="button" (click)="removeOption(q, oi)" [disabled]="(q.options?.length || 0) <= 2"
+                                    class="shrink-0 rounded-lg px-2.5 py-2 bg-white dark:bg-zinc-800 text-slate-400 hover:text-red-500 border border-slate-200 dark:border-zinc-700 transition-colors disabled:opacity-30 disabled:pointer-events-none shadow-sm"
+                                    title="Remove option">
+                              <i class="bi bi-x-lg text-xs"></i>
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <!-- Editable Raw JSON Schema -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">
+                Schema JSON
+              </label>
+              @if (jsonParseError) {
+                <span class="text-xs font-bold text-red-600 dark:text-red-400">{{ jsonParseError }}</span>
+              } @else {
+                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400"><i class="bi bi-check2-circle"></i> Valid JSON</span>
+              }
+            </div>
+            <textarea
+              rows="14"
+              [ngModel]="schemaJsonText"
+              (ngModelChange)="onSchemaJsonChange($event)"
+              class="w-full font-mono text-xs bg-white dark:bg-[#0d1117] text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-zinc-700 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed shadow-sm"></textarea>
+          </div>
+        }
+
+        <!-- Advanced Session Configuration -->
+        <details class="group bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+          <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+            <div class="flex items-center justify-between w-full">
+              <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced Session Configuration</span>
+              <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+            </div>
+          </summary>
+          <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                Parallel Draws (<code class="font-mono">samples</code>)
+              </label>
+              <input type="number" min="1" max="8" [(ngModel)]="samples" (ngModelChange)="updateGeneratedCode()"
+                     class="w-32 text-sm bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+            </div>
+            <div class="flex items-center gap-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
+              <input type="checkbox" [(ngModel)]="useAbortSignal" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
+              <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- 2. Check Availability -->
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">2</div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Check Availability</h2>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <button type="button" (click)="checkAvailability()" class="rounded-lg px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium shadow-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 w-fit">
+            <i class="bi bi-activity"></i> Check Availability
+          </button>
+          @if (availabilityStatus) {
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Status:</span>
+              <span class="rounded-lg px-3 py-1.5 text-xs font-mono font-bold tracking-wide border shadow-sm"
+                    [ngClass]="availabilityStatus === 'available' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'">
+                {{availabilityStatus}}
+              </span>
+              @if (availabilityTimeMs !== null) {
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+                  {{availabilityTimeMs}}ms
+                </span>
+              }
+            </div>
+          }
+        </div>
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+            <div class="flex items-center justify-between w-full">
+              <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Initialization Code</span>
+              <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+            </div>
+          </summary>
+          <div class="h-[260px] min-h-[180px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+            <app-code-editor [code]="codeAvailability" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- 3. Create Session -->
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">3</div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Create Session</h2>
+      </div>
+      <div class="p-6 space-y-6">
+        <p class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-4">Initialize the classifier with the question schema defined above.</p>
+
+        <div class="flex flex-col items-center gap-3">
+          @if (!session && !isCreating) {
+            <div class="w-full flex justify-center">
+              <button type="button" (click)="createSession()" [disabled]="availabilityStatus === 'unavailable'" class="rounded-lg group relative px-6 py-3 w-full bg-indigo-600 text-white text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="bi bi-play-circle text-lg"></i> Create Classifier
+              </button>
+            </div>
+          }
+
+          @if (errorMessage && !session) {
+            <div class="w-full p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-sm">
+              <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+              <div>{{errorMessage}}</div>
+            </div>
+          }
+
+          @if (isCreating) {
+            <div class="rounded-lg px-5 py-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-500/20 shadow-sm flex flex-col items-center justify-center gap-2 w-full sm:w-auto min-w-[280px]">
+              <div class="flex items-center gap-2">
+                <i class="bi bi-arrow-repeat animate-spin text-lg"></i> Initializing Session...
+                @if (sessionCreationTimeMs !== null) {
+                  <span class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
+                }
+              </div>
+              @if (isDownloading) {
+                <div class="w-full bg-indigo-200 dark:bg-indigo-900/50 h-1.5 mt-1 overflow-hidden shadow-inner" style="border-radius: 9999px !important;">
+                  <div class="bg-indigo-600 dark:bg-indigo-400 h-1.5 transition-all duration-300 ease-out" style="border-radius: 9999px !important;" [style.width]="downloadProgress + '%'"></div>
+                </div>
+                <button type="button" (click)="abortCreation()" class="text-xs font-bold underline hover:no-underline">Abort</button>
+              }
+            </div>
+          }
+
+          @if (session) {
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+              <div class="rounded-lg px-5 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Session Active</span>
+                @if (sessionCreationTimeMs !== null) {
+                  <span class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
+                }
+              </div>
+              <button type="button" (click)="destroySession()" [disabled]="isClassifying" class="rounded-md px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm" title="Destroy Session">
+                <i class="bi bi-trash3 text-lg"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+            <div class="flex items-center justify-between w-full">
+              <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Session Creation Code</span>
+              <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+            </div>
+          </summary>
+          <div class="h-[260px] min-h-[180px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+            <app-code-editor [code]="codeSession" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- 4. The Input -->
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 relative overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">4</div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">The Input</h2>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex justify-between items-center">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">Document to Classify</label>
+          <span class="text-xs font-medium text-slate-400 font-mono">{{ inputText.length }} chars</span>
+        </div>
+        <textarea
+          [(ngModel)]="inputText"
+          (ngModelChange)="updateGeneratedCode()"
+          class="w-full p-4 text-slate-700 dark:text-slate-300 bg-white dark:bg-[#121212] border border-slate-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y min-h-[140px] leading-relaxed text-sm outline-none placeholder-slate-400 dark:placeholder-zinc-600 font-medium transition-all shadow-sm"
+          placeholder="Paste the text you want to classify here..."></textarea>
+      </div>
+    </div>
+
+    <!-- 5. Execution -->
+    <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
+      <div class="border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-3 flex items-center gap-3">
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 text-xs font-bold">5</div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-0">Execution</h2>
+      </div>
+      <div class="p-6 space-y-6">
+
+        <div class="py-4 flex flex-col items-center gap-3">
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center transition-all" [class.opacity-50]="!session" [class.pointer-events-none]="!session">
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full bg-slate-50/50 dark:bg-zinc-900/30 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+              <button type="button" (click)="runClassification()" [disabled]="isClassifying" class="rounded-lg flex-1 sm:flex-none px-6 py-2.5 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden disabled:opacity-50">
+                <span class="flex items-center justify-center gap-2">
+                  <i class="bi" [ngClass]="isClassifying ? 'bi-hourglass-split animate-spin' : 'bi-play-fill text-lg'"></i>
+                  {{ isClassifying ? 'Classifying...' : 'Classify' }}
+                </span>
+              </button>
+              @if (isClassifying) {
+                <button type="button" (click)="abortPrompt()" class="rounded-lg px-5 py-2.5 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-semibold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all shadow-sm">
+                  <span class="flex items-center justify-center gap-2"><i class="bi bi-stop-circle"></i> Abort</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <details class="group bg-white dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-6">
+          <summary class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
+            <div class="flex items-center justify-between w-full">
+              <span class="flex items-center gap-2"><i class="bi bi-code text-slate-400"></i> View Execution Code</span>
+              <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+            </div>
+          </summary>
+          <div class="h-[280px] min-h-[180px] resize-y border-t border-slate-200 dark:border-zinc-800 overflow-auto relative bg-slate-100 dark:bg-[#0d1117]">
+            <app-code-editor [code]="codeExecution" [language]="'javascript'" [height]="'100%'" [readOnly]="true"></app-code-editor>
+          </div>
+        </details>
+
+        <!-- Output -->
+        <div id="output-section" class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden relative transition-all mt-6" [class.opacity-50]="!session && !result && !errorMessage">
+          <div class="px-5 py-3 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/50">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500 dark:text-indigo-400 rounded">
+                <i class="bi bi-stars text-sm"></i>
+              </div>
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">Execution Output</span>
+            </div>
+            @if (executionTimeMs !== null) {
+              <div class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono">
+                {{executionTimeMs}}ms
+              </div>
+            }
+          </div>
+
+          <div class="p-6 md:p-8 text-base leading-relaxed text-slate-800 dark:text-slate-200 min-h-[120px] flex flex-col justify-center">
+            @if (errorMessage) {
+              <div class="p-3 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium border border-red-200 dark:border-red-500/20 mb-3 flex items-start gap-3 shadow-sm">
+                <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
+                <div>{{errorMessage}}</div>
+              </div>
+            }
+
+            @if (!result && !isClassifying && !errorMessage) {
+              <span class="text-slate-400 dark:text-slate-500 italic font-semibold flex items-center justify-center text-sm w-full">
+                Create a session and click Classify to evaluate the schema.
+              </span>
+            }
+
+            @if (isClassifying) {
+              <span class="text-indigo-500 dark:text-indigo-400 italic animate-pulse flex items-center justify-center gap-2 text-base font-medium w-full">
+                <i class="bi bi-magic text-xl"></i> Classifying...
+              </span>
+            }
+
+            @if (result && result.decisions.length > 0) {
+              <div class="space-y-6">
+                <!-- Decision Rows -->
+                <div class="space-y-4">
+                  @for (d of result.decisions; track d.id) {
+                    <div class="p-5 bg-slate-50 dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm space-y-3">
+                      <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                          <span class="text-xs font-mono font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/20">
+                            {{ d.type }}
+                          </span>
+                          <span class="font-mono font-bold text-sm text-slate-900 dark:text-white">{{ d.id }}</span>
+                          <span class="text-slate-400">&rarr;</span>
+                          <span class="font-mono font-bold text-sm text-indigo-600 dark:text-indigo-400">{{ d.label }}</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 text-xs font-mono">
+                          @if (d.probability !== null && d.probability !== undefined) {
+                            <span class="text-slate-600 dark:text-slate-400">
+                              P(true): <strong class="text-slate-900 dark:text-white">{{ (d.probability * 100).toFixed(1) }}%</strong>
+                            </span>
+                          }
+                          @if (d.expectedScore !== null && d.expectedScore !== undefined) {
+                            <span class="text-slate-600 dark:text-slate-400">
+                              E[S]: <strong class="text-slate-900 dark:text-white">{{ d.expectedScore.toFixed(2) }}</strong>
+                              @if (d.standardError !== null && d.standardError !== undefined) {
+                                <span>(&plusmn;{{ d.standardError.toFixed(2) }})</span>
+                              }
+                            </span>
+                          }
+                          <span class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 font-bold text-slate-700 dark:text-slate-300">
+                            {{ (d.confidence * 100).toFixed(1) }}% conf
+                          </span>
+                        </div>
+                      </div>
+
+                      <p class="text-xs text-slate-500 dark:text-slate-400 m-0">{{ d.prompt }}</p>
+
+                      <!-- Probability Distribution Bars -->
+                      <div class="space-y-2 pt-1">
+                        @for (item of d.probabilities; track item.label) {
+                          <div class="flex items-center gap-3">
+                            <span class="w-32 shrink-0 font-mono text-xs font-semibold text-slate-700 dark:text-slate-300 truncate" [title]="item.label">
+                              {{ item.label }}
+                            </span>
+                            <div class="flex-1 h-2 bg-slate-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                              <div class="h-full rounded-full bg-indigo-600 dark:bg-indigo-400 transition-all duration-300"
+                                   [style.width.%]="item.probability * 100"></div>
+                            </div>
+                            <span class="w-14 shrink-0 text-right font-mono text-xs text-slate-500 dark:text-slate-400">
+                              {{ (item.probability * 100).toFixed(1) }}%
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Raw JSON output -->
+                <details class="group bg-slate-50 dark:bg-[#121212] rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden">
+                  <summary class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 cursor-pointer list-none flex items-center justify-between">
+                    <span>Raw ClassifierResult JSON</span>
+                    <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                  </summary>
+                  <pre class="p-4 border-t border-slate-200 dark:border-zinc-800 text-xs font-mono text-slate-700 dark:text-slate-300 overflow-x-auto m-0">{{ rawOutputJson }}</pre>
+                </details>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

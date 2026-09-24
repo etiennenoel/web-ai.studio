@@ -171,6 +171,7 @@ import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api.page';
+import { ClassifierApiPage } from './pages/docs/apis/classifier-api.page';
 import { CodeSnippetComponent } from './components/code-snippet/code-snippet.component';
 import { DocsSectionHeaderComponent } from './components/docs-section-header/docs-section-header.component';
 import { PracticeComparisonComponent } from './components/practice-comparison/practice-comparison.component';
@@ -192,9 +193,19 @@ import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/transla
 import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
+import { ClassifierPlaygroundPage } from './pages/playgrounds/classifier/classifier.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
 import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardware-analysis/consumer-hardware-analysis.page';
+import { ClassifierStatusComponent } from './pages/demos/components/classifier-status/classifier-status.component';
+import { System1TicketRouterDemoComponent } from './pages/demos/features/system1-ticket-router-demo.component';
+import { LiveDraftGuardrailsDemoComponent } from './pages/demos/features/live-draft-guardrails-demo.component';
+import { ChameleonAdaptiveUiDemoComponent } from './pages/demos/features/chameleon-adaptive-ui-demo.component';
+import { NlCatalogMatcherDemoComponent } from './pages/demos/features/nl-catalog-matcher-demo.component';
+import { System1System2CascadeDemoComponent } from './pages/demos/features/system1-system2-cascade-demo.component';
+import { SmartClipboardPasteDemoComponent } from './pages/demos/features/smart-clipboard-paste-demo.component';
+import { FocusNotificationShieldDemoComponent } from './pages/demos/features/focus-notification-shield-demo.component';
+import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant-form-autofill-demo.component';
 
 @NgModule({
   declarations: [
@@ -230,6 +241,7 @@ import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardwa
     LanguageDetectorApiPage,
     ProofreaderApiPage,
     SemanticEmbedderApiPage,
+    ClassifierApiPage,
     PromptPlaygroundPage,
     SummarizerPlaygroundPage,
     WriterPlaygroundPage,
@@ -238,6 +250,7 @@ import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardwa
     LanguageDetectorPlaygroundPage,
     ProofreaderPlaygroundPage,
     SemanticEmbedderPlaygroundPage,
+    ClassifierPlaygroundPage,
     WebSpeechPlaygroundPage,
     NoteEditorPage,
     ConsumerHardwareAnalysisPage,
@@ -267,6 +280,7 @@ import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardwa
     ImageAudioQueryDemoComponent,
     ReceiptToJsonDemoComponent,
     EmbedderStatusComponent,
+    ClassifierStatusComponent,
     DocumentChatDemoComponent,
     SemanticSearchDemoComponent,
     SmartTriageDemoComponent,
@@ -302,6 +316,14 @@ import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardwa
     PhotoSearchDemoComponent,
     TongueTwisterDemoComponent,
     MysteryLanguageDemoComponent,
+    System1TicketRouterDemoComponent,
+    LiveDraftGuardrailsDemoComponent,
+    ChameleonAdaptiveUiDemoComponent,
+    NlCatalogMatcherDemoComponent,
+    System1System2CascadeDemoComponent,
+    SmartClipboardPasteDemoComponent,
+    FocusNotificationShieldDemoComponent,
+    InstantFormAutofillDemoComponent,
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,
