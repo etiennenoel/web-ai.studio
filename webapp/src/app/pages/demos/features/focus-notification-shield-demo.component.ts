@@ -176,9 +176,6 @@ export class FocusNotificationShieldDemoComponent extends BaseClassifierDemoComp
     this.setTitle(`Demo: ${this.demo.title}`);
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
-    if (this.classifierStatus !== 'unavailable') {
-      await this.filterNotifications();
-    }
   }
 
   async filterNotifications() {
@@ -192,11 +189,13 @@ export class FocusNotificationShieldDemoComponent extends BaseClassifierDemoComp
         });
         ping.deliveryMode = (res.byId['delivery_mode']?.label as any) || 'digest_5pm';
         ping.latencyMs = res.elapsedMs;
+        this.cdr.detectChanges();
       }
     } catch (e: any) {
       this.errorMessage = e.message || 'Notification screening failed.';
     } finally {
       this.isRunning = false;
+      this.cdr.detectChanges();
     }
   }
 

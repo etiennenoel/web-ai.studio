@@ -142,25 +142,56 @@ export class ClassifierService {
 
     for (const q of schema.questions) {
       const modality = this.normalizeModality(q.type);
-      const entry = rawDecisionsArray.find((d: any) => d?.id === q.id) ?? raw?.[q.id] ?? {};
+      const entry =
+        rawDecisionsArray.find((d: any) => (d?.id ?? d?.questionId) === q.id) ??
+        raw?.[q.id] ??
+        {};
 
       const probs: ClassifierOptionProbability[] = Array.isArray(entry.probabilities)
         ? entry.probabilities.map((p: any) => ({
-            label: String(p.label),
+            label: String(p.label ?? p.option ?? ''),
             description: p.description,
             probability: Number(p.probability ?? 0)
           }))
         : [];
 
+      let rawLabel = entry.label ?? entry.choice ?? entry.value;
+      if ((rawLabel === undefined || rawLabel === null || rawLabel === '') && probs.length > 0) {
+        const best = [...probs].sort((a, b) => b.probability - a.probability)[0];
+        rawLabel = best?.label;
+      }
+
+      if (modality === 'binary') {
+        if (typeof rawLabel === 'boolean') {
+          rawLabel = rawLabel ? 'true' : 'false';
+        } else if (typeof rawLabel === 'string') {
+          const lower = rawLabel.toLowerCase().trim();
+          if (lower === 'yes' || lower === '1' || lower === 'true') rawLabel = 'true';
+          else if (lower === 'no' || lower === '0' || lower === 'false') rawLabel = 'false';
+        }
+        if (
+          (rawLabel !== 'true' && rawLabel !== 'false') &&
+          entry.probability !== undefined &&
+          entry.probability !== null
+        ) {
+          rawLabel = Number(entry.probability) >= 0.5 ? 'true' : 'false';
+        }
+      }
+
+      const scoreVal =
+        entry.expectedScore !== undefined && entry.expectedScore !== null
+          ? entry.expectedScore
+          : entry.score;
+
       const nd: NormalizedDecision = {
         id: q.id,
         type: modality,
         prompt: q.prompt,
-        label: String(entry.label ?? entry.value ?? ''),
+        label: String(rawLabel ?? ''),
         confidence: Number(entry.confidence ?? 0),
-        probability: entry.probability !== undefined ? Number(entry.probability) : null,
-        expectedScore: entry.expectedScore !== undefined ? Number(entry.expectedScore) : null,
-        standardError: entry.standardError !== undefined ? Number(entry.standardError) : null,
+        probability: entry.probability !== undefined && entry.probability !== null ? Number(entry.probability) : null,
+        expectedScore: scoreVal !== undefined && scoreVal !== null ? Number(scoreVal) : null,
+        standardError: entry.standardError !== undefined && entry.standardError !== null ? Number(entry.standardError) : null,
         probabilities: probs
       };
 

@@ -1,4 +1,4 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, inject, ChangeDetectorRef } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { BaseDemoComponent } from './base-demo.component';
 import { ClassifierService, ClassifierSchema } from '../../../../core/services/classifier.service';
@@ -10,6 +10,7 @@ declare const Summarizer: any;
 @Directive()
 export abstract class BaseClassifierDemoComponent extends BaseDemoComponent {
   protected readonly classifierService = inject(ClassifierService);
+  protected readonly cdr = inject(ChangeDetectorRef);
 
   classifierStatus: string = 'loading...';
   writerStatus: string = 'loading...';
@@ -23,6 +24,7 @@ export abstract class BaseClassifierDemoComponent extends BaseDemoComponent {
   async checkClassifierAvailability(schema?: ClassifierSchema) {
     if (isPlatformServer(this.platformId)) return;
     this.classifierStatus = await this.classifierService.availability(schema);
+    this.cdr.detectChanges();
   }
 
   async checkWriterAvailability() {
@@ -32,6 +34,7 @@ export abstract class BaseClassifierDemoComponent extends BaseDemoComponent {
     } catch {
       this.writerStatus = 'unavailable';
     }
+    this.cdr.detectChanges();
   }
 
   async checkRewriterAvailability() {
@@ -41,6 +44,7 @@ export abstract class BaseClassifierDemoComponent extends BaseDemoComponent {
     } catch {
       this.rewriterStatus = 'unavailable';
     }
+    this.cdr.detectChanges();
   }
 
   async checkSummarizerAvailability() {
@@ -50,11 +54,13 @@ export abstract class BaseClassifierDemoComponent extends BaseDemoComponent {
     } catch {
       this.summarizerStatus = 'unavailable';
     }
+    this.cdr.detectChanges();
   }
 
   protected onDownloadProgress = (loaded: number) => {
     this.isDownloading = loaded < 1;
     this.downloadProgress = Math.round(loaded * 100);
     if (loaded >= 1) this.classifierStatus = 'available';
+    this.cdr.detectChanges();
   };
 }
