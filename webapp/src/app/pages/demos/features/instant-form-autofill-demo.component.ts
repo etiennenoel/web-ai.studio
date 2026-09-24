@@ -37,6 +37,7 @@ import { ClassifierSchema, NormalizedClassifierResult } from '../../../core/serv
               <div class="flex-grow flex items-center gap-3 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2.5">
                 <i class="bi bi-magic text-indigo-500"></i>
                 <input type="text"
+                       name="noteText"
                        [(ngModel)]="noteText"
                        (keydown.enter)="autofillForm()"
                        class="w-full bg-transparent border-none outline-none text-sm text-slate-800 dark:text-slate-200"
@@ -44,12 +45,12 @@ import { ClassifierSchema, NormalizedClassifierResult } from '../../../core/serv
               </div>
               <button type="button"
                       (click)="autofillForm()"
-                      [disabled]="isFilling || classifierStatus === 'unavailable'"
-                      class="px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all border-none disabled:opacity-50">
+                      [disabled]="isFilling || !noteText.trim() || classifierStatus === 'unavailable'"
+                      class="px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-all border-none disabled:opacity-50 shrink-0">
                 @if (isFilling) {
                   <i class="bi bi-arrow-repeat animate-spin mr-1"></i> Filling...
                 } @else {
-                  Auto-Fill Form
+                  <i class="bi bi-lightning-charge-fill mr-1"></i> Auto-Fill Form
                 }
               </button>
             </div>
@@ -72,17 +73,42 @@ import { ClassifierSchema, NormalizedClassifierResult } from '../../../core/serv
                 <i class="bi bi-ui-checks text-indigo-500"></i> Expense Report Form
               </span>
               @if (result) {
-                <span class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                  filled in {{ result.elapsedMs }}ms
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-semibold">
+                  ✓ Auto-filled in {{ result.elapsedMs }}ms
                 </span>
+              } @else {
+                <span class="text-xs text-slate-400">Click "Auto-Fill Form" or a sample above to populate</span>
               }
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Expense Category</label>
-                <select [(ngModel)]="expenseCategory"
-                        class="w-full rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Amount ($)</label>
+                  @if (amount) {
+                    <span class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">Parsed</span>
+                  }
+                </div>
+                <input type="text"
+                       name="amount"
+                       [(ngModel)]="amount"
+                       placeholder="--"
+                       class="w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 transition-colors"
+                       [ngClass]="amount ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/30 dark:bg-indigo-500/5' : 'border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900'" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Expense Category</label>
+                  @if (result?.byId?.['expense_category']; as d) {
+                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">{{ (d.confidence * 100) | number:'1.0-0' }}% conf</span>
+                  }
+                </div>
+                <select name="expenseCategory"
+                        [(ngModel)]="expenseCategory"
+                        class="w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 transition-colors"
+                        [ngClass]="expenseCategory ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/30 dark:bg-indigo-500/5' : 'border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900'">
+                  <option value="">-- Waiting for Auto-Fill --</option>
                   <option value="ground_transport">Ground Transport (Taxi / Rail)</option>
                   <option value="airfare_lodging">Airfare &amp; Lodging</option>
                   <option value="client_meals">Client Meals &amp; Hospitality</option>
@@ -91,19 +117,35 @@ import { ClassifierSchema, NormalizedClassifierResult } from '../../../core/serv
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Cost Tier</label>
-                <select [(ngModel)]="costTier"
-                        class="w-full rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Cost Tier</label>
+                  @if (result?.byId?.['cost_tier']; as d) {
+                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">{{ (d.confidence * 100) | number:'1.0-0' }}% conf</span>
+                  }
+                </div>
+                <select name="costTier"
+                        [(ngModel)]="costTier"
+                        class="w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 transition-colors"
+                        [ngClass]="costTier ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/30 dark:bg-indigo-500/5' : 'border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900'">
+                  <option value="">-- Waiting for Auto-Fill --</option>
                   <option value="under_75">Under $75 (Auto-Approved)</option>
-                  <option value="75_to_500">$75 – $500 (Manager Review)</option>
+                  <option value="mid_tier">$75 – $500 (Manager Review)</option>
                   <option value="over_500">$500+ (VP Sign-off)</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client Billable?</label>
-                <select [(ngModel)]="clientBillable"
-                        class="w-full rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Client Billable?</label>
+                  @if (result?.byId?.['client_billable']; as d) {
+                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">{{ (d.confidence * 100) | number:'1.0-0' }}% conf</span>
+                  }
+                </div>
+                <select name="clientBillable"
+                        [(ngModel)]="clientBillable"
+                        class="w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 transition-colors"
+                        [ngClass]="clientBillable ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/30 dark:bg-indigo-500/5' : 'border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900'">
+                  <option value="">-- Waiting for Auto-Fill --</option>
                   <option value="true">Yes — Bill to Client Project</option>
                   <option value="false">No — Internal Team Budget</option>
                 </select>
@@ -112,8 +154,9 @@ import { ClassifierSchema, NormalizedClassifierResult } from '../../../core/serv
 
             <div class="pt-2 flex justify-end">
               <button type="button"
+                      [disabled]="!expenseCategory"
                       (click)="submitted = true"
-                      class="px-6 py-2.5 rounded-full text-xs font-semibold border-none shadow-sm transition-all"
+                      class="px-6 py-2.5 rounded-full text-xs font-semibold border-none shadow-sm transition-all disabled:opacity-40"
                       [ngClass]="submitted ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'">
                 <i class="bi mr-1" [ngClass]="submitted ? 'bi-check-lg' : 'bi-send'"></i>
                 {{ submitted ? 'Expense Submitted!' : 'Submit Expense Report' }}
@@ -149,7 +192,7 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
         prompt: 'Select the cost approval tier.',
         options: [
           { label: 'under_75', description: 'Small expense under $75' },
-          { label: '75_to_500', description: 'Medium expense between $75 and $500' },
+          { label: 'mid_tier', description: 'Medium expense between $75 and $500' },
           { label: 'over_500', description: 'Large expense over $500' }
         ]
       },
@@ -164,13 +207,15 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
   samples = [
     { label: '$42 Uber to Client Site', text: 'Took a $42 Uber from SFO airport directly to the Acme client kickoff meeting.' },
     { label: '$890 Flight to Conference', text: 'Round-trip $890 Delta flight to attend our internal engineering summit.' },
+    { label: '$145 Client Dinner', text: 'Hosted a $145 dinner with the Globex product team to review the Q4 contract.' },
     { label: '$29 Dev Tool Subscription', text: 'Monthly $29 license for local profiling software for our internal team.' }
   ];
 
   noteText = this.samples[0].text;
-  expenseCategory = 'ground_transport';
-  costTier = 'under_75';
-  clientBillable = 'true';
+  amount = '';
+  expenseCategory = '';
+  costTier = '';
+  clientBillable = '';
   isFilling = false;
   submitted = false;
   result: NormalizedClassifierResult | null = null;
@@ -180,9 +225,6 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
     this.setTitle(`Demo: ${this.demo.title}`);
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
-    if (this.classifierStatus !== 'unavailable') {
-      await this.autofillForm();
-    }
   }
 
   selectSample(text: string) {
@@ -197,16 +239,20 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
     this.submitted = false;
     this.errorMessage = '';
     try {
+      const priceMatch = this.noteText.match(/\$\s*(\d+(?:\.\d{1,2})?)/);
+      this.amount = priceMatch ? Number(priceMatch[1]).toFixed(2) : '';
+
       this.result = await this.classifierService.classify(this.schema, this.noteText, {
         onDownloadProgress: this.onDownloadProgress
       });
       this.expenseCategory = this.result.byId['expense_category']?.label || 'ground_transport';
       this.costTier = this.result.byId['cost_tier']?.label || 'under_75';
-      this.clientBillable = this.result.byId['client_billable']?.label || 'false';
+      this.clientBillable = this.result.byId['client_billable']?.label === 'true' ? 'true' : 'false';
     } catch (e: any) {
       this.errorMessage = e.message || 'Auto-fill failed.';
     } finally {
       this.isFilling = false;
+      this.cdr.detectChanges();
     }
   }
 }

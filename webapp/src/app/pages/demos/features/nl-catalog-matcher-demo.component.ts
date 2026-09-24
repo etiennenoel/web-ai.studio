@@ -234,9 +234,6 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
     this.setTitle(`Demo: ${this.demo.title}`);
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
-    if (this.classifierStatus !== 'unavailable') {
-      await this.applyNaturalLanguageFilters();
-    }
   }
 
   setQuery(q: string) {
@@ -259,6 +256,7 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
       this.errorMessage = e.message || 'Failed to classify search filters.';
     } finally {
       this.isFiltering = false;
+      this.cdr.detectChanges();
     }
   }
 

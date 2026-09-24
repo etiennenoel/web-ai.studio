@@ -179,9 +179,6 @@ export class LiveDraftGuardrailsDemoComponent extends BaseClassifierDemoComponen
     if (isPlatformServer(this.platformId)) return;
     await this.checkClassifierAvailability(this.schema);
     await this.checkRewriterAvailability();
-    if (this.classifierStatus !== 'unavailable') {
-      await this.verifyDraft();
-    }
   }
 
   onDraftChanged() {
@@ -204,6 +201,8 @@ export class LiveDraftGuardrailsDemoComponent extends BaseClassifierDemoComponen
       });
     } catch (e: any) {
       this.errorMessage = e.message || 'Classification failed.';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
