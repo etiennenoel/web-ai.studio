@@ -21,8 +21,8 @@ interface CategoryStyle {
 })
 export class DemosPage extends BasePage implements OnInit {
   demos: DemoExample[] = DEMOS_DATA;
-  categories: DemoCategory[] = ['Embeddings', 'Speech', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
-  apis: DemoApi[] = ['Prompt API', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader'];
+  categories: DemoCategory[] = ['Classification', 'Embeddings', 'Speech', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
+  apis: DemoApi[] = ['Prompt API', 'Classifier', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader'];
 
   searchQuery = '';
   selectedCategory: DemoCategory | null = null;
@@ -38,6 +38,7 @@ export class DemosPage extends BasePage implements OnInit {
 
   availability: Record<DemoApi, DemoApiAvailability> = {
     'Prompt API': 'checking',
+    'Classifier': 'checking',
     'Semantic Embedder': 'checking',
     'Web Speech': 'checking',
     'Translator': 'checking',
@@ -49,6 +50,10 @@ export class DemosPage extends BasePage implements OnInit {
   };
 
   private readonly categoryStyles: Record<DemoCategory, CategoryStyle> = {
+    'Classification': {
+      icon: 'text-fuchsia-600 dark:text-fuchsia-400',
+      iconContainer: 'bg-fuchsia-50 dark:bg-fuchsia-500/10',
+    },
     'Speech': {
       icon: 'text-cyan-600 dark:text-cyan-400',
       iconContainer: 'bg-cyan-50 dark:bg-cyan-500/10',

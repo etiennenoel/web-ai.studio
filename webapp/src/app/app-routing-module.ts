@@ -91,6 +91,7 @@ import { TranslatorApiPage } from './pages/docs/apis/translator-api.page';
 import { LanguageDetectorApiPage } from './pages/docs/apis/language-detector-api.page';
 import { ProofreaderApiPage } from './pages/docs/apis/proofreader-api.page';
 import { SemanticEmbedderApiPage } from './pages/docs/apis/semantic-embedder-api.page';
+import { ClassifierApiPage } from './pages/docs/apis/classifier-api.page';
 import { PromptPlaygroundPage } from './pages/playgrounds/prompt/prompt.page';
 import { SummarizerPlaygroundPage } from './pages/playgrounds/summarizer/summarizer.page';
 import { WriterPlaygroundPage } from './pages/playgrounds/writer/writer.page';
@@ -99,9 +100,18 @@ import { TranslatorPlaygroundPage } from './pages/playgrounds/translator/transla
 import { LanguageDetectorPlaygroundPage } from './pages/playgrounds/language-detector/language-detector.page';
 import { ProofreaderPlaygroundPage } from './pages/playgrounds/proofreader/proofreader.page';
 import { SemanticEmbedderPlaygroundPage } from './pages/playgrounds/semantic-embedder/semantic-embedder.page';
+import { ClassifierPlaygroundPage } from './pages/playgrounds/classifier/classifier.page';
 import { WebSpeechPlaygroundPage } from './pages/playgrounds/web-speech/web-speech.page';
 import { NoteEditorPage } from './pages/labs/note-editor/note-editor.page';
 import { ConsumerHardwareAnalysisPage } from './pages/dashboards/consumer-hardware-analysis/consumer-hardware-analysis.page';
+import { System1TicketRouterDemoComponent } from './pages/demos/features/system1-ticket-router-demo.component';
+import { LiveDraftGuardrailsDemoComponent } from './pages/demos/features/live-draft-guardrails-demo.component';
+import { ChameleonAdaptiveUiDemoComponent } from './pages/demos/features/chameleon-adaptive-ui-demo.component';
+import { NlCatalogMatcherDemoComponent } from './pages/demos/features/nl-catalog-matcher-demo.component';
+import { System1System2CascadeDemoComponent } from './pages/demos/features/system1-system2-cascade-demo.component';
+import { SmartClipboardPasteDemoComponent } from './pages/demos/features/smart-clipboard-paste-demo.component';
+import { FocusNotificationShieldDemoComponent } from './pages/demos/features/focus-notification-shield-demo.component';
+import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant-form-autofill-demo.component';
 
 const routes: Routes = [
   {
@@ -277,6 +287,13 @@ const routes: Routes = [
         }
       },
       {
+        path: "docs/classifier",
+        component: ClassifierApiPage,
+        data: {
+          route: RouteEnum.ClassifierApi
+        }
+      },
+      {
         path: "playgrounds/prompt",
         component: PromptPlaygroundPage,
         data: {
@@ -330,6 +347,13 @@ const routes: Routes = [
         component: SemanticEmbedderPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsSemanticEmbedder
+        }
+      },
+      {
+        path: "playgrounds/classifier",
+        component: ClassifierPlaygroundPage,
+        data: {
+          route: RouteEnum.PlaygroundsClassifier
         }
       },
       {
@@ -784,6 +808,62 @@ const routes: Routes = [
       {
         path: "demos/mystery-language",
         component: MysteryLanguageDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/system1-ticket-router",
+        component: System1TicketRouterDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/live-draft-guardrails",
+        component: LiveDraftGuardrailsDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/chameleon-adaptive-ui",
+        component: ChameleonAdaptiveUiDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/nl-catalog-matcher",
+        component: NlCatalogMatcherDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/system1-system2-cascade",
+        component: System1System2CascadeDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/smart-clipboard-paste",
+        component: SmartClipboardPasteDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/focus-notification-shield",
+        component: FocusNotificationShieldDemoComponent,
+        data: {
+          route: RouteEnum.Demos
+        }
+      },
+      {
+        path: "demos/instant-form-autofill",
+        component: InstantFormAutofillDemoComponent,
         data: {
           route: RouteEnum.Demos
         }

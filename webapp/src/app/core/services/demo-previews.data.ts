@@ -588,4 +588,78 @@ setScene({ room: "living", scene: "evening" })
   "organizations": []
 }`,
   },
+
+  // ----------------------------------------------------------- Classifier API
+  'system1-ticket-router': {
+    kind: 'io',
+    rows: [
+      { role: 'in', text: 'We were charged twice on invoice #4821 ($49.00) and need a refund.' },
+      { role: 'out', text: 'Action: Refund Duplicate Charge ($49) · Reply drafted via Writer API' },
+    ],
+  },
+
+  'live-draft-guardrails': {
+    kind: 'io',
+    rows: [
+      { role: 'in', text: 'Only an amateur would break the build like this without running tests.' },
+      { role: 'out', text: 'Kindness Nudge → Soften phrasing with Rewriter API before sending' },
+    ],
+  },
+
+  'chameleon-adaptive-ui': {
+    kind: 'chips',
+    caption: '"I am boarding a flight in 30 seconds — give me the TL;DR"',
+    rows: [
+      { label: 'Format: 30s TL;DR' },
+      { label: 'Summarizer: short' },
+      { label: 'Adapted automatically' },
+    ],
+  },
+
+  'nl-catalog-matcher': {
+    kind: 'chips',
+    caption: '"waterproof jacket for winter hiking under $150"',
+    rows: [
+      { group: 'category', label: 'Outerwear' },
+      { group: 'price', label: 'Under $150' },
+      { group: 'feature', label: 'Waterproof' },
+    ],
+  },
+
+  'smart-clipboard-paste': {
+    kind: 'io',
+    rows: [
+      { role: 'in', text: 'Let’s sync tomorrow from 2:00 PM to 2:45 PM PST over Google Meet.' },
+      { role: 'out', text: 'Smart Action: Add Event to Calendar (1-click)' },
+    ],
+  },
+
+  'focus-notification-shield': {
+    kind: 'list',
+    query: 'Deep Work Focus Shield Active',
+    rows: [
+      { text: 'SEV-1: Checkout API latency > 15s', score: 0.96, meta: 'Ring Now' },
+      { text: 'Free bagels in the 4th floor kitchen!', score: 0.91, meta: '5 PM Digest' },
+    ],
+  },
+
+  'instant-form-autofill': {
+    kind: 'chips',
+    caption: '"Took a $42 Uber from SFO airport to the Acme client kickoff"',
+    rows: [
+      { group: 'category', label: 'Ground Transport' },
+      { group: 'tier', label: 'Under $75' },
+      { group: 'billable', label: 'Client Billable: Yes' },
+    ],
+  },
+
+  'system1-system2-cascade': {
+    kind: 'list',
+    query: '13 comments · 10 resolved by Classifier, 3 escalated to LLM judge',
+    rows: [
+      { text: '"This tutorial saved my weekend, thank you!"', score: 0.96, meta: 'benign · Classifier' },
+      { text: '"Wow, genius idea. Slow clap."', score: 0.58, meta: 'toxic · LLM judge' },
+    ],
+  },
 };
+

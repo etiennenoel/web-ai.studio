@@ -9,6 +9,7 @@ export type DemoApiAvailability = 'checking' | 'available' | 'downloadable' | 'd
 export class DemoAvailabilityService {
   private readonly availabilitySubject = new BehaviorSubject<Record<DemoApi, DemoApiAvailability>>({
     'Prompt API': 'checking',
+    'Classifier': 'checking',
     'Semantic Embedder': 'checking',
     'Web Speech': 'checking',
     'Translator': 'checking',
@@ -29,6 +30,10 @@ export class DemoAvailabilityService {
 
   private checkAll(): void {
     this.check('Prompt API', () => (globalThis as any).LanguageModel?.availability());
+    this.check('Classifier', () => (globalThis as any).Classifier?.availability({
+      context: 'Probe',
+      questions: [{ id: 'probe', type: 'binary', prompt: 'Is this text?' }]
+    }));
     this.check('Semantic Embedder', () => (globalThis as any).SemanticEmbedder?.availability());
     this.check('Language Detector', () => (globalThis as any).LanguageDetector?.availability());
     this.check('Summarizer', () => (globalThis as any).Summarizer?.availability());
