@@ -132,7 +132,7 @@ export class CortexInsightsPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.titleService.setTitle("Cortex Insights - Web AI Studio");
+    this.titleService.setTitle("Cortex Insights | WebAI Studio");
     this.metaService.updateTag({ name: 'description', content: 'Historical performance profiler and leaderboard for Chrome WebAI Cortex benchmark suites.' });
     this.loadData();
     this.filterService.filtersChanged.subscribe(() => {

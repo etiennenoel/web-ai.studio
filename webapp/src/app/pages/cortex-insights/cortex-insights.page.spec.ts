@@ -50,7 +50,7 @@ describe('CortexInsightsPage', () => {
   it('should create', () => {
     fixture.detectChanges(); // triggers ngOnInit
     expect(component).toBeTruthy();
-    expect(titleService.setTitle).toHaveBeenCalledWith('Cortex Insights - Web AI Studio');
+    expect(titleService.setTitle).toHaveBeenCalledWith('Cortex Insights | WebAI Studio');
     expect(metaService.updateTag).toHaveBeenCalledWith({ name: 'description', content: 'Historical performance profiler and leaderboard for Chrome WebAI Cortex benchmark suites.' });
 
     // Expecting the index.json request
