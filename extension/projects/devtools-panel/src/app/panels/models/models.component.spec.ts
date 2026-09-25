@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModelsComponent } from './models.component';
 import { AiModelDataService } from '../../services/ai-model-data.service';
-import { ToastService } from 'base';
+import { ToastService, ClassifierManager } from 'base';
+import { Subject } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ModelsComponent', () => {
@@ -12,12 +13,18 @@ describe('ModelsComponent', () => {
   beforeEach(async () => {
     toastSpy = jasmine.createSpy('show');
     const mockDataService = { getModels: jasmine.createSpy('getModels').and.returnValue(Promise.resolve([{ name: 'TestModel', status: 'available' }])) };
+    // The real manager talks to the extension runtime, which does not exist in Karma.
+    const mockClassifierManager = {
+      modelsChangedEvent: new Subject<void>(),
+      listModels: jasmine.createSpy('listModels').and.returnValue(Promise.resolve({ activeVariantId: 'laya', models: [] })),
+    };
 
     await TestBed.configureTestingModule({
       declarations: [ModelsComponent],
       providers: [
         { provide: AiModelDataService, useValue: mockDataService },
-        { provide: ToastService, useValue: { show: toastSpy } }
+        { provide: ToastService, useValue: { show: toastSpy } },
+        { provide: ClassifierManager, useValue: mockClassifierManager }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

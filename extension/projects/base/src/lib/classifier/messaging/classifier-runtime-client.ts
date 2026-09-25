@@ -139,6 +139,7 @@ export class ClassifierRuntimeClient {
         lastFailure = pong?.error?.message ?? 'unexpected ping reply';
       } catch (e) {
         lastFailure = (e as Error).message;
+        if (!this.isExtensionContext) break;
       }
       await new Promise((r) => setTimeout(r, PING_DELAY_MS));
     }
@@ -153,7 +154,17 @@ export class ClassifierRuntimeClient {
     return /did not respond|message port closed|Receiving end does not exist|offscreen document unreachable/i.test(message);
   }
 
+  /** True only inside extension contexts; web pages expose a `chrome.runtime` that never answers. */
+  static get isExtensionContext(): boolean {
+    return typeof chrome !== 'undefined' && !!chrome.runtime?.id && typeof chrome.runtime.sendMessage === 'function';
+  }
+
   private static sendRuntimeMessage<T>(message: unknown): Promise<T | undefined> {
+    if (!this.isExtensionContext) {
+      return Promise.reject(
+        new DOMException('Classifier runtime is only reachable from inside the WebAI extension.', 'InvalidStateError'),
+      );
+    }
     return new Promise<T | undefined>((resolve, reject) => {
       try {
         chrome.runtime.sendMessage(message, (response: T) => {
