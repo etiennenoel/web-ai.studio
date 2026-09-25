@@ -196,25 +196,24 @@ export class ClassifierDemoComponent implements OnInit, OnDestroy {
     const requestId = crypto.randomUUID();
     this.activeRequestId = requestId;
     try {
-      if (!this.sessionId || this.sessionPresetId !== this.preset.id) {
-        this.dropSession();
-        this.busyLabel = this.availability === 'available' ? 'Loading model...' : 'Downloading...';
+      const run = async (sessionId: string) => {
+        this.busyLabel = 'Classifying...';
         this.cdr.detectChanges();
-        const info = await this.classifierManager.createSession(
-          this.preset.schema,
-          (loaded) => this.ngZone.run(() => this.onProgress(loaded)),
-          requestId,
-        );
-        this.sessionId = info.sessionId;
-        this.sessionPresetId = this.preset.id;
-        this.downloading = false;
-        this.availability = 'available';
+        const start = performance.now();
+        const result = await this.classifierManager.classify(sessionId, this.input, {}, requestId);
+        this.elapsedMs = Math.round(performance.now() - start);
+        return result;
+      };
+      let sessionId = await this.ensureSession(requestId);
+      try {
+        this.result = await run(sessionId);
+      } catch (e: any) {
+        // The runtime lost the session (extension reload, runtime restart): create a new one and retry once.
+        if (e?.name !== 'InvalidStateError' || !/destroyed/i.test(e.message)) throw e;
+        this.sessionId = null;
+        sessionId = await this.ensureSession(requestId);
+        this.result = await run(sessionId);
       }
-      this.busyLabel = 'Classifying...';
-      this.cdr.detectChanges();
-      const start = performance.now();
-      this.result = await this.classifierManager.classify(this.sessionId!, this.input, {}, requestId);
-      this.elapsedMs = Math.round(performance.now() - start);
     } catch (e: any) {
       this.error = `${e.name ?? 'Error'}: ${e.message}`;
       if (e.name === 'InvalidStateError') this.dropSession();
@@ -233,6 +232,24 @@ export class ClassifierDemoComponent implements OnInit, OnDestroy {
 
   copyCode(): void {
     navigator.clipboard.writeText(this.code).catch(() => undefined);
+  }
+
+  /** Reuses the session for the current preset, otherwise creates one (downloading the model if needed). */
+  private async ensureSession(requestId: string): Promise<string> {
+    if (this.sessionId && this.sessionPresetId === this.preset.id) return this.sessionId;
+    this.dropSession();
+    this.busyLabel = this.availability === 'available' ? 'Loading model...' : 'Downloading...';
+    this.cdr.detectChanges();
+    const info = await this.classifierManager.createSession(
+      this.preset.schema,
+      (loaded) => this.ngZone.run(() => this.onProgress(loaded)),
+      requestId,
+    );
+    this.sessionId = info.sessionId;
+    this.sessionPresetId = this.preset.id;
+    this.downloading = false;
+    this.availability = 'available';
+    return info.sessionId;
   }
 
   private onProgress(loaded: number): void {
