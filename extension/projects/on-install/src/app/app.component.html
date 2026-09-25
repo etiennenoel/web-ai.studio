@@ -9,6 +9,105 @@
                         class="text-gray-600 dark:text-gray-400 font-normal">Extension</span></h1>
             </div>
             <div class="flex items-center gap-4">
+                <!-- On-device models status -->
+                <button popovertarget="models-popover" class="models-anchor relative flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border transition-colors cursor-pointer"
+                    [ngClass]="missingModelCount > 0
+                        ? 'border-amber-400 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40'
+                        : 'border-gray-300 dark:border-[#3c4043] text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'"
+                    [title]="missingModelCount > 0 ? 'Some on-device models are not installed' : 'On-device models'">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span class="hidden sm:inline font-medium">Models</span>
+                    <span *ngIf="missingModelCount > 0" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center shadow" aria-label="Models need to be downloaded">
+                        <i class="fa-solid fa-exclamation"></i>
+                    </span>
+                    <span *ngIf="missingModelCount === 0 && modelsChecked" class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 border-2 border-gray-50 dark:border-[#292a2d]" aria-label="All on-device models installed"></span>
+                </button>
+
+                <div id="models-popover" popover class="models-popover w-[26rem] max-w-[calc(100vw-2rem)] rounded-xl border border-gray-300 dark:border-[#3c4043] bg-white dark:bg-[#202124] text-gray-900 dark:text-[#e8eaed] shadow-2xl p-0">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-[#3c4043]">
+                        <h3 class="font-bold text-sm">On-device models</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5" *ngIf="missingModelCount > 0">
+                            {{ missingModelCount }} model{{ missingModelCount > 1 ? 's are' : ' is' }} not installed yet. Download {{ missingModelCount > 1 ? 'them' : 'it' }} once; everything then runs locally.
+                        </p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5" *ngIf="missingModelCount === 0">Everything is installed and runs locally.</p>
+                    </div>
+
+                    <!-- Gemini Nano -->
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-[#3c4043] flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                            [ngClass]="downloadStatus() === 'available' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'">
+                            <i class="fa-solid" [ngClass]="downloadStatus() === 'available' ? 'fa-circle-check' : 'fa-wand-magic-sparkles'"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-sm">Gemini Nano</span>
+                                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded" [ngClass]="badgeClass(downloadStatus())">{{ badgeText(downloadStatus()) }}</span>
+                            </div>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Powers the Prompt, Summarizer, Writer, Rewriter, and Proofreader APIs. About 2 GB.</p>
+                            @switch (downloadStatus()) {
+                                @case ('downloadable') {
+                                    <button (click)="onDownloadGeminiNanoClick()" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center gap-2">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> Download now
+                                    </button>
+                                }
+                                @case ('error') {
+                                    <button (click)="onDownloadGeminiNanoClick()" class="mt-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center gap-2">
+                                        <i class="fa-solid fa-rotate-right"></i> Retry download
+                                    </button>
+                                }
+                                @case ('unavailable') {
+                                    <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">This Chrome build or device cannot run Gemini Nano. See the DevTools Diagnosis tab for requirements.</p>
+                                }
+                                @case ('downloading') {
+                                    <div class="mt-2 flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-[#3c4043] rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full transition-all" [style.width.%]="downloadProgress()"></div></div>
+                                        <span class="font-mono">{{ downloadProgress() }}%</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-1">Please keep this tab open.</p>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Classifier model -->
+                    <div class="px-4 py-3 flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                            [ngClass]="classifierStatus === 'available' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'">
+                            <i class="fa-solid" [ngClass]="classifierStatus === 'available' ? 'fa-circle-check' : 'fa-signs-post'"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-sm">Classifier model</span>
+                                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded" [ngClass]="badgeClass(classifierStatus)">{{ badgeText(classifierStatus) }}</span>
+                            </div>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 truncate" [title]="classifierModelName">{{ classifierModelName }}. {{ classifierModelSize }}. Powers <code>window.Classifier</code>.</p>
+                            @switch (classifierStatus) {
+                                @case ('downloadable') {
+                                    <button (click)="downloadClassifierModel()" class="mt-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center gap-2">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> Download now
+                                    </button>
+                                }
+                                @case ('error') {
+                                    <button (click)="downloadClassifierModel()" class="mt-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center gap-2">
+                                        <i class="fa-solid fa-rotate-right"></i> Retry download
+                                    </button>
+                                    <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ classifierError }}</p>
+                                }
+                                @case ('unavailable') {
+                                    <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">The active model cannot run here. Pick another one in Settings.</p>
+                                }
+                                @case ('downloading') {
+                                    <div class="mt-2 flex items-center gap-2 text-xs text-purple-700 dark:text-purple-300">
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-[#3c4043] rounded-full overflow-hidden"><div class="h-full bg-purple-500 rounded-full transition-all" [style.width.%]="classifierProgress"></div></div>
+                                        <span class="font-mono">{{ classifierProgress }}%</span>
+                                    </div>
+                                }
+                            }
+                            <a routerLink="/settings" class="inline-block mt-2 text-[11px] text-gray-500 hover:text-blue-500">Change model in Settings</a>
+                        </div>
+                    </div>
+                </div>
+
                 <a routerLink="/settings" class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors cursor-pointer" *ngIf="!isSettingsRoute" title="Settings">
                     <i class="fa-solid fa-gear text-lg"></i>
                 </a>
@@ -23,99 +122,67 @@
     <!-- Hero Section -->
     <main class="flex-1">
         <div *ngIf="!isSettingsRoute">
-            <section class="py-16 text-center px-4">
-            <div class="max-w-3xl mx-auto">
-                <div class="inline-block mb-4">
-                    <span
-                        class="bg-blue-50 dark:bg-[#3c4043] text-blue-700 dark:text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-200 dark:border-gray-600">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-2 text-yellow-600 dark:text-yellow-400"></i>New Update Installed
-                    </span>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">Debug the Chrome Built-in AI APIs<br><span
-                        class="gradient-text">Like a Pro</span></h2>
-                <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-                    The ultimate DevTools extension for inspecting, debugging, and prototyping with Chrome's local
-                    Gemini Nano APIs. Monitor tokens, latency, and model status in real-time.
-                </p>
-
-
-                @if(this.downloadStatus() !== 'unknown') {
-                <!-- Gemini Nano Download Alert Box -->
-                <div
-                    class="max-w-2xl mx-auto mb-12  rounded-xl p-6 text-left relative overflow-hidden" [ngClass]="{
-                        'bg-blue-50 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-500/50': downloadStatus() === 'downloadable' || downloadStatus() === 'downloading',
-                        'bg-green-50 dark:bg-green-900/20 border border-green-400 dark:border-green-500/50': downloadStatus() === 'available',
-                        'bg-red-50 dark:bg-red-900/20 border border-red-400 dark:border-red-500/50': downloadStatus() === 'error',
-                    }">
-                    <!-- Background decoration -->
-                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl">
-                    </div>
-
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-4">
-                            @switch (downloadStatus()) {
-                            @case ("downloadable") {
-                            <div
-                                class="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-600/20 rounded-full flex items-center justify-center text-blue-700 dark:text-blue-400 ">
-                                <i class="fa-solid fa-download text-xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="text-xl font-bold text-black dark:text-white mb-1">Install Gemini Nano Locally</h3>
-                                <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">
-                                    Get Started now and install Gemini Nano
-                                </p>
-                                <button (click)="onDownloadGeminiNanoClick()"
-                                    class="bg-blue-600 hover:bg-blue-700 text-black dark:text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2">
-                                    <i class="fa-solid fa-cloud-arrow-down"></i>
-                                    Download Now (~2GB)
-                                </button>
-                            </div>
-                            }
-                            @case ("downloading") {
-
-                            <div
-                                class="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-600/20 rounded-full flex items-center justify-center text-blue-700 dark:text-blue-400">
-                                <i class="fa-solid fa-download text-xl fa-beat-fade"
-                                    style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div
-                                    class="flex justify-between text-xs text-blue-800 dark:text-blue-300 uppercase font-semibold tracking-wider">
-                                    <span>Downloading Model...</span>
-                                    <span>{{ downloadProgress() }}%</span>
-                                </div>
-                                <div class="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                                    <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300 ease-out"
-                                        [style.width.%]="downloadProgress()"></div>
-                                </div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Please do not close this tab.</p>
-                            </div>
-                            }
-                            @case ("available") {
-                            <div
-                                class="flex-shrink-0 w-12 h-12 bg-green-100 dark:bg-green-600/20 rounded-full flex items-center justify-center  text-green-700 dark:text-green-400">
-                                <i class="fa-solid fa-circle-check text-xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 text-green-700 dark:text-green-400">
-                                    <span class="font-semibold">Gemini Nano Installed Successfully!</span>
-                                </div>
-                            </div>
-                            }
-                            }
-
+            <!-- Hero: Classifier API polyfill -->
+            <section id="classifier" class="py-12 md:py-16 px-6">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+                    <div class="lg:col-span-2">
+                        <div class="flex flex-wrap items-center gap-2 mb-5">
+                            <span class="bg-blue-50 dark:bg-[#3c4043] text-blue-700 dark:text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-200 dark:border-gray-600">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-2 text-yellow-600 dark:text-yellow-400"></i>New Update Installed · v{{ appVersion }}
+                            </span>
+                            <span class="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700 inline-flex items-center gap-2">
+                                <i class="fa-solid fa-signs-post"></i> Classifier API polyfill
+                            </span>
                         </div>
+                        <h2 class="text-3xl md:text-4xl font-bold mb-5 leading-tight">Have you heard about <span class="gradient-text">Jev</span>?</h2>
+                        <p class="text-gray-600 dark:text-gray-400 text-lg mb-4">
+                            Jev, Laya, and the other <em>System One</em> models make typed decisions in a single forward pass:
+                            no token generation, no hallucinated labels, calibrated probabilities on every option, in tens of milliseconds.
+                        </p>
+                        <p class="text-gray-600 dark:text-gray-400 mb-5">
+                            Well, you have it now in the WebAI Studio extension, all locally in your browser.
+                            Every page you visit gets <code class="text-sm bg-gray-100 dark:bg-[#3c4043] px-1.5 py-0.5 rounded">window.Classifier</code>,
+                            a polyfill of the proposed
+                            <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Classifier API</a>,
+                            backed by the open Laya decision encoder running on LiteRT.js.
+                        </p>
+                        <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2 mb-6">
+                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Three question types: <code>binary</code>, <code>categorical</code>, <code>ordinal</code>. Any number of questions per call.</span></li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Explainer-shaped results: a record keyed by question id with <code>label</code>, <code>confidence</code>, and <code>probabilities</code>.</span></li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Model downloaded once from Hugging Face, then cached. Nothing you classify leaves the device.</span></li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Full support in the DevTools panel: history, diagnosis, model management, and a playground.</span></li>
+                        </ul>
+                        <div class="flex flex-wrap gap-3 text-sm">
+                            <a href="https://web-ai.studio/docs/classifier" target="_blank" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2"><i class="fa-solid fa-book"></i> Read the docs</a>
+                            <a href="https://web-ai.studio/playgrounds/classifier" target="_blank" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-2"><i class="fa-solid fa-flask"></i> Open the web playground</a>
+                            <a routerLink="/settings" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-2"><i class="fa-solid fa-gear"></i> Choose the model</a>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-8">
+                            WebAI Extension remains the DevTools companion for Chrome's built-in AI APIs: inspect, debug, and prototype with Gemini Nano, and monitor tokens, latency, and model status in real time.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-3">
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Try it now, right here</p>
+                        <lib-classifier-demo [columns]="1"></lib-classifier-demo>
                     </div>
                 </div>
-                }
-            </div>
-        </section>
+            </section>
 
         <!-- Key Features Grid -->
         <section class="py-12 bg-gray-50 dark:bg-gray-100 dark:bg-[#171717]">
             <div class="max-w-5xl mx-auto px-6">
                 <h3 class="text-2xl font-bold mb-8 text-center">What's New in v{{ appVersion }}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Feature 0 -->
+                    <div class="feature-card p-6 rounded-xl bg-white dark:bg-[#292a2d] border border-purple-300 dark:border-purple-800 hover:border-purple-600 dark:hover:border-purple-400">
+                        <div
+                            class="h-10 w-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 text-purple-700 dark:text-purple-400">
+                            <i class="fa-solid fa-signs-post text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Classifier API Polyfill</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><code>window.Classifier</code> on every page, powered by a local Laya decision model on LiteRT.js. Pick the model in Settings, manage downloads in DevTools.</p>
+                    </div>
 
                     <!-- Feature 1 -->
                     <div class="feature-card p-6 rounded-xl bg-white dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] hover:border-blue-600 dark:hover:border-blue-400">

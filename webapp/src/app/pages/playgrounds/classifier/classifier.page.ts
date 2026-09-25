@@ -53,8 +53,8 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
   jsonParseError = '';
 
   inputText = 'Urgent: our production database pipeline crashes with a fatal segmentation fault and customers cannot sign in!';
-  samples = 1;
   useAbortSignal = true;
+  isPolyfilled = false;
 
   availabilityStatus: string | null = null;
   availabilityTimeMs: number | null = null;
@@ -93,6 +93,7 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
     if (!this.classifierService.isSupported()) {
       this.availabilityStatus = 'unavailable';
     }
+    this.isPolyfilled = this.classifierService.isPolyfilled();
     this.updateGeneratedCode();
   }
 
@@ -307,7 +308,6 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
     try {
       const t0 = performance.now();
       const raw = await this.session.classify(this.inputText, {
-        samples: this.samples,
         signal: this.activeAbortController?.signal
       });
       const elapsed = Number((performance.now() - t0).toFixed(1));
@@ -363,10 +363,9 @@ const classifier = await Classifier.create({
 
     this.codeExecution = `const input = ${inputLiteral};
 
-const result = await classifier.classify(input, {
-  samples: ${this.samples}
-});
+const result = await classifier.classify(input);
 
+// result is a record keyed by question id
 console.log(result);
 classifier.destroy();`;
   }

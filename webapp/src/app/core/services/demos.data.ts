@@ -1688,7 +1688,7 @@ const decision = await classifier.classify(customerEmail);
 // 2. Draft a tailored response for that exact action (window.Writer)
 const writer = await Writer.create({ tone: "formal", length: "short" });
 const reply = await writer.write(
-  \`Write a helpful support reply confirming action "\${decision.byId.recommended_action.label}" for: \${customerEmail}\`
+  \`Write a helpful support reply confirming action "\${decision.recommended_action.label}" for: \${customerEmail}\`
 );`,
     promptRunOptions: {},
     initialPrompt: ''
@@ -1712,7 +1712,7 @@ const classifier = await Classifier.create({
 const check = await classifier.classify(draftText);
 
 // 2. If it sounds harsh, offer a one-click polite rewrite (window.Rewriter)
-if (check.byId.sounds_harsh.label === "true") {
+if (check.sounds_harsh.label === "true") {
   const rewriter = await Rewriter.create({ tone: "more-formal" });
   draftText = await rewriter.rewrite(draftText, {
     context: "Make this reply constructive, polite, and collaborative."
@@ -1745,12 +1745,12 @@ const classifier = await Classifier.create({
     }
   ]
 });
-const { byId } = await classifier.classify(userPreference);
+const { reading_mode } = await classifier.classify(userPreference);
 
 // 2. Transform the article automatically (window.Summarizer)
-if (byId.reading_mode.label !== "full_article") {
+if (reading_mode.label !== "full_article") {
   const summarizer = await Summarizer.create({
-    type: byId.reading_mode.label === "quick_tldr" ? "tldr" : "key-points",
+    type: reading_mode.label === "quick_tldr" ? "tldr" : "key-points",
     length: "short"
   });
   displayedContent = await summarizer.summarize(articleBody);
@@ -1822,7 +1822,8 @@ const filters = await classifier.classify(searchQuery);`,
   ]
 });
 
-const { byId } = await classifier.classify(clipboardText);`,
+const { paste_type } = await classifier.classify(clipboardText);
+// paste_type -> { id, label, confidence, probabilities }`,
     promptRunOptions: {},
     initialPrompt: ''
   },
@@ -1909,8 +1910,8 @@ const classifier = await Classifier.create({
 });
 
 const s1 = await classifier.classify(comment.text);
-if (s1.byId.verdict.confidence >= 0.80) {
-  return { verdict: s1.byId.verdict.label, stage: "Classifier" };
+if (s1.verdict.confidence >= 0.80) {
+  return { verdict: s1.verdict.label, stage: "Classifier" };
 }
 
 // Stage 2: Borderline confidence -> escalate to Prompt API judge

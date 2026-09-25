@@ -5,6 +5,7 @@ import { LogApiCallHandler } from './handlers/log-api-call.handler';
 import { HistoryHandler } from './handlers/history.handler';
 import { HardwareInfoHandler } from './handlers/hardware-info.handler';
 import { SettingsHandler } from './handlers/settings.handler';
+import { OffscreenHandler } from './handlers/offscreen.handler';
 import { WebAIDatabase } from './db';
 
 /**
@@ -25,6 +26,7 @@ export class RuntimeMessageDispatcher {
       new HistoryHandler(database),
       new HardwareInfoHandler(),
       new SettingsHandler(database),
+      new OffscreenHandler(),
     ];
 
     for (const handler of allHandlers) {
@@ -57,7 +59,9 @@ export class RuntimeMessageDispatcher {
       case RuntimeMessageAction.DELETE_API_SESSION:
       case RuntimeMessageAction.GET_HARDWARE_INFO:
       case RuntimeMessageAction.GET_SETTING:
-      case RuntimeMessageAction.SET_SETTING: {
+      case RuntimeMessageAction.SET_SETTING:
+      case RuntimeMessageAction.ENSURE_OFFSCREEN:
+      case RuntimeMessageAction.CLASSIFIER_PROGRESS: {
         const handler = this.handlers.get(action);
         if (!handler) {
           sendResponse({ error: `No handler registered for action: ${action}` });
@@ -78,6 +82,11 @@ export class RuntimeMessageDispatcher {
       // It arrives here only if sent from devtools panel directly; the content
       // script's onMessage listener handles it before it reaches the service worker.
       case RuntimeMessageAction.DIAGNOSE_APIS:
+        return false;
+
+      // CLASSIFIER_REQUEST is answered by the offscreen document, which also
+      // receives every chrome.runtime message. The service worker stays silent.
+      case RuntimeMessageAction.CLASSIFIER_REQUEST:
         return false;
 
       default: {

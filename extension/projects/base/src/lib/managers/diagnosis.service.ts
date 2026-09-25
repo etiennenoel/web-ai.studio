@@ -78,6 +78,15 @@ export class DiagnosisService {
       devToolsStatus: 'checking',
       siteStatus: 'checking',
       docsUrl: 'https://developer.chrome.com/docs/ai/built-in-apis'
+    },
+    {
+      name: 'Classifier API (polyfill)',
+      globalName: 'Classifier',
+      statusType: 'dev-trial',
+      flagName: 'classifier-api',
+      devToolsStatus: 'checking',
+      siteStatus: 'checking',
+      docsUrl: 'https://github.com/michaelwasserman/classifier-api'
     }
   ];
 
@@ -114,7 +123,8 @@ export class DiagnosisService {
             LanguageDetector: typeof LanguageDetector !== 'undefined',
             Writer: typeof Writer !== 'undefined',
             Rewriter: typeof Rewriter !== 'undefined',
-            Proofreader: typeof Proofreader !== 'undefined'
+            Proofreader: typeof Proofreader !== 'undefined',
+            Classifier: typeof Classifier !== 'undefined'
           };
         })()
       `;

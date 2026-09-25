@@ -53,15 +53,12 @@ describe('DiagnosisService', () => {
       
       // Setup the mock eval to succeed with some APIs missing
       evalSpy.mockImplementation((expr: string, callback: Function) => {
-        callback({
-          Summarizer: true,
-          LanguageModel: false, // Emulating missing API
-          Translator: true,
-          LanguageDetector: true,
-          Writer: true,
-          Rewriter: true,
-          Proofreader: true
-        }, null);
+        // Every API present except LanguageModel (emulating a missing API)
+        const result: Record<string, boolean> = {};
+        for (const api of service.apis$.getValue()) {
+          result[api.globalName] = api.globalName !== 'LanguageModel';
+        }
+        callback(result, null);
       });
 
       service.errorCount$.subscribe(count => {
@@ -89,9 +86,10 @@ describe('DiagnosisService', () => {
         callback(null, { isError: true, description: 'Internal error' });
       });
 
+      const totalApis = service.apis$.getValue().length;
       service.errorCount$.subscribe(count => {
-        // 7 APIs total, if all fail, count should be 7
-        if (count === 7) { 
+        // If all APIs fail, the count equals the number of APIs
+        if (count === totalApis) { 
           const apis = service.apis$.getValue();
           const allFailed = apis.every(a => a.siteStatus === false);
           expect(allFailed).toBe(true);
@@ -109,7 +107,7 @@ describe('DiagnosisService', () => {
     
     service.runChecks();
     
-    expect(service.errorCount$.getValue()).toBe(7); // All fail
+    expect(service.errorCount$.getValue()).toBe(service.apis$.getValue().length); // All fail
     const apis = service.apis$.getValue();
     expect(apis.every(a => a.siteStatus === false)).toBe(true);
   });

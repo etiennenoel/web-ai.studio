@@ -83,6 +83,29 @@ export interface DiagnoseApisMessage extends RuntimeMessageBase {
 }
 
 // ---------------------------------------------------------------------------
+// Classifier polyfill runtime
+// ---------------------------------------------------------------------------
+
+export interface EnsureOffscreenMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.ENSURE_OFFSCREEN;
+}
+
+/** Handled by the offscreen document; see ClassifierRuntimeRequest in the base library. */
+export interface ClassifierRequestRuntimeMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.CLASSIFIER_REQUEST;
+  target: string;
+  requestId: string;
+}
+
+export interface ClassifierProgressRuntimeMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.CLASSIFIER_PROGRESS;
+  requestId: string;
+  clientTabId?: number;
+  loaded: number;
+  variantId?: string;
+}
+
+// ---------------------------------------------------------------------------
 // Discriminated union
 // ---------------------------------------------------------------------------
 
@@ -102,4 +125,7 @@ export type RuntimeMessage =
   | GetHardwareInfoMessage
   | GetSettingMessage
   | SetSettingMessage
-  | DiagnoseApisMessage;
+  | DiagnoseApisMessage
+  | EnsureOffscreenMessage
+  | ClassifierRequestRuntimeMessage
+  | ClassifierProgressRuntimeMessage;

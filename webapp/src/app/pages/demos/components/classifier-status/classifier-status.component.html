@@ -40,12 +40,18 @@
     }
   </div>
 
+  @if (isPolyfilled && classifierStatus !== 'unavailable') {
+    <div class="text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+      <i class="bi bi-puzzle-fill"></i> Provided by the WebAI Studio extension polyfill (local Laya model on LiteRT.js).
+    </div>
+  }
+
   @if (classifierStatus === 'unavailable') {
     <div class="bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30 rounded-2xl p-4 text-sm text-amber-900 dark:text-amber-100/90 flex items-start gap-3">
       <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg"></i>
       <div>
         <span class="font-semibold">window.Classifier is not exposed in this browser.</span>
-        Enable <code class="font-mono text-xs bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded">chrome://flags/#classifier-api</code> to use this API.
+        Enable <code class="font-mono text-xs bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded">chrome://flags/#classifier-api</code>, or install the WebAI Studio extension, which polyfills this API with a local model.
       </div>
     </div>
   }

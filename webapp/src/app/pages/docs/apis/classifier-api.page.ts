@@ -50,6 +50,14 @@ import { Component } from '@angular/core';
               Enable <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">#classifier-api</code> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
             </div>
           </div>
+
+          <!-- Polyfill Notice -->
+          <div class="mt-3 p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl text-emerald-800 dark:text-emerald-300 text-sm leading-relaxed max-w-4xl flex gap-3">
+            <i class="bi bi-puzzle-fill text-lg mt-0.5"></i>
+            <div>
+              No flag? The <a href="https://chromewebstore.google.com/search/WebAI%20Extension" target="_blank" rel="noopener noreferrer" class="underline font-semibold">WebAI Studio extension</a> polyfills <code class="bg-emerald-100 dark:bg-emerald-900/30 px-1 py-0.5 rounded text-xs font-mono">window.Classifier</code> on every page with a local <a href="https://huggingface.co/litert-community/laya-LiteRT" target="_blank" rel="noopener noreferrer" class="underline">Laya decision encoder</a> running on LiteRT.js. The model is downloaded once from Hugging Face; inputs never leave the device. Pick the model in the extension settings and inspect calls in the DevTools panel.
+            </div>
+          </div>
         </div>
 
         <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 mb-10 max-w-4xl"></div>
@@ -121,7 +129,7 @@ import { Component } from '@angular/core';
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">ordinal</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Yes (ordered levels, e.g., <code class="text-xs font-mono">"1"</code> through <code class="text-xs font-mono">"5"</code>)</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns <code class="text-xs font-mono">label</code>, <code class="text-xs font-mono">expectedScore</code> (weighted average across levels), <code class="text-xs font-mono">standardError</code>, <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code>.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns <code class="text-xs font-mono">label</code>, <code class="text-xs font-mono">expectedScore</code> (weighted average across levels), <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code>.</td>
                   </tr>
                 </tbody>
               </table>
@@ -169,7 +177,7 @@ import { Component } from '@angular/core';
           <section id="classify" class="scroll-mt-6">
             <app-docs-section-header anchorId="classify" title="classifier.classify()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">ClassifierResult</code>.
+              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">ClassifierResult</code>: a record keyed by question <code class="text-sm font-mono">id</code>, so you can read <code class="text-sm font-mono">result.category.label</code> or destructure <code class="text-sm font-mono">const &#123; command &#125; = await classifier.classify(input)</code>.
             </p>
             <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
               <code class="text-sm text-slate-300 font-mono">
@@ -214,11 +222,6 @@ import { Component } from '@angular/core';
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">expectedScore</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double?</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Present for <code class="text-xs font-mono">ordinal</code> questions: weighted average across the ordered option levels.</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">standardError</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double?</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Optional standard error around <code class="text-xs font-mono">expectedScore</code>.</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">probabilities</td>
@@ -399,7 +402,6 @@ dictionary ClassifierOption {
 
 dictionary ClassifierClassifyOptions {
   DOMString context;
-  unsigned long samples = 1;
   AbortSignal signal;
 };
 
@@ -409,7 +411,9 @@ dictionary ClassifierDecision {
   double confidence;
   double? probability;
   double? expectedScore;
-  double? standardError;
   sequence<ClassifierOptionProbability> probabilities;
-};`;
+};
+
+// classify() resolves to a record keyed by question id
+typedef record<DOMString, ClassifierDecision> ClassifierResult;`;
 }
