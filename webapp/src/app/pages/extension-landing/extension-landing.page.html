@@ -55,13 +55,9 @@
               <i class="bi bi-puzzle-fill text-emerald-600 dark:text-emerald-400 text-lg"></i>
               <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">The WebAI extension is installed. <code>window.Classifier</code> is live on this page, served by the local Laya model.</span>
             }
-            @case ('native') {
-              <i class="bi bi-browser-chrome text-emerald-600 dark:text-emerald-400 text-lg"></i>
-              <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Chrome provides <code>window.Classifier</code> natively on this page. The demo below runs on it.</span>
-            }
             @case ('none') {
               <i class="bi bi-exclamation-triangle-fill text-amber-600 dark:text-amber-400 text-lg"></i>
-              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">This page has no <code>window.Classifier</code>. Install the extension, reload, and the demo below runs on your device.</span>
+              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">This page has no <code>window.Classifier</code>. Chrome does not ship it yet; install the extension, reload, and the demo below runs on your device.</span>
               <a [href]="webStoreUrl" target="_blank" rel="noopener noreferrer" class="ml-auto inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors">
                 <i class="bi bi-chrome"></i> Install and reload
               </a>

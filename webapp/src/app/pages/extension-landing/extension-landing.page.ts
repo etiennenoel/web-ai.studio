@@ -8,8 +8,8 @@ import {
   NormalizedClassifierResult,
 } from '../../core/services/classifier.service';
 
-/** How `window.Classifier` is provided on this page, if at all. */
-export type ClassifierProvider = 'checking' | 'extension' | 'native' | 'none';
+/** Whether the extension provides `window.Classifier` on this page. Chrome has no native implementation yet. */
+export type ClassifierProvider = 'checking' | 'extension' | 'none';
 
 @Component({
   selector: 'app-extension-landing',
@@ -102,18 +102,14 @@ classifier.destroy();`;
   }
 
   detectClassifierProvider(): void {
-    if (this.classifierService.isPolyfilled()) {
-      this.classifierProvider = 'extension';
-    } else if (this.classifierService.isSupported()) {
-      this.classifierProvider = 'native';
-    } else {
-      this.classifierProvider = 'none';
-    }
+    // Only the extension provides window.Classifier today; a bare `Classifier`
+    // global without the polyfill marker comes from an older extension build.
+    this.classifierProvider = this.classifierService.isSupported() ? 'extension' : 'none';
     this.cdr.detectChanges();
   }
 
   get demoAvailable(): boolean {
-    return this.classifierProvider === 'extension' || this.classifierProvider === 'native';
+    return this.classifierProvider === 'extension';
   }
 
   async runDemo(): Promise<void> {

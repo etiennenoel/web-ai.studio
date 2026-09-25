@@ -1,5 +1,7 @@
 import {ChatPage} from './pages/chat/chat.page';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { TitleStrategy } from '@angular/router';
+import { WebAiTitleStrategy } from './core/strategies/web-ai-title.strategy';
 import {DialogModule} from '@angular/cdk/dialog';
 import { LayoutComponent } from './components/layout/layout.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -369,6 +371,7 @@ import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant
     }),
   ],
   providers: [
+    { provide: TitleStrategy, useClass: WebAiTitleStrategy },
     provideBrowserGlobalErrorListeners(),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch()),

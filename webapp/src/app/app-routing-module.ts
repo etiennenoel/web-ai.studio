@@ -116,6 +116,8 @@ import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant
 const routes: Routes = [
   {
     path: "cortex",
+
+    title: "Cortex",
     component: CortexPage,
     data: {
       route: RouteEnum.Cortex
@@ -123,6 +125,8 @@ const routes: Routes = [
   },
   {
     path: "cortex-insights",
+
+    title: "Cortex Insights",
     component: CortexInsightsPage,
     data: {
       route: RouteEnum.CortexInsights
@@ -130,6 +134,8 @@ const routes: Routes = [
   },
   {
     path: "bugs",
+
+    title: "Bugs",
     component: BugsPage,
     data: {
       route: RouteEnum.Bugs
@@ -137,6 +143,8 @@ const routes: Routes = [
   },
   {
     path: "bugs/first-create-should-fully-load-the-model",
+
+    title: "Bug: First Create Should Fully Load The Model",
     component: FirstCreateShouldFullyLoadTheModelPage,
     data: {
       route: RouteEnum.Bugs
@@ -148,6 +156,8 @@ const routes: Routes = [
     children: [
       {
         path: "best-practices",
+
+        title: "Best Practices",
         component: BestPracticesPage,
         data: {
           route: RouteEnum.BestPractices
@@ -155,6 +165,8 @@ const routes: Routes = [
       },
       {
         path: "best-practices/session-management",
+
+        title: "Session Management Best Practices",
         component: SessionManagementPage,
         data: {
           route: RouteEnum.BestPracticesSessionManagement
@@ -162,6 +174,8 @@ const routes: Routes = [
       },
       {
         path: "best-practices/performance",
+
+        title: "Performance Best Practices",
         component: PerformancePage,
         data: {
           route: RouteEnum.BestPracticesPerformance
@@ -169,6 +183,8 @@ const routes: Routes = [
       },
       {
         path: "best-practices/streaming",
+
+        title: "Streaming Best Practices",
         component: StreamingPage,
         data: {
           route: RouteEnum.BestPracticesStreaming
@@ -176,6 +192,8 @@ const routes: Routes = [
       },
       {
         path: "best-practices/structured-output",
+
+        title: "Structured Output Best Practices",
         component: StructuredOutputPage,
         data: {
           route: RouteEnum.BestPracticesStructuredOutput
@@ -183,6 +201,8 @@ const routes: Routes = [
       },
       {
         path: "best-practices/user-experience",
+
+        title: "User Experience Best Practices",
         component: UserExperiencePage,
         data: {
           route: RouteEnum.BestPracticesUserExperience
@@ -190,6 +210,8 @@ const routes: Routes = [
       },
       {
         path: "docs",
+
+        title: "Docs",
         component: DocsHomePage,
         data: {
           route: RouteEnum.Docs
@@ -197,6 +219,8 @@ const routes: Routes = [
       },
       {
         path: "docs/get-started",
+
+        title: "Get Started Docs",
         component: GetStartedPage,
         data: {
           route: RouteEnum.GetStarted
@@ -204,6 +228,8 @@ const routes: Routes = [
       },
       {
         path: "docs/check-availability",
+
+        title: "Check Availability Docs",
         component: CheckAvailabilityPage,
         data: {
           route: RouteEnum.CheckAvailability
@@ -211,6 +237,8 @@ const routes: Routes = [
       },
       {
         path: "docs/tracking-download",
+
+        title: "Tracking Download Docs",
         component: TrackingDownloadPage,
         data: {
           route: RouteEnum.TrackingDownload
@@ -218,6 +246,8 @@ const routes: Routes = [
       },
       {
         path: "docs/aborting-operations",
+
+        title: "Aborting Operations Docs",
         component: AbortingOperationsPage,
         data: {
           route: RouteEnum.AbortingOperations
@@ -225,6 +255,8 @@ const routes: Routes = [
       },
       {
         path: "docs/errors",
+
+        title: "Errors Docs",
         component: DocsErrorsPage,
         data: {
           route: RouteEnum.Errors
@@ -232,6 +264,8 @@ const routes: Routes = [
       },
       {
         path: "docs/prompt-api",
+
+        title: "Prompt API Docs",
         component: PromptApiPage,
         data: {
           route: RouteEnum.PromptApi
@@ -239,6 +273,8 @@ const routes: Routes = [
       },
       {
         path: "docs/summarizer",
+
+        title: "Summarizer Docs",
         component: SummarizerApiPage,
         data: {
           route: RouteEnum.SummarizerApi
@@ -246,6 +282,8 @@ const routes: Routes = [
       },
       {
         path: "docs/writer",
+
+        title: "Writer Docs",
         component: WriterApiPage,
         data: {
           route: RouteEnum.WriterApi
@@ -253,6 +291,8 @@ const routes: Routes = [
       },
       {
         path: "docs/rewriter",
+
+        title: "Rewriter Docs",
         component: RewriterApiPage,
         data: {
           route: RouteEnum.RewriterApi
@@ -260,6 +300,8 @@ const routes: Routes = [
       },
       {
         path: "docs/translator",
+
+        title: "Translator Docs",
         component: TranslatorApiPage,
         data: {
           route: RouteEnum.TranslatorApi
@@ -267,6 +309,8 @@ const routes: Routes = [
       },
       {
         path: "docs/language-detector",
+
+        title: "Language Detector Docs",
         component: LanguageDetectorApiPage,
         data: {
           route: RouteEnum.LanguageDetectorApi
@@ -274,6 +318,8 @@ const routes: Routes = [
       },
       {
         path: "docs/proofreader",
+
+        title: "Proofreader Docs",
         component: ProofreaderApiPage,
         data: {
           route: RouteEnum.ProofreaderApi
@@ -281,6 +327,8 @@ const routes: Routes = [
       },
       {
         path: "docs/semantic-embedder",
+
+        title: "Semantic Embedder Docs",
         component: SemanticEmbedderApiPage,
         data: {
           route: RouteEnum.SemanticEmbedderApi
@@ -288,6 +336,8 @@ const routes: Routes = [
       },
       {
         path: "docs/classifier",
+
+        title: "Classifier Docs",
         component: ClassifierApiPage,
         data: {
           route: RouteEnum.ClassifierApi
@@ -295,6 +345,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/prompt",
+
+        title: "Prompt Playground",
         component: PromptPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsPrompt
@@ -302,6 +354,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/summarizer",
+
+        title: "Summarizer Playground",
         component: SummarizerPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsSummarizer
@@ -309,6 +363,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/writer",
+
+        title: "Writer Playground",
         component: WriterPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsWriter
@@ -316,6 +372,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/rewriter",
+
+        title: "Rewriter Playground",
         component: RewriterPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsRewriter
@@ -323,6 +381,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/translator",
+
+        title: "Translator Playground",
         component: TranslatorPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsTranslator
@@ -330,6 +390,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/language-detector",
+
+        title: "Language Detector Playground",
         component: LanguageDetectorPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsLanguageDetector
@@ -337,6 +399,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/proofreader",
+
+        title: "Proofreader Playground",
         component: ProofreaderPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsProofreader
@@ -344,6 +408,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/semantic-embedder",
+
+        title: "Semantic Embedder Playground",
         component: SemanticEmbedderPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsSemanticEmbedder
@@ -351,6 +417,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/classifier",
+
+        title: "Classifier Playground",
         component: ClassifierPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsClassifier
@@ -358,6 +426,8 @@ const routes: Routes = [
       },
       {
         path: "playgrounds/web-speech",
+
+        title: "Web Speech Playground",
         component: WebSpeechPlaygroundPage,
         data: {
           route: RouteEnum.PlaygroundsWebSpeech
@@ -365,6 +435,8 @@ const routes: Routes = [
       },
       {
         path: "labs/note-editor",
+
+        title: "Note Editor Lab",
         component: NoteEditorPage,
         data: {
           route: RouteEnum.LabsNoteEditor
@@ -372,6 +444,8 @@ const routes: Routes = [
       },
       {
         path: "dashboards/consumer-hardware-analysis",
+
+        title: "Consumer Hardware Analysis",
         component: ConsumerHardwareAnalysisPage,
         data: {
           route: RouteEnum.DashboardsConsumerHardware
@@ -379,6 +453,8 @@ const routes: Routes = [
       },
       {
         path: "extension",
+
+        title: "Extension",
         component: ExtensionLandingPage,
         data: {
           route: RouteEnum.Extension
@@ -386,6 +462,8 @@ const routes: Routes = [
       },
       {
         path: "",
+
+        title: "Chat",
         component: ChatPage,
         pathMatch: "full",
         data: {
@@ -394,6 +472,8 @@ const routes: Routes = [
       },
       {
         path: "evals",
+
+        title: "Evals",
         component: EvalsPage,
         data: {
           route: RouteEnum.Evals
@@ -401,6 +481,8 @@ const routes: Routes = [
       },
       {
         path: "translation",
+
+        title: "Translation",
         component: TranslationPage,
         data: {
           route: RouteEnum.Translation
@@ -408,6 +490,8 @@ const routes: Routes = [
       },
       {
         path: "writing-assistance",
+
+        title: "Writing Assistance",
         component: WritingAssistancePage,
         data: {
           route: RouteEnum.Translation
@@ -415,6 +499,8 @@ const routes: Routes = [
       },
       {
         path: "demos",
+
+        title: "Demos",
         component: DemosPage,
         data: {
           route: RouteEnum.Demos
@@ -422,6 +508,8 @@ const routes: Routes = [
       },
             {
         path: "demos/translation",
+
+        title: "Demo: Translation",
         component: TranslationDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -429,6 +517,8 @@ const routes: Routes = [
       },
       {
         path: "demos/summarization",
+
+        title: "Demo: Summarization",
         component: SummarizationDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -436,6 +526,8 @@ const routes: Routes = [
       },
       {
         path: "demos/proofreading",
+
+        title: "Demo: Proofreading",
         component: ProofreadingDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -443,6 +535,8 @@ const routes: Routes = [
       },
       {
         path: "demos/tone-changer",
+
+        title: "Demo: Tone Changer",
         component: ToneChangerDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -450,6 +544,8 @@ const routes: Routes = [
       },
       {
         path: "demos/brainstorming",
+
+        title: "Demo: Brainstorming",
         component: BrainstormingDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -457,6 +553,8 @@ const routes: Routes = [
       },
       {
         path: "demos/write-javascript",
+
+        title: "Demo: Write Javascript",
         component: WriteJavascriptDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -464,6 +562,8 @@ const routes: Routes = [
       },
       {
         path: "demos/write-html-css",
+
+        title: "Demo: Write HTML CSS",
         component: WriteHtmlCssDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -471,6 +571,8 @@ const routes: Routes = [
       },
       {
         path: "demos/eli5",
+
+        title: "Demo: ELI5",
         component: Eli5DemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -478,6 +580,8 @@ const routes: Routes = [
       },
       {
         path: "demos/sql-generator",
+
+        title: "Demo: SQL Generator",
         component: SqlGeneratorDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -485,6 +589,8 @@ const routes: Routes = [
       },
       {
         path: "demos/write-email",
+
+        title: "Demo: Write Email",
         component: WriteEmailDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -492,6 +598,8 @@ const routes: Routes = [
       },
       {
         path: "demos/ocr",
+
+        title: "Demo: OCR",
         component: OcrDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -499,6 +607,8 @@ const routes: Routes = [
       },
       {
         path: "demos/image-description",
+
+        title: "Demo: Image Description",
         component: ImageDescriptionDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -506,6 +616,8 @@ const routes: Routes = [
       },
       {
         path: "demos/explain-meme",
+
+        title: "Demo: Explain Meme",
         component: ExplainMemeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -513,6 +625,8 @@ const routes: Routes = [
       },
       {
         path: "demos/fridge-recipe",
+
+        title: "Demo: Fridge Recipe",
         component: FridgeRecipeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -520,6 +634,8 @@ const routes: Routes = [
       },
       {
         path: "demos/image-categorization",
+
+        title: "Demo: Image Categorization",
         component: ImageCategorizationDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -527,6 +643,8 @@ const routes: Routes = [
       },
       {
         path: "demos/audio-transcription",
+
+        title: "Demo: Audio Transcription",
         component: AudioTranscriptionDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -534,6 +652,8 @@ const routes: Routes = [
       },
       {
         path: "demos/meeting-notes",
+
+        title: "Demo: Meeting Notes",
         component: MeetingNotesDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -541,6 +661,8 @@ const routes: Routes = [
       },
       {
         path: "demos/audio-summarization",
+
+        title: "Demo: Audio Summarization",
         component: AudioSummarizationDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -548,6 +670,8 @@ const routes: Routes = [
       },
       {
         path: "demos/structured-json",
+
+        title: "Demo: Structured JSON",
         component: StructuredJsonDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -555,6 +679,8 @@ const routes: Routes = [
       },
       {
         path: "demos/extract-entities",
+
+        title: "Demo: Extract Entities",
         component: ExtractEntitiesDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -562,6 +688,8 @@ const routes: Routes = [
       },
       {
         path: "demos/image-audio-query",
+
+        title: "Demo: Image Audio Query",
         component: ImageAudioQueryDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -569,6 +697,8 @@ const routes: Routes = [
       },
       {
         path: "demos/receipt-to-json",
+
+        title: "Demo: Receipt To JSON",
         component: ReceiptToJsonDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -576,6 +706,8 @@ const routes: Routes = [
       },
       {
         path: "demos/document-chat",
+
+        title: "Demo: Document Chat",
         component: DocumentChatDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -583,6 +715,8 @@ const routes: Routes = [
       },
       {
         path: "demos/semantic-search",
+
+        title: "Demo: Semantic Search",
         component: SemanticSearchDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -590,6 +724,8 @@ const routes: Routes = [
       },
       {
         path: "demos/smart-triage",
+
+        title: "Demo: Smart Triage",
         component: SmartTriageDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -597,6 +733,8 @@ const routes: Routes = [
       },
       {
         path: "demos/duplicate-detector",
+
+        title: "Demo: Duplicate Detector",
         component: DuplicateDetectorDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -604,6 +742,8 @@ const routes: Routes = [
       },
       {
         path: "demos/cluster-and-label",
+
+        title: "Demo: Cluster And Label",
         component: ClusterLabelDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -611,6 +751,8 @@ const routes: Routes = [
       },
       {
         path: "demos/semantic-cache",
+
+        title: "Demo: Semantic Cache",
         component: SemanticCacheDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -618,6 +760,8 @@ const routes: Routes = [
       },
       {
         path: "demos/command-palette",
+
+        title: "Demo: Command Palette",
         component: CommandPaletteDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -625,6 +769,8 @@ const routes: Routes = [
       },
       {
         path: "demos/semantic-word-game",
+
+        title: "Demo: Semantic Word Game",
         component: SemanticWordGameDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -632,6 +778,8 @@ const routes: Routes = [
       },
       {
         path: "demos/live-translated-captions",
+
+        title: "Demo: Live Translated Captions",
         component: LiveTranslatedCaptionsDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -639,6 +787,8 @@ const routes: Routes = [
       },
       {
         path: "demos/speak-to-fill",
+
+        title: "Demo: Speak To Fill",
         component: SpeakToFillDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -646,6 +796,8 @@ const routes: Routes = [
       },
       {
         path: "demos/asr-quality-tiers",
+
+        title: "Demo: ASR Quality Tiers",
         component: AsrQualityTiersDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -653,6 +805,8 @@ const routes: Routes = [
       },
       {
         path: "demos/contextual-biasing",
+
+        title: "Demo: Contextual Biasing",
         component: ContextualBiasingDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -660,6 +814,8 @@ const routes: Routes = [
       },
       {
         path: "demos/polyglot-chat",
+
+        title: "Demo: Polyglot Chat",
         component: PolyglotChatDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -667,6 +823,8 @@ const routes: Routes = [
       },
       {
         path: "demos/proofreader-inline",
+
+        title: "Demo: Proofreader Inline",
         component: ProofreaderInlineDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -674,6 +832,8 @@ const routes: Routes = [
       },
       {
         path: "demos/universal-inbox",
+
+        title: "Demo: Universal Inbox",
         component: UniversalInboxDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -681,6 +841,8 @@ const routes: Routes = [
       },
       {
         path: "demos/tone-pad",
+
+        title: "Demo: Tone Pad",
         component: TonePadDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -688,6 +850,8 @@ const routes: Routes = [
       },
       {
         path: "demos/summarizer-matrix",
+
+        title: "Demo: Summarizer Matrix",
         component: SummarizerMatrixDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -695,6 +859,8 @@ const routes: Routes = [
       },
       {
         path: "demos/reply-composer",
+
+        title: "Demo: Reply Composer",
         component: ReplyComposerDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -702,6 +868,8 @@ const routes: Routes = [
       },
       {
         path: "demos/dictate-and-polish",
+
+        title: "Demo: Dictate And Polish",
         component: DictateAndPolishDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -709,6 +877,8 @@ const routes: Routes = [
       },
       {
         path: "demos/camera-qa",
+
+        title: "Demo: Camera Qa",
         component: CameraQaDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -716,6 +886,8 @@ const routes: Routes = [
       },
       {
         path: "demos/draw-and-guess",
+
+        title: "Demo: Draw And Guess",
         component: DrawAndGuessDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -723,6 +895,8 @@ const routes: Routes = [
       },
       {
         path: "demos/story-time",
+
+        title: "Demo: Story Time",
         component: StoryTimeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -730,6 +904,8 @@ const routes: Routes = [
       },
       {
         path: "demos/tool-calling",
+
+        title: "Demo: Tool Calling",
         component: ToolCallingDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -737,6 +913,8 @@ const routes: Routes = [
       },
       {
         path: "demos/screenshot-to-code",
+
+        title: "Demo: Screenshot To Code",
         component: ScreenshotToCodeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -744,6 +922,8 @@ const routes: Routes = [
       },
       {
         path: "demos/regex-lab",
+
+        title: "Demo: Regex Lab",
         component: RegexLabDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -751,6 +931,8 @@ const routes: Routes = [
       },
       {
         path: "demos/csv-qa",
+
+        title: "Demo: CSV Qa",
         component: CsvQaDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -758,6 +940,8 @@ const routes: Routes = [
       },
       {
         path: "demos/session-branching",
+
+        title: "Demo: Session Branching",
         component: SessionBranchingDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -765,6 +949,8 @@ const routes: Routes = [
       },
       {
         path: "demos/localization-qa",
+
+        title: "Demo: Localization Qa",
         component: LocalizationQaDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -772,6 +958,8 @@ const routes: Routes = [
       },
       {
         path: "demos/omnibox",
+
+        title: "Demo: Omnibox",
         component: OmniboxDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -779,6 +967,8 @@ const routes: Routes = [
       },
       {
         path: "demos/moderation-cascade",
+
+        title: "Demo: Moderation Cascade",
         component: ModerationCascadeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -786,6 +976,8 @@ const routes: Routes = [
       },
       {
         path: "demos/study-kit",
+
+        title: "Demo: Study Kit",
         component: StudyKitDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -793,6 +985,8 @@ const routes: Routes = [
       },
       {
         path: "demos/photo-search",
+
+        title: "Demo: Photo Search",
         component: PhotoSearchDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -800,6 +994,8 @@ const routes: Routes = [
       },
       {
         path: "demos/tongue-twister",
+
+        title: "Demo: Tongue Twister",
         component: TongueTwisterDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -807,6 +1003,8 @@ const routes: Routes = [
       },
       {
         path: "demos/mystery-language",
+
+        title: "Demo: Mystery Language",
         component: MysteryLanguageDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -814,6 +1012,8 @@ const routes: Routes = [
       },
       {
         path: "demos/system1-ticket-router",
+
+        title: "Demo: System1 Ticket Router",
         component: System1TicketRouterDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -821,6 +1021,8 @@ const routes: Routes = [
       },
       {
         path: "demos/live-draft-guardrails",
+
+        title: "Demo: Live Draft Guardrails",
         component: LiveDraftGuardrailsDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -828,6 +1030,8 @@ const routes: Routes = [
       },
       {
         path: "demos/chameleon-adaptive-ui",
+
+        title: "Demo: Chameleon Adaptive UI",
         component: ChameleonAdaptiveUiDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -835,6 +1039,8 @@ const routes: Routes = [
       },
       {
         path: "demos/nl-catalog-matcher",
+
+        title: "Demo: NL Catalog Matcher",
         component: NlCatalogMatcherDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -842,6 +1048,8 @@ const routes: Routes = [
       },
       {
         path: "demos/system1-system2-cascade",
+
+        title: "Demo: System1 System2 Cascade",
         component: System1System2CascadeDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -849,6 +1057,8 @@ const routes: Routes = [
       },
       {
         path: "demos/smart-clipboard-paste",
+
+        title: "Demo: Smart Clipboard Paste",
         component: SmartClipboardPasteDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -856,6 +1066,8 @@ const routes: Routes = [
       },
       {
         path: "demos/focus-notification-shield",
+
+        title: "Demo: Focus Notification Shield",
         component: FocusNotificationShieldDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -863,6 +1075,8 @@ const routes: Routes = [
       },
       {
         path: "demos/instant-form-autofill",
+
+        title: "Demo: Instant Form Autofill",
         component: InstantFormAutofillDemoComponent,
         data: {
           route: RouteEnum.Demos
@@ -870,6 +1084,8 @@ const routes: Routes = [
       },
       {
         path: "privacy-policy",
+
+        title: "Privacy Policy",
         component: PrivacyPolicyPage,
         data: {
           route: RouteEnum.PrivacyPolicy
@@ -877,6 +1093,8 @@ const routes: Routes = [
       },
       {
         path: "terms-of-service",
+
+        title: "Terms Of Service",
         component: TermsOfServicePage,
         data: {
           route: RouteEnum.TermsOfService
