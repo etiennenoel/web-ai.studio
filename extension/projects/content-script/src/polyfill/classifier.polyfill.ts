@@ -39,7 +39,17 @@ export class Classifier {
 
   static async availability(options: unknown = {}): Promise<ClassifierAvailability> {
     const schema = Classifier.toSchema(options);
-    return ClassifierPageBridge.request<ClassifierAvailability>(ClassifierRuntimeOp.AVAILABILITY, { schema });
+    try {
+      return await ClassifierPageBridge.request<ClassifierAvailability>(ClassifierRuntimeOp.AVAILABILITY, { schema });
+    } catch (e) {
+      // Schema problems are the caller's; runtime problems mean the API cannot serve right now.
+      if (e instanceof TypeError) throw e;
+      console.warn(
+        '[WebAI] Classifier polyfill: availability() could not reach the extension runtime, reporting "unavailable".',
+        e,
+      );
+      return 'unavailable';
+    }
   }
 
   static async create(options: unknown): Promise<Classifier> {
@@ -79,6 +89,12 @@ export class Classifier {
         Classifier.rejectOnAbort(signal),
       ]);
       return new Classifier(CONSTRUCTOR_TOKEN, info);
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'InvalidStateError') {
+        console.warn('[WebAI] Classifier polyfill: create() failed in the extension runtime.', e);
+        throw new DOMException(`Classifier polyfill: ${e.message}`, 'InvalidStateError');
+      }
+      throw e;
     } finally {
       signal?.removeEventListener('abort', onAbort);
     }

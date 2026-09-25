@@ -31,3 +31,4 @@ export * from './components/classifier-decisions.component';
 export * from './components/classifier-demo-preset.interface';
 export * from './components/classifier-demo-presets.const';
 export * from './components/classifier-demo.component';
+export * from './components/classifier-model-card.component';

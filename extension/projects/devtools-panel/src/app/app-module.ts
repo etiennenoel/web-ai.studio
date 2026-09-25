@@ -23,7 +23,7 @@ import { PerformanceComponent } from './panels/performance/performance.component
 import { ModelDownloadCard } from './components/model-download-card/model-download-card';
 import { ApiStatusComponent } from './components/api-status/api-status.component';
 import { InlineCodeEditorComponent } from './components/inline-code-editor/inline-code-editor.component';
-import {BaseModule, DiagnosisComponent, ClassifierDecisionsComponent} from "base";
+import {BaseModule, DiagnosisComponent, ClassifierDecisionsComponent, ClassifierModelCardComponent} from "base";
 
 @NgModule({
   declarations: [
@@ -55,6 +55,7 @@ import {BaseModule, DiagnosisComponent, ClassifierDecisionsComponent} from "base
     BaseModule,
     DiagnosisComponent,
     ClassifierDecisionsComponent,
+    ClassifierModelCardComponent,
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

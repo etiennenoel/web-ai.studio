@@ -11,7 +11,8 @@ import {
     ProofreaderManager,
     SummarizerManager,
     TranslatorManager,
-    LanguageDetectorManager
+    LanguageDetectorManager,
+    ClassifierManager
 } from 'base';
 import {Subscription} from 'rxjs';
 
@@ -58,7 +59,8 @@ export class OverviewComponent implements OnInit {
     private proofreaderManager: ProofreaderManager,
     private summarizerManager: SummarizerManager,
     private translatorManager: TranslatorManager,
-    private detectorManager: LanguageDetectorManager
+    private detectorManager: LanguageDetectorManager,
+    private classifierManager: ClassifierManager
   ) {}
 
   ngOnInit() {
@@ -251,6 +253,18 @@ export class OverviewComponent implements OnInit {
               case 'detector':
                  result = await this.detectorManager.create(options);
                  break;
+             case 'classifier': {
+                 // The polyfill model lives in the extension; download it through the runtime.
+                 const variantId = await this.classifierManager.getActiveVariantId();
+                 await this.classifierManager.downloadModel(variantId, (loaded) => {
+                     const download = this.activeDownloads.get(apiId);
+                     if (download) {
+                         download.progress = Math.round(loaded * 100);
+                         this.cdr.detectChanges();
+                     }
+                 });
+                 break;
+             }
              default:
                  console.warn(`Unknown API ID: ${apiId}`);
                  throw new Error('Unknown API');

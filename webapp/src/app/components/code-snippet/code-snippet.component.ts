@@ -8,7 +8,7 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
         <div class="flex justify-between items-center w-full px-4 py-2">
           <div class="flex items-center gap-2.5 h-full">
             <i class="bi bi-chevron-right text-[10px] text-slate-400 dark:text-zinc-500 transition-transform duration-200 group-open:rotate-90 flex-shrink-0"></i>
-            <span class="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider translate-y-[0.5px] whitespace-nowrap flex-shrink-0">{{ runnable ? 'Interactive Playground' : 'Example Output' }}</span>
+            <span class="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider translate-y-[0.5px] whitespace-nowrap flex-shrink-0">{{ label || (runnable ? 'Interactive Playground' : 'Example Output') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <button *ngIf="isOpen && runnable" (click)="runCode($event)"
@@ -46,6 +46,8 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
       @Input() code: string = '';
       @Input() expanded: boolean = true;
       @Input() runnable: boolean = true;
+      /** Optional header label; defaults to 'Interactive Playground' or 'Example Output'. */
+      @Input() label: string = '';
       copied = false;
       isOpen = false;
       executionOutput = '';

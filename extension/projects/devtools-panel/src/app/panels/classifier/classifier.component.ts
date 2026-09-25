@@ -10,9 +10,7 @@ import {
   ClassifierModelVariant,
   ClassifierModelState,
   CLASSIFIER_DEMO_PRESETS,
-  CLASSIFIER_MODEL_REGISTRY,
   findClassifierModelVariant,
-  classifierModelTotalBytes,
   ToastService,
 } from 'base';
 
@@ -54,7 +52,6 @@ export class ClassifierComponent implements OnInit, OnDestroy {
 
   activeVariant: ClassifierModelVariant | undefined;
   activeModelStatus: ClassifierModelStatus | undefined;
-  readonly variants = CLASSIFIER_MODEL_REGISTRY;
 
   private sessionId: string | null = null;
   private sessionSchemaJson = '';
@@ -99,10 +96,6 @@ export class ClassifierComponent implements OnInit, OnDestroy {
     return this.classifierManager.getCodeSnippet(schema, this.inputText);
   }
 
-  get modelSize(): string {
-    return this.activeVariant ? `${Math.round(classifierModelTotalBytes(this.activeVariant) / 1_000_000)} MB` : '';
-  }
-
   loadPreset(id: string): void {
     const preset = this.presets.find((p) => p.id === id);
     if (!preset) return;
@@ -143,45 +136,12 @@ export class ClassifierComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  async onVariantChange(variantId: string): Promise<void> {
-    await this.classifierManager.setActiveVariantId(variantId);
-  }
 
   get isModelCached(): boolean {
     return this.activeModelStatus?.state === ClassifierModelState.CACHED;
   }
 
-  async downloadModel(): Promise<void> {
-    if (!this.activeVariant || this.busy) return;
-    this.busy = true;
-    this.busyLabel = 'Downloading model...';
-    this.downloading = true;
-    this.downloadProgress = 0;
-    const requestId = crypto.randomUUID();
-    this.activeRequestId = requestId;
-    try {
-      await this.classifierManager.downloadModel(
-        this.activeVariant.id,
-        (loaded) => this.ngZone.run(() => this.onProgress(loaded)),
-        requestId,
-      );
-      this.toastService.show('Classifier model downloaded.', 'success');
-    } catch (e: any) {
-      this.toastService.show(`Download failed: ${e.message}`, 'error');
-    } finally {
-      this.busy = false;
-      this.downloading = false;
-      this.activeRequestId = null;
-      this.cdr.detectChanges();
-    }
-  }
 
-  async deleteModel(): Promise<void> {
-    if (!this.activeVariant) return;
-    if (!confirm(`Delete the cached files of "${this.activeVariant.name}"?`)) return;
-    await this.classifierManager.deleteModel(this.activeVariant.id);
-    this.toastService.show('Model deleted.', 'success');
-  }
 
   async classify(): Promise<void> {
     const schema = this.parsedSchema;

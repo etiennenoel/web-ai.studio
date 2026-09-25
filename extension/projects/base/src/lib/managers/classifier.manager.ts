@@ -29,7 +29,7 @@ export class ClassifierManager {
   readonly modelsChangedEvent = new Subject<void>();
 
   get isRuntimeAvailable(): boolean {
-    return typeof chrome !== 'undefined' && !!chrome.runtime?.sendMessage;
+    return ClassifierRuntimeClient.isExtensionContext;
   }
 
   availability(schema: ClassifierSchema = {}): Promise<ClassifierAvailability> {
