@@ -6,6 +6,7 @@ import { RoutingHandler } from './handlers/routing.handler';
 import { ProviderRequestHandler } from './handlers/provider-request.handler';
 import { ApiCallForwardHandler } from './handlers/api-call-forward.handler';
 import { HistoryForwardHandler } from './handlers/history-forward.handler';
+import { ClassifierRequestHandler } from './handlers/classifier-request.handler';
 
 /**
  * Routes incoming window messages to the appropriate handler.
@@ -30,6 +31,7 @@ export class WindowMessageDispatcher {
       new ProviderRequestHandler(),
       new ApiCallForwardHandler(),
       new HistoryForwardHandler(),
+      new ClassifierRequestHandler(),
     ];
 
     for (const handler of allHandlers) {
@@ -54,6 +56,7 @@ export class WindowMessageDispatcher {
       case WindowMessageType.PROVIDER_REQUEST:
       case WindowMessageType.API_CALL:
       case WindowMessageType.GET_HISTORY_REQUEST:
+      case WindowMessageType.CLASSIFIER_REQUEST:
         this.handlers.get(message.type)?.handle(message);
         break;
 
@@ -64,6 +67,9 @@ export class WindowMessageDispatcher {
       case WindowMessageType.GET_HISTORY_RESPONSE:
       case WindowMessageType.ROUTING_RESPONSE:
       case WindowMessageType.PROVIDER_RESPONSE:
+      case WindowMessageType.CLASSIFIER_RESPONSE:
+      case WindowMessageType.CLASSIFIER_PROGRESS:
+      case WindowMessageType.SETTINGS_PUSH:
         break;
 
       default: {

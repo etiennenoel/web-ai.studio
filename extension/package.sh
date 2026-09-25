@@ -40,6 +40,11 @@ cp -r dist/side-panel/browser/* ./release/side-panel
 cp dist/content-script/main.js ./release/content-script.js
 cp dist/content-script/injected.js ./release/injected.js
 cp dist/service-worker/main.js ./release/service-worker.js
+cp dist/offscreen/main.js ./release/offscreen.js
+
+# LiteRT.js Wasm runtime used by the classifier offscreen document
+mkdir -p ./release/wasm
+cp node_modules/@litertjs/core/wasm/* ./release/wasm/
 
 # Copy Assets
 cp -r ./release/assets ./release/devtools-panel

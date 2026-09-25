@@ -17,8 +17,16 @@ const WRAPPED_INSTANCE_METHODS = [
   'detect', 'write', 'writeStreaming',
   'rewrite', 'rewriteStreaming',
   'proofread', 'proofreadStreaming',
+  'classify', 'measureContextUsage',
   'clone', 'destroy',
 ] as const;
+
+/**
+ * APIs that are never routed to an external provider. The Classifier API is
+ * served by the extension's own on-device polyfill, so the routing setting
+ * (Gemini/OpenAI) does not apply to it.
+ */
+const LOCAL_ONLY_APIS: readonly string[] = ['Classifier'];
 
 /**
  * Methods available on mock instances returned when routing to an external provider.
@@ -49,6 +57,7 @@ const MOCK_INSTANCE_METHODS = [
 export class ChromeAiApiWrapper {
   private readonly emitter: ApiStageEmitter;
   private readonly streamHandler: TrackedStreamHandler;
+  private originalCreate: Function | null = null;
 
   constructor(private readonly apiName: string) {
     this.emitter = new ApiStageEmitter(apiName);
@@ -69,6 +78,7 @@ export class ChromeAiApiWrapper {
 
     const originalCreate = apiObj.create;
     const wrapper = this;
+    this.originalCreate = originalCreate;
 
     apiObj.create = async function (options?: unknown) {
       const callId = crypto.randomUUID();
@@ -82,7 +92,7 @@ export class ChromeAiApiWrapper {
           WindowMessageType.ROUTING_RESPONSE,
         );
 
-        if (routingResponse.modelRouting !== 'chrome') {
+        if (routingResponse.modelRouting !== 'chrome' && !LOCAL_ONLY_APIS.includes(wrapper.apiName)) {
           wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.COMPLETED);
           return wrapper.createMockInstance(callId);
         }
@@ -97,6 +107,16 @@ export class ChromeAiApiWrapper {
         throw err;
       }
     };
+  }
+
+  /**
+   * Restores the original .create() (used when API wrapping is disabled in settings).
+   */
+  unwrap(): void {
+    if (!this.originalCreate || typeof window === 'undefined') return;
+    const apiObj = (window as any)[this.apiName];
+    if (apiObj) apiObj.create = this.originalCreate;
+    this.originalCreate = null;
   }
 
   /**
@@ -231,6 +251,7 @@ export class ChromeAiApiWrapper {
         const value = Reflect.get(target, prop, target);
 
         if (typeof value !== 'function') return value;
+        if (prop === 'constructor') return value;
 
         const methodName = prop.toString();
         const shouldWrap = (WRAPPED_INSTANCE_METHODS as readonly string[]).includes(methodName);

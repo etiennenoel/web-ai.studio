@@ -24,13 +24,22 @@
 
   <div class="max-w-4xl mx-auto p-8 space-y-8">
 
-    <!-- Flag notice -->
-    <div class="p-4 bg-violet-50 dark:bg-violet-900/10 border border-violet-200 dark:border-violet-900/30 rounded-xl text-violet-800 dark:text-violet-300 text-sm leading-relaxed flex gap-3">
-      <i class="bi bi-flag-fill text-lg mt-0.5"></i>
-      <div>
-        Enable <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">#classifier-api</code> in <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
+    <!-- Flag / polyfill notice -->
+    @if (isPolyfilled) {
+      <div class="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl text-emerald-800 dark:text-emerald-300 text-sm leading-relaxed flex gap-3">
+        <i class="bi bi-puzzle-fill text-lg mt-0.5"></i>
+        <div>
+          <code class="bg-emerald-100 dark:bg-emerald-900/30 px-1 py-0.5 rounded text-xs font-mono">window.Classifier</code> is provided by the WebAI Studio extension polyfill. Inference runs locally with a Laya decision model on LiteRT.js; the model is downloaded from Hugging Face on first <code class="text-xs font-mono">create()</code>.
+        </div>
       </div>
-    </div>
+    } @else {
+      <div class="p-4 bg-violet-50 dark:bg-violet-900/10 border border-violet-200 dark:border-violet-900/30 rounded-xl text-violet-800 dark:text-violet-300 text-sm leading-relaxed flex gap-3">
+        <i class="bi bi-flag-fill text-lg mt-0.5"></i>
+        <div>
+          Enable <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">#classifier-api</code> in <code class="bg-violet-100 dark:bg-violet-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code>, or install the <a href="https://chromewebstore.google.com/search/WebAI%20Extension" target="_blank" rel="noopener" class="underline font-semibold">WebAI Studio extension</a>, which polyfills this API with a local model.
+        </div>
+      </div>
+    }
 
     <!-- 1. Configuration -->
     <div class="bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden">
@@ -180,13 +189,6 @@
             </div>
           </summary>
           <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                Parallel Draws (<code class="font-mono">samples</code>)
-              </label>
-              <input type="number" min="1" max="8" [(ngModel)]="samples" (ngModelChange)="updateGeneratedCode()"
-                     class="w-32 text-sm bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg px-3.5 py-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" />
-            </div>
             <div class="flex items-center gap-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
               <input type="checkbox" [(ngModel)]="useAbortSignal" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
@@ -426,9 +428,6 @@
                           @if (d.expectedScore !== null && d.expectedScore !== undefined) {
                             <span class="text-slate-600 dark:text-slate-400">
                               E[S]: <strong class="text-slate-900 dark:text-white">{{ d.expectedScore.toFixed(2) }}</strong>
-                              @if (d.standardError !== null && d.standardError !== undefined) {
-                                <span>(&plusmn;{{ d.standardError.toFixed(2) }})</span>
-                              }
                             </span>
                           }
                           <span class="px-2.5 py-0.5 rounded-md bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 font-bold text-slate-700 dark:text-slate-300">

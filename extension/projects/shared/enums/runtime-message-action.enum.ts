@@ -41,4 +41,13 @@ export enum RuntimeMessageAction {
 
   /** Retrieve the list of API calls for the current page session (content script memory). */
   GET_PAGE_SESSIONS = 'get_page_sessions',
+
+  /** Create the offscreen document that hosts the Classifier polyfill runtime. */
+  ENSURE_OFFSCREEN = 'ensure_offscreen',
+
+  /** A request for the offscreen classifier runtime. The service worker ignores it. */
+  CLASSIFIER_REQUEST = 'classifier_request',
+
+  /** Download progress from the offscreen runtime; relayed to the originating tab. */
+  CLASSIFIER_PROGRESS = 'classifier_progress',
 }

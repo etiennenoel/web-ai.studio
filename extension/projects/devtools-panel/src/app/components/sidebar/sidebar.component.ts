@@ -31,6 +31,7 @@ export class SidebarComponent {
     { id: PanelTab.PROOFREADER, label: 'Proofreader API', iconClass: 'fa-solid fa-check-double', isApi: true, isManagement: false },
     { id: PanelTab.WRITER, label: 'Writer API', iconClass: 'fa-solid fa-pen-nib', isApi: true, isManagement: false },
     { id: PanelTab.REWRITER, label: 'Rewriter API', iconClass: 'fa-solid fa-wand-magic-sparkles', isApi: true, isManagement: false },
+    { id: PanelTab.CLASSIFIER, label: 'Classifier API', iconClass: 'fa-solid fa-signs-post', isApi: true, isManagement: false },
   ];
 
   constructor(private diagnosisService: DiagnosisService) {

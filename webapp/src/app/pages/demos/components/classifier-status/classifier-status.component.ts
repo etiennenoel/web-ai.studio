@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { ClassifierService } from '../../../../core/services/classifier.service';
 
 @Component({
   selector: 'app-classifier-status',
@@ -11,4 +12,10 @@ export class ClassifierStatusComponent {
   @Input() downloadProgress = 0;
   @Input() showPromptApi = false;
   @Input() promptApiStatus = 'loading...';
+
+  private readonly classifierService = inject(ClassifierService);
+
+  get isPolyfilled(): boolean {
+    return this.classifierService.isPolyfilled();
+  }
 }

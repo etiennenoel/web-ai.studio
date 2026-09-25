@@ -1,8 +1,3 @@
-
-
-
-
-
 .feature-card {
   transition: all 0.3s ease;
 }
@@ -10,4 +5,32 @@
   transform: translateY(-2px);
 }
 
+/* Models status popover, anchored under its header button (CSS anchor positioning). */
+.models-anchor {
+  anchor-name: --models-button;
+}
 
+.models-popover {
+  position: fixed;
+  position-anchor: --models-button;
+  inset: auto;
+  top: calc(anchor(bottom) + 0.5rem);
+  right: anchor(right);
+  margin: 0;
+  position-try-fallbacks: flip-block;
+}
+
+.models-popover:popover-open {
+  animation: models-popover-in 120ms ease-out;
+}
+
+@keyframes models-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

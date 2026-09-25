@@ -1,0 +1,113 @@
+<section class="p-6 h-full flex flex-col overflow-y-auto">
+    <div class="flex justify-between items-center mb-2 flex-shrink-0 relative w-full z-50">
+        <h2 class="text-xl font-semibold">Classifier API</h2>
+        <app-api-status
+            [apiName]="'Classifier'"
+            [statusText]="statusText"
+            [isAvailable]="isApiAvailable"
+            [isWarning]="isWarning"
+            [checks]="checks"
+            [errorHtml]="errorHtml">
+        </app-api-status>
+    </div>
+    <p class="text-xs text-gray-600 dark:text-gray-400 mb-6">
+        Served by the extension's polyfill (<code>window.Classifier</code> on every page) following the
+        <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-500 hover:underline">Classifier API explainer</a>.
+        Runs a Laya decision encoder locally with LiteRT.js.
+    </p>
+
+    <!-- Model card -->
+    <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] mb-6 flex flex-wrap items-center gap-4">
+        <div class="flex-1 min-w-[16rem]">
+            <label class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase block mb-1">Model</label>
+            <select [ngModel]="activeVariant?.id" (ngModelChange)="onVariantChange($event)" [disabled]="busy"
+                class="w-full bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#3c4043] rounded p-1.5 text-sm text-gray-800 dark:text-gray-200 focus:border-blue-500 focus:outline-none">
+                <option *ngFor="let v of variants" [value]="v.id">{{ v.name }}</option>
+            </select>
+            <p *ngIf="activeVariant" class="text-[11px] text-gray-500 mt-1">{{ activeVariant.description }} {{ modelSize }}.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider"
+                [ngClass]="isModelCached ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'">
+                {{ activeModelStatus?.state ?? 'unknown' }}<span *ngIf="activeModelStatus?.loaded"> · loaded on {{ activeModelStatus?.accelerator }}</span>
+            </span>
+            <button *ngIf="!isModelCached" (click)="downloadModel()" [disabled]="busy" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 disabled:opacity-50 flex items-center gap-1" title="Download from Hugging Face">
+                <i class="fa-solid fa-download"></i> Download
+            </button>
+            <button *ngIf="isModelCached" (click)="deleteModel()" [disabled]="busy" class="text-sm text-red-600 dark:text-red-400 hover:text-red-300 disabled:opacity-50 flex items-center gap-1" title="Delete cached files">
+                <i class="fa-solid fa-trash"></i> Delete
+            </button>
+        </div>
+        <div *ngIf="downloading" class="w-full flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+            <div class="flex-1 h-2 bg-gray-300 dark:bg-[#3c4043] rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full transition-all" [style.width.%]="downloadProgress"></div>
+            </div>
+            <span class="font-mono">{{ downloadProgress }}%</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Schema -->
+        <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] flex flex-col">
+            <div class="flex justify-between items-center mb-2">
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase">Schema (ClassifierCreateOptions)</label>
+                <select (change)="loadPreset($any($event.target).value)" class="bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#3c4043] rounded p-1 text-xs text-gray-800 dark:text-gray-200">
+                    <option value="">Load a preset...</option>
+                    <option *ngFor="let p of presets" [value]="p.id">{{ p.title }}</option>
+                </select>
+            </div>
+            <textarea [(ngModel)]="schemaJson" rows="18" spellcheck="false"
+                class="flex-1 w-full bg-white dark:bg-[#202124] border rounded p-3 text-xs text-gray-800 dark:text-gray-200 resize-y focus:border-blue-500 focus:outline-none font-mono"
+                [ngClass]="schemaError ? 'border-red-500' : 'border-gray-400 dark:border-[#5f6368]'"></textarea>
+            <p *ngIf="schemaError" class="text-[11px] text-red-500 mt-1 font-mono">{{ schemaError }}</p>
+            <p *ngIf="contextWindow !== null" class="text-[11px] text-gray-500 mt-2 font-mono">
+                contextWindow {{ contextWindow }} · contextUsage {{ contextUsage }}<span *ngIf="inputUsage !== null"> · input {{ inputUsage }}</span> tokens
+            </p>
+        </div>
+
+        <!-- Input & results -->
+        <div class="flex flex-col gap-4">
+            <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] flex flex-col">
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase">Input</label>
+                <textarea [(ngModel)]="inputText" rows="4" class="w-full bg-white dark:bg-[#202124] border border-gray-400 dark:border-[#5f6368] rounded p-3 text-sm text-gray-800 dark:text-gray-200 resize-y focus:border-blue-500 focus:outline-none" placeholder="Text to classify..."></textarea>
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold mt-3 mb-1 uppercase">Per-call context <span class="normal-case font-normal">(optional)</span></label>
+                <input [(ngModel)]="callContext" class="w-full bg-white dark:bg-[#202124] border border-gray-400 dark:border-[#5f6368] rounded p-2 text-sm text-gray-800 dark:text-gray-200 focus:border-blue-500 focus:outline-none" placeholder="e.g. Sent by a paying customer">
+                <div class="flex items-center gap-3 mt-4">
+                    <button (click)="classify()" [disabled]="busy || !inputText.trim() || !!schemaError" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                        <i class="fa-solid" [ngClass]="busy ? 'fa-spinner fa-spin' : 'fa-play'"></i>
+                        {{ busy ? busyLabel : 'Classify' }}
+                    </button>
+                    <button *ngIf="busy" (click)="cancel()" class="px-4 py-2 rounded border border-gray-300 dark:border-[#5f6368] text-sm">Cancel</button>
+                    <span *ngIf="elapsedMs !== null" class="ml-auto text-xs font-mono text-gray-500">{{ elapsedMs }} ms</span>
+                </div>
+            </div>
+
+            <div *ngIf="error" class="text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded p-3 font-mono whitespace-pre-wrap">{{ error }}</div>
+
+            <lib-classifier-decisions *ngIf="result" [result]="result" [columns]="1"></lib-classifier-decisions>
+        </div>
+    </div>
+
+    <!-- Raw result -->
+    <div *ngIf="rawJson" class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase">Raw result (record keyed by question id)</span>
+            <button (click)="copyRaw()" class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white text-xs"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+        <app-inline-code-editor [content]="rawJson" [maxLines]="24"></app-inline-code-editor>
+    </div>
+
+    <!-- Code Viewer -->
+    <div class="mb-6">
+        <button (click)="toggleCodeViewer()" class="flex items-center justify-between w-full text-sm font-medium text-left text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white focus:outline-none mb-2">
+            <span>Show Code</span>
+            <i class="fa-solid fa-chevron-down transform transition-transform duration-200" [class.rotate-180]="isCodeViewerVisible"></i>
+        </button>
+        <div *ngIf="isCodeViewerVisible" class="bg-gray-200 dark:bg-[#0d1117] p-3 rounded border border-gray-300 dark:border-[#3c4043] overflow-x-auto relative group-code">
+            <pre><code class="text-xs font-mono text-gray-700 dark:text-gray-300">{{codeSnippet}}</code></pre>
+            <button (click)="copyCode()" class="absolute top-2 right-2 bg-gray-200 dark:bg-[#292a2d] hover:bg-gray-300 dark:hover:bg-[#3c4043] text-gray-700 dark:text-gray-400 p-1.5 rounded">
+                <i class="fa-regular fa-copy"></i>
+            </button>
+        </div>
+    </div>
+</section>

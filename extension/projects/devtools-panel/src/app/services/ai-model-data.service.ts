@@ -5,11 +5,14 @@ import { SystemStatus } from '../interfaces/data/system-status.interface';
 import { StorageStats } from '../interfaces/data/storage-stats.interface';
 import { RecentActivity } from '../interfaces/data/recent-activity.interface';
 import { PanelTab } from '../enums/panel-tab.enum';
+import { ClassifierManager } from 'base';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiModelDataService {
+    constructor(private readonly classifierManager: ClassifierManager) {}
+
     private readonly MOCK_MODELS: AiModel[] = [
         { name: 'Gemini Nano 3.0 4B GPU', status: 'available' },
         { name: 'Gemini Nano 3.0 2B GPU', status: 'downloading', progress: 60 },
@@ -116,6 +119,16 @@ export class AiModelDataService {
         } catch (e) {
             proofreader.status = "error";
             proofreader.error = (e as Error).message;
+        }
+
+        // Classifier API (extension polyfill)
+        const classifier: ApiAvailability = { id: 'classifier', name: 'Classifier API', description: 'Typed decisions (polyfill)', status: 'unknown', icon: 'fa-solid fa-signs-post', panelTabId: PanelTab.CLASSIFIER };
+        apiAvailabilities.push(classifier);
+        try {
+            classifier.status = await this.classifierManager.availability({});
+        } catch (e) {
+            classifier.status = "error";
+            classifier.error = (e as Error).message;
         }
 
         return apiAvailabilities;

@@ -2,6 +2,8 @@ import { WindowMessageType } from '../enums/window-message-type.enum';
 import { ApiCallPayload } from './api-call-payload.interface';
 import { HardwareInformation } from '../../base/src/lib/interfaces/hardware-info.interface';
 import { ChromeAiApiName } from '../enums/chrome-ai-api-name.enum';
+import { ClassifierRuntimeOp } from '../../base/src/lib/classifier/enums/classifier-runtime-op.enum';
+import { ClassifierRuntimeResponse } from '../../base/src/lib/classifier/interfaces/classifier-runtime-response.interface';
 
 // ---------------------------------------------------------------------------
 // Base
@@ -110,6 +112,43 @@ export interface ProviderResponseMessage extends CorrelatedMessage {
 }
 
 // ---------------------------------------------------------------------------
+// Classifier polyfill
+// ---------------------------------------------------------------------------
+
+export interface ClassifierRequestMessage extends CorrelatedMessage {
+  type: WindowMessageType.CLASSIFIER_REQUEST;
+  op: ClassifierRuntimeOp;
+  /** Correlates progress and aborts across the whole request chain. */
+  requestId: string;
+  payload?: unknown;
+}
+
+export interface ClassifierResponseMessage extends CorrelatedMessage {
+  type: WindowMessageType.CLASSIFIER_RESPONSE;
+  data: ClassifierRuntimeResponse;
+}
+
+export interface ClassifierProgressWindowMessage {
+  type: WindowMessageType.CLASSIFIER_PROGRESS;
+  requestId: string;
+  loaded: number;
+}
+
+// ---------------------------------------------------------------------------
+// Settings push
+// ---------------------------------------------------------------------------
+
+export interface SettingsPushData {
+  wrapApi: boolean;
+  classifierPolyfill: boolean;
+}
+
+export interface SettingsPushMessage {
+  type: WindowMessageType.SETTINGS_PUSH;
+  data: SettingsPushData;
+}
+
+// ---------------------------------------------------------------------------
 // Discriminated union
 // ---------------------------------------------------------------------------
 
@@ -128,4 +167,8 @@ export type WindowMessage =
   | RoutingRequestMessage
   | RoutingResponseMessage
   | ProviderRequestMessage
-  | ProviderResponseMessage;
+  | ProviderResponseMessage
+  | ClassifierRequestMessage
+  | ClassifierResponseMessage
+  | ClassifierProgressWindowMessage
+  | SettingsPushMessage;

@@ -28,4 +28,13 @@ export enum WindowMessageType {
   /** Request an external provider (Gemini/OpenAI) to handle an API call. */
   PROVIDER_REQUEST = 'WEBAI_GEMINI_REQUEST',
   PROVIDER_RESPONSE = 'WEBAI_GEMINI_RESPONSE',
+
+  /** Classifier API polyfill: page -> content script -> offscreen runtime. */
+  CLASSIFIER_REQUEST = 'WEBAI_CLASSIFIER_REQUEST',
+  CLASSIFIER_RESPONSE = 'WEBAI_CLASSIFIER_RESPONSE',
+  /** One-way: content script -> page. Download progress for a classifier request. */
+  CLASSIFIER_PROGRESS = 'WEBAI_CLASSIFIER_PROGRESS',
+
+  /** One-way: content script -> page. Settings that gate the injected script's behavior. */
+  SETTINGS_PUSH = 'WEBAI_SETTINGS_PUSH',
 }

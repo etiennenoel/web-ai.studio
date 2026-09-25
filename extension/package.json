@@ -1,6 +1,6 @@
 {
   "name": "",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,7 +11,7 @@
     "build:base": "ng build base",
     "build:devtools-panel": "ng build devtools-panel",
     "build:on-install": "ng build on-install",
-    "build:scripts": "esbuild projects/content-script/src/main.ts --bundle --outfile=dist/content-script/main.js && esbuild projects/content-script/src/injected.ts --bundle --outfile=dist/content-script/injected.js && esbuild projects/service-worker/src/main.ts --bundle --outfile=dist/service-worker/main.js",
+    "build:scripts": "esbuild projects/content-script/src/main.ts --bundle --outfile=dist/content-script/main.js && esbuild projects/content-script/src/injected.ts --bundle --outfile=dist/content-script/injected.js && esbuild projects/service-worker/src/main.ts --bundle --outfile=dist/service-worker/main.js && esbuild projects/offscreen/src/main.ts --bundle --format=esm --outfile=dist/offscreen/main.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:all": "ng test devtools-panel --watch=false --browsers=ChromeHeadless && ng test popup --watch=false && ng test side-panel --watch=false && ng test on-install --watch=false --browsers=ChromeHeadless && ng test base --watch=false && vitest run",
@@ -38,6 +38,8 @@
     "@angular/platform-browser": "^21.0.3",
     "@angular/router": "^21.0.3",
     "@fortawesome/fontawesome-free": "^7.1.0",
+    "@huggingface/tokenizers": "^0.2.0",
+    "@litertjs/core": "^2.5.3",
     "@tailwindcss/postcss": "^4.1.17",
     "ace-builds": "^1.43.6",
     "chart.js": "^4.5.1",

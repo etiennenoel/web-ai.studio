@@ -1,6 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CLASSIFIER_MODEL_REGISTRY, DEFAULT_CLASSIFIER_MODEL_VARIANT_ID } from '../classifier/registry/classifier-model-registry.const';
+import { ClassifierModelVariant } from '../classifier/interfaces/classifier-model-variant.interface';
+import { ClassifierSettingsKey } from '../classifier/enums/classifier-settings-key.enum';
+import { classifierModelTotalBytes } from '../classifier/registry/classifier-model-registry.utils';
 
 declare const chrome: any;
 
@@ -56,6 +60,43 @@ const DEFAULT_PROVIDERS: Provider[] = [
               </div>
             </div>
           </label>
+
+          <!-- Classifier API polyfill -->
+          <div class="flex flex-col gap-3 p-5 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
+            <label class="flex items-start gap-4 cursor-pointer group">
+              <div class="flex-shrink-0 mt-1">
+                <input
+                  type="checkbox"
+                  class="w-5 h-5 rounded border-gray-500 bg-white dark:bg-[#202124] text-blue-500 focus:ring-blue-600 ring-offset-gray-50 dark:ring-offset-[#292a2d] transition-colors cursor-pointer"
+                  [(ngModel)]="classifierPolyfillEnabled"
+                  (change)="saveSettings()"
+                  [disabled]="loading"
+                >
+              </div>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-white transition-colors">Enable Classifier API polyfill</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                  Exposes <code>window.Classifier</code> on every page when Chrome has no native implementation, following the
+                  <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-500 hover:underline">Classifier API explainer</a>.
+                  Inference runs locally with LiteRT.js; the model is downloaded from Hugging Face on first use.
+                </div>
+              </div>
+            </label>
+
+            <div>
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Classifier model</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Only Laya decision encoders are supported for now. Changing the model affects new sessions.</p>
+            </div>
+            <select
+              [(ngModel)]="classifierModelVariantId"
+              (change)="saveSettings()"
+              [disabled]="loading || !classifierPolyfillEnabled"
+              class="bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#5f6368] text-gray-900 dark:text-[#e8eaed] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none disabled:opacity-50"
+            >
+              <option *ngFor="let v of classifierModels" [value]="v.id">{{ v.family }} · {{ v.name }} ({{ modelSize(v) }})</option>
+            </select>
+            <p *ngIf="selectedClassifierModel" class="text-xs text-gray-500 dark:text-gray-400">{{ selectedClassifierModel.description }}</p>
+          </div>
 
           <!-- Provider Selection -->
           <div class="flex flex-col gap-3 p-5 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
@@ -202,6 +243,9 @@ export class SettingsComponent implements OnInit {
   @Input() showHeader: boolean = true;
   
   wrapApiEnabled: boolean = true;
+  classifierPolyfillEnabled: boolean = true;
+  classifierModelVariantId: string = DEFAULT_CLASSIFIER_MODEL_VARIANT_ID;
+  readonly classifierModels: ClassifierModelVariant[] = CLASSIFIER_MODEL_REGISTRY;
   providers: Provider[] = [];
   activeProviderId: string = 'chrome';
   loading: boolean = true;
@@ -218,6 +262,14 @@ export class SettingsComponent implements OnInit {
 
   get activeProvider(): Provider | undefined {
     return this.providers.find(p => p.id === this.activeProviderId);
+  }
+
+  get selectedClassifierModel(): ClassifierModelVariant | undefined {
+    return this.classifierModels.find(v => v.id === this.classifierModelVariantId);
+  }
+
+  modelSize(variant: ClassifierModelVariant): string {
+    return `${Math.round(classifierModelTotalBytes(variant) / 1_000_000)} MB`;
   }
 
   loadSettings() {
@@ -270,8 +322,19 @@ export class SettingsComponent implements OnInit {
                     this.activeProviderId = this.providers[0]?.id || 'chrome';
                   }
 
-                  this.loading = false;
-                  this.cdr.detectChanges();
+                  chrome.runtime.sendMessage({ action: 'get_setting', key: ClassifierSettingsKey.POLYFILL_ENABLED, defaultValue: true }, (polyResponse: any) => {
+                    chrome.runtime.sendMessage({ action: 'get_setting', key: ClassifierSettingsKey.MODEL_VARIANT, defaultValue: DEFAULT_CLASSIFIER_MODEL_VARIANT_ID }, (variantResponse: any) => {
+                      this.ngZone.run(() => {
+                        if (!chrome.runtime.lastError) {
+                          this.classifierPolyfillEnabled = polyResponse?.value !== false;
+                          const variantId = variantResponse?.value;
+                          this.classifierModelVariantId = this.classifierModels.some(v => v.id === variantId) ? variantId : DEFAULT_CLASSIFIER_MODEL_VARIANT_ID;
+                        }
+                        this.loading = false;
+                        this.cdr.detectChanges();
+                      });
+                    });
+                  });
                 });
               });
             });
@@ -290,10 +353,14 @@ export class SettingsComponent implements OnInit {
       chrome.runtime.sendMessage({ action: 'set_setting', key: 'wrap_api', value: this.wrapApiEnabled }, () => {
         chrome.runtime.sendMessage({ action: 'set_setting', key: 'providers', value: this.providers }, () => {
           chrome.runtime.sendMessage({ action: 'set_setting', key: 'activeProviderId', value: this.activeProviderId }, () => {
-            this.ngZone.run(() => {
-              this.loading = false;
-              this.showSavedMessage();
-              this.cdr.detectChanges();
+            chrome.runtime.sendMessage({ action: 'set_setting', key: ClassifierSettingsKey.POLYFILL_ENABLED, value: this.classifierPolyfillEnabled }, () => {
+              chrome.runtime.sendMessage({ action: 'set_setting', key: ClassifierSettingsKey.MODEL_VARIANT, value: this.classifierModelVariantId }, () => {
+                this.ngZone.run(() => {
+                  this.loading = false;
+                  this.showSavedMessage();
+                  this.cdr.detectChanges();
+                });
+              });
             });
           });
         });

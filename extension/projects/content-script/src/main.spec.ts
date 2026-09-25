@@ -33,44 +33,51 @@ describe('content-script main', () => {
   // Script injection
   // -------------------------------------------------------------------------
 
-  it('should inject the script if wrap_api is true', async () => {
+  it('should not inject a script tag (injected.js is a MAIN-world content script) and push settings', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
-      if (req.action === 'get_setting' && req.key === 'wrap_api') {
-        cb({ value: true });
-      }
+      if (req.action === 'get_setting') cb({ value: true });
     });
+    const postMessage = vi.spyOn(window, 'postMessage');
 
     await import('./main');
+    await new Promise((r) => setTimeout(r, 0));
 
-    const scripts = document.head.getElementsByTagName('script');
-    expect(scripts.length).toBe(1);
-    expect(scripts[0].src).toBe('chrome-extension://mock-id/injected.js');
+    expect(document.head.getElementsByTagName('script').length).toBe(0);
+    expect(postMessage).toHaveBeenCalledWith(
+      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: true, classifierPolyfill: true } },
+      '*',
+    );
   });
 
-  it('should not inject the script if wrap_api is false', async () => {
+  it('should push wrapApi=false when the setting is off', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
-      if (req.action === 'get_setting' && req.key === 'wrap_api') {
-        cb({ value: false });
-      }
+      if (req.action === 'get_setting' && req.key === 'wrap_api') cb({ value: false });
+      else if (req.action === 'get_setting') cb({ value: true });
     });
+    const postMessage = vi.spyOn(window, 'postMessage');
 
     await import('./main');
+    await new Promise((r) => setTimeout(r, 0));
 
-    const scripts = document.head.getElementsByTagName('script');
-    expect(scripts.length).toBe(0);
+    expect(postMessage).toHaveBeenCalledWith(
+      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: false, classifierPolyfill: true } },
+      '*',
+    );
   });
 
-  it('should inject script when setting response is undefined (defaults to true)', async () => {
+  it('should default both settings to true when the response has no value', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
-      if (req.action === 'get_setting') {
-        cb({}); // No value property
-      }
+      if (req.action === 'get_setting') cb({});
     });
+    const postMessage = vi.spyOn(window, 'postMessage');
 
     await import('./main');
+    await new Promise((r) => setTimeout(r, 0));
 
-    const scripts = document.head.getElementsByTagName('script');
-    expect(scripts.length).toBe(1);
+    expect(postMessage).toHaveBeenCalledWith(
+      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: true, classifierPolyfill: true } },
+      '*',
+    );
   });
 
   // -------------------------------------------------------------------------

@@ -35,14 +35,12 @@ export interface NormalizedDecision {
   confidence: number;
   probability?: number | null;
   expectedScore?: number | null;
-  standardError?: number | null;
   probabilities: ClassifierOptionProbability[];
 }
 
 export interface NormalizedClassifierResult {
   decisions: NormalizedDecision[];
   byId: Record<string, NormalizedDecision>;
-  drawsExecuted: number;
   elapsedMs: number;
   raw: any;
 }
@@ -65,6 +63,12 @@ export class ClassifierService {
 
   isSupported(): boolean {
     return this.getNativeApi() !== null;
+  }
+
+  /** True when `window.Classifier` is provided by the WebAI Studio extension rather than the browser. */
+  isPolyfilled(): boolean {
+    if (!this.isBrowser) return false;
+    return (window as any).webai?.classifier?.isPolyfilled === true;
   }
 
   async availability(schema?: ClassifierSchema): Promise<string> {
@@ -110,13 +114,12 @@ export class ClassifierService {
   async classify(
     schema: ClassifierSchema,
     input: string,
-    options: { samples?: number; signal?: AbortSignal; onDownloadProgress?: (loaded: number) => void } = {}
+    options: { signal?: AbortSignal; onDownloadProgress?: (loaded: number) => void } = {}
   ): Promise<NormalizedClassifierResult> {
     const t0 = performance.now();
     const classifier = await this.getClassifier(schema, options.onDownloadProgress, options.signal);
 
     const classifyOpts: any = {};
-    if (options.samples) classifyOpts.samples = options.samples;
     if (options.signal) classifyOpts.signal = options.signal;
 
     const raw = await classifier.classify(input, classifyOpts);
@@ -191,7 +194,6 @@ export class ClassifierService {
         confidence: Number(entry.confidence ?? 0),
         probability: entry.probability !== undefined && entry.probability !== null ? Number(entry.probability) : null,
         expectedScore: scoreVal !== undefined && scoreVal !== null ? Number(scoreVal) : null,
-        standardError: entry.standardError !== undefined && entry.standardError !== null ? Number(entry.standardError) : null,
         probabilities: probs
       };
 
@@ -202,7 +204,6 @@ export class ClassifierService {
     return {
       decisions,
       byId,
-      drawsExecuted: Number(raw?.drawsExecuted ?? 1),
       elapsedMs,
       raw
     };

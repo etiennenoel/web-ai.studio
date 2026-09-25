@@ -8,6 +8,7 @@ import { RewriterManager } from './managers/rewriter.manager';
 import { ProofreaderManager } from './managers/proofreader.manager';
 import { LanguageDetectorManager } from './managers/language-detector.manager';
 import { PromptManager } from './managers/prompt.manager';
+import { ClassifierManager } from './managers/classifier.manager';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { PromptManager } from './managers/prompt.manager';
     RewriterManager,
     ProofreaderManager,
     LanguageDetectorManager,
-    PromptManager
+    PromptManager,
+    ClassifierManager
   ],
 })
 export class BaseModule { }

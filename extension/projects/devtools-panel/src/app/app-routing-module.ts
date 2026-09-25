@@ -9,6 +9,7 @@ import { DetectorComponent } from './panels/detector/detector.component';
 import { ProofreaderComponent } from './panels/proofreader/proofreader.component';
 import { WriterComponent } from './panels/writer/writer.component';
 import { RewriterComponent } from './panels/rewriter/rewriter.component';
+import { ClassifierComponent } from './panels/classifier/classifier.component';
 import { PerformanceComponent } from './panels/performance/performance.component';
 import { HistoryComponent } from './panels/history/history.component';
 import { PanelTab } from './enums/panel-tab.enum';
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: PanelTab.PROOFREADER, component: ProofreaderComponent },
   { path: PanelTab.WRITER, component: WriterComponent },
   { path: PanelTab.REWRITER, component: RewriterComponent },
+  { path: PanelTab.CLASSIFIER, component: ClassifierComponent },
   { path: PanelTab.SETTINGS, component: SettingsComponent },
 ];
 

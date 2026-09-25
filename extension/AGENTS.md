@@ -10,12 +10,16 @@ This repository uses a **Hybrid Monorepo** architecture. It strictly separates t
 
 * **extension-src/** (The Platform Layer)
   * **Role:** Contains raw Chrome Extension files.
-  * **Contents:** manifest.json, service\_worker.js, devtools.js, devtools-loader.html.
+  * **Contents:** manifest.json, devtools.js, devtools-loader.html, offscreen.html.
   * **Build Behavior:** These are copied directly to release/ by the build script.
-* **projects/** (The UI Layer)
-  * **Role:** Standard Angular applications.
-  * **Current Projects:** devtools-panel, on-install.
-  * **Build Behavior:** Built via ng build, then artifacts are manually moved to release/\<project-name\> by the script.
+* **projects/** (The UI Layer and script bundles)
+  * **Role:** Angular applications (`devtools-panel`, `on-install`, `popup`, `side-panel`), the shared Angular library (`base`), and plain TypeScript bundles built with esbuild (`content-script`, `service-worker`, `offscreen`, `laya`, `shared`).
+  * **Build Behavior:** Angular projects are built via ng build, then artifacts are manually moved to release/\<project-name\> by the script. Script bundles are built by `npm run build:scripts` into `dist/` and copied to the release root.
+* **Classifier API polyfill** (see section 8)
+  * `projects/laya/`: port of the Laya host contract (tokenizer, sequence builder, decoder, LiteRT.js runner). Pure TypeScript, unit tested against the reference rows in the model's `HOST_CONTRACT.md`.
+  * `projects/offscreen/`: the offscreen document that owns the LiteRT.js runtime, the OPFS model cache, and classifier sessions for every tab.
+  * `projects/base/src/lib/classifier/`: explainer-aligned types, the model registry, the runtime message protocol, the `ClassifierRuntimeClient`, and the shared demo components.
+  * `projects/content-script/src/polyfill/`: the page-side `window.Classifier` class.
 * **release/** (The Artifact)
   * **Role:** The **ONLY** folder that should be loaded into Chrome (Load Unpacked).
   * **Structure:**  
@@ -80,7 +84,18 @@ To test changes:
 3. Go to chrome://extensions.
 4. Click **Reload** on the extension card (points to release/ folder).
 
-### **7\. How to Update the Extension Version**
+### **7\. Classifier API polyfill architecture**
+
+`window.Classifier` (explainer: https://github.com/michaelwasserman/classifier-api) is polyfilled when Chrome has no native implementation.
+
+* **Page (MAIN world):** `injected.js` is declared in `manifest.json` as a MAIN-world content script at `document_start`, so it runs before page scripts and regardless of page CSP. It installs `Classifier` (only if absent), then wraps every AI API for telemetry. Settings (`wrap_api`, `classifier_polyfill`) are pushed afterwards via `WEBAI_SETTINGS_PUSH` and roll back wrapping / the polyfill when disabled.
+* **Transport:** page `Classifier` -> `window.postMessage` (`WEBAI_CLASSIFIER_REQUEST`) -> content script `ClassifierRequestHandler` -> `chrome.runtime.sendMessage` (`classifier_request`, `target: webai-classifier-offscreen`) -> offscreen document. The service worker only creates the offscreen document (`ensure_offscreen`) and relays `classifier_progress` to the originating tab. Extension pages (devtools panel, on-install) call `ClassifierRuntimeClient` directly.
+* **Runtime:** `projects/offscreen` loads LiteRT.js from `release/wasm/` (copied from `@litertjs/core`), downloads the active model variant from Hugging Face into OPFS (`classifier-models/<variantId>/<role>`), and runs one Laya forward pass per question. WebGPU is tried first for variants flagged `gpuCompiles`, then WASM.
+* **Models:** `CLASSIFIER_MODEL_REGISTRY` in `projects/base/src/lib/classifier/registry/` lists the Laya variants (both `litert-community/laya-LiteRT` and `litert-community/Laya-Multilingual-LiteRT`). The active variant is the `classifier_model_variant` setting.
+* **Manifest requirements:** `offscreen` permission and `content_security_policy.extension_pages` with `'wasm-unsafe-eval'`.
+* **Tests:** `npx vitest run` covers the Laya port (parity with the published reference rows), the schema validator and mapper, and the message dispatchers.
+
+### **8\. How to Update the Extension Version**
 
 To update the version number of the Chrome WebAI Extension, follow these steps:
 

@@ -13,6 +13,7 @@ export enum PanelTab {
     PROOFREADER = 'proofreader',
     WRITER = 'writer',
     REWRITER = 'rewriter',
+    CLASSIFIER = 'classifier',
     MODELS = 'models',
     SETTINGS = 'settings',
     DIAGNOSIS = 'diagnosis',

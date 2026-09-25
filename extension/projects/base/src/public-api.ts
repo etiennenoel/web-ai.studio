@@ -19,3 +19,5 @@ export * from './lib/interfaces/hardware-info.interface';
 export * from './lib/settings/settings.component';
 export * from './lib/diagnosis/diagnosis.component';
 export * from './lib/managers/diagnosis.service';
+
+export * from './lib/classifier/index';

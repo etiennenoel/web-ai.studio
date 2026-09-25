@@ -36,4 +36,68 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Classifier API polyfill models -->
+    <div class="flex justify-between items-center mt-10 mb-4">
+        <div>
+            <h2 class="text-xl font-semibold">Classifier API Models</h2>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Downloaded from Hugging Face and cached in the extension. The active model backs <code>window.Classifier</code> on every page.
+            </p>
+        </div>
+        <button (click)="unloadClassifier()" class="text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white flex items-center gap-1" title="Free memory; the model reloads on next use">
+            <i class="fa-solid fa-memory"></i> Unload from memory
+        </button>
+    </div>
+
+    <div class="bg-gray-50 dark:bg-[#292a2d] rounded border border-gray-300 dark:border-[#3c4043] overflow-hidden">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-200 dark:bg-[#35363a] text-gray-600 dark:text-gray-400 uppercase text-xs">
+                <tr>
+                    <th class="p-3 font-normal w-10">Active</th>
+                    <th class="p-3 font-normal">Model</th>
+                    <th class="p-3 font-normal">Size</th>
+                    <th class="p-3 font-normal">Status</th>
+                    <th class="p-3 font-normal text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="font-mono text-xs text-gray-700 dark:text-gray-300">
+                <tr *ngFor="let v of classifierVariants" class="border-b border-gray-300 dark:border-[#3c4043] last:border-0 hover:bg-gray-100 dark:hover:bg-[#2f3034]">
+                    <td class="p-3">
+                        <input type="radio" name="activeClassifier" [checked]="v.id === activeClassifierVariantId" (change)="setActiveClassifier(v.id)" class="cursor-pointer" [title]="'Use ' + v.name">
+                    </td>
+                    <td class="p-3">
+                        <div class="text-gray-900 dark:text-white">{{ v.name }}</div>
+                        <div class="text-[11px] text-gray-500 font-sans">{{ v.description }}</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5">{{ v.repository }} · window {{ v.window }} · {{ v.languages.join(', ') }}</div>
+                    </td>
+                    <td class="p-3 whitespace-nowrap">{{ formatBytes(classifierStatus(v.id)?.totalBytes ?? 0) }}</td>
+                    <td class="p-3">
+                        <ng-container *ngIf="classifierStatus(v.id) as st; else unknownStatus">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full"
+                                      [ngClass]="st.state === ClassifierModelState.CACHED ? 'bg-green-400' : (st.state === ClassifierModelState.DOWNLOADING || classifierProgress.has(v.id) ? 'bg-blue-400 animate-pulse' : 'bg-gray-300 dark:bg-gray-500')"></span>
+                                <span class="capitalize">{{ classifierProgress.has(v.id) ? 'downloading' : st.state }}</span>
+                                <span *ngIf="classifierProgress.has(v.id)" class="text-gray-500">({{ classifierProgress.get(v.id) }}%)</span>
+                                <span *ngIf="st.loaded" class="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 uppercase">loaded · {{ st.accelerator }}</span>
+                                <span *ngIf="!st.loaded && st.state !== ClassifierModelState.CACHED && st.cachedBytes > 0" class="text-gray-500">({{ formatBytes(st.cachedBytes) }} partial)</span>
+                            </div>
+                        </ng-container>
+                        <ng-template #unknownStatus><span class="text-gray-500">checking...</span></ng-template>
+                    </td>
+                    <td class="p-3 text-right whitespace-nowrap">
+                        <button *ngIf="classifierProgress.has(v.id)" (click)="cancelClassifierDownload(v.id)" class="text-gray-600 dark:text-gray-400 hover:text-red-400 transition-colors" title="Cancel">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state !== ClassifierModelState.CACHED" (click)="downloadClassifier(v)" class="text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors" title="Download from Hugging Face">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state === ClassifierModelState.CACHED" (click)="deleteClassifier(v)" class="text-red-600 dark:text-red-400 hover:text-red-300 transition-colors" title="Delete cached files">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </section>
