@@ -68,8 +68,9 @@ export class ClassifierComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.checkApiStatus();
     this.refreshModel();
+    // Sessions survive model downloads and switches (the runtime reloads the
+    // session's model on demand), so only the status displays refresh here.
     this.subscriptions.push(this.classifierManager.modelsChangedEvent.subscribe(() => {
-      this.dropSession();
       this.checkApiStatus();
       this.refreshModel();
     }));
@@ -158,30 +159,27 @@ export class ClassifierComponent implements OnInit, OnDestroy {
     const requestId = crypto.randomUUID();
     this.activeRequestId = requestId;
     try {
-      if (!this.sessionId || this.sessionSchemaJson !== this.schemaJson) {
-        this.dropSession();
-        this.busyLabel = this.isModelCached ? 'Loading model...' : 'Downloading model...';
-        this.cdr.detectChanges();
-        const info = await this.classifierManager.createSession(
-          schema,
-          (loaded) => this.ngZone.run(() => this.onProgress(loaded)),
-          requestId,
-        );
-        this.sessionId = info.sessionId;
-        this.sessionSchemaJson = this.schemaJson;
-        this.contextWindow = info.contextWindow;
-        this.contextUsage = info.contextUsage;
-        this.downloading = false;
-        this.refreshModel();
-      }
-
-      this.busyLabel = 'Classifying...';
-      this.cdr.detectChanges();
       const options = this.callContext.trim() ? { context: this.callContext } : {};
-      this.inputUsage = await this.classifierManager.measureContextUsage(this.sessionId!, this.inputText, options);
-      const start = performance.now();
-      this.result = await this.classifierManager.classify(this.sessionId!, this.inputText, options, requestId);
-      this.elapsedMs = Math.round(performance.now() - start);
+      const run = async (sessionId: string) => {
+        this.busyLabel = 'Classifying...';
+        this.cdr.detectChanges();
+        this.inputUsage = await this.classifierManager.measureContextUsage(sessionId, this.inputText, options);
+        const start = performance.now();
+        const result = await this.classifierManager.classify(sessionId, this.inputText, options, requestId);
+        this.elapsedMs = Math.round(performance.now() - start);
+        return result;
+      };
+
+      let sessionId = await this.ensureSession(schema, requestId);
+      try {
+        this.result = await run(sessionId);
+      } catch (e: any) {
+        // The runtime lost the session (extension reload, runtime restart): create a new one and retry once.
+        if (e?.name !== 'InvalidStateError' || !/destroyed/i.test(e.message)) throw e;
+        this.sessionId = null;
+        sessionId = await this.ensureSession(schema, requestId);
+        this.result = await run(sessionId);
+      }
       this.rawJson = JSON.stringify(this.result, null, 2);
     } catch (e: any) {
       this.error = `${e.name ?? 'Error'}: ${e.message}`;
@@ -196,6 +194,26 @@ export class ClassifierComponent implements OnInit, OnDestroy {
 
   cancel(): void {
     if (this.activeRequestId) this.classifierManager.abort(this.activeRequestId);
+  }
+
+  /** Reuses the current session when the schema is unchanged, otherwise creates one (downloading the model if needed). */
+  private async ensureSession(schema: ClassifierSchema, requestId: string): Promise<string> {
+    if (this.sessionId && this.sessionSchemaJson === this.schemaJson) return this.sessionId;
+    this.dropSession();
+    this.busyLabel = this.isModelCached ? 'Loading model...' : 'Downloading model...';
+    this.cdr.detectChanges();
+    const info = await this.classifierManager.createSession(
+      schema,
+      (loaded) => this.ngZone.run(() => this.onProgress(loaded)),
+      requestId,
+    );
+    this.sessionId = info.sessionId;
+    this.sessionSchemaJson = this.schemaJson;
+    this.contextWindow = info.contextWindow;
+    this.contextUsage = info.contextUsage;
+    this.downloading = false;
+    this.refreshModel();
+    return info.sessionId;
   }
 
   toggleCodeViewer(): void {
