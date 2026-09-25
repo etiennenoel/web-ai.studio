@@ -17,34 +17,7 @@
     </p>
 
     <!-- Model card -->
-    <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] mb-6 flex flex-wrap items-center gap-4">
-        <div class="flex-1 min-w-[16rem]">
-            <label class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase block mb-1">Model</label>
-            <select [ngModel]="activeVariant?.id" (ngModelChange)="onVariantChange($event)" [disabled]="busy"
-                class="w-full bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#3c4043] rounded p-1.5 text-sm text-gray-800 dark:text-gray-200 focus:border-blue-500 focus:outline-none">
-                <option *ngFor="let v of variants" [value]="v.id">{{ v.name }}</option>
-            </select>
-            <p *ngIf="activeVariant" class="text-[11px] text-gray-500 mt-1">{{ activeVariant.description }} {{ modelSize }}.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider"
-                [ngClass]="isModelCached ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'">
-                {{ activeModelStatus?.state ?? 'unknown' }}<span *ngIf="activeModelStatus?.loaded"> · loaded on {{ activeModelStatus?.accelerator }}</span>
-            </span>
-            <button *ngIf="!isModelCached" (click)="downloadModel()" [disabled]="busy" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 disabled:opacity-50 flex items-center gap-1" title="Download from Hugging Face">
-                <i class="fa-solid fa-download"></i> Download
-            </button>
-            <button *ngIf="isModelCached" (click)="deleteModel()" [disabled]="busy" class="text-sm text-red-600 dark:text-red-400 hover:text-red-300 disabled:opacity-50 flex items-center gap-1" title="Delete cached files">
-                <i class="fa-solid fa-trash"></i> Delete
-            </button>
-        </div>
-        <div *ngIf="downloading" class="w-full flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-            <div class="flex-1 h-2 bg-gray-300 dark:bg-[#3c4043] rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 rounded-full transition-all" [style.width.%]="downloadProgress"></div>
-            </div>
-            <span class="font-mono">{{ downloadProgress }}%</span>
-        </div>
-    </div>
+    <div class="mb-6"><lib-classifier-model-card></lib-classifier-model-card></div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Schema -->

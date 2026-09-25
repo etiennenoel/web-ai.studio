@@ -5,6 +5,8 @@ import { WindowMessageBridge } from '../../shared/messaging/window-message-bridg
 import { ChromeAiApiWrapper } from './api-wrapping/chrome-ai-api-wrapper';
 import { DiagnosisEvalResult, SettingsPushData } from '../../shared/interfaces/window-messages.interface';
 import { ClassifierPolyfillInstaller } from './polyfill/classifier-polyfill.installer';
+import { ClassifierPageBridge } from './polyfill/classifier-page-bridge';
+import { ClassifierRuntimeOp } from '../../base/src/lib/classifier/enums/classifier-runtime-op.enum';
 
 declare global {
   interface Window {
@@ -29,6 +31,23 @@ window.webai.version = APP_VERSION;
 const classifierPolyfilled = ClassifierPolyfillInstaller.install();
 window.webai.classifier = window.webai.classifier || {};
 window.webai.classifier.isPolyfilled = classifierPolyfilled;
+/** Prints the polyfill runtime state (offscreen document, active model, cached models) to help debugging. */
+window.webai.classifier.diagnose = async function (): Promise<unknown> {
+  const report: Record<string, unknown> = {
+    isPolyfilled: classifierPolyfilled,
+    hasClassifier: typeof window.Classifier !== 'undefined',
+  };
+  try {
+    report['availability'] = await ClassifierPageBridge.request(ClassifierRuntimeOp.AVAILABILITY, { schema: {} });
+    report['models'] = await ClassifierPageBridge.request(ClassifierRuntimeOp.LIST_MODELS, {});
+    report['runtime'] = 'ok';
+  } catch (e) {
+    report['runtime'] = 'error';
+    report['error'] = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+  }
+  console.table(report);
+  return report;
+};
 
 // ---------------------------------------------------------------------------
 // 2. Hardware information - uses the bridge to request from content script

@@ -5,6 +5,7 @@ import { CLASSIFIER_MODEL_REGISTRY, DEFAULT_CLASSIFIER_MODEL_VARIANT_ID } from '
 import { ClassifierModelVariant } from '../classifier/interfaces/classifier-model-variant.interface';
 import { ClassifierSettingsKey } from '../classifier/enums/classifier-settings-key.enum';
 import { classifierModelTotalBytes } from '../classifier/registry/classifier-model-registry.utils';
+import { ClassifierModelCardComponent } from '../classifier/components/classifier-model-card.component';
 
 declare const chrome: any;
 
@@ -28,7 +29,7 @@ const DEFAULT_PROVIDERS: Provider[] = [
 @Component({
   selector: 'lib-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ClassifierModelCardComponent],
   template: `
     <div class="h-full flex flex-col bg-white dark:bg-[#202124] text-gray-900 dark:text-[#e8eaed]">
       <!-- Header -->
@@ -96,6 +97,7 @@ const DEFAULT_PROVIDERS: Provider[] = [
               <option *ngFor="let v of classifierModels" [value]="v.id">{{ v.family }} · {{ v.name }} ({{ modelSize(v) }})</option>
             </select>
             <p *ngIf="selectedClassifierModel" class="text-xs text-gray-500 dark:text-gray-400">{{ selectedClassifierModel.description }}</p>
+            <lib-classifier-model-card *ngIf="classifierPolyfillEnabled" [showSelector]="false"></lib-classifier-model-card>
           </div>
 
           <!-- Provider Selection -->

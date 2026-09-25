@@ -50,6 +50,8 @@
         </button>
     </div>
 
+    <div class="mb-4"><lib-classifier-model-card [showSelector]="false"></lib-classifier-model-card></div>
+
     <div class="bg-gray-50 dark:bg-[#292a2d] rounded border border-gray-300 dark:border-[#3c4043] overflow-hidden">
         <table class="w-full text-left text-sm">
             <thead class="bg-gray-200 dark:bg-[#35363a] text-gray-600 dark:text-gray-400 uppercase text-xs">
@@ -89,11 +91,11 @@
                         <button *ngIf="classifierProgress.has(v.id)" (click)="cancelClassifierDownload(v.id)" class="text-gray-600 dark:text-gray-400 hover:text-red-400 transition-colors" title="Cancel">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
-                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state !== ClassifierModelState.CACHED" (click)="downloadClassifier(v)" class="text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors" title="Download from Hugging Face">
-                            <i class="fa-solid fa-download"></i>
+                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state !== ClassifierModelState.CACHED" (click)="downloadClassifier(v)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white transition-colors" title="Download from Hugging Face">
+                            <i class="fa-solid fa-download"></i> Download
                         </button>
-                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state === ClassifierModelState.CACHED" (click)="deleteClassifier(v)" class="text-red-600 dark:text-red-400 hover:text-red-300 transition-colors" title="Delete cached files">
-                            <i class="fa-solid fa-trash"></i>
+                        <button *ngIf="!classifierProgress.has(v.id) && classifierStatus(v.id)?.state === ClassifierModelState.CACHED" (click)="deleteClassifier(v)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Delete cached files">
+                            <i class="fa-solid fa-trash"></i> Delete
                         </button>
                     </td>
                 </tr>
