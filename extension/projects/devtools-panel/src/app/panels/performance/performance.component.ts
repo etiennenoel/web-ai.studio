@@ -59,6 +59,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'Writer', name: 'Writer API', icon: 'fa-pen-nib', color: 'text-pink-500 dark:text-pink-400', hex: '#ec4899', bg: 'bg-pink-100 dark:bg-pink-400/10', border: 'border-pink-200 dark:border-pink-400/20', activeBg: 'bg-pink-600 dark:bg-pink-500', activeText: 'text-white' },
     { id: 'Rewriter', name: 'Rewriter API', icon: 'fa-pen-to-square', color: 'text-rose-500 dark:text-rose-400', hex: '#f43f5e', bg: 'bg-rose-100 dark:bg-rose-400/10', border: 'border-rose-200 dark:border-rose-400/20', activeBg: 'bg-rose-600 dark:bg-rose-500', activeText: 'text-white' },
     { id: 'Proofreader', name: 'Proofreader API', icon: 'fa-spell-check', color: 'text-teal-500 dark:text-teal-400', hex: '#14b8a6', bg: 'bg-teal-100 dark:bg-teal-400/10', border: 'border-teal-200 dark:border-teal-400/20', activeBg: 'bg-teal-600 dark:bg-teal-500', activeText: 'text-white' },
+    { id: 'Classifier', name: 'Classifier API', icon: 'fa-signs-post', color: 'text-indigo-500 dark:text-indigo-400', hex: '#6366f1', bg: 'bg-indigo-100 dark:bg-indigo-400/10', border: 'border-indigo-200 dark:border-indigo-400/20', activeBg: 'bg-indigo-600 dark:bg-indigo-500', activeText: 'text-white' },
   ];
 
   selectedApis: Set<string> = new Set<string>(this.apiConfigs.map(a => a.id));
@@ -245,12 +246,31 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isLoading = true;
     this.error = null;
 
-    if (typeof chrome !== 'undefined' && chrome.devtools) {
+    if (typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow) {
+      let hasResponded = false;
+      const timeoutId = setTimeout(() => {
+        if (!hasResponded) {
+          hasResponded = true;
+          this.ngZone.run(() => {
+            this.isLoading = false;
+            this.rawItems = [];
+            this.groupSessions();
+            this.cdr.detectChanges();
+          });
+        }
+      }, 2000);
+
       chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+        if (hasResponded) return;
+        hasResponded = true;
+        clearTimeout(timeoutId);
+
         if (isException || !origin) {
-          this.error = 'Could not get inspected window origin.';
-          this.isLoading = false;
-          this.cdr.detectChanges();
+          this.ngZone.run(() => {
+            this.error = 'Could not get inspected window origin.';
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          });
           return;
         }
         
@@ -258,16 +278,18 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
           action: 'get_api_history',
           payload: { origin, apiName: 'all' }
         }, (response: any) => {
-          this.isLoading = false;
-          if (chrome.runtime.lastError) {
-            this.error = chrome.runtime.lastError.message;
-          } else if (response.error) {
-            this.error = response.error;
-          } else {
-            this.rawItems = response.data || [];
-            this.groupSessions();
-          }
-          this.cdr.detectChanges();
+          this.ngZone.run(() => {
+            this.isLoading = false;
+            if (chrome.runtime.lastError) {
+              this.error = chrome.runtime.lastError.message;
+            } else if (response && response.error) {
+              this.error = response.error;
+            } else {
+              this.rawItems = (response && response.data) || [];
+              this.groupSessions();
+            }
+            this.cdr.detectChanges();
+          });
         });
       });
     } else {

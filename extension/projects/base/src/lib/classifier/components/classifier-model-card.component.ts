@@ -20,19 +20,17 @@ import { classifierModelTotalBytes, findClassifierModelVariant } from '../regist
   template: `
     <div class="rounded-xl border p-4 bg-gray-50 dark:bg-[#292a2d]"
          [ngClass]="runtimeError ? 'border-red-300 dark:border-red-800/60' : (isCached ? 'border-green-300 dark:border-green-800/60' : 'border-purple-300 dark:border-purple-800/60')">
-      <div class="flex items-start justify-between gap-3 mb-3">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                [ngClass]="isCached ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'">
             <i class="fa-solid fa-signs-post"></i>
           </div>
-          <div class="min-w-0">
-            <div class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wide">Classifier API model</div>
-            <div class="font-semibold text-sm text-gray-900 dark:text-white truncate" [title]="variant?.name">{{ variant?.name || 'Laya' }}</div>
-          </div>
+          <span class="text-xs text-gray-600 dark:text-gray-400 font-mono uppercase">Classifier API Model</span>
         </div>
         <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shrink-0" [ngClass]="badgeClass">{{ badgeText }}</span>
       </div>
+      <div class="font-semibold text-sm text-gray-900 dark:text-white truncate mb-2" [title]="variant?.name">{{ variant?.name || 'Laya' }}</div>
 
       <p *ngIf="variant" class="text-xs text-gray-600 dark:text-gray-400 mb-3">
         {{ variant.description }} {{ sizeLabel }} from Hugging Face, cached in the extension.

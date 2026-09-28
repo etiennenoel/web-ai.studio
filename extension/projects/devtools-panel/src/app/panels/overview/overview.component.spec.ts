@@ -24,6 +24,7 @@ describe('OverviewComponent', () => {
       getModels: jasmine.createSpy('getModels').and.returnValue(Promise.resolve([])),
       getSystemStatus: jasmine.createSpy('getSystemStatus').and.returnValue(Promise.resolve({ vramUsage: '1GB' })),
       getStorageStats: jasmine.createSpy('getStorageStats').and.returnValue(Promise.resolve({ totalSize: '1GB', modelsSize: '1GB', languagePacksSize: '0GB' })),
+      getInitialApiCapabilities: jasmine.createSpy('getInitialApiCapabilities').and.returnValue([]),
       getApiAvailability: jasmine.createSpy('getApiAvailability').and.returnValue(Promise.resolve([])),
       getRecentActivity: jasmine.createSpy('getRecentActivity').and.returnValue(Promise.resolve([]))
     };

@@ -1,6 +1,6 @@
 {
   "name": "",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -15,6 +15,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:all": "ng test devtools-panel --watch=false --browsers=ChromeHeadless && ng test popup --watch=false && ng test side-panel --watch=false && ng test on-install --watch=false --browsers=ChromeHeadless && ng test base --watch=false && vitest run",
+    "test:e2e": "node e2e/devtools-e2e.mjs",
     "package": "./package.sh"
   },
   "prettier": {

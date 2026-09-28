@@ -9,7 +9,10 @@ chrome.devtools.panels.create(
   "assets/images/icon.png",
   "devtools-panel/index.html", // <--- CRITICAL: Matches your Angular build output path
   (panel) => {
-    // Optional: Code to run when the panel is created
-    console.log("Panel created successfully");
+    if (chrome.runtime && chrome.runtime.lastError) {
+      console.error("Failed to create WebAI DevTools panel:", chrome.runtime.lastError.message);
+      return;
+    }
+    console.log("Panel created successfully", panel);
   }
 );

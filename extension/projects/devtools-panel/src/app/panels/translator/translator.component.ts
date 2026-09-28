@@ -196,59 +196,51 @@ export class TranslatorComponent implements OnInit {
   }
 
   async getLanguagePacksStatus() {
-    // If we are already downloading, we don't want to overwrite the progress
-    // We only update the status if it's not downloading or if the list is empty
-    if (this.languagePacksStatus.length > 0 && this.languagePacksStatus.some(p => p.status === ApiStatus.DOWNLOADING)) {
-       // Ideally we should update non-downloading ones, but for simplicity let's skip full refresh if busy
-       // Or better, only update those that are not downloading
-    }
+    const statuses: TranslatorLanguagePackStatus[] = await Promise.all(
+      this.LANGUAGE_PAIRS.map(async (pair) => {
+        const existing = this.languagePacksStatus.find(p => p.sourceLanguage === pair.source && p.targetLanguage === pair.target);
+        if (existing && existing.status === ApiStatus.DOWNLOADING) {
+          return existing;
+        }
 
-    const statuses: TranslatorLanguagePackStatus[] = [];
-    for (const pair of this.LANGUAGE_PAIRS) {
-      // Check if we have an existing status for this pair that is downloading
-      const existing = this.languagePacksStatus.find(p => p.sourceLanguage === pair.source && p.targetLanguage === pair.target);
-      if (existing && existing.status === ApiStatus.DOWNLOADING) {
-          statuses.push(existing);
-          continue;
-      }
-
-      try {
-        const availability = await this.translatorManager.getAvailability({
+        try {
+          const availability = await this.translatorManager.getAvailability({
             sourceLanguage: pair.source,
             targetLanguage: pair.target
-        });
-        let message = '';
-        let status: ApiStatus;
+          });
+          let message = '';
+          let status: ApiStatus;
 
-        if (availability === ApiStatus.AVAILABLE) {
-          message = 'Available';
-          status = ApiStatus.AVAILABLE;
-        } else if (availability === ApiStatus.DOWNLOADABLE) {
-          message = 'Downloadable';
-          status = ApiStatus.DOWNLOADABLE;
-        } else if (availability === ApiStatus.DOWNLOADING) {
-          message = 'Downloading';
-          status = ApiStatus.DOWNLOADING;
-        } else {
-          message = 'Unavailable';
-          status = ApiStatus.UNAVAILABLE;
-        }
-        statuses.push({ 
-            sourceLanguage: pair.source, 
-            targetLanguage: pair.target, 
-            status, 
+          if (availability === ApiStatus.AVAILABLE) {
+            message = 'Available';
+            status = ApiStatus.AVAILABLE;
+          } else if (availability === ApiStatus.DOWNLOADABLE) {
+            message = 'Downloadable';
+            status = ApiStatus.DOWNLOADABLE;
+          } else if (availability === ApiStatus.DOWNLOADING) {
+            message = 'Downloading';
+            status = ApiStatus.DOWNLOADING;
+          } else {
+            message = 'Unavailable';
+            status = ApiStatus.UNAVAILABLE;
+          }
+          return {
+            sourceLanguage: pair.source,
+            targetLanguage: pair.target,
+            status,
             message,
-            progress: undefined 
-        });
-      } catch (e: any) {
-        statuses.push({ 
-            sourceLanguage: pair.source, 
-            targetLanguage: pair.target, 
-            status: ApiStatus.ERROR, 
-            message: `Error: ${e.message}` 
-        });
-      }
-    }
+            progress: undefined
+          };
+        } catch (e: any) {
+          return {
+            sourceLanguage: pair.source,
+            targetLanguage: pair.target,
+            status: ApiStatus.ERROR,
+            message: `Error: ${e.message}`
+          };
+        }
+      })
+    );
     this.languagePacksStatus = statuses;
     this.cdr.detectChanges();
   }

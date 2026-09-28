@@ -1,8 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { PanelTab } from '../../enums/panel-tab.enum';
 import { MenuItemConfig } from '../../interfaces/menu-item-config.interface';
-import { APP_VERSION, DiagnosisService } from 'base';
-import { Observable } from 'rxjs';
+import { APP_VERSION, DiagnosisService, ModelManager } from 'base';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,12 +10,15 @@ import { Observable } from 'rxjs';
   styleUrls: ['./sidebar.component.scss'],
   standalone: false
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
   appVersion = APP_VERSION;
   errorCount$: Observable<number>;
 
   sidebarWidth = 256;
   isResizingSidebar = false;
+  nanoStatusLabel = 'Nano: Checking...';
+  nanoDotClass = 'status-gray';
+  private subscription: Subscription | null = null;
 
   readonly menuItems: MenuItemConfig[] = [
     { id: PanelTab.OVERVIEW, label: 'Overview', iconClass: 'fa-solid fa-gauge-high', isApi: false, isManagement: false },
@@ -34,8 +37,48 @@ export class SidebarComponent {
     { id: PanelTab.CLASSIFIER, label: 'Classifier API', iconClass: 'fa-solid fa-signs-post', isApi: true, isManagement: false },
   ];
 
-  constructor(private diagnosisService: DiagnosisService) {
+  constructor(
+    private diagnosisService: DiagnosisService,
+    private modelManager: ModelManager,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.errorCount$ = this.diagnosisService.errorCount$;
+  }
+
+  ngOnInit(): void {
+    this.refreshNanoStatus();
+    if (this.modelManager?.modelDownloadedEvent) {
+      this.subscription = this.modelManager.modelDownloadedEvent.subscribe(() => {
+        this.refreshNanoStatus();
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  async refreshNanoStatus(): Promise<void> {
+    try {
+      const status = await this.modelManager.availability();
+      if (status === 'available' || (status as string) === 'readily') {
+        this.nanoStatusLabel = 'Nano: Ready';
+        this.nanoDotClass = 'status-green';
+      } else if (status === 'downloadable' || (status as string) === 'after-download') {
+        this.nanoStatusLabel = 'Nano: Downloadable';
+        this.nanoDotClass = 'status-amber';
+      } else if (status === 'downloading') {
+        this.nanoStatusLabel = 'Nano: Downloading';
+        this.nanoDotClass = 'status-blue';
+      } else {
+        this.nanoStatusLabel = 'Nano: Unavailable';
+        this.nanoDotClass = 'status-red';
+      }
+    } catch {
+      this.nanoStatusLabel = 'Nano: Unavailable';
+      this.nanoDotClass = 'status-red';
+    }
+    this.cdr.detectChanges();
   }
 
   @HostListener('document:mousemove', ['$event'])

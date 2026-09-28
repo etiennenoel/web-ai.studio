@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Extract version from package.json
 VERSION=$(node -p "require('./package.json').version")

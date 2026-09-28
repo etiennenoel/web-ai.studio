@@ -38,8 +38,8 @@
       <div class="text-xs text-gray-500 flex flex-col items-center justify-center" [ngClass]="{'items-start': sidebarWidth >= 120}">
           <span *ngIf="sidebarWidth >= 120" class="whitespace-nowrap">Extension v{{ appVersion }}</span>
           <div class="mt-1 flex items-center gap-2">
-              <div class="status-dot status-green shrink-0" title="Nano: Ready"></div>
-              <span *ngIf="sidebarWidth >= 120" class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Nano: Ready</span>
+              <div class="status-dot shrink-0" [ngClass]="nanoDotClass" [title]="nanoStatusLabel"></div>
+              <span *ngIf="sidebarWidth >= 120" class="text-gray-600 dark:text-gray-400 whitespace-nowrap">{{ nanoStatusLabel }}</span>
           </div>
       </div>
   </div>

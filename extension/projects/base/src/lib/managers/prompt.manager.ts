@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
+import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class PromptManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await window.LanguageModel.availability(options);
+    return await withAvailabilityTimeout(window.LanguageModel.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
   }
 
   async createSession(options?: any): Promise<any> {
@@ -27,7 +28,7 @@ export class PromptManager {
       return null;
     }
     // @ts-ignore
-    return await window.LanguageModel.params();
+    return await withAvailabilityTimeout(window.LanguageModel.params(), DEFAULT_AVAILABILITY_TIMEOUT_MS, null);
   }
 
   getCodeSnippet(options: any, promptText: string): string {
@@ -73,7 +74,7 @@ export class PromptManager {
 
     try {
       // @ts-ignore
-      const availability = await window.LanguageModel.availability();
+      const availability = await withAvailabilityTimeout(window.LanguageModel.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
       
       checks.push({
         titleHtml: 'Availability Check',

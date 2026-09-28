@@ -11,6 +11,8 @@ import { ProofreaderManager } from '../managers/proofreader.manager';
 import { SummarizerManager } from '../managers/summarizer.manager';
 import { TranslatorManager } from '../managers/translator.manager';
 import { LanguageDetectorManager } from '../managers/language-detector.manager';
+import { ClassifierManager } from '../managers/classifier.manager';
+import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
 
 declare const chrome: any;
 declare const window: any;
@@ -69,7 +71,8 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
     private proofreaderManager: ProofreaderManager,
     private summarizerManager: SummarizerManager,
     private translatorManager: TranslatorManager,
-    private detectorManager: LanguageDetectorManager
+    private detectorManager: LanguageDetectorManager,
+    private classifierManager: ClassifierManager
   ) {}
 
   ngOnInit() {
@@ -106,6 +109,9 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.modelManager.modelDownloadedEvent.subscribe(() => {
         this.refreshApis();
+      }),
+      this.classifierManager.modelsChangedEvent.subscribe(() => {
+        this.refreshApis();
       })
     );
 
@@ -122,42 +128,99 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
   }
 
   async refreshApis() {
-    const apiAvailabilities: ApiAvailability[] = [];
-
-    const checkAvailability = async (id: string, name: string, description: string, icon: string, apiObj: any, extraOptions?: any) => {
-      const cap: ApiAvailability = { id, name, description, status: 'unknown', icon };
-      apiAvailabilities.push(cap);
-      try {
-        if (apiObj) {
-          cap.status = await apiObj.availability(extraOptions);
-        } else {
-          cap.status = 'unavailable';
+    let targetLanguage = "es";
+    if (typeof navigator !== 'undefined' && Array.isArray(navigator.languages)) {
+      for (const lang of navigator.languages) {
+        if (!lang.startsWith("en")) {
+          targetLanguage = lang;
+          break;
         }
+      }
+    }
+
+    const definitions: { id: string; name: string; description: string; icon: string; check: () => Promise<string> }[] = [
+      {
+        id: 'prompt',
+        name: 'Prompt API',
+        description: 'Interactive chat',
+        icon: 'fa-solid fa-comments',
+        check: () => window.LanguageModel ? withAvailabilityTimeout(window.LanguageModel.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'summarizer',
+        name: 'Summarizer API',
+        description: 'Condense text',
+        icon: 'fa-solid fa-compress',
+        check: () => window.Summarizer ? withAvailabilityTimeout(window.Summarizer.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'writer',
+        name: 'Writer API',
+        description: 'Generate content',
+        icon: 'fa-solid fa-pen-nib',
+        check: () => window.Writer ? withAvailabilityTimeout(window.Writer.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'rewriter',
+        name: 'Rewriter API',
+        description: 'Refine text',
+        icon: 'fa-solid fa-wand-magic-sparkles',
+        check: () => window.Rewriter ? withAvailabilityTimeout(window.Rewriter.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'detector',
+        name: 'Language Detector',
+        description: 'Identify languages',
+        icon: 'fa-solid fa-language',
+        check: () => window.LanguageDetector ? withAvailabilityTimeout(window.LanguageDetector.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'translator',
+        name: 'Translator API',
+        description: 'Translate text',
+        icon: 'fa-solid fa-globe',
+        check: () => window.Translator ? withAvailabilityTimeout(window.Translator.availability({ sourceLanguage: "en", targetLanguage }), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'proofreader',
+        name: 'Proofreader API',
+        description: 'Fix grammar',
+        icon: 'fa-solid fa-check-double',
+        check: () => window.Proofreader ? withAvailabilityTimeout(window.Proofreader.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable') : Promise.resolve('unavailable'),
+      },
+      {
+        id: 'classifier',
+        name: 'Classifier API',
+        description: 'Typed decisions (polyfill)',
+        icon: 'fa-solid fa-signs-post',
+        check: () => withAvailabilityTimeout(this.classifierManager.availability({}), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable'),
+      },
+    ];
+
+    const apiAvailabilities: ApiAvailability[] = definitions.map(({ id, name, description, icon }) => ({
+      id,
+      name,
+      description,
+      status: 'unknown',
+      icon,
+    }));
+
+    this.apiCapabilities = apiAvailabilities;
+    this.cdr.detectChanges();
+
+    const apiPromises = definitions.map(async (def, index) => {
+      const cap = apiAvailabilities[index];
+      try {
+        cap.status = await def.check();
       } catch (e: any) {
         cap.status = "error";
         cap.error = e.message;
       }
-    };
+      this.cdr.detectChanges();
+    });
 
-    await checkAvailability('prompt', 'Prompt API', 'Interactive chat', 'fa-solid fa-comments', window.LanguageModel);
-    await checkAvailability('summarizer', 'Summarizer API', 'Condense text', 'fa-solid fa-compress', window.Summarizer);
-    await checkAvailability('writer', 'Writer API', 'Generate content', 'fa-solid fa-pen-nib', window.Writer);
-    await checkAvailability('rewriter', 'Rewriter API', 'Refine text', 'fa-solid fa-wand-magic-sparkles', window.Rewriter);
-    await checkAvailability('detector', 'Language Detector', 'Identify languages', 'fa-solid fa-language', window.LanguageDetector);
-
-    let targetLanguage = "es";
-    for (const lang of navigator.languages) {
-      if (!lang.startsWith("en")) {
-        targetLanguage = lang;
-        break;
-      }
-    }
-    await checkAvailability('translator', 'Translator API', 'Translate text', 'fa-solid fa-globe', window.Translator, { sourceLanguage: "en", targetLanguage });
-    await checkAvailability('proofreader', 'Proofreader API', 'Fix grammar', 'fa-solid fa-check-double', window.Proofreader);
-
-    this.apiCapabilities = apiAvailabilities;
-
-    try {
+    const modelPromise = (async () => {
+      try {
         this.modelStatus = await this.modelManager.availability();
         if (this.modelStatus === 'available' || this.modelStatus === 'readily' as any) {
             this.modelStatusText = 'Ready';
@@ -176,14 +239,16 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
             this.modelVariant = '-';
             this.modelStatusClass = 'bg-gray-300 dark:bg-gray-500';
         }
-    } catch (e: any) {
+      } catch (e: any) {
         this.modelStatus = 'error';
         this.modelStatusText = 'Error';
         this.modelVariant = '-';
         this.modelStatusClass = 'bg-red-400';
-    }
+      }
+      this.cdr.detectChanges();
+    })();
 
-    this.cdr.detectChanges();
+    await Promise.all([...apiPromises, modelPromise]);
   }
 
   async handleModelDownload() {
@@ -290,6 +355,17 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
               case 'detector':
                  result = await this.detectorManager.create(options);
                  break;
+              case 'classifier': {
+                 const variantId = await this.classifierManager.getActiveVariantId();
+                 await this.classifierManager.downloadModel(variantId, (loaded) => {
+                     const download = this.activeDownloads.get(apiId);
+                     if (download) {
+                         download.progress = Math.round(loaded * 100);
+                         this.cdr.detectChanges();
+                     }
+                 });
+                 break;
+              }
              default:
                  console.warn(`Unknown API ID: ${apiId}`);
                  throw new Error('Unknown API');

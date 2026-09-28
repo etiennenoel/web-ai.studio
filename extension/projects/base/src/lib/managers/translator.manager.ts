@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
+import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class TranslatorManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await window.Translator.availability(options);
+    return await withAvailabilityTimeout(window.Translator.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
   }
 
   async create(options?: any): Promise<any> {
@@ -70,10 +71,10 @@ console.log(result);`;
     // Check 2: Availability
     try {
       // @ts-ignore
-      const availability = await window.Translator.availability({
+      const availability = await withAvailabilityTimeout(window.Translator.availability({
           sourceLanguage: 'en',
           targetLanguage: 'es'
-      });
+      }), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
       
       checks.push({
         titleHtml: 'Availability Check (en -> es)',
