@@ -15,7 +15,7 @@ export class PromptManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(window.LanguageModel.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+    return await withAvailabilityTimeout(() => window.LanguageModel.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
   }
 
   async createSession(options?: any): Promise<any> {
@@ -28,7 +28,7 @@ export class PromptManager {
       return null;
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(window.LanguageModel.params(), DEFAULT_AVAILABILITY_TIMEOUT_MS, null);
+    return await withAvailabilityTimeout(() => window.LanguageModel.params(), DEFAULT_AVAILABILITY_TIMEOUT_MS, null);
   }
 
   getCodeSnippet(options: any, promptText: string): string {

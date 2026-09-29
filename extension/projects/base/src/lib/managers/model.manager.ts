@@ -13,7 +13,7 @@ export class ModelManager {
           return 'unavailable';
         }
         return withAvailabilityTimeout(
-          Summarizer.availability({ outputLanguage: 'en' }), // We use the Summarizer because that's the API that is GA.
+          () => Summarizer.availability({ outputLanguage: 'en' }), // We use the Summarizer because that's the API that is GA.
           DEFAULT_AVAILABILITY_TIMEOUT_MS,
           'unavailable',
         );

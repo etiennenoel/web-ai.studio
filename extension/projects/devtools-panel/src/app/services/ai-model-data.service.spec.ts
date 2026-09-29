@@ -34,6 +34,11 @@ describe('AiModelDataService', () => {
       availability: jasmine.createSpy('availability').and.returnValue(Promise.resolve('downloadable')),
     };
     delete (self as any).Writer;
+    delete (self as any).Rewriter;
+    delete (self as any).Translator;
+    delete (self as any).LanguageDetector;
+    delete (self as any).Proofreader;
+    delete (self as any).ai;
 
     const updates: number[] = [];
     const result = await service.getApiAvailability((caps) => {
@@ -52,5 +57,19 @@ describe('AiModelDataService', () => {
     const hangingPromise = new Promise<string>(() => {});
     const result = await withAvailabilityTimeout(hangingPromise, 25, 'unavailable');
     expect(result).toBe('unavailable');
+  });
+
+  it('withAvailabilityTimeout should retry a factory function when the first cold-start call hangs', async () => {
+    let calls = 0;
+    const factory = () => {
+      calls++;
+      if (calls === 1) {
+        return new Promise<string>(() => {}); // Simulate cold-start hang
+      }
+      return Promise.resolve('downloadable');
+    };
+    const result = await withAvailabilityTimeout(factory, 2000, 'unavailable');
+    expect(calls).toBe(2);
+    expect(result).toBe('downloadable');
   });
 });

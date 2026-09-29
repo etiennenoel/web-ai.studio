@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, signal, WritableSignal, OnDestroy
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-import { APP_VERSION, ClassifierManager, findClassifierModelVariant, classifierModelTotalBytes } from 'base';
+import { APP_VERSION, ClassifierManager, findClassifierModelVariant, classifierModelTotalBytes, DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from 'base';
 
 type ModelDownloadStatus = 'unknown' | 'downloadable' | 'downloading' | 'available' | 'unavailable' | 'error';
 
@@ -102,8 +102,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   async checkAvailability() {
     try {
-      // @ts-expect-error
-      const status = await Summarizer.availability({ outputLanguage: "en" }); // Using summarizer because it's shipped.
+      const win = self as any;
+      if (typeof win.Summarizer === 'undefined' || typeof win.Summarizer.availability !== 'function') {
+        this.downloadStatus.set('unavailable');
+        return;
+      }
+      const status = await withAvailabilityTimeout<ModelDownloadStatus>(
+        () => win.Summarizer.availability({ outputLanguage: "en" }), // Using summarizer because it's shipped.
+        DEFAULT_AVAILABILITY_TIMEOUT_MS,
+        'unavailable',
+      );
       this.downloadStatus.set(status);
       if (status === "downloading") {
         this.monitorDownloadProgress();

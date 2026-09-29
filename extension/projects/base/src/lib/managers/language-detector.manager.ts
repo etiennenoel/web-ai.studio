@@ -15,7 +15,7 @@ export class LanguageDetectorManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(window.LanguageDetector.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+    return await withAvailabilityTimeout(() => window.LanguageDetector.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
   }
 
   async create(options?: any): Promise<any> {

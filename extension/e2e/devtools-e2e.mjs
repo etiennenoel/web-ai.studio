@@ -250,7 +250,7 @@ async function runE2E() {
 
     // 5. Poll the Overview panel until all 8 API capability cards and System Health cards resolve
     let overviewState = null;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 50; i++) {
       await new Promise((r) => setTimeout(r, 250));
       const evalRes = await sendCdp(panelWs, 'Runtime.evaluate', {
         expression: `(() => {
@@ -317,6 +317,7 @@ async function runE2E() {
     );
     console.log(
       '[E2E] Overview panel verified: all 8 API cards, Gemini Nano card, Classifier card, and Sidebar settled cleanly.',
+      { modelCard: overviewState.modelCardText, badges: overviewState.badgeTexts },
     );
 
     // 6. Navigate to the Diagnosis panel and verify it completes all checks without hanging
@@ -330,7 +331,7 @@ async function runE2E() {
     });
 
     let diagnosisState = null;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 50; i++) {
       await new Promise((r) => setTimeout(r, 250));
       const evalRes = await sendCdp(panelWs, 'Runtime.evaluate', {
         expression: `(() => {
