@@ -341,27 +341,27 @@
               }
             </div>
 
-            <!-- Classifier -->
+            <!-- Decisions -->
             <div>
-              <a [routerLink]="getRouterLink(RouteEnum.ClassifierApi)"
+              <a [routerLink]="getRouterLink(RouteEnum.DecisionsApi)"
                  class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-                 [ngClass]="routeEnum === RouteEnum.ClassifierApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
-                @if (routeEnum === RouteEnum.ClassifierApi) {
+                 [ngClass]="routeEnum === RouteEnum.DecisionsApi ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+                @if (routeEnum === RouteEnum.DecisionsApi) {
                   <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
                 }
                 <div class="flex items-center">
                   <i class="bi bi-ui-checks-grid text-sm w-6 flex justify-start"></i>
-                  <span>Classifier</span>
+                  <span>Decisions</span>
                 </div>
               </a>
-              @if (routeEnum === RouteEnum.ClassifierApi) {
+              @if (routeEnum === RouteEnum.DecisionsApi) {
                 <div class="flex flex-col gap-1 pl-6 mt-1 mb-2 relative before:content-[''] before:absolute before:left-[14px] before:top-1 before:bottom-1 before:w-px before:bg-slate-200 dark:before:bg-zinc-800">
                   <button (click)="scrollTo('use-cases', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Use cases</button>
                   <button (click)="scrollTo('question-types', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Question types</button>
-                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Classifier.availability()</button>
-                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">Classifier.create()</button>
-                  <button (click)="scrollTo('classify', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">classifier.classify()</button>
-                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">classifier.destroy()</button>
+                  <button (click)="scrollTo('availability', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">DecisionModel.availability()</button>
+                  <button (click)="scrollTo('create', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">DecisionModel.create()</button>
+                  <button (click)="scrollTo('classify', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">decisionModel.classify()</button>
+                  <button (click)="scrollTo('destroy', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">decisionModel.destroy()</button>
                   <button (click)="scrollTo('api-reference', $event)" class="text-left text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 py-1 transition-colors relative hover:before:content-[''] hover:before:absolute hover:before:-left-[11px] hover:before:top-1/2 hover:before:-translate-y-1/2 hover:before:w-[3px] hover:before:h-[3px] hover:before:bg-indigo-500 hover:before:rounded-full">API reference</button>
                 </div>
               }
@@ -577,16 +577,16 @@
               </div>
             </a>
 
-            <!-- Classifier API -->
-            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsClassifier)"
+            <!-- Decisions API -->
+            <a [routerLink]="getRouterLink(RouteEnum.PlaygroundsDecisions)"
                class="!no-underline group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer relative"
-               [ngClass]="routeEnum === RouteEnum.PlaygroundsClassifier ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
-              @if (routeEnum === RouteEnum.PlaygroundsClassifier) {
+               [ngClass]="routeEnum === RouteEnum.PlaygroundsDecisions ? 'bg-slate-100 dark:bg-zinc-800/80 !text-slate-900 dark:!text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700/50' : '!text-slate-500 dark:!text-slate-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40 hover:!text-slate-800 dark:hover:!text-slate-200'">
+              @if (routeEnum === RouteEnum.PlaygroundsDecisions) {
                 <div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-indigo-500 rounded-full"></div>
               }
               <div class="flex items-center">
                 <i class="bi bi-ui-checks-grid text-sm w-6 flex justify-start"></i>
-                <span>Classifier API</span>
+                <span>Decisions API</span>
               </div>
             </a>
 

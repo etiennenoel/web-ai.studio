@@ -1,8 +1,8 @@
 <section class="p-6 h-full flex flex-col overflow-y-auto">
     <div class="flex justify-between items-center mb-2 flex-shrink-0 relative w-full z-50">
-        <h2 class="text-xl font-semibold">Classifier API</h2>
+        <h2 class="text-xl font-semibold">Decisions API</h2>
         <app-api-status
-            [apiName]="'Classifier'"
+            [apiName]="'Decisions'"
             [statusText]="statusText"
             [isAvailable]="isApiAvailable"
             [isWarning]="isWarning"
@@ -11,8 +11,8 @@
         </app-api-status>
     </div>
     <p class="text-xs text-gray-600 dark:text-gray-400 mb-6">
-        Served by the extension's polyfill (<code>window.Classifier</code> on every page) following the
-        <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-500 hover:underline">Classifier API explainer</a>.
+        Served by the extension's polyfill (<code>window.DecisionModel</code> on every page) following the
+        <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" class="text-blue-500 hover:underline">Decisions API explainer</a>.
         Runs a Laya decision encoder locally with LiteRT.js.
     </p>
 
@@ -23,7 +23,7 @@
         <!-- Schema -->
         <div class="bg-gray-50 dark:bg-[#292a2d] p-4 rounded border border-gray-300 dark:border-[#3c4043] flex flex-col">
             <div class="flex justify-between items-center mb-2">
-                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase">Schema (ClassifierCreateOptions)</label>
+                <label class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase">Schema (DecisionModelCreateOptions)</label>
                 <select (change)="loadPreset($any($event.target).value)" class="bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#3c4043] rounded p-1 text-xs text-gray-800 dark:text-gray-200">
                     <option value="">Load a preset...</option>
                     <option *ngFor="let p of presets" [value]="p.id">{{ p.title }}</option>

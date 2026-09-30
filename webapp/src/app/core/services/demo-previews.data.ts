@@ -589,7 +589,7 @@ setScene({ room: "living", scene: "evening" })
 }`,
   },
 
-  // ----------------------------------------------------------- Classifier API
+  // ----------------------------------------------------------- Decisions API
   'system1-ticket-router': {
     kind: 'io',
     rows: [
@@ -655,9 +655,9 @@ setScene({ room: "living", scene: "evening" })
 
   'system1-system2-cascade': {
     kind: 'list',
-    query: '13 comments · 10 resolved by Classifier, 3 escalated to LLM judge',
+    query: '13 comments · 10 resolved by DecisionModel, 3 escalated to LLM judge',
     rows: [
-      { text: '"This tutorial saved my weekend, thank you!"', score: 0.96, meta: 'benign · Classifier' },
+      { text: '"This tutorial saved my weekend, thank you!"', score: 0.96, meta: 'benign · DecisionModel' },
       { text: '"Wow, genius idea. Slow clap."', score: 0.58, meta: 'toxic · LLM judge' },
     ],
   },

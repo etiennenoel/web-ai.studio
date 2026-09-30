@@ -53,7 +53,7 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
   demoDownloading = false;
   demoProgress = 0;
 
-  readonly demoCode = `const classifier = await Classifier.create({
+  readonly demoCode = `const decisionModel = await DecisionModel.create({
   context: "Document editor command palette",
   questions: [
     {
@@ -70,10 +70,10 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
 });
 
 // The result is a record keyed by question id, so destructure directly.
-const { command } = await classifier.classify("let my coworkers view this file");
+const { command } = await decisionModel.classify("let my coworkers view this file");
 // command -> { id: "command", label: "share_link", confidence: 0.93, probabilities: [...] }
 console.log(command.label, command.confidence.toFixed(3), command.probabilities);
-classifier.destroy();`;
+decisionModel.destroy();`;
 
   private readonly isBrowser: boolean;
 

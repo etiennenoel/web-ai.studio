@@ -26,7 +26,7 @@ import { classifierModelTotalBytes, findClassifierModelVariant } from '../regist
                [ngClass]="isCached ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'">
             <i class="fa-solid fa-signs-post"></i>
           </div>
-          <span class="text-xs text-gray-600 dark:text-gray-400 font-mono uppercase">Classifier API Model</span>
+          <span class="text-xs text-gray-600 dark:text-gray-400 font-mono uppercase">Decisions API Model</span>
         </div>
         <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shrink-0" [ngClass]="badgeClass">{{ badgeText }}</span>
       </div>
@@ -34,7 +34,7 @@ import { classifierModelTotalBytes, findClassifierModelVariant } from '../regist
 
       <p *ngIf="variant" class="text-xs text-gray-600 dark:text-gray-400 mb-3">
         {{ variant.description }} {{ sizeLabel }} from Hugging Face, cached in the extension.
-        Powers <code>window.Classifier</code> on every page.
+        Powers <code>window.DecisionModel</code> on every page.
       </p>
 
       <!-- Model selector -->

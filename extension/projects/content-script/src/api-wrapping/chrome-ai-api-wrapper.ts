@@ -17,16 +17,16 @@ const WRAPPED_INSTANCE_METHODS = [
   'detect', 'write', 'writeStreaming',
   'rewrite', 'rewriteStreaming',
   'proofread', 'proofreadStreaming',
-  'classify', 'measureContextUsage',
+  'classify', 'decide', 'measureContextUsage',
   'clone', 'destroy',
 ] as const;
 
 /**
- * APIs that are never routed to an external provider. The Classifier API is
+ * APIs that are never routed to an external provider. The Decisions API is
  * served by the extension's own on-device polyfill, so the routing setting
  * (Gemini/OpenAI) does not apply to it.
  */
-const LOCAL_ONLY_APIS: readonly string[] = ['Classifier'];
+const LOCAL_ONLY_APIS: readonly string[] = ['DecisionModel', 'Classifier'];
 
 /**
  * Methods available on mock instances returned when routing to an external provider.

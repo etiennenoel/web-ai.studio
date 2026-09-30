@@ -21,8 +21,8 @@ interface CategoryStyle {
 })
 export class DemosPage extends BasePage implements OnInit {
   demos: DemoExample[] = DEMOS_DATA;
-  categories: DemoCategory[] = ['Classification', 'Embeddings', 'Speech', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
-  apis: DemoApi[] = ['Prompt API', 'Classifier', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader'];
+  categories: DemoCategory[] = ['Decisions', 'Embeddings', 'Speech', 'Text Input', 'Image Input', 'Audio Input', 'Tools Calling', 'Mix-and-Match'];
+  apis: DemoApi[] = ['Prompt API', 'Decisions', 'Semantic Embedder', 'Web Speech', 'Translator', 'Language Detector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader'];
 
   searchQuery = '';
   selectedCategory: DemoCategory | null = null;
@@ -38,7 +38,7 @@ export class DemosPage extends BasePage implements OnInit {
 
   availability: Record<DemoApi, DemoApiAvailability> = {
     'Prompt API': 'checking',
-    'Classifier': 'checking',
+    'Decisions': 'checking',
     'Semantic Embedder': 'checking',
     'Web Speech': 'checking',
     'Translator': 'checking',
@@ -50,7 +50,7 @@ export class DemosPage extends BasePage implements OnInit {
   };
 
   private readonly categoryStyles: Record<DemoCategory, CategoryStyle> = {
-    'Classification': {
+    'Decisions': {
       icon: 'text-fuchsia-600 dark:text-fuchsia-400',
       iconContainer: 'bg-fuchsia-50 dark:bg-fuchsia-500/10',
     },
@@ -113,13 +113,19 @@ export class DemosPage extends BasePage implements OnInit {
     this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
       this.searchQuery = params.get('q') ?? '';
 
-      const category = params.get('category');
+      const rawCategory = params.get('category');
+      const category = rawCategory === 'Classification' ? 'Decisions' : rawCategory;
       this.selectedCategory = this.categories.find(c => c === category) ?? null;
 
-      const api = params.get('api');
+      const rawApi = params.get('api');
+      const api = rawApi === 'Classifier' ? 'Decisions' : rawApi;
       this.selectedApi = this.apis.find(a => a === api) ?? null;
 
       this.onlyUnexplored = params.get('unexplored') === '1';
+
+      if (rawCategory === 'Classification' || rawApi === 'Classifier') {
+        this.syncQueryParams();
+      }
     }));
 
     this.subscriptions.push(this.demoAvailabilityService.availability$.subscribe(availability => {

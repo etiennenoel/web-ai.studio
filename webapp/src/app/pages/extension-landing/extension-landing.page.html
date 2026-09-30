@@ -11,7 +11,7 @@
           <i class="bi bi-stars text-yellow-500"></i> New in v0.12.0
         </span>
         <span class="inline-flex items-center gap-2 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
-          <i class="bi bi-signpost-split"></i> Classifier API polyfill
+          <i class="bi bi-signpost-split"></i> Decisions API polyfill
         </span>
       </div>
       <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white tracking-tight">
@@ -23,15 +23,15 @@
       </p>
       <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
         The WebAI extension now polyfills the proposed
-        <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Classifier API</a>
-        on every page you visit: <code class="text-base bg-gray-200 dark:bg-[#35363a] px-1.5 py-0.5 rounded">window.Classifier</code>, backed by the open Laya decision encoder running locally with LiteRT.js. It stays the DevTools companion for all of Chrome's built-in AI APIs.
+        <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Decisions API</a>
+        on every page you visit: <code class="text-base bg-gray-200 dark:bg-[#35363a] px-1.5 py-0.5 rounded">window.DecisionModel</code>, backed by the open Laya decision encoder running locally with LiteRT.js. It stays the DevTools companion for all of Chrome's built-in AI APIs.
       </p>
       <div class="flex flex-wrap items-center justify-center gap-4">
         <a [href]="webStoreUrl" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-3 text-lg font-semibold shadow-sm hover:shadow-md transition-all">
           <i class="bi bi-chrome"></i> Install Extension
         </a>
-        <a routerLink="/playgrounds/classifier" class="flex items-center justify-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-full px-8 py-3 text-lg font-semibold transition-all !no-underline">
-          <i class="bi bi-play-circle"></i> Classifier Playground
+        <a routerLink="/playgrounds/decisions" class="flex items-center justify-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-full px-8 py-3 text-lg font-semibold transition-all !no-underline">
+          <i class="bi bi-play-circle"></i> Decisions Playground
         </a>
         <a href="https://github.com/etiennenoel/web-ai.studio/tree/master/extension" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-full px-8 py-3 text-lg font-semibold transition-all">
           <i class="bi bi-github"></i> View Source
@@ -49,15 +49,15 @@
           @switch (classifierProvider) {
             @case ('checking') {
               <i class="bi bi-hourglass-split text-gray-500"></i>
-              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Checking whether <code>window.Classifier</code> exists on this page...</span>
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Checking whether <code>window.DecisionModel</code> exists on this page...</span>
             }
             @case ('extension') {
               <i class="bi bi-puzzle-fill text-emerald-600 dark:text-emerald-400 text-lg"></i>
-              <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">The WebAI extension is installed. <code>window.Classifier</code> is live on this page, served by the local Laya model.</span>
+              <span class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">The WebAI extension is installed. <code>window.DecisionModel</code> is live on this page, served by the local Laya model.</span>
             }
             @case ('none') {
               <i class="bi bi-exclamation-triangle-fill text-amber-600 dark:text-amber-400 text-lg"></i>
-              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">This page has no <code>window.Classifier</code>. Chrome does not ship it yet; install the extension, reload, and the demo below runs on your device.</span>
+              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">This page has no <code>window.DecisionModel</code>. Chrome does not ship it yet; install the extension, reload, and the demo below runs on your device.</span>
               <a [href]="webStoreUrl" target="_blank" rel="noopener noreferrer" class="ml-auto inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors">
                 <i class="bi bi-chrome"></i> Install and reload
               </a>
@@ -141,8 +141,8 @@
               <li class="flex gap-2"><i class="bi bi-check-circle-fill text-emerald-500 mt-0.5"></i><span>Pick the model in the extension settings; inspect every call in the DevTools panel.</span></li>
             </ul>
             <div class="mt-4 flex flex-wrap gap-3 text-sm">
-              <a routerLink="/docs/classifier" class="!no-underline inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:opacity-90"><i class="bi bi-book"></i> Read the Classifier docs</a>
-              <a routerLink="/demos" class="!no-underline inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold"><i class="bi bi-grid"></i> See the 8 Classifier demos</a>
+              <a routerLink="/docs/decisions" class="!no-underline inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:opacity-90"><i class="bi bi-book"></i> Read the Decisions docs</a>
+              <a routerLink="/demos" class="!no-underline inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold"><i class="bi bi-grid"></i> See the 8 Decisions demos</a>
             </div>
           </div>
         </div>
@@ -214,7 +214,7 @@
             </div>
             <div (click)="setTab('classifier')" [ngClass]="activeTab === 'classifier' ? 'bg-gray-200 dark:bg-[#35363a] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#35363a] text-gray-600 dark:text-gray-400 cursor-pointer'" class="px-3 py-2 rounded text-sm flex items-center gap-3 transition-colors">
               <i class="bi bi-signpost-split text-gray-500"></i>
-              <span class="flex-1">Classifier API</span>
+              <span class="flex-1">Decisions API</span>
               <span class="bg-purple-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">New</span>
             </div>
           </div>
@@ -508,11 +508,11 @@
           </div>
         </div>
 
-        <!-- Classifier API Tab -->
+        <!-- Decisions API Tab -->
         <div *ngIf="activeTab === 'classifier'" class="p-6 animate-fade-in">
           <div class="flex justify-between items-start mb-5">
             <div>
-              <h2 class="text-2xl font-bold mb-1">Classifier API</h2>
+              <h2 class="text-2xl font-bold mb-1">Decisions API</h2>
               <p class="text-sm text-gray-500 dark:text-gray-400">Served by the extension's polyfill on every page. Runs a Laya decision encoder locally with LiteRT.js.</p>
             </div>
             <div class="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
@@ -528,7 +528,7 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-gray-50 dark:bg-[#292a2d] p-3 rounded border border-gray-300 dark:border-[#3c4043]">
-              <div class="text-[10px] uppercase font-bold text-gray-500 mb-2">Schema (ClassifierCreateOptions)</div>
+              <div class="text-[10px] uppercase font-bold text-gray-500 mb-2">Schema (DecisionModelCreateOptions)</div>
               <pre class="text-[10px] font-mono text-gray-700 dark:text-gray-300 leading-snug overflow-hidden">{{ '{' }}
   "context": "Enterprise customer support ticket router.",
   "questions": [
@@ -589,14 +589,14 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Feature 0: Classifier API polyfill -->
+        <!-- Feature 0: Decisions API polyfill -->
         <div class="bg-[#ffffff] dark:bg-[#292a2d] p-6 rounded-2xl border border-purple-200 dark:border-purple-800/60 hover:border-purple-400 dark:hover:border-purple-500 transition-colors">
           <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4">
             <i class="bi bi-signpost-split text-xl text-purple-600 dark:text-purple-400"></i>
           </div>
-          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Classifier API Polyfill <span class="ml-1 align-middle text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-600 text-white">New</span></h3>
+          <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Decisions API Polyfill <span class="ml-1 align-middle text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-600 text-white">New</span></h3>
           <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-            <code>window.Classifier</code> on every page, months before it ships in Chrome. Typed decisions from a local Laya model, with a dedicated DevTools tab, model management, history, and diagnosis.
+            <code>window.DecisionModel</code> on every page, months before it ships in Chrome. Typed decisions from a local Laya model, with a dedicated DevTools tab, model management, history, and diagnosis.
           </p>
         </div>
 

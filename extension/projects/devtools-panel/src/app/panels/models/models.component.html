@@ -37,12 +37,12 @@
         </table>
     </div>
 
-    <!-- Classifier API polyfill models -->
+    <!-- Decisions API polyfill models -->
     <div class="flex justify-between items-center mt-10 mb-4">
         <div>
-            <h2 class="text-xl font-semibold">Classifier API Models</h2>
+            <h2 class="text-xl font-semibold">Decisions API Models</h2>
             <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Downloaded from Hugging Face and cached in the extension. The active model backs <code>window.Classifier</code> on every page.
+                Downloaded from Hugging Face and cached in the extension. The active model backs <code>window.DecisionModel</code> on every page.
             </p>
         </div>
         <button (click)="unloadClassifier()" class="text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white flex items-center gap-1" title="Free memory; the model reloads on next use">

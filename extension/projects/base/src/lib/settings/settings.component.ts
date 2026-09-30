@@ -62,7 +62,7 @@ const DEFAULT_PROVIDERS: Provider[] = [
             </div>
           </label>
 
-          <!-- Classifier API polyfill -->
+          <!-- Decisions API polyfill -->
           <div class="flex flex-col gap-3 p-5 bg-gray-50 dark:bg-[#292a2d] border border-gray-300 dark:border-[#3c4043] rounded-xl transition-all">
             <label class="flex items-start gap-4 cursor-pointer group">
               <div class="flex-shrink-0 mt-1">
@@ -75,17 +75,17 @@ const DEFAULT_PROVIDERS: Provider[] = [
                 >
               </div>
               <div class="flex-1">
-                <div class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-white transition-colors">Enable Classifier API polyfill</div>
+                <div class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-white transition-colors">Enable Decisions API polyfill</div>
                 <div class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
-                  Exposes <code>window.Classifier</code> on every page when Chrome has no native implementation, following the
-                  <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-500 hover:underline">Classifier API explainer</a>.
+                  Exposes <code>window.DecisionModel</code> on every page when Chrome has no native implementation, following the
+                  <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" class="text-blue-500 hover:underline">Decisions API explainer</a>.
                   Inference runs locally with LiteRT.js; the model is downloaded from Hugging Face on first use.
                 </div>
               </div>
             </label>
 
             <div>
-              <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Classifier model</h4>
+              <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Decision model</h4>
               <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Only Laya decision encoders are supported for now. Changing the model affects new sessions.</p>
             </div>
             <select

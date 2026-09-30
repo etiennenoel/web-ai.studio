@@ -21,7 +21,7 @@ import { findClassifierModelVariant, classifierModelTotalBytes } from '../regist
     <div class="rounded-xl border border-gray-300 dark:border-[#3c4043] bg-gray-50 dark:bg-[#292a2d] overflow-hidden">
       <!-- Status bar -->
       <div class="px-4 py-3 border-b border-gray-300 dark:border-[#3c4043] flex flex-wrap items-center gap-3 bg-white dark:bg-[#202124]">
-        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Classifier API</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Decisions API</span>
         <span class="text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider" [ngClass]="badgeClass">{{ badgeText }}</span>
         <span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ modelName }}</span>
         <div *ngIf="downloading" class="flex items-center gap-2 ml-auto text-xs text-blue-600 dark:text-blue-400">

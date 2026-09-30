@@ -122,10 +122,10 @@ export class ClassifierManager {
   getCodeSnippet(schema: ClassifierSchema, input: string): string {
     return `const schema = ${JSON.stringify(schema, null, 2)};
 
-const status = await Classifier.availability(schema);
+const status = await DecisionModel.availability(schema);
 
 if (status === "available" || status === "downloadable") {
-  const classifier = await Classifier.create({
+  const decisionModel = await DecisionModel.create({
     ...schema,
     monitor(m) {
       m.addEventListener("downloadprogress", (e) => {
@@ -134,10 +134,10 @@ if (status === "available" || status === "downloadable") {
     }
   });
 
-  const result = await classifier.classify(${JSON.stringify(input)});
+  const result = await decisionModel.classify(${JSON.stringify(input)});
   console.log(result);
 
-  classifier.destroy();
+  decisionModel.destroy();
 }`;
   }
 
@@ -165,11 +165,11 @@ if (status === "available" || status === "downloadable") {
       checks.push({ titleHtml: `Offscreen runtime: ${e.message}`, success: false });
       return {
         status: ApiStatus.ERROR,
-        message: 'Classifier runtime failed to start.',
+        message: 'Decisions runtime failed to start.',
         checks,
         errorHtml: `
           <h4 class="text-xs font-bold text-red-200 uppercase mb-2"><i class="fa-solid fa-exclamation-triangle mr-1"></i> Runtime Error</h4>
-          <div class="text-xs text-red-100"><p class="mb-2">The offscreen document that runs the classifier model did not start: <code>${e.message}</code></p>
+          <div class="text-xs text-red-100"><p class="mb-2">The offscreen document that runs the decision model did not start: <code>${e.message}</code></p>
           <ul class="list-disc pl-4 space-y-1"><li>Reload the extension from <code>chrome://extensions</code>.</li><li>Check the offscreen document's console for errors.</li></ul></div>`,
       };
     }
@@ -190,16 +190,16 @@ if (status === "available" || status === "downloadable") {
         errorHtml = `
           <h4 class="text-xs font-bold text-orange-200 uppercase mb-2"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Model Download Required</h4>
           <div class="text-xs text-orange-100">
-            <p class="mb-2">The classifier model (${variant?.name ?? activeVariantId}) is downloaded from Hugging Face on first use.</p>
+            <p class="mb-2">The decision model (${variant?.name ?? activeVariantId}) is downloaded from Hugging Face on first use.</p>
             <ul class="list-disc pl-4 space-y-1">
               <li>Go to the <strong>Models</strong> tab and click <strong>Download</strong>, or</li>
-              <li>run a classification below; <code>Classifier.create()</code> downloads it and reports progress.</li>
+              <li>run a classification below; <code>DecisionModel.create()</code> downloads it and reports progress.</li>
             </ul>
           </div>`;
       } else if (status === ApiStatus.DOWNLOADING) {
         message = 'Model is downloading.';
       } else {
-        message = 'Classifier API unavailable.';
+        message = 'Decisions API unavailable.';
         status = ApiStatus.UNAVAILABLE;
         errorHtml = `
           <h4 class="text-xs font-bold text-red-200 uppercase mb-2"><i class="fa-solid fa-ban mr-1"></i> API Unavailable</h4>
@@ -211,7 +211,7 @@ if (status === "available" || status === "downloadable") {
       checks.push({ titleHtml: `Check Failed: ${e.message}`, success: false });
       errorHtml = `
         <h4 class="text-xs font-bold text-red-200 uppercase mb-2"><i class="fa-solid fa-exclamation-triangle mr-1"></i> Error Details</h4>
-        <div class="text-xs text-red-100"><p class="mb-2">An error occurred while checking the Classifier API availability: <code>${e.message}</code></p></div>`;
+        <div class="text-xs text-red-100"><p class="mb-2">An error occurred while checking the Decisions API availability: <code>${e.message}</code></p></div>`;
     }
 
     return { status, message, checks, errorHtml };

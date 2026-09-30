@@ -80,13 +80,13 @@ export class DiagnosisService {
       docsUrl: 'https://developer.chrome.com/docs/ai/built-in-apis'
     },
     {
-      name: 'Classifier API (polyfill)',
-      globalName: 'Classifier',
+      name: 'Decisions API (polyfill)',
+      globalName: 'DecisionModel',
       statusType: 'dev-trial',
-      flagName: 'classifier-api',
+      flagName: 'decisions-api',
       devToolsStatus: 'checking',
       siteStatus: 'checking',
-      docsUrl: 'https://github.com/michaelwasserman/classifier-api'
+      docsUrl: 'https://web-ai.studio/docs/decisions'
     }
   ];
 
@@ -124,7 +124,7 @@ export class DiagnosisService {
             Writer: typeof Writer !== 'undefined',
             Rewriter: typeof Rewriter !== 'undefined',
             Proofreader: typeof Proofreader !== 'undefined',
-            Classifier: typeof Classifier !== 'undefined'
+            DecisionModel: typeof DecisionModel !== 'undefined' || typeof Classifier !== 'undefined'
           };
         })()
       `;

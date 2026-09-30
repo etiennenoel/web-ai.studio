@@ -228,13 +228,13 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
       const nativeApi = this.classifierService.getNativeApi();
       if (!nativeApi) {
         this.availabilityStatus = 'unavailable';
-        throw new Error('Classifier API is not supported in this browser.');
+        throw new Error('Decisions API is not supported in this browser.');
       }
 
       const avail = await nativeApi.availability(this.schema);
       this.availabilityStatus = avail;
       if (avail === 'unavailable') {
-        throw new Error('Classifier model is unavailable for this configuration.');
+        throw new Error('Decision model is unavailable for this configuration.');
       }
 
       const createOptions: any = {
@@ -254,7 +254,7 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
       }
       this.session = await nativeApi.create(createOptions);
     } catch (e: any) {
-      this.errorMessage = e.message || 'Failed to create Classifier session';
+      this.errorMessage = e.message || 'Failed to create DecisionModel session';
     } finally {
       clearInterval(this.sessionTimer);
       this.sessionCreationTimeMs = Math.floor(performance.now() - startTime);
@@ -347,12 +347,12 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
 
     this.codeAvailability = `const schema = ${schemaLiteral};
 
-const availability = await Classifier.availability(schema);
+const availability = await DecisionModel.availability(schema);
 console.log("Availability:", availability);`;
 
     this.codeSession = `const schema = ${schemaLiteral};
 
-const classifier = await Classifier.create({
+const decisionModel = await DecisionModel.create({
   ...schema,
   monitor(m) {
     m.addEventListener("downloadprogress", (e) => {
@@ -363,10 +363,10 @@ const classifier = await Classifier.create({
 
     this.codeExecution = `const input = ${inputLiteral};
 
-const result = await classifier.classify(input);
+const result = await decisionModel.classify(input);
 
 // result is a record keyed by question id
 console.log(result);
-classifier.destroy();`;
+decisionModel.destroy();`;
   }
 }

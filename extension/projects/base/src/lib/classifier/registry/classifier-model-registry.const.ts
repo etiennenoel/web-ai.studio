@@ -43,7 +43,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['multilingual'],
     gpuCompiles: true,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_embeds_wfp16.tflite', bytes: 250889408 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_embeds_wfp16.tflite', bytes: 250889040 },
       ...ML_EMBEDS_HOST_FILES,
     ],
   },
@@ -60,7 +60,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['multilingual'],
     gpuCompiles: true,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s512_embeds_wfp16.tflite', bytes: 251806912 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s512_embeds_wfp16.tflite', bytes: 251806544 },
       ...ML_EMBEDS_HOST_FILES,
     ],
   },
@@ -77,7 +77,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['multilingual'],
     gpuCompiles: false,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_wfp16.tflite', bytes: 644077088 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_wfp16.tflite', bytes: 644077360 },
       { role: ClassifierModelFileRole.ACT_HEAD, path: 'laya_ml_act_head_fp32.tflite', bytes: 795816 },
       ...ML_TOKENIZER_FILES,
     ],
@@ -95,7 +95,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['multilingual'],
     gpuCompiles: true,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_fp32.tflite', bytes: 1287375376 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s256_fp32.tflite', bytes: 1287376352 },
       { role: ClassifierModelFileRole.ACT_HEAD, path: 'laya_ml_act_head_fp32.tflite', bytes: 795816 },
       ...ML_TOKENIZER_FILES,
     ],
@@ -113,7 +113,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['en'],
     gpuCompiles: true,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s256_fp32.tflite', bytes: 1684754688 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s256_fp32.tflite', bytes: 1684756736 },
       { role: ClassifierModelFileRole.ACT_HEAD, path: 'laya_act_head_fp32.tflite', bytes: 1057960 },
       ...EN_TOKENIZER_FILES,
     ],
@@ -131,7 +131,7 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     languages: ['en'],
     gpuCompiles: false,
     files: [
-      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s512_wfp16.tflite', bytes: 843929120 },
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s512_wfp16.tflite', bytes: 843929776 },
       { role: ClassifierModelFileRole.ACT_HEAD, path: 'laya_act_head_fp32.tflite', bytes: 1057960 },
       ...EN_TOKENIZER_FILES,
     ],

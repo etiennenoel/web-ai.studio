@@ -69,7 +69,7 @@
                         </div>
                     </div>
 
-                    <!-- Classifier model -->
+                    <!-- Decision model -->
                     <div class="px-4 py-3 flex items-start gap-3">
                         <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                             [ngClass]="classifierStatus === 'available' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'">
@@ -77,10 +77,10 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-semibold text-sm">Classifier model</span>
+                                <span class="font-semibold text-sm">Decision model</span>
                                 <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded" [ngClass]="badgeClass(classifierStatus)">{{ badgeText(classifierStatus) }}</span>
                             </div>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 truncate" [title]="classifierModelName">{{ classifierModelName }}. {{ classifierModelSize }}. Powers <code>window.Classifier</code>.</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 truncate" [title]="classifierModelName">{{ classifierModelName }}. {{ classifierModelSize }}. Powers <code>window.DecisionModel</code>.</p>
                             @switch (classifierStatus) {
                                 @case ('downloadable') {
                                     <button (click)="downloadClassifierModel()" class="mt-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center gap-2">
@@ -122,7 +122,7 @@
     <!-- Hero Section -->
     <main class="flex-1">
         <div *ngIf="!isSettingsRoute">
-            <!-- Hero: Classifier API polyfill -->
+            <!-- Hero: Decisions API polyfill -->
             <section id="classifier" class="py-12 md:py-16 px-6">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
                     <div class="lg:col-span-2">
@@ -131,7 +131,7 @@
                                 <i class="fa-solid fa-wand-magic-sparkles mr-2 text-yellow-600 dark:text-yellow-400"></i>New Update Installed · v{{ appVersion }}
                             </span>
                             <span class="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700 inline-flex items-center gap-2">
-                                <i class="fa-solid fa-signs-post"></i> Classifier API polyfill
+                                <i class="fa-solid fa-signs-post"></i> Decisions API polyfill
                             </span>
                         </div>
                         <h2 class="text-3xl md:text-4xl font-bold mb-5 leading-tight">Have you heard about <span class="gradient-text">Jev</span>?</h2>
@@ -141,9 +141,9 @@
                         </p>
                         <p class="text-gray-600 dark:text-gray-400 mb-5">
                             Well, you have it now in the WebAI Studio extension, all locally in your browser.
-                            Every page you visit gets <code class="text-sm bg-gray-100 dark:bg-[#3c4043] px-1.5 py-0.5 rounded">window.Classifier</code>,
+                            Every page you visit gets <code class="text-sm bg-gray-100 dark:bg-[#3c4043] px-1.5 py-0.5 rounded">window.DecisionModel</code>,
                             a polyfill of the proposed
-                            <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Classifier API</a>,
+                            <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Decisions API</a>,
                             backed by the open Laya decision encoder running on LiteRT.js.
                         </p>
                         <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2 mb-6">
@@ -153,8 +153,8 @@
                             <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Full support in the DevTools panel: history, diagnosis, model management, and a playground.</span></li>
                         </ul>
                         <div class="flex flex-wrap gap-3 text-sm">
-                            <a href="https://web-ai.studio/docs/classifier" target="_blank" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2"><i class="fa-solid fa-book"></i> Read the docs</a>
-                            <a href="https://web-ai.studio/playgrounds/classifier" target="_blank" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-2"><i class="fa-solid fa-flask"></i> Open the web playground</a>
+                            <a href="https://web-ai.studio/docs/decisions" target="_blank" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2"><i class="fa-solid fa-book"></i> Read the docs</a>
+                            <a href="https://web-ai.studio/playgrounds/decisions" target="_blank" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-2"><i class="fa-solid fa-flask"></i> Open the web playground</a>
                             <a routerLink="/settings" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-2"><i class="fa-solid fa-gear"></i> Choose the model</a>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-500 mt-8">
@@ -180,8 +180,8 @@
                             class="h-10 w-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 text-purple-700 dark:text-purple-400">
                             <i class="fa-solid fa-signs-post text-xl"></i>
                         </div>
-                        <h4 class="font-bold text-lg mb-2">Classifier API Polyfill</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><code>window.Classifier</code> on every page, powered by a local Laya decision model on LiteRT.js. Pick the model in Settings, manage downloads in DevTools.</p>
+                        <h4 class="font-bold text-lg mb-2">Decisions API Polyfill</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><code>window.DecisionModel</code> on every page, powered by a local Laya decision model on LiteRT.js. Pick the model in Settings, manage downloads in DevTools.</p>
                     </div>
 
                     <!-- Feature 1 -->

@@ -77,7 +77,7 @@ export class HistoryComponent implements OnInit {
     'Writer',
     'Rewriter',
     'Proofreader',
-    'Classifier',
+    'DecisionModel',
   ];
   apiColors: Record<string, string> = {
     LanguageModel: '#8ab4f8',
@@ -87,6 +87,7 @@ export class HistoryComponent implements OnInit {
     Writer: '#c58af9',
     Rewriter: '#f48fb1',
     Proofreader: '#80cbc4',
+    DecisionModel: '#a5b4fc',
     Classifier: '#a5b4fc',
   };
 
