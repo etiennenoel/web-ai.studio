@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import {Subject} from 'rxjs';
-import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
+import { callModelAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: "root",
@@ -12,11 +12,8 @@ export class ModelManager {
         if (typeof Summarizer === 'undefined' || typeof Summarizer.availability !== 'function') {
           return 'unavailable';
         }
-        return withAvailabilityTimeout(
-          () => Summarizer.availability({ outputLanguage: 'en' }), // We use the Summarizer because that's the API that is GA.
-          DEFAULT_AVAILABILITY_TIMEOUT_MS,
-          'unavailable',
-        );
+        // We use the Summarizer because that's the API that is GA.
+        return callModelAvailability(() => Summarizer.availability({ outputLanguage: 'en' }));
     }
 
     async download(progressCallback: (progress: number) => void): Promise<void> {

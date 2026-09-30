@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
-import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
+import { callModelAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ProofreaderManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(() => window.Proofreader.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+    return await callModelAvailability(() => window.Proofreader.availability(options));
   }
 
   async create(options?: any): Promise<any> {
@@ -63,7 +63,7 @@ export class ProofreaderManager {
 
     try {
       // @ts-ignore
-      const availability = await withAvailabilityTimeout(window.Proofreader.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+      const availability = await callModelAvailability(() => window.Proofreader.availability());
       
       checks.push({
         titleHtml: 'Availability Check',

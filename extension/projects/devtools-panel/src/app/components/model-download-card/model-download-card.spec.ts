@@ -41,4 +41,13 @@ describe('ModelDownloadCard', () => {
     expect(component.status()).toBe('available');
     expect(fixture.nativeElement.textContent).toContain('Available');
   });
+
+  it('should render an unknown state, not unavailable, when the check fails', async () => {
+    mockModelManager.availability.and.returnValue(Promise.reject(new Error('timed out')));
+    await component.refreshStatus();
+    fixture.detectChanges();
+    expect(component.status()).toBe('check-failed');
+    expect(fixture.nativeElement.textContent).toContain('Status unknown');
+    expect(fixture.nativeElement.textContent).not.toContain('Unavailable');
+  });
 });

@@ -5,7 +5,7 @@ import { SystemStatus } from '../interfaces/data/system-status.interface';
 import { StorageStats } from '../interfaces/data/storage-stats.interface';
 import { RecentActivity } from '../interfaces/data/recent-activity.interface';
 import { PanelTab } from '../enums/panel-tab.enum';
-import { ClassifierManager, DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from 'base';
+import { ClassifierManager, callAvailability, callModelAvailability } from 'base';
 
 @Injectable({
   providedIn: 'root'
@@ -59,27 +59,27 @@ export class AiModelDataService {
         const win = self as any;
         const checks: Record<string, () => Promise<any>> = {
             prompt: () => typeof win.LanguageModel !== 'undefined' && typeof win.LanguageModel.availability === 'function'
-                ? withAvailabilityTimeout(() => win.LanguageModel.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callModelAvailability(() => win.LanguageModel.availability())
                 : Promise.resolve('unavailable'),
             summarizer: () => typeof win.Summarizer !== 'undefined' && typeof win.Summarizer.availability === 'function'
-                ? withAvailabilityTimeout(() => win.Summarizer.availability({ outputLanguage: 'en' }), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callModelAvailability(() => win.Summarizer.availability({ outputLanguage: 'en' }))
                 : Promise.resolve('unavailable'),
             writer: () => typeof win.Writer !== 'undefined' && typeof win.Writer.availability === 'function'
-                ? withAvailabilityTimeout(() => win.Writer.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callModelAvailability(() => win.Writer.availability())
                 : Promise.resolve('unavailable'),
             rewriter: () => typeof win.Rewriter !== 'undefined' && typeof win.Rewriter.availability === 'function'
-                ? withAvailabilityTimeout(() => win.Rewriter.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callModelAvailability(() => win.Rewriter.availability())
                 : Promise.resolve('unavailable'),
             detector: () => typeof win.LanguageDetector !== 'undefined' && typeof win.LanguageDetector.availability === 'function'
-                ? withAvailabilityTimeout(() => win.LanguageDetector.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callAvailability(() => win.LanguageDetector.availability())
                 : Promise.resolve('unavailable'),
             translator: () => typeof win.Translator !== 'undefined' && typeof win.Translator.availability === 'function'
-                ? withAvailabilityTimeout(() => win.Translator.availability({ sourceLanguage: "en", targetLanguage }), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callAvailability(() => win.Translator.availability({ sourceLanguage: "en", targetLanguage }))
                 : Promise.resolve('unavailable'),
             proofreader: () => typeof win.Proofreader !== 'undefined' && typeof win.Proofreader.availability === 'function'
-                ? withAvailabilityTimeout(() => win.Proofreader.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable')
+                ? callModelAvailability(() => win.Proofreader.availability())
                 : Promise.resolve('unavailable'),
-            classifier: () => withAvailabilityTimeout(() => this.classifierManager.availability({}), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable'),
+            classifier: () => callAvailability(() => this.classifierManager.availability({})),
         };
 
         await Promise.all(

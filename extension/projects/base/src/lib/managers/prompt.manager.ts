@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
-import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
+import { callModelAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class PromptManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(() => window.LanguageModel.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+    return await callModelAvailability(() => window.LanguageModel.availability(options));
   }
 
   async createSession(options?: any): Promise<any> {
@@ -28,7 +28,7 @@ export class PromptManager {
       return null;
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(() => window.LanguageModel.params(), DEFAULT_AVAILABILITY_TIMEOUT_MS, null);
+    return await callModelAvailability(() => window.LanguageModel.params());
   }
 
   getCodeSnippet(options: any, promptText: string): string {
@@ -74,7 +74,7 @@ export class PromptManager {
 
     try {
       // @ts-ignore
-      const availability = await withAvailabilityTimeout(window.LanguageModel.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+      const availability = await callModelAvailability(() => window.LanguageModel.availability());
       
       checks.push({
         titleHtml: 'Availability Check',

@@ -22,4 +22,5 @@ export * from './lib/managers/diagnosis.service';
 
 export * from './lib/classifier/index';
 export * from './lib/utils/availability.utils';
+export * from './lib/errors/availability-timeout.error';
 

@@ -166,15 +166,24 @@ async function runE2E() {
 
     // 3. Connect to the DevTools frontend target, select the "WebAI" panel,
     //    and wait for the devtools-panel/index.html iframe target to mount
-    let listRes = await fetch(`http://127.0.0.1:${port}/json/list`);
-    let targets = await listRes.json();
-
-    const dtTarget = targets.find(
-      (t) =>
-        t.webSocketDebuggerUrl &&
-        t.url.startsWith('devtools://') &&
-        t.title.includes('about:blank'),
-    );
+    // The DevTools window title changes to "DevTools - about:blank" only after
+    // DevTools attaches, so poll for it instead of reading the list once.
+    let listRes;
+    let targets = [];
+    let dtTarget = null;
+    for (let attempt = 0; attempt < 40 && !dtTarget; attempt++) {
+      listRes = await fetch(`http://127.0.0.1:${port}/json/list`);
+      targets = await listRes.json();
+      dtTarget = targets.find(
+        (t) =>
+          t.webSocketDebuggerUrl &&
+          t.url.startsWith('devtools://') &&
+          t.title.includes('about:blank'),
+      );
+      if (!dtTarget) {
+        await new Promise((r) => setTimeout(r, 250));
+      }
+    }
     assert.ok(dtTarget, `Could not find DevTools target for about:blank. Targets: ${JSON.stringify(targets.map(t => ({ type: t.type, title: t.title, url: t.url })))}`);
 
     const dtWs = await connectWebSocket(dtTarget.webSocketDebuggerUrl);

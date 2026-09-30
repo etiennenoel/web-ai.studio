@@ -40,6 +40,17 @@
       <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span>
       <span>Available</span>
     </div>
+  } @else if (status() === 'check-failed') {
+    <div class="mt-4 flex flex-col gap-2">
+      <div class="inline-flex self-start items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 ring-1 ring-inset ring-gray-500/20">
+        <span class="w-2 h-2 rounded-full bg-gray-400 mr-2"></span>
+        <span>Status unknown</span>
+      </div>
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Chrome did not answer the availability check.
+        <button type="button" (click)="refreshStatus()" class="underline text-blue-600 dark:text-blue-400">Check again</button>
+      </p>
+    </div>
   } @else {
     <div class="mt-4 flex flex-col gap-2">
       <div class="inline-flex self-start items-center rounded-md bg-amber-50 dark:bg-amber-900/30 px-2 py-1 text-xs font-medium text-amber-800 dark:text-amber-300 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-800/50">

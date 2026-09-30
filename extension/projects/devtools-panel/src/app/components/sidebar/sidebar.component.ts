@@ -75,8 +75,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.nanoDotClass = 'status-red';
       }
     } catch {
-      this.nanoStatusLabel = 'Nano: Unavailable';
-      this.nanoDotClass = 'status-red';
+      // A failed or timed-out check is not the same as "unavailable".
+      this.nanoStatusLabel = 'Nano: Unknown';
+      this.nanoDotClass = 'status-gray';
     }
     this.cdr.detectChanges();
   }

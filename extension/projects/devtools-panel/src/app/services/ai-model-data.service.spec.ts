@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AiModelDataService } from './ai-model-data.service';
-import { ClassifierManager, withAvailabilityTimeout } from 'base';
+import { ClassifierManager, resetModelBrokerWarmUp } from 'base';
 
 describe('AiModelDataService', () => {
   let service: AiModelDataService;
@@ -18,6 +18,7 @@ describe('AiModelDataService', () => {
       ],
     });
     service = TestBed.inject(AiModelDataService);
+    resetModelBrokerWarmUp();
   });
 
   it('should return all 8 initial API capabilities immediately with unknown status', () => {
@@ -51,25 +52,5 @@ describe('AiModelDataService', () => {
     expect(result.find((c) => c.id === 'summarizer')?.status).toBe('downloadable');
     expect(result.find((c) => c.id === 'writer')?.status).toBe('unavailable');
     expect(result.find((c) => c.id === 'classifier')?.status).toBe('downloadable');
-  });
-
-  it('withAvailabilityTimeout should resolve to fallbackValue when a promise hangs', async () => {
-    const hangingPromise = new Promise<string>(() => {});
-    const result = await withAvailabilityTimeout(hangingPromise, 25, 'unavailable');
-    expect(result).toBe('unavailable');
-  });
-
-  it('withAvailabilityTimeout should retry a factory function when the first cold-start call hangs', async () => {
-    let calls = 0;
-    const factory = () => {
-      calls++;
-      if (calls === 1) {
-        return new Promise<string>(() => {}); // Simulate cold-start hang
-      }
-      return Promise.resolve('downloadable');
-    };
-    const result = await withAvailabilityTimeout(factory, 2000, 'unavailable');
-    expect(calls).toBe(2);
-    expect(result).toBe('downloadable');
   });
 });

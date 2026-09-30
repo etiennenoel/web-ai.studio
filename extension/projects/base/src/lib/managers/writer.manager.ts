@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
-import { DEFAULT_AVAILABILITY_TIMEOUT_MS, withAvailabilityTimeout } from '../utils/availability.utils';
+import { callModelAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class WriterManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await withAvailabilityTimeout(() => window.Writer.availability(options), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+    return await callModelAvailability(() => window.Writer.availability(options));
   }
 
   async create(options?: any): Promise<any> {
@@ -75,7 +75,7 @@ export class WriterManager {
 
     try {
       // @ts-ignore
-      const availability = await withAvailabilityTimeout(window.Writer.availability(), DEFAULT_AVAILABILITY_TIMEOUT_MS, 'unavailable');
+      const availability = await callModelAvailability(() => window.Writer.availability());
       
       checks.push({
         titleHtml: 'Availability Check',
