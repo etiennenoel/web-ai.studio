@@ -190,7 +190,7 @@ export class DiagnosisComponent implements OnInit, OnDestroy {
       },
       {
         id: 'classifier',
-        name: 'Classifier API',
+        name: 'Decisions API',
         description: 'Typed decisions (polyfill)',
         icon: 'fa-solid fa-signs-post',
         check: () => callAvailability(() => this.classifierManager.availability({})),

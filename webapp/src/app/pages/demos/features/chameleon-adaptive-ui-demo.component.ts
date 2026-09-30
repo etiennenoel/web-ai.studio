@@ -24,7 +24,7 @@ declare const Summarizer: any;
           [apis]="statusPills"
           [isDownloading]="isDownloading"
           [downloadProgress]="downloadProgress"
-          unavailableHint="<span class='font-semibold'>Classifier API</span> chooses the best reading format, and <span class='font-semibold'>Summarizer API</span> condenses the article.">
+          unavailableHint="<span class='font-semibold'>Decisions API</span> chooses the best reading format, and <span class='font-semibold'>Summarizer API</span> condenses the article.">
         </app-api-status>
 
         @if (errorMessage) {
@@ -131,9 +131,9 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
   };
 
   articleParagraphs = [
-    'Modern web applications increasingly combine two distinct classes of on-device models: fast, non-autoregressive System-1 decision models (like window.Classifier and SemanticEmbedder) and generative System-2 language models (like LanguageModel, Summarizer, Writer, and Rewriter).',
+    'Modern web applications increasingly combine two distinct classes of on-device models: fast, non-autoregressive System-1 decision models (like window.DecisionModel and SemanticEmbedder) and generative System-2 language models (like LanguageModel, Summarizer, Writer, and Rewriter).',
     'While generative models excel at drafting prose and synthesizing long documents, invoking a multi-billion parameter LLM on every keystroke or scroll event drains laptop batteries and introduces hundreds of milliseconds of latency.',
-    'By placing a 15-millisecond System-1 classifier in front of generative APIs, web apps can understand user intent on every interaction and only wake up heavier generative tools with the exact configuration needed.'
+    'By placing a 15-millisecond System-1 decision model in front of generative APIs, web apps can understand user intent on every interaction and only wake up heavier generative tools with the exact configuration needed.'
   ];
 
   scenarios = [
@@ -159,7 +159,7 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
 
   get statusPills() {
     return [
-      { name: 'Classifier', status: this.classifierStatus },
+      { name: 'Decisions', status: this.classifierStatus },
       { name: 'Summarizer', status: this.summarizerStatus }
     ];
   }

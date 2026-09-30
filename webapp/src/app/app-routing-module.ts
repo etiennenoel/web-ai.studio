@@ -335,13 +335,23 @@ const routes: Routes = [
         }
       },
       {
-        path: "docs/classifier",
+        path: "docs/decisions",
 
-        title: "Classifier Docs",
+        title: "Decisions Docs",
         component: ClassifierApiPage,
         data: {
-          route: RouteEnum.ClassifierApi
+          route: RouteEnum.DecisionsApi
         }
+      },
+      {
+        path: "docs/classifier",
+        redirectTo: "docs/decisions",
+        pathMatch: "full"
+      },
+      {
+        path: "docs/classifier-api",
+        redirectTo: "docs/decisions",
+        pathMatch: "full"
       },
       {
         path: "playgrounds/prompt",
@@ -416,13 +426,23 @@ const routes: Routes = [
         }
       },
       {
-        path: "playgrounds/classifier",
+        path: "playgrounds/decisions",
 
-        title: "Classifier Playground",
+        title: "Decisions Playground",
         component: ClassifierPlaygroundPage,
         data: {
-          route: RouteEnum.PlaygroundsClassifier
+          route: RouteEnum.PlaygroundsDecisions
         }
+      },
+      {
+        path: "playgrounds/classifier",
+        redirectTo: "playgrounds/decisions",
+        pathMatch: "full"
+      },
+      {
+        path: "playgrounds/classifier-api",
+        redirectTo: "playgrounds/decisions",
+        pathMatch: "full"
       },
       {
         path: "playgrounds/web-speech",

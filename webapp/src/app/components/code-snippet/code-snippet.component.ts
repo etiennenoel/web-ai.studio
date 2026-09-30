@@ -124,7 +124,9 @@ import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
           // that this browser does not expose fail gracefully (undefined) instead
           // of throwing a ReferenceError.
           const { LanguageModel, Translator, LanguageDetector, Summarizer,
-                  Writer, Rewriter, Proofreader, SemanticEmbedder, Classifier } = window;
+                  Writer, Rewriter, Proofreader, SemanticEmbedder } = window;
+          const DecisionModel = window.DecisionModel ?? window.Classifier;
+          const Classifier = window.Classifier ?? window.DecisionModel;
 
           ${this.code}
         })();

@@ -58,17 +58,17 @@ export class ClassifierService {
 
   getNativeApi(): any {
     if (!this.isBrowser) return null;
-    return (window as any).Classifier ?? null;
+    return (window as any).DecisionModel ?? (window as any).Classifier ?? null;
   }
 
   isSupported(): boolean {
     return this.getNativeApi() !== null;
   }
 
-  /** True when `window.Classifier` is provided by the WebAI Studio extension rather than the browser. */
+  /** True when `window.DecisionModel` is provided by the WebAI Studio extension rather than the browser. */
   isPolyfilled(): boolean {
     if (!this.isBrowser) return false;
-    return (window as any).webai?.classifier?.isPolyfilled === true;
+    return (window as any).webai?.decisions?.isPolyfilled === true || (window as any).webai?.classifier?.isPolyfilled === true;
   }
 
   async availability(schema?: ClassifierSchema): Promise<string> {
@@ -92,7 +92,7 @@ export class ClassifierService {
   ): Promise<any> {
     const api = this.getNativeApi();
     if (!api) {
-      throw new Error('window.Classifier is not available in this browser.');
+      throw new Error('window.DecisionModel is not available in this browser.');
     }
 
     const cacheKey = JSON.stringify(schema);
@@ -122,7 +122,9 @@ export class ClassifierService {
     const classifyOpts: any = {};
     if (options.signal) classifyOpts.signal = options.signal;
 
-    const raw = await classifier.classify(input, classifyOpts);
+    const raw = typeof classifier.decide === 'function'
+      ? await classifier.decide(input, classifyOpts)
+      : await classifier.classify(input, classifyOpts);
     const elapsedMs = Number((performance.now() - t0).toFixed(1));
     return this.normalizeResult(schema, raw, elapsedMs);
   }
