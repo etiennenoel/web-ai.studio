@@ -20,5 +20,7 @@ export interface ClassifierModelVariant {
   languages: string[];
   /** Whether the publisher reports GPU compilation for this file. */
   gpuCompiles: boolean;
+  /** Whether the graph compiles on WebNN / NPU (defaults to true). */
+  webnnCompiles?: boolean;
   files: ClassifierModelFile[];
 }

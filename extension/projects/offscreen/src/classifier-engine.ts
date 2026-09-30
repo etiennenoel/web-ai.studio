@@ -15,6 +15,12 @@ import { ClassifierModelStatus } from '../../base/src/lib/classifier/interfaces/
 import { ClassifierModelState } from '../../base/src/lib/classifier/enums/classifier-model-state.enum';
 import { ClassifierSettingsKey } from '../../base/src/lib/classifier/enums/classifier-settings-key.enum';
 import {
+  CLASSIFIER_ACCELERATOR_PREFERENCES,
+  CLASSIFIER_WEBNN_DEVICE_PREFERENCES,
+  ClassifierAcceleratorPreference,
+  ClassifierWebNNDevicePreference,
+} from '../../base/src/lib/classifier/types/classifier-accelerator.type';
+import {
   CLASSIFIER_MODEL_REGISTRY,
   DEFAULT_CLASSIFIER_MODEL_VARIANT_ID,
 } from '../../base/src/lib/classifier/registry/classifier-model-registry.const';
@@ -142,6 +148,8 @@ export class ClassifierEngine {
         totalBytes: classifierModelTotalBytes(variant),
         loaded,
         accelerator: loaded ? this.loaded!.accelerator : undefined,
+        webnnDevicePreference:
+          loaded && this.loaded!.accelerator === 'webnn' ? this.loaded!.webnnDevicePreference : undefined,
       });
     }
     return { activeVariantId: active.id, models };
@@ -262,12 +270,24 @@ export class ClassifierEngine {
     await download;
   }
 
-  private ensureLoaded(variant: ClassifierModelVariant): Promise<ClassifierLoadedModel> {
-    if (this.loaded?.variant.id === variant.id) return Promise.resolve(this.loaded);
+  private async ensureLoaded(variant: ClassifierModelVariant): Promise<ClassifierLoadedModel> {
+    const { acceleratorPreference, webnnDevicePreference } = await this.activeAcceleratorSettings();
+
+    if (
+      this.loaded?.variant.id === variant.id &&
+      (this.loaded.acceleratorPreference ?? 'auto') === acceleratorPreference &&
+      (this.loaded.accelerator !== 'webnn' ||
+        (this.loaded.webnnDevicePreference ?? 'auto') === webnnDevicePreference)
+    ) {
+      return this.loaded;
+    }
     if (this.loading && this.loaded === null) return this.loading;
 
     this.unloadModel();
-    this.loading = ClassifierModelLoader.load(variant, this.store)
+    this.loading = ClassifierModelLoader.load(variant, this.store, {
+      acceleratorPreference,
+      webnnDevicePreference,
+    })
       .then((model) => {
         this.loaded = model;
         return model;
@@ -295,6 +315,26 @@ export class ClassifierEngine {
       DEFAULT_CLASSIFIER_MODEL_VARIANT_ID,
     );
     return findClassifierModelVariant(id) ?? findClassifierModelVariant(DEFAULT_CLASSIFIER_MODEL_VARIANT_ID)!;
+  }
+
+  private async activeAcceleratorSettings(): Promise<{
+    acceleratorPreference: ClassifierAcceleratorPreference;
+    webnnDevicePreference: ClassifierWebNNDevicePreference;
+  }> {
+    const [rawAccelerator, rawDevice] = await Promise.all([
+      ClassifierEngine.readSetting<ClassifierAcceleratorPreference>(ClassifierSettingsKey.ACCELERATOR, 'auto'),
+      ClassifierEngine.readSetting<ClassifierWebNNDevicePreference>(
+        ClassifierSettingsKey.WEBNN_DEVICE_PREFERENCE,
+        'auto',
+      ),
+    ]);
+    const acceleratorPreference = CLASSIFIER_ACCELERATOR_PREFERENCES.includes(rawAccelerator)
+      ? rawAccelerator
+      : 'auto';
+    const webnnDevicePreference = CLASSIFIER_WEBNN_DEVICE_PREFERENCES.includes(rawDevice)
+      ? rawDevice
+      : 'auto';
+    return { acceleratorPreference, webnnDevicePreference };
   }
 
   private static readSetting<T>(key: string, defaultValue: T): Promise<T> {

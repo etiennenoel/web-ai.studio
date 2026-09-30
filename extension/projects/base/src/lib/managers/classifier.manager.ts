@@ -8,6 +8,12 @@ import { ClassifierSchema } from '../classifier/interfaces/classifier-schema.int
 import { ClassifierSessionInfo } from '../classifier/interfaces/classifier-session-info.interface';
 import { ClassifierResult } from '../classifier/types/classifier-result.type';
 import { ClassifierAvailability } from '../classifier/types/classifier-availability.type';
+import {
+  CLASSIFIER_ACCELERATOR_PREFERENCES,
+  CLASSIFIER_WEBNN_DEVICE_PREFERENCES,
+  ClassifierAcceleratorPreference,
+  ClassifierWebNNDevicePreference,
+} from '../classifier/types/classifier-accelerator.type';
 import { ClassifierClassifyOptions } from '../classifier/interfaces/classifier-classify-options.interface';
 import { ClassifierModelStatus } from '../classifier/interfaces/classifier-model-status.interface';
 import { ClassifierSettingsKey } from '../classifier/enums/classifier-settings-key.enum';
@@ -108,6 +114,29 @@ export class ClassifierManager {
 
   async setActiveVariantId(variantId: string): Promise<void> {
     await this.setSetting(ClassifierSettingsKey.MODEL_VARIANT, variantId);
+    this.modelsChangedEvent.next();
+  }
+
+  getAcceleratorPreference(): Promise<ClassifierAcceleratorPreference> {
+    return this.getSetting<ClassifierAcceleratorPreference>(ClassifierSettingsKey.ACCELERATOR, 'auto').then((pref) =>
+      CLASSIFIER_ACCELERATOR_PREFERENCES.includes(pref) ? pref : 'auto',
+    );
+  }
+
+  async setAcceleratorPreference(preference: ClassifierAcceleratorPreference): Promise<void> {
+    await this.setSetting(ClassifierSettingsKey.ACCELERATOR, preference);
+    this.modelsChangedEvent.next();
+  }
+
+  getWebNNDevicePreference(): Promise<ClassifierWebNNDevicePreference> {
+    return this.getSetting<ClassifierWebNNDevicePreference>(
+      ClassifierSettingsKey.WEBNN_DEVICE_PREFERENCE,
+      'auto',
+    ).then((pref) => (CLASSIFIER_WEBNN_DEVICE_PREFERENCES.includes(pref) ? pref : 'auto'));
+  }
+
+  async setWebNNDevicePreference(preference: ClassifierWebNNDevicePreference): Promise<void> {
+    await this.setSetting(ClassifierSettingsKey.WEBNN_DEVICE_PREFERENCE, preference);
     this.modelsChangedEvent.next();
   }
 
