@@ -41,6 +41,9 @@ jobs:
       - name: Run Tests
         run: npm run test:all
 
+      - name: Run DevTools E2E Tests
+        run: xvfb-run --auto-servernum npm run test:e2e
+
       - name: Zip Extension
         run: |
           cd release

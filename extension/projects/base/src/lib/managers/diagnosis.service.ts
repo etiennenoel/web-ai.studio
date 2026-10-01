@@ -113,7 +113,7 @@ export class DiagnosisService {
     this.apis$.next(currentApis);
 
     // 2. Check in Inspected Page Context
-    if (typeof chrome !== 'undefined' && chrome.devtools) {
+    if (typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow) {
       const expression = `
         (function() {
           return {
@@ -128,25 +128,62 @@ export class DiagnosisService {
           };
         })()
       `;
-      chrome.devtools.inspectedWindow.eval(expression, (result: any, isException: any) => {
-        this.ngZone.run(() => {
-          let errorCount = 0;
-          if (isException || !result) {
+      let hasResponded = false;
+      const timeoutId = setTimeout(() => {
+        if (!hasResponded) {
+          hasResponded = true;
+          this.ngZone.run(() => {
+            let errorCount = 0;
             currentApis.forEach(api => {
               api.siteStatus = false;
               errorCount++;
             });
-          } else {
-            currentApis.forEach(api => {
-              api.siteStatus = result[api.globalName] === true;
-              if (!api.siteStatus) errorCount++;
-            });
-          }
-          this.apis$.next([...currentApis]);
-          this.errorCount$.next(errorCount);
-          this.isChecking$.next(false);
+            this.apis$.next([...currentApis]);
+            this.errorCount$.next(errorCount);
+            this.isChecking$.next(false);
+          });
+        }
+      }, 2000);
+
+      try {
+        chrome.devtools.inspectedWindow.eval(expression, (result: any, isException: any) => {
+          if (hasResponded) return;
+          hasResponded = true;
+          clearTimeout(timeoutId);
+          this.ngZone.run(() => {
+            let errorCount = 0;
+            if (isException || !result) {
+              currentApis.forEach(api => {
+                api.siteStatus = false;
+                errorCount++;
+              });
+            } else {
+              currentApis.forEach(api => {
+                api.siteStatus = result[api.globalName] === true;
+                if (!api.siteStatus) errorCount++;
+              });
+            }
+            this.apis$.next([...currentApis]);
+            this.errorCount$.next(errorCount);
+            this.isChecking$.next(false);
+          });
         });
-      });
+      } catch (err) {
+        if (!hasResponded) {
+          hasResponded = true;
+          clearTimeout(timeoutId);
+          this.ngZone.run(() => {
+            let errorCount = 0;
+            currentApis.forEach(api => {
+              api.siteStatus = false;
+              errorCount++;
+            });
+            this.apis$.next([...currentApis]);
+            this.errorCount$.next(errorCount);
+            this.isChecking$.next(false);
+          });
+        }
+      }
     } else if (typeof chrome !== 'undefined' && chrome.tabs) {
       // Not in DevTools environment, likely in Side Panel. Send message to active tab content script
       try {

@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { ApiStatus } from '../enums/api-status.enum';
 import { ApiStatusResult } from '../interfaces/api-status-result.interface';
+import { callAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class LanguageDetectorManager {
       return 'unavailable';
     }
     // @ts-ignore
-    return await window.LanguageDetector.availability(options);
+    return await callAvailability(() => window.LanguageDetector.availability(options));
   }
 
   async create(options?: any): Promise<any> {
@@ -64,7 +65,7 @@ console.log(result);`;
 
     try {
       // @ts-ignore
-      const availability = await window.LanguageDetector.availability();
+      const availability = await callAvailability(() => window.LanguageDetector.availability());
       
       checks.push({
         titleHtml: 'Availability Check',

@@ -9,7 +9,7 @@ import {ModelManager} from "base";
 })
 export class ModelDownloadCard implements OnInit {
   progress: WritableSignal<number> = signal(0);
-  status: WritableSignal<'unknown' | 'downloadable' | 'downloading' | 'available' | 'error'> = signal('unknown');
+  status: WritableSignal<'unknown' | 'downloadable' | 'downloading' | 'available' | 'unavailable' | 'error' | 'check-failed'> = signal('unknown');
 
   constructor(private readonly modelManager: ModelManager) {}
 
@@ -18,19 +18,28 @@ export class ModelDownloadCard implements OnInit {
   }
 
   async refreshStatus() {
-    const availability = await this.modelManager.availability();
-    this.status.set(availability);
+    this.status.set('unknown');
+    try {
+      const availability = await this.modelManager.availability();
+      this.status.set(availability);
+    } catch {
+      // A failed or timed-out check is not the same as "unavailable".
+      this.status.set('check-failed');
+    }
   }
 
   async onDownloadClick() {
     const self = this;
     this.status.set('downloading');
-    this.progress.set(0)
-    await this.modelManager.download((progress: number) => {
-      self.progress.set(progress);
-    });
-
-    this.status.set('available');
-    this.refreshStatus();
+    this.progress.set(0);
+    try {
+      await this.modelManager.download((progress: number) => {
+        self.progress.set(progress);
+      });
+      this.status.set('available');
+      await this.refreshStatus();
+    } catch {
+      this.status.set('error');
+    }
   }
 }

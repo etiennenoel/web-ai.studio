@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { AiModelDataService } from '../../services/ai-model-data.service';
 import { ApiAvailability } from '../../interfaces/data/api-availability.interface';
 import { RecentActivity } from '../../interfaces/data/recent-activity.interface';
@@ -22,7 +22,7 @@ import {Subscription} from 'rxjs';
   styleUrls: ['./overview.component.scss'],
   standalone: false
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
 
   // System Status
   modelStatusText = 'Checking...';
@@ -64,11 +64,28 @@ export class OverviewComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.modelManager.modelDownloadedEvent.subscribe(value => {
-      this.refresh();
-    });
+    if (typeof this.aiModelData.getInitialApiCapabilities === 'function') {
+      this.apiCapabilities = this.aiModelData.getInitialApiCapabilities();
+    }
+
+    this.subscriptions.push(
+      this.modelManager.modelDownloadedEvent.subscribe(() => {
+        this.refresh();
+      })
+    );
+    if (this.classifierManager?.modelsChangedEvent) {
+      this.subscriptions.push(
+        this.classifierManager.modelsChangedEvent.subscribe(() => {
+          this.refresh();
+        })
+      );
+    }
 
     this.refresh();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   async refresh() {
@@ -111,8 +128,11 @@ export class OverviewComponent implements OnInit {
   }
 
   async updateApiGrid() {
-    this.apiCapabilities = await this.aiModelData.getApiAvailability();
-    this.cdr.detectChanges()
+    this.apiCapabilities = await this.aiModelData.getApiAvailability((capabilities) => {
+      this.apiCapabilities = capabilities;
+      this.cdr.detectChanges();
+    });
+    this.cdr.detectChanges();
   }
 
   async updateRecentActivity() {
@@ -198,7 +218,7 @@ export class OverviewComponent implements OnInit {
         case 'error':
             return `Error: ${cap.error}`;
         default:
-            return 'Unknown';
+            return 'Checking...';
     }
   }
 

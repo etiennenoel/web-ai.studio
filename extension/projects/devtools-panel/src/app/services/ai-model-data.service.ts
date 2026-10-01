@@ -5,7 +5,7 @@ import { SystemStatus } from '../interfaces/data/system-status.interface';
 import { StorageStats } from '../interfaces/data/storage-stats.interface';
 import { RecentActivity } from '../interfaces/data/recent-activity.interface';
 import { PanelTab } from '../enums/panel-tab.enum';
-import { ClassifierManager } from 'base';
+import { ClassifierManager, callAvailability, callModelAvailability } from 'base';
 
 @Injectable({
   providedIn: 'root'
@@ -29,107 +29,71 @@ export class AiModelDataService {
         return Promise.resolve([...this.MOCK_MODELS]);
     }
 
-    public async getApiAvailability(): Promise<ApiAvailability[]> {
-        const apiAvailabilities: ApiAvailability[] = [];
+    public getInitialApiCapabilities(): ApiAvailability[] {
+        return [
+            { id: 'prompt', name: 'Prompt API', description: 'Interactive chat & instructions', status: 'unknown', icon: 'fa-solid fa-comments', panelTabId: PanelTab.PROMPT },
+            { id: 'summarizer', name: 'Summarizer API', description: 'Condense text content', status: 'unknown', icon: 'fa-solid fa-compress', panelTabId: PanelTab.SUMMARIZER },
+            { id: 'writer', name: 'Writer API', description: 'Generate new content', status: 'unknown', icon: 'fa-solid fa-pen-nib', panelTabId: PanelTab.WRITER },
+            { id: 'rewriter', name: 'Rewriter API', description: 'Refine & edit text', status: 'unknown', icon: 'fa-solid fa-wand-magic-sparkles', panelTabId: PanelTab.REWRITER },
+            { id: 'detector', name: 'Language Detector', description: 'Identify languages', status: 'unknown', icon: 'fa-solid fa-language', panelTabId: PanelTab.DETECTOR },
+            { id: 'translator', name: 'Translator API', description: 'Translate text', status: 'unknown', icon: 'fa-solid fa-globe', panelTabId: PanelTab.TRANSLATOR },
+            { id: 'proofreader', name: 'Proofreader API', description: 'Fix grammar & typos', status: 'unknown', icon: 'fa-solid fa-check-double', panelTabId: PanelTab.PROOFREADER },
+            { id: 'classifier', name: 'Classifier API', description: 'Typed decisions (polyfill)', status: 'unknown', icon: 'fa-solid fa-signs-post', panelTabId: PanelTab.CLASSIFIER },
+        ];
+    }
 
-        // Prompt API
-        const prompt: ApiAvailability = { id: 'prompt', name: 'Prompt API', description: 'Interactive chat & instructions', status: 'unknown', icon: 'fa-solid fa-comments', panelTabId: PanelTab.PROMPT };
-        apiAvailabilities.push(prompt);
-        try {
-            // @ts-expect-error
-            prompt.status = await LanguageModel.availability();
-        } catch (e) {
-            prompt.status = "error";
-            prompt.error = (e as Error).message;
-        }
+    public async getApiAvailability(onUpdate?: (capabilities: ApiAvailability[]) => void): Promise<ApiAvailability[]> {
+        const apiAvailabilities = this.getInitialApiCapabilities();
+        onUpdate?.(apiAvailabilities);
 
-        // Summarizer API
-        const summarizer: ApiAvailability = { id: 'summarizer', name: 'Summarizer API', description: 'Condense text content', status: 'unknown', icon: 'fa-solid fa-compress', panelTabId: PanelTab.SUMMARIZER };
-        apiAvailabilities.push(summarizer);
-        try {
-            // @ts-expect-error
-            summarizer.status = await Summarizer.availability();
-        } catch (e) {
-            summarizer.status = "error";
-            summarizer.error = (e as Error).message;
-        }
-
-        // Writer API
-        const writer: ApiAvailability = { id: 'writer', name: 'Writer API', description: 'Generate new content', status: 'unknown', icon: 'fa-solid fa-pen-nib', panelTabId: PanelTab.WRITER };
-        apiAvailabilities.push(writer);
-        try {
-            // @ts-expect-error
-            writer.status = await Writer.availability();
-        } catch (e) {
-            writer.status = "error";
-            writer.error = (e as Error).message;
-        }
-
-        // Rewriter API
-        const rewriter: ApiAvailability = { id: 'rewriter', name: 'Rewriter API', description: 'Refine & edit text', status: 'unknown', icon: 'fa-solid fa-wand-magic-sparkles', panelTabId: PanelTab.REWRITER };
-        apiAvailabilities.push(rewriter);
-        try {
-            // @ts-expect-error
-            rewriter.status = await Rewriter.availability();
-        } catch (e) {
-            rewriter.status = "error";
-            rewriter.error = (e as Error).message;
-        }
-
-        // Detector API
-        const detector: ApiAvailability = { id: 'detector', name: 'Language Detector', description: 'Identify languages', status: 'unknown', icon: 'fa-solid fa-language', panelTabId: PanelTab.DETECTOR };
-        apiAvailabilities.push(detector);
-        try {
-            // @ts-expect-error
-            detector.status = await LanguageDetector.availability();
-        } catch (e) {
-            detector.status = "error";
-            detector.error = (e as Error).message;
-        }
-
-        // Translator API
-        const translator: ApiAvailability = { id: 'translator', name: 'Translator API', description: 'Translate text', status: 'unknown', icon: 'fa-solid fa-globe', panelTabId: PanelTab.TRANSLATOR };
-        apiAvailabilities.push(translator);
-        try {
-            let targetLanguage = "es"; // Default language to avoid failure
-
-            for(const lang of navigator.languages) {
-                if(lang.startsWith("en") === false) {
+        let targetLanguage = "es";
+        if (typeof navigator !== 'undefined' && Array.isArray(navigator.languages)) {
+            for (const lang of navigator.languages) {
+                if (lang.startsWith("en") === false) {
                     targetLanguage = lang;
                     break;
                 }
             }
-
-            // @ts-expect-error
-            translator.status = await Translator.availability({
-                sourceLanguage: "en",
-                targetLanguage,
-            });
-        } catch (e) {
-            translator.status = "error";
-            translator.error = (e as Error).message;
         }
 
-        // Proofreader API
-        const proofreader: ApiAvailability = { id: 'proofreader', name: 'Proofreader API', description: 'Fix grammar & typos', status: 'unknown', icon: 'fa-solid fa-check-double', panelTabId: PanelTab.PROOFREADER };
-        apiAvailabilities.push(proofreader);
-        try {
-            // @ts-expect-error
-            proofreader.status = await Proofreader.availability();
-        } catch (e) {
-            proofreader.status = "error";
-            proofreader.error = (e as Error).message;
-        }
+        const win = self as any;
+        const checks: Record<string, () => Promise<any>> = {
+            prompt: () => typeof win.LanguageModel !== 'undefined' && typeof win.LanguageModel.availability === 'function'
+                ? callModelAvailability(() => win.LanguageModel.availability())
+                : Promise.resolve('unavailable'),
+            summarizer: () => typeof win.Summarizer !== 'undefined' && typeof win.Summarizer.availability === 'function'
+                ? callModelAvailability(() => win.Summarizer.availability({ outputLanguage: 'en' }))
+                : Promise.resolve('unavailable'),
+            writer: () => typeof win.Writer !== 'undefined' && typeof win.Writer.availability === 'function'
+                ? callModelAvailability(() => win.Writer.availability())
+                : Promise.resolve('unavailable'),
+            rewriter: () => typeof win.Rewriter !== 'undefined' && typeof win.Rewriter.availability === 'function'
+                ? callModelAvailability(() => win.Rewriter.availability())
+                : Promise.resolve('unavailable'),
+            detector: () => typeof win.LanguageDetector !== 'undefined' && typeof win.LanguageDetector.availability === 'function'
+                ? callAvailability(() => win.LanguageDetector.availability())
+                : Promise.resolve('unavailable'),
+            translator: () => typeof win.Translator !== 'undefined' && typeof win.Translator.availability === 'function'
+                ? callAvailability(() => win.Translator.availability({ sourceLanguage: "en", targetLanguage }))
+                : Promise.resolve('unavailable'),
+            proofreader: () => typeof win.Proofreader !== 'undefined' && typeof win.Proofreader.availability === 'function'
+                ? callModelAvailability(() => win.Proofreader.availability())
+                : Promise.resolve('unavailable'),
+            classifier: () => callAvailability(() => this.classifierManager.availability({})),
+        };
 
-        // Classifier API (extension polyfill)
-        const classifier: ApiAvailability = { id: 'classifier', name: 'Classifier API', description: 'Typed decisions (polyfill)', status: 'unknown', icon: 'fa-solid fa-signs-post', panelTabId: PanelTab.CLASSIFIER };
-        apiAvailabilities.push(classifier);
-        try {
-            classifier.status = await this.classifierManager.availability({});
-        } catch (e) {
-            classifier.status = "error";
-            classifier.error = (e as Error).message;
-        }
+        await Promise.all(
+            apiAvailabilities.map(async (cap) => {
+                try {
+                    const fn = checks[cap.id];
+                    cap.status = fn ? await fn() : 'unavailable';
+                } catch (e) {
+                    cap.status = "error";
+                    cap.error = (e as Error).message;
+                }
+                onUpdate?.(apiAvailabilities);
+            })
+        );
 
         return apiAvailabilities;
     }

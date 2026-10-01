@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import {Subject} from 'rxjs';
+import { callModelAvailability } from '../utils/availability.utils';
 
 @Injectable({
   providedIn: "root",
@@ -8,7 +9,11 @@ export class ModelManager {
   modelDownloadedEvent = new Subject<void>();
 
     async availability(): Promise<Availability> {
-        return Summarizer.availability({ outputLanguage: 'en',}); // We use the Summarizer because that's the API that is GA.
+        if (typeof Summarizer === 'undefined' || typeof Summarizer.availability !== 'function') {
+          return 'unavailable';
+        }
+        // We use the Summarizer because that's the API that is GA.
+        return callModelAvailability(() => Summarizer.availability({ outputLanguage: 'en' }));
     }
 
     async download(progressCallback: (progress: number) => void): Promise<void> {

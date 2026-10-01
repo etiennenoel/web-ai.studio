@@ -77,6 +77,7 @@ export class HistoryComponent implements OnInit {
     'Writer',
     'Rewriter',
     'Proofreader',
+    'Classifier',
   ];
   apiColors: Record<string, string> = {
     LanguageModel: '#8ab4f8',
@@ -86,6 +87,7 @@ export class HistoryComponent implements OnInit {
     Writer: '#c58af9',
     Rewriter: '#f48fb1',
     Proofreader: '#80cbc4',
+    Classifier: '#a5b4fc',
   };
 
   showClearConfirm: boolean = false;
@@ -132,12 +134,31 @@ export class HistoryComponent implements OnInit {
         },
       );
 
-      if (chrome.devtools) {
+      if (chrome.devtools && chrome.devtools.inspectedWindow) {
+        let hasResponded = false;
+        const timeoutId = setTimeout(() => {
+          if (!hasResponded) {
+            hasResponded = true;
+            this.ngZone.run(() => {
+              this.isLoading = false;
+              this.rawItems = [];
+              this.groupSessions();
+              this.cdr.detectChanges();
+            });
+          }
+        }, 2000);
+
         chrome.devtools.inspectedWindow.eval('window.location.origin', (origin: string, isException: any) => {
+          if (hasResponded) return;
+          hasResponded = true;
+          clearTimeout(timeoutId);
+
           if (isException || !origin) {
-            this.error = 'Could not get inspected window origin.';
-            this.isLoading = false;
-            this.cdr.detectChanges();
+            this.ngZone.run(() => {
+              this.error = 'Could not get inspected window origin.';
+              this.isLoading = false;
+              this.cdr.detectChanges();
+            });
             return;
           }
 
