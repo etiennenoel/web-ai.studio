@@ -17,7 +17,7 @@ const EXPECTED_API_CARDS = [
   'Language Detector',
   'Translator API',
   'Proofreader API',
-  'Classifier API',
+  'Decisions API',
 ];
 
 function findChromeBinary() {
@@ -351,7 +351,7 @@ async function runE2E() {
             text.includes('Re-run Checks') &&
             !text.includes('Checking...') &&
             text.includes('Prompt API') &&
-            text.includes('Classifier API');
+            text.includes('Decisions API');
           return { isFinished, text };
         })()`,
         returnByValue: true,

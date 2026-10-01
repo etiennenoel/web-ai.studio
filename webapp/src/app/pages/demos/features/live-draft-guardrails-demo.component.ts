@@ -25,7 +25,7 @@ declare const Rewriter: any;
           [apis]="statusPills"
           [isDownloading]="isDownloading"
           [downloadProgress]="downloadProgress"
-          unavailableHint="<span class='font-semibold'>Classifier API</span> checks your draft locally, and <span class='font-semibold'>Rewriter API</span> softens harsh phrasing in one click.">
+          unavailableHint="<span class='font-semibold'>Decisions API</span> checks your draft locally, and <span class='font-semibold'>Rewriter API</span> softens harsh phrasing in one click.">
         </app-api-status>
 
         @if (errorMessage) {
@@ -165,7 +165,7 @@ export class LiveDraftGuardrailsDemoComponent extends BaseClassifierDemoComponen
 
   get statusPills() {
     return [
-      { name: 'Classifier', status: this.classifierStatus },
+      { name: 'Decisions', status: this.classifierStatus },
       { name: 'Rewriter', status: this.rewriterStatus }
     ];
   }

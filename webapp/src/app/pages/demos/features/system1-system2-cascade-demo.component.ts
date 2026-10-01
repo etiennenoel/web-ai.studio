@@ -48,7 +48,7 @@ const JUDGE_SCHEMA = {
           [apis]="statusPills"
           [isDownloading]="isDownloading"
           [downloadProgress]="downloadProgress"
-          unavailableHint="<span class='font-semibold'>The cascade needs the Classifier API.</span> Borderline comments escalate to the Prompt API when available.">
+          unavailableHint="<span class='font-semibold'>The cascade needs the Decisions API.</span> Borderline comments escalate to the Prompt API when available.">
         </app-api-status>
 
         @if (errorMessage) {
@@ -60,7 +60,7 @@ const JUDGE_SCHEMA = {
         <!-- Scoreboard -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Resolved by Classifier</div>
+            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Resolved by DecisionModel</div>
             <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ classifierResolved }}</div>
           </div>
           <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
@@ -68,7 +68,7 @@ const JUDGE_SCHEMA = {
             <div class="text-2xl font-bold text-slate-700 dark:text-slate-300">{{ llmResolved }}</div>
           </div>
           <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Avg Classifier Time</div>
+            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Avg DecisionModel Time</div>
             <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ averageClassifierMs !== null ? averageClassifierMs + 'ms' : 'N/A' }}</div>
           </div>
           <div class="bg-[#ffffff] dark:bg-zinc-800/90 rounded-2xl p-4 border border-slate-200 dark:border-zinc-700 shadow-sm">
@@ -120,7 +120,7 @@ const JUDGE_SCHEMA = {
                     }
                     @if (comment.resolvedBy === 'classifier') {
                       <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                        <i class="bi bi-lightning-charge-fill"></i> Classifier
+                        <i class="bi bi-lightning-charge-fill"></i> DecisionModel
                       </span>
                     } @else if (comment.resolvedBy === 'llm') {
                       <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-zinc-800 text-slate-600 dark:text-slate-300">
@@ -203,7 +203,7 @@ export class System1System2CascadeDemoComponent extends BaseClassifierDemoCompon
 
   get statusPills() {
     return [
-      { name: 'Classifier', status: this.classifierStatus },
+      { name: 'Decisions', status: this.classifierStatus },
       { name: 'Prompt API (judge)', status: this.languageModelAvailability }
     ];
   }

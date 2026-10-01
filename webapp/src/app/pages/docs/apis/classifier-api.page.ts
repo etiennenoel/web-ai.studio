@@ -11,14 +11,14 @@ import { Component } from '@angular/core';
           <nav class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
             <a routerLink="/docs" class="!no-underline hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Documentation</a>
             <i class="bi bi-chevron-right text-[10px] opacity-70"></i>
-            <span class="text-slate-900 dark:text-slate-200">Classifier API</span>
+            <span class="text-slate-900 dark:text-slate-200">Decisions API</span>
           </nav>
 
           <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
                 <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                  Classifier API
+                  Decisions API
                 </h1>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 uppercase tracking-wider border border-amber-200 dark:border-amber-500/30">
                   Dev Trial
@@ -33,21 +33,21 @@ import { Component } from '@angular/core';
               <a href="https://github.com/explainers-by-googlers/classifier-api/issues" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-bug"></i> File an issue
               </a>
-              <a routerLink="/playgrounds/classifier" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors border border-indigo-600 flex items-center gap-2">
+              <a routerLink="/playgrounds/decisions" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors border border-indigo-600 flex items-center gap-2">
                 <i class="bi bi-play-circle"></i> Playground
               </a>
             </div>
           </div>
 
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
-            The Classifier API (<code class="text-sm font-mono text-indigo-600 dark:text-indigo-400">window.Classifier</code>) evaluates input text against a caller-defined schema of structured questions (<code class="text-sm font-mono">binary</code>, <code class="text-sm font-mono">categorical</code>, and <code class="text-sm font-mono">ordinal</code>) on the user's device, returning a selected option label, confidence score, and probability distribution for each question.
+            The Decisions API (<code class="text-sm font-mono text-indigo-600 dark:text-indigo-400">window.DecisionModel</code>) evaluates input text against a caller-defined schema of structured questions (<code class="text-sm font-mono">binary</code>, <code class="text-sm font-mono">categorical</code>, and <code class="text-sm font-mono">ordinal</code>) on the user's device, returning a selected option label, confidence score, and probability distribution for each question.
           </p>
 
           <!-- Flag Notice -->
           <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
             <div>
-              Enable <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">#classifier-api</code> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
+              Enable <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">#decisions-api</code> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
             </div>
           </div>
 
@@ -55,7 +55,7 @@ import { Component } from '@angular/core';
           <div class="mt-3 p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl text-emerald-800 dark:text-emerald-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-puzzle-fill text-lg mt-0.5"></i>
             <div>
-              No flag? The <a href="https://chromewebstore.google.com/search/WebAI%20Extension" target="_blank" rel="noopener noreferrer" class="underline font-semibold">WebAI Studio extension</a> polyfills <code class="bg-emerald-100 dark:bg-emerald-900/30 px-1 py-0.5 rounded text-xs font-mono">window.Classifier</code> on every page with a local <a href="https://huggingface.co/litert-community/laya-LiteRT" target="_blank" rel="noopener noreferrer" class="underline">Laya decision encoder</a> running on LiteRT.js. The model is downloaded once from Hugging Face; inputs never leave the device. Pick the model in the extension settings and inspect calls in the DevTools panel.
+              No flag? The <a href="https://chromewebstore.google.com/search/WebAI%20Extension" target="_blank" rel="noopener noreferrer" class="underline font-semibold">WebAI Studio extension</a> polyfills <code class="bg-emerald-100 dark:bg-emerald-900/30 px-1 py-0.5 rounded text-xs font-mono">window.DecisionModel</code> on every page with a local <a href="https://huggingface.co/litert-community/laya-LiteRT" target="_blank" rel="noopener noreferrer" class="underline">Laya decision encoder</a> running on LiteRT.js. The model is downloaded once from Hugging Face; inputs never leave the device. Pick the model in the extension settings and inspect calls in the DevTools panel.
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ import { Component } from '@angular/core';
           <section id="question-types" class="scroll-mt-6">
             <app-docs-section-header anchorId="question-types" title="Question types"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-6">
-              A schema passed to <code class="text-sm font-mono">Classifier.create()</code> contains a <code class="text-sm font-mono">questions</code> array. Each question specifies an <code class="text-sm font-mono">id</code>, a <code class="text-sm font-mono">prompt</code>, and one of three <code class="text-sm font-mono">type</code> values:
+              A schema passed to <code class="text-sm font-mono">DecisionModel.create()</code> contains a <code class="text-sm font-mono">questions</code> array. Each question specifies an <code class="text-sm font-mono">id</code>, a <code class="text-sm font-mono">prompt</code>, and one of three <code class="text-sm font-mono">type</code> values:
             </p>
 
             <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
@@ -138,13 +138,13 @@ import { Component } from '@angular/core';
 
           <!-- availability -->
           <section id="availability" class="scroll-mt-6">
-            <app-docs-section-header anchorId="availability" title="Classifier.availability()"></app-docs-section-header>
+            <app-docs-section-header anchorId="availability" title="DecisionModel.availability()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Checks whether the browser supports creating a classifier session for the given options.
+              Checks whether the browser supports creating a decision model session for the given options.
             </p>
             <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
               <code class="text-sm text-slate-300 font-mono">
-                <span class="text-indigo-400">static</span> <span class="text-blue-400">availability</span>(options?: <span class="text-emerald-400">ClassifierCreateOptions</span>): Promise&lt;<span class="text-emerald-400">Availability</span>&gt;;
+                <span class="text-indigo-400">static</span> <span class="text-blue-400">availability</span>(options?: <span class="text-emerald-400">DecisionModelCreateOptions</span>): Promise&lt;<span class="text-emerald-400">Availability</span>&gt;;
               </code>
             </div>
 
@@ -161,13 +161,13 @@ import { Component } from '@angular/core';
 
           <!-- create -->
           <section id="create" class="scroll-mt-6">
-            <app-docs-section-header anchorId="create" title="Classifier.create()"></app-docs-section-header>
+            <app-docs-section-header anchorId="create" title="DecisionModel.create()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Creates a new <code class="text-sm font-mono">Classifier</code> instance configured with the provided question schema.
+              Creates a new <code class="text-sm font-mono">DecisionModel</code> instance configured with the provided question schema.
             </p>
             <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
               <code class="text-sm text-slate-300 font-mono">
-                <span class="text-indigo-400">static</span> <span class="text-blue-400">create</span>(options: <span class="text-emerald-400">ClassifierCreateOptions</span>): Promise&lt;<span class="text-emerald-400">Classifier</span>&gt;;
+                <span class="text-indigo-400">static</span> <span class="text-blue-400">create</span>(options: <span class="text-emerald-400">DecisionModelCreateOptions</span>): Promise&lt;<span class="text-emerald-400">DecisionModel</span>&gt;;
               </code>
             </div>
             <app-code-snippet [code]="snippetCreate"></app-code-snippet>
@@ -175,19 +175,19 @@ import { Component } from '@angular/core';
 
           <!-- classify -->
           <section id="classify" class="scroll-mt-6">
-            <app-docs-section-header anchorId="classify" title="classifier.classify()"></app-docs-section-header>
+            <app-docs-section-header anchorId="classify" title="decisionModel.classify()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">ClassifierResult</code>: a record keyed by question <code class="text-sm font-mono">id</code>, so you can read <code class="text-sm font-mono">result.category.label</code> or destructure <code class="text-sm font-mono">const &#123; command &#125; = await classifier.classify(input)</code>.
+              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">DecisionResult</code>: a record keyed by question <code class="text-sm font-mono">id</code>, so you can read <code class="text-sm font-mono">result.category.label</code> or destructure <code class="text-sm font-mono">const &#123; command &#125; = await decisionModel.classify(input)</code>.
             </p>
             <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
               <code class="text-sm text-slate-300 font-mono">
-                <span class="text-blue-400">classify</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">ClassifierClassifyOptions</span>): Promise&lt;<span class="text-emerald-400">ClassifierResult</span>&gt;;
+                <span class="text-blue-400">classify</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">DecisionModelClassifyOptions</span>): Promise&lt;<span class="text-emerald-400">DecisionResult</span>&gt;;
               </code>
             </div>
 
             <app-code-snippet [code]="snippetExample1"></app-code-snippet>
 
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 mt-8">Decision properties (ClassifierDecision)</h3>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 mt-8">Decision properties (Decision)</h3>
             <div class="overflow-x-auto ring-1 ring-slate-200 dark:ring-zinc-800 rounded-xl mb-6">
               <table class="w-full text-left border-collapse">
                 <thead>
@@ -235,9 +235,9 @@ import { Component } from '@angular/core';
 
           <!-- destroy -->
           <section id="destroy" class="scroll-mt-6">
-            <app-docs-section-header anchorId="destroy" title="classifier.destroy()"></app-docs-section-header>
+            <app-docs-section-header anchorId="destroy" title="decisionModel.destroy()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Releases the resources associated with the classifier session when it is no longer needed.
+              Releases the resources associated with the decision model session when it is no longer needed.
             </p>
             <app-code-snippet [code]="snippetDestroy"></app-code-snippet>
           </section>
@@ -257,9 +257,9 @@ import { Component } from '@angular/core';
             <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Semantic Embedder API</span>
           </a>
 
-          <a routerLink="/playgrounds/classifier" class="!no-underline group flex flex-col items-end px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+          <a routerLink="/playgrounds/decisions" class="!no-underline group flex flex-col items-end px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
             <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">Try it live <i class="bi bi-chevron-right text-[10px]"></i></span>
-            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Classifier Playground</span>
+            <span class="text-slate-900 dark:text-slate-200 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Decisions Playground</span>
           </a>
         </div>
 
@@ -277,8 +277,8 @@ export class ClassifierApiPage {
   ]
 };
 
-const status = await Classifier.availability(schema);
-console.log("Classifier availability:", status);`;
+const status = await DecisionModel.availability(schema);
+console.log("Decisions API availability:", status);`;
 
   snippetCreate = `const schema = {
   context: "Customer support ticket router.",
@@ -313,9 +313,9 @@ console.log("Classifier availability:", status);`;
   ]
 };
 
-const classifier = await Classifier.create(schema);
-console.log("Classifier created");
-classifier.destroy();`;
+const decisionModel = await DecisionModel.create(schema);
+console.log("DecisionModel created");
+decisionModel.destroy();`;
 
   snippetExample1 = `const schema = {
   context: "Customer support ticket router.",
@@ -338,18 +338,18 @@ classifier.destroy();`;
   ]
 };
 
-const status = await Classifier.availability(schema);
+const status = await DecisionModel.availability(schema);
 
 if (status === "available" || status === "downloadable") {
-  const classifier = await Classifier.create(schema);
+  const decisionModel = await DecisionModel.create(schema);
 
   const input = "Urgent: our production database pipeline crashes with a fatal segfault!";
-  const result = await classifier.classify(input);
-  console.log("Classification result:", result);
+  const result = await decisionModel.classify(input);
+  console.log("Decision result:", result);
 
-  classifier.destroy();
+  decisionModel.destroy();
 } else {
-  console.log("Classifier unavailable:", status);
+  console.log("DecisionModel unavailable:", status);
 }`;
 
   snippetDestroy = `const schema = {
@@ -359,61 +359,61 @@ if (status === "available" || status === "downloadable") {
   ]
 };
 
-const classifier = await Classifier.create(schema);
-const result = await classifier.classify("We were charged twice on invoice #4821");
-console.log("Classified before destroy:", result);
-classifier.destroy();
-console.log("Classifier session destroyed.");`;
+const decisionModel = await DecisionModel.create(schema);
+const result = await decisionModel.classify("We were charged twice on invoice #4821");
+console.log("Evaluated before destroy:", result);
+decisionModel.destroy();
+console.log("DecisionModel session destroyed.");`;
 
   snippetWebIdl = `enum Availability { "unavailable", "downloadable", "downloading", "available" };
-enum ClassifierQuestionType { "binary", "categorical", "ordinal" };
+enum DecisionQuestionType { "binary", "categorical", "ordinal" };
 
 [Exposed=Window, SecureContext]
-interface Classifier {
-  static Promise<Availability> availability(optional ClassifierCreateOptions options = {});
-  static Promise<Classifier> create(ClassifierCreateOptions options);
+interface DecisionModel {
+  static Promise<Availability> availability(optional DecisionModelCreateOptions options = {});
+  static Promise<DecisionModel> create(DecisionModelCreateOptions options);
 
-  Promise<ClassifierResult> classify(
+  Promise<DecisionResult> classify(
       DOMString input,
-      optional ClassifierClassifyOptions options = {});
+      optional DecisionModelClassifyOptions options = {});
 
   undefined destroy();
 };
 
-dictionary ClassifierCreateOptions {
+dictionary DecisionModelCreateOptions {
   DOMString context;
-  sequence<ClassifierExpectedInput> expectedInputs;
-  required sequence<ClassifierQuestion> questions;
+  sequence<DecisionExpectedInput> expectedInputs;
+  required sequence<DecisionQuestion> questions;
   AbortSignal signal;
   CreateMonitorCallback monitor;
 };
 
-dictionary ClassifierQuestion {
+dictionary DecisionQuestion {
   required DOMString id;
-  required ClassifierQuestionType type;
+  required DecisionQuestionType type;
   required DOMString prompt;
-  sequence<ClassifierOption> options; // Required for "categorical" and "ordinal"
+  sequence<DecisionOption> options; // Required for "categorical" and "ordinal"
 };
 
-dictionary ClassifierOption {
+dictionary DecisionOption {
   required DOMString label;
   DOMString description;
 };
 
-dictionary ClassifierClassifyOptions {
+dictionary DecisionModelClassifyOptions {
   DOMString context;
   AbortSignal signal;
 };
 
-dictionary ClassifierDecision {
+dictionary Decision {
   DOMString id;
   DOMString label;
   double confidence;
   double? probability;
   double? expectedScore;
-  sequence<ClassifierOptionProbability> probabilities;
+  sequence<DecisionOptionProbability> probabilities;
 };
 
 // classify() resolves to a record keyed by question id
-typedef record<DOMString, ClassifierDecision> ClassifierResult;`;
+typedef record<DOMString, Decision> DecisionResult;`;
 }

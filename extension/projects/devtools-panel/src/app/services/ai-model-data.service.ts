@@ -38,7 +38,7 @@ export class AiModelDataService {
             { id: 'detector', name: 'Language Detector', description: 'Identify languages', status: 'unknown', icon: 'fa-solid fa-language', panelTabId: PanelTab.DETECTOR },
             { id: 'translator', name: 'Translator API', description: 'Translate text', status: 'unknown', icon: 'fa-solid fa-globe', panelTabId: PanelTab.TRANSLATOR },
             { id: 'proofreader', name: 'Proofreader API', description: 'Fix grammar & typos', status: 'unknown', icon: 'fa-solid fa-check-double', panelTabId: PanelTab.PROOFREADER },
-            { id: 'classifier', name: 'Classifier API', description: 'Typed decisions (polyfill)', status: 'unknown', icon: 'fa-solid fa-signs-post', panelTabId: PanelTab.CLASSIFIER },
+            { id: 'classifier', name: 'Decisions API', description: 'Typed decisions (polyfill)', status: 'unknown', icon: 'fa-solid fa-signs-post', panelTabId: PanelTab.CLASSIFIER },
         ];
     }
 

@@ -216,16 +216,16 @@ import { Component } from '@angular/core';
               </p>
             </a>
 
-            <!-- Classifier -->
-            <a routerLink="/docs/classifier" class="!no-underline group relative p-6 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-fuchsia-300 dark:hover:border-fuchsia-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full">
+            <!-- Decisions -->
+            <a routerLink="/docs/decisions" class="!no-underline group relative p-6 rounded-3xl bg-[#ffffff] dark:bg-[#161616] border border-slate-200 dark:border-zinc-800 hover:border-fuchsia-300 dark:hover:border-fuchsia-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full">
               <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity text-fuchsia-500">
                 <i class="bi bi-arrow-right"></i>
               </div>
               <div class="w-12 h-12 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 flex items-center justify-center text-2xl mb-5">
                 <i class="bi bi-ui-checks-grid"></i>
               </div>
-              <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-2 tracking-tight">Classifier</h3>
-              <code class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded w-fit mb-4 border border-slate-200 dark:border-zinc-700">Classifier</code>
+              <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-2 tracking-tight">Decisions</h3>
+              <code class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded w-fit mb-4 border border-slate-200 dark:border-zinc-700">DecisionModel</code>
               <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-auto font-medium">
                 Evaluate text against structured binary, categorical, and ordinal questions on-device.
               </p>

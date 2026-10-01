@@ -22,19 +22,22 @@ window.webai = window.webai || {};
 window.webai.version = APP_VERSION;
 
 // ---------------------------------------------------------------------------
-// 1b. Classifier API polyfill
+// 1b. Decisions API polyfill
 //
 // Defined before wrapping so the wrapper below records its calls like any
 // native API. Removed again if the setting is off (see SETTINGS_PUSH).
 // ---------------------------------------------------------------------------
 
 const classifierPolyfilled = ClassifierPolyfillInstaller.install();
+window.webai.decisions = window.webai.decisions || {};
+window.webai.decisions.isPolyfilled = classifierPolyfilled;
 window.webai.classifier = window.webai.classifier || {};
 window.webai.classifier.isPolyfilled = classifierPolyfilled;
 /** Prints the polyfill runtime state (offscreen document, active model, cached models) to help debugging. */
-window.webai.classifier.diagnose = async function (): Promise<unknown> {
+const diagnoseDecisions = async function (): Promise<unknown> {
   const report: Record<string, unknown> = {
     isPolyfilled: classifierPolyfilled,
+    hasDecisionModel: typeof (window as any).DecisionModel !== 'undefined',
     hasClassifier: typeof window.Classifier !== 'undefined',
   };
   try {
@@ -48,6 +51,8 @@ window.webai.classifier.diagnose = async function (): Promise<unknown> {
   console.table(report);
   return report;
 };
+window.webai.decisions.diagnose = diagnoseDecisions;
+window.webai.classifier.diagnose = diagnoseDecisions;
 
 // ---------------------------------------------------------------------------
 // 2. Hardware information - uses the bridge to request from content script
@@ -103,7 +108,8 @@ window.addEventListener('message', (event: MessageEvent) => {
     [ChromeAiApiName.WRITER]: typeof window.Writer !== 'undefined',
     [ChromeAiApiName.REWRITER]: typeof window.Rewriter !== 'undefined',
     [ChromeAiApiName.PROOFREADER]: typeof window.Proofreader !== 'undefined',
-    [ChromeAiApiName.CLASSIFIER]: typeof window.Classifier !== 'undefined',
+    [ChromeAiApiName.CLASSIFIER]:
+      typeof (window as any).DecisionModel !== 'undefined' || typeof window.Classifier !== 'undefined',
   } as DiagnosisEvalResult;
 
   window.postMessage(
@@ -140,6 +146,7 @@ window.addEventListener('message', (event: MessageEvent) => {
   }
   if (!settings.classifierPolyfill && ClassifierPolyfillInstaller.isInstalled) {
     ClassifierPolyfillInstaller.uninstall();
+    window.webai.decisions.isPolyfilled = false;
     window.webai.classifier.isPolyfilled = false;
   }
 });

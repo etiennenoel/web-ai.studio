@@ -10,5 +10,5 @@ export enum ChromeAiApiName {
   WRITER = 'Writer',
   REWRITER = 'Rewriter',
   PROOFREADER = 'Proofreader',
-  CLASSIFIER = 'Classifier',
+  CLASSIFIER = 'DecisionModel',
 }

@@ -25,7 +25,7 @@ declare const Writer: any;
           [apis]="statusPills"
           [isDownloading]="isDownloading"
           [downloadProgress]="downloadProgress"
-          unavailableHint="<span class='font-semibold'>Classifier API is required</span> to select the resolution action, and <span class='font-semibold'>Writer API</span> drafts the customer reply.">
+          unavailableHint="<span class='font-semibold'>Decisions API is required</span> to select the resolution action, and <span class='font-semibold'>Writer API</span> drafts the customer reply.">
         </app-api-status>
 
         @if (errorMessage) {
@@ -172,7 +172,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
 
   get statusPills() {
     return [
-      { name: 'Classifier', status: this.classifierStatus },
+      { name: 'Decisions', status: this.classifierStatus },
       { name: 'Writer', status: this.writerStatus }
     ];
   }
@@ -225,7 +225,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     if (actionId === 'issue_refund') {
       return {
         title: 'Duplicate Charge Detected — Issue Refund',
-        subtitle: 'Classifier identified a billing dispute and prepared a one-click refund action.',
+        subtitle: 'DecisionModel identified a billing dispute and prepared a one-click refund action.',
         buttonLabel: 'Refund Duplicate Charge',
         doneLabel: 'Refund Issued',
         icon: 'bi-credit-card-2-back',
@@ -235,7 +235,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     if (actionId === 'page_oncall') {
       return {
         title: 'Production Incident — Page On-Call Engineer',
-        subtitle: 'Classifier identified a blocking outage and prepared an engineering escalation.',
+        subtitle: 'DecisionModel identified a blocking outage and prepared an engineering escalation.',
         buttonLabel: 'Page On-Call Engineer',
         doneLabel: 'Incident Escalated',
         icon: 'bi-broadcast-pin',
@@ -244,7 +244,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     }
     return {
       title: 'Product Feedback — Add to Roadmap',
-      subtitle: 'Classifier identified a feature request and linked it to the product backlog.',
+      subtitle: 'DecisionModel identified a feature request and linked it to the product backlog.',
       buttonLabel: 'Add +1 to Roadmap',
       doneLabel: 'Added to Backlog',
       icon: 'bi-lightbulb',

@@ -9,20 +9,19 @@ import { ClassifierClassifyOptions } from '../../../base/src/lib/classifier/inte
 const CREATE_TIMEOUT_MS = 3 * 60 * 60 * 1000;
 const CLASSIFY_TIMEOUT_MS = 30 * 60 * 1000;
 
-const CONSTRUCTOR_TOKEN = Symbol('Classifier.create');
+const CONSTRUCTOR_TOKEN = Symbol('DecisionModel.create');
 
 /**
- * `window.Classifier` polyfill following the Classifier API explainer
- * (https://github.com/michaelwasserman/classifier-api):
+ * `window.DecisionModel` (and `window.Classifier` alias) polyfill following the Decisions API explainer:
  *
- * - `Classifier.availability(options)` / `Classifier.create(options)`
- * - `classify(input, options)` resolves to a record keyed by question id
+ * - `DecisionModel.availability(options)` / `DecisionModel.create(options)`
+ * - `classify(input, options)` / `decide(input, options)` resolves to a record keyed by question id
  * - `contextWindow`, `contextUsage`, `measureContextUsage(input, options)`
  * - `destroy()`
  *
  * Inference runs in the extension's offscreen document (LiteRT.js + Laya).
  */
-export class Classifier {
+export class DecisionModel {
   private sessionId: string;
   private readonly contextWindowValue: number;
   private readonly contextUsageValue: number;
@@ -38,23 +37,23 @@ export class Classifier {
   }
 
   static async availability(options: unknown = {}): Promise<ClassifierAvailability> {
-    const schema = Classifier.toSchema(options);
+    const schema = DecisionModel.toSchema(options);
     try {
       return await ClassifierPageBridge.request<ClassifierAvailability>(ClassifierRuntimeOp.AVAILABILITY, { schema });
     } catch (e) {
       // Schema problems are the caller's; runtime problems mean the API cannot serve right now.
       if (e instanceof TypeError) throw e;
       console.warn(
-        '[WebAI] Classifier polyfill: availability() could not reach the extension runtime, reporting "unavailable".',
+        '[WebAI] DecisionModel polyfill: availability() could not reach the extension runtime, reporting "unavailable".',
         e,
       );
       return 'unavailable';
     }
   }
 
-  static async create(options: unknown): Promise<Classifier> {
+  static async create(options: unknown): Promise<DecisionModel> {
     if (options === null || typeof options !== 'object') {
-      throw new TypeError("Failed to execute 'create' on 'Classifier': parameter 1 is not a dictionary.");
+      throw new TypeError("Failed to execute 'create' on 'DecisionModel': parameter 1 is not a dictionary.");
     }
     const { monitor, signal } = options as { monitor?: unknown; signal?: unknown };
     if (signal !== undefined && !(signal instanceof AbortSignal)) {
@@ -64,7 +63,7 @@ export class Classifier {
       throw new TypeError("Failed to read the 'monitor' property: The provided value is not a function.");
     }
     signal?.throwIfAborted();
-    const schema = Classifier.toSchema(options);
+    const schema = DecisionModel.toSchema(options);
 
     const monitorTarget = new EventTarget();
     if (monitor) (monitor as (m: EventTarget) => void)(monitorTarget);
@@ -86,13 +85,13 @@ export class Classifier {
               ),
           },
         ),
-        Classifier.rejectOnAbort(signal),
+        DecisionModel.rejectOnAbort(signal),
       ]);
-      return new Classifier(CONSTRUCTOR_TOKEN, info);
+      return new DecisionModel(CONSTRUCTOR_TOKEN, info);
     } catch (e) {
       if (e instanceof DOMException && e.name === 'InvalidStateError') {
-        console.warn('[WebAI] Classifier polyfill: create() failed in the extension runtime.', e);
-        throw new DOMException(`Classifier polyfill: ${e.message}`, 'InvalidStateError');
+        console.warn('[WebAI] DecisionModel polyfill: create() failed in the extension runtime.', e);
+        throw new DOMException(`DecisionModel polyfill: ${e.message}`, 'InvalidStateError');
       }
       throw e;
     } finally {
@@ -110,7 +109,7 @@ export class Classifier {
 
   async classify(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
     this.assertAlive('classify');
-    const { signal, classifyOptions } = Classifier.toClassifyOptions(options);
+    const { signal, classifyOptions } = DecisionModel.toClassifyOptions(options);
     signal?.throwIfAborted();
 
     const requestId = crypto.randomUUID();
@@ -120,23 +119,27 @@ export class Classifier {
       return await Promise.race([
         ClassifierPageBridge.request<ClassifierResult>(
           ClassifierRuntimeOp.CLASSIFY,
-          { sessionId: this.sessionId, input: Classifier.toDomString(input), options: classifyOptions },
+          { sessionId: this.sessionId, input: DecisionModel.toDomString(input), options: classifyOptions },
           { requestId, timeoutMs: CLASSIFY_TIMEOUT_MS },
         ),
-        Classifier.rejectOnAbort(signal),
+        DecisionModel.rejectOnAbort(signal),
       ]);
     } finally {
       signal?.removeEventListener('abort', onAbort);
     }
   }
 
+  async decide(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
+    return this.classify(input, options);
+  }
+
   async measureContextUsage(input: unknown, options: unknown = {}): Promise<number> {
     this.assertAlive('measureContextUsage');
-    const { signal, classifyOptions } = Classifier.toClassifyOptions(options);
+    const { signal, classifyOptions } = DecisionModel.toClassifyOptions(options);
     signal?.throwIfAborted();
     return ClassifierPageBridge.request<number>(ClassifierRuntimeOp.MEASURE_CONTEXT_USAGE, {
       sessionId: this.sessionId,
-      input: Classifier.toDomString(input),
+      input: DecisionModel.toDomString(input),
       options: classifyOptions,
     });
   }
@@ -150,7 +153,7 @@ export class Classifier {
   private assertAlive(method: string): void {
     if (this.destroyed) {
       throw new DOMException(
-        `Failed to execute '${method}' on 'Classifier': The classifier session has been destroyed.`,
+        `Failed to execute '${method}' on 'DecisionModel': The decision model session has been destroyed.`,
         'InvalidStateError',
       );
     }
@@ -160,7 +163,7 @@ export class Classifier {
   private static toSchema(options: unknown): ClassifierSchema {
     if (options === null || options === undefined) return {};
     if (typeof options !== 'object') {
-      throw new TypeError("Failed to execute 'availability' on 'Classifier': parameter 1 is not a dictionary.");
+      throw new TypeError("Failed to execute 'availability' on 'DecisionModel': parameter 1 is not a dictionary.");
     }
     const { context, expectedInputs, questions } = options as ClassifierSchema;
     return JSON.parse(JSON.stringify({ context, expectedInputs, questions }));
@@ -172,14 +175,14 @@ export class Classifier {
   } {
     if (options === null || options === undefined) return { signal: undefined, classifyOptions: {} };
     if (typeof options !== 'object') {
-      throw new TypeError("Failed to execute 'classify' on 'Classifier': parameter 2 is not a dictionary.");
+      throw new TypeError("Failed to execute 'classify' on 'DecisionModel': parameter 2 is not a dictionary.");
     }
     const { signal, context } = options as { signal?: unknown; context?: unknown };
     if (signal !== undefined && !(signal instanceof AbortSignal)) {
       throw new TypeError("Failed to read the 'signal' property: The provided value is not an AbortSignal.");
     }
     const classifyOptions: ClassifierClassifyOptions = {};
-    if (context !== undefined) classifyOptions.context = Classifier.toDomString(context);
+    if (context !== undefined) classifyOptions.context = DecisionModel.toDomString(context);
     return { signal: signal as AbortSignal | undefined, classifyOptions };
   }
 
@@ -199,3 +202,6 @@ export class Classifier {
     });
   }
 }
+
+export const Classifier = DecisionModel;
+export type Classifier = DecisionModel;

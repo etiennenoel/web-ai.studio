@@ -58,7 +58,7 @@ export class ModelsComponent implements OnInit, OnDestroy {
       this.activeClassifierVariantId = activeVariantId;
       this.classifierStatuses = new Map(models.map((m) => [m.variantId, m]));
     } catch (e: any) {
-      this.toastService.show(`Classifier runtime: ${e.message}`, 'error');
+      this.toastService.show(`Decisions runtime: ${e.message}`, 'error');
     }
     this.cdr.detectChanges();
   }
@@ -73,7 +73,7 @@ export class ModelsComponent implements OnInit, OnDestroy {
 
   async setActiveClassifier(variantId: string) {
     await this.classifierManager.setActiveVariantId(variantId);
-    this.toastService.show('Active classifier model updated.', 'success');
+    this.toastService.show('Active decision model updated.', 'success');
   }
 
   async downloadClassifier(variant: ClassifierModelVariant) {
@@ -118,7 +118,7 @@ export class ModelsComponent implements OnInit, OnDestroy {
 
   async unloadClassifier() {
     await this.classifierManager.unloadModel();
-    this.toastService.show('Classifier model unloaded from memory.', 'success');
+    this.toastService.show('Decision model unloaded from memory.', 'success');
   }
 
   deleteModel(name: string) {

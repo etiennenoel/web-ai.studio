@@ -1657,17 +1657,17 @@ const result = await session.prompt([
     requiredAttachmentTypes: [AttachmentTypeEnum.Image]
   },
 
-  // CLASSIFIER API
+  // DECISIONS API
   {
     id: 'system1-ticket-router',
     title: 'One-Click Support Responder',
     description: 'Open a customer email and get the exact one-click resolution button plus a tailored reply drafted with the Writer API.',
-    category: 'Classification',
-    apis: ['Classifier', 'Writer'],
+    category: 'Decisions',
+    apis: ['Decisions', 'Writer'],
     icon: 'bi-envelope-check',
-    onDeviceReason: 'Classifier silently identifies what action the customer needs so the right resolution tool and Writer prompt are ready before the agent even finishes reading.',
-    codeSnippet: `// 1. Silently understand what action the customer needs (window.Classifier)
-const classifier = await Classifier.create({
+    onDeviceReason: 'Decisions API silently identifies what action the customer needs so the right resolution tool and Writer prompt are ready before the agent even finishes reading.',
+    codeSnippet: `// 1. Silently understand what action the customer needs (window.DecisionModel)
+const decisionModel = await DecisionModel.create({
   context: "Customer support action assistant.",
   questions: [
     {
@@ -1683,7 +1683,7 @@ const classifier = await Classifier.create({
     { id: "is_urgent", type: "binary", prompt: "Is the customer blocked right now?" }
   ]
 });
-const decision = await classifier.classify(customerEmail);
+const decision = await decisionModel.classify(customerEmail);
 
 // 2. Draft a tailored response for that exact action (window.Writer)
 const writer = await Writer.create({ tone: "formal", length: "short" });
@@ -1697,19 +1697,19 @@ const reply = await writer.write(
     id: 'live-draft-guardrails',
     title: 'Kind Reply Coach',
     description: 'Write a message in peace — if your draft sounds harsh or leaks an API key, get a gentle nudge to soften it with the Rewriter API.',
-    category: 'Classification',
-    apis: ['Classifier', 'Rewriter'],
+    category: 'Decisions',
+    apis: ['Decisions', 'Rewriter'],
     icon: 'bi-chat-heart',
-    onDeviceReason: 'Half-typed messages and accidental API keys never leave your browser. Classifier checks your draft locally on every pause, and Rewriter softens harsh phrasing in one click.',
-    codeSnippet: `// 1. Silently check the draft locally as the user types (window.Classifier)
-const classifier = await Classifier.create({
+    onDeviceReason: 'Half-typed messages and accidental API keys never leave your browser. Decisions API checks your draft locally on every pause, and Rewriter softens harsh phrasing in one click.',
+    codeSnippet: `// 1. Silently check the draft locally as the user types (window.DecisionModel)
+const decisionModel = await DecisionModel.create({
   context: "Friendly writing coach and secret shield.",
   questions: [
     { id: "contains_secret", type: "binary", prompt: "Does this draft contain an API key, token, or phone number?" },
     { id: "sounds_harsh", type: "binary", prompt: "Does the draft sound harsh, insulting, or passive-aggressive?" }
   ]
 });
-const check = await classifier.classify(draftText);
+const check = await decisionModel.classify(draftText);
 
 // 2. If it sounds harsh, offer a one-click polite rewrite (window.Rewriter)
 if (check.sounds_harsh.label === "true") {
@@ -1725,12 +1725,12 @@ if (check.sounds_harsh.label === "true") {
     id: 'chameleon-adaptive-ui',
     title: 'Adaptive Article Reader',
     description: 'Tell the reader how much time you have ("I have 30 seconds" or "Just the technical takeaways") and watch the article adapt with the Summarizer API.',
-    category: 'Classification',
-    apis: ['Classifier', 'Summarizer'],
+    category: 'Decisions',
+    apis: ['Decisions', 'Summarizer'],
     icon: 'bi-book-half',
-    onDeviceReason: 'Classifier maps a reader\'s natural sentence to the ideal Summarizer configuration (tldr vs. key-points, short vs. long) and reading layout in a single local pass.',
-    codeSnippet: `// 1. Map the user's reading preference to Summarizer settings (window.Classifier)
-const classifier = await Classifier.create({
+    onDeviceReason: 'Decisions API maps a reader\'s natural sentence to the ideal Summarizer configuration (tldr vs. key-points, short vs. long) and reading layout in a single local pass.',
+    codeSnippet: `// 1. Map the user's reading preference to Summarizer settings (window.DecisionModel)
+const decisionModel = await DecisionModel.create({
   context: "Adaptive article reader controller.",
   questions: [
     {
@@ -1745,7 +1745,7 @@ const classifier = await Classifier.create({
     }
   ]
 });
-const { reading_mode } = await classifier.classify(userPreference);
+const { reading_mode } = await decisionModel.classify(userPreference);
 
 // 2. Transform the article automatically (window.Summarizer)
 if (reading_mode.label !== "full_article") {
@@ -1762,11 +1762,11 @@ if (reading_mode.label !== "full_article") {
     id: 'nl-catalog-matcher',
     title: 'Plain-English Gear Finder',
     description: 'Skip the 10 filter dropdowns: describe what you need in plain English and watch the storefront filter pills toggle themselves.',
-    category: 'Classification',
-    apis: ['Classifier'],
+    category: 'Decisions',
+    apis: ['Decisions'],
     icon: 'bi-sliders',
     onDeviceReason: 'Turns a shopper\'s natural sentence into structured storefront filter toggles (Category, Price Tier, Waterproof) locally.',
-    codeSnippet: `const classifier = await Classifier.create({
+    codeSnippet: `const decisionModel = await DecisionModel.create({
   context: "Outdoor gear storefront filter assistant.",
   questions: [
     {
@@ -1793,7 +1793,7 @@ if (reading_mode.label !== "full_article") {
   ]
 });
 
-const filters = await classifier.classify(searchQuery);`,
+const filters = await decisionModel.classify(searchQuery);`,
     promptRunOptions: {},
     initialPrompt: ''
   },
@@ -1801,11 +1801,11 @@ const filters = await classifier.classify(searchQuery);`,
     id: 'smart-clipboard-paste',
     title: 'Smart Clipboard Paste',
     description: 'Paste a meeting snippet, a cURL command, a receipt, or a tracking number and immediately get the right one-click action card.',
-    category: 'Classification',
-    apis: ['Classifier'],
+    category: 'Decisions',
+    apis: ['Decisions'],
     icon: 'bi-clipboard-check',
-    onDeviceReason: 'Clipboard contents are highly private. Classifier detects what kind of snippet you pasted locally without uploading your clipboard.',
-    codeSnippet: `const classifier = await Classifier.create({
+    onDeviceReason: 'Clipboard contents are highly private. Decisions API detects what kind of snippet you pasted locally without uploading your clipboard.',
+    codeSnippet: `const decisionModel = await DecisionModel.create({
   context: "Smart clipboard paste action detector.",
   questions: [
     {
@@ -1822,7 +1822,7 @@ const filters = await classifier.classify(searchQuery);`,
   ]
 });
 
-const { paste_type } = await classifier.classify(clipboardText);
+const { paste_type } = await decisionModel.classify(clipboardText);
 // paste_type -> { id, label, confidence, probabilities }`,
     promptRunOptions: {},
     initialPrompt: ''
@@ -1830,12 +1830,12 @@ const { paste_type } = await classifier.classify(clipboardText);
   {
     id: 'focus-notification-shield',
     title: 'Focus Mode Notification Shield',
-    description: 'Stay in deep work: Classifier screens incoming pings so only true emergencies ring now while routine updates wait for your 5 PM digest.',
-    category: 'Classification',
-    apis: ['Classifier'],
+    description: 'Stay in deep work: Decisions API screens incoming pings so only true emergencies ring now while routine updates wait for your 5 PM digest.',
+    category: 'Decisions',
+    apis: ['Decisions'],
     icon: 'bi-bell-slash-fill',
     onDeviceReason: 'Private DMs and work alerts are screened locally on your device so your notification filter works offline and never exposes messages to a third party.',
-    codeSnippet: `const shield = await Classifier.create({
+    codeSnippet: `const shield = await DecisionModel.create({
   context: "Deep-work focus mode notification filter.",
   questions: [
     {
@@ -1858,11 +1858,11 @@ const decision = await shield.classify(notificationText);`,
     id: 'instant-form-autofill',
     title: 'One-Sentence Expense Filler',
     description: 'Describe a travel or software expense in one plain sentence and watch the accounting dropdowns and toggles select themselves.',
-    category: 'Classification',
-    apis: ['Classifier'],
+    category: 'Decisions',
+    apis: ['Decisions'],
     icon: 'bi-ui-checks',
     onDeviceReason: 'Maps an unstructured one-line expense note to structured dropdown options (Category, Approval Tier, Client Billable) in a single local pass.',
-    codeSnippet: `const filler = await Classifier.create({
+    codeSnippet: `const filler = await DecisionModel.create({
   context: "Corporate expense report form dropdown filler.",
   questions: [
     {
@@ -1887,13 +1887,13 @@ const fields = await filler.classify(userNote);`,
   {
     id: 'system1-system2-cascade',
     title: 'Fast-Path Comment Moderator',
-    description: 'Clear obvious community comments with Classifier, and only wake the Prompt API judge when a comment is sarcastic or borderline.',
-    category: 'Classification',
-    apis: ['Classifier', 'Prompt API'],
+    description: 'Clear obvious community comments with Decisions API, and only wake the Prompt API judge when a comment is sarcastic or borderline.',
+    category: 'Decisions',
+    apis: ['Decisions', 'Prompt API'],
     icon: 'bi-lightning-charge-fill',
-    onDeviceReason: 'Combining a fast classifier pass with a generative LLM judge gives you both low latency on clear-cut cases and nuanced explanations on borderline cases.',
-    codeSnippet: `// Stage 1: Fast Classifier pass
-const classifier = await Classifier.create({
+    onDeviceReason: 'Combining a fast decision model pass with a generative LLM judge gives you both low latency on clear-cut cases and nuanced explanations on borderline cases.',
+    codeSnippet: `// Stage 1: Fast DecisionModel pass
+const decisionModel = await DecisionModel.create({
   context: "Community comment moderator.",
   questions: [
     {
@@ -1909,9 +1909,9 @@ const classifier = await Classifier.create({
   ]
 });
 
-const s1 = await classifier.classify(comment.text);
+const s1 = await decisionModel.classify(comment.text);
 if (s1.verdict.confidence >= 0.80) {
-  return { verdict: s1.verdict.label, stage: "Classifier" };
+  return { verdict: s1.verdict.label, stage: "DecisionModel" };
 }
 
 // Stage 2: Borderline confidence -> escalate to Prompt API judge
