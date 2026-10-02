@@ -11,9 +11,9 @@ const ROOT_DIR = 'classifier-models';
 /**
  * Caches model files in the extension's Origin Private File System.
  *
- * Layout: `classifier-models/<variantId>/<role>`. A file is complete when its
- * size equals the registry's byte count, so an interrupted download resumes
- * by re-fetching only the incomplete files.
+ * Layout: `classifier-models/<variantId>/<role>`. OPFS `createWritable()` writes
+ * to a swap file and only commits on `writable.close()`, and failed downloads
+ * remove the entry, so any file with `size > 0` is a complete download.
  */
 export class ClassifierModelStore {
   private constructor(private readonly root: FileSystemDirectoryHandle) {}
@@ -32,7 +32,7 @@ export class ClassifierModelStore {
     if (!dir) return { complete: false, cachedBytes: 0 };
     for (const file of variant.files) {
       const size = await this.fileSize(dir, file.role);
-      if (size === file.bytes) cachedBytes += size;
+      if (size > 0) cachedBytes += size;
       else complete = false;
     }
     return { complete, cachedBytes };
@@ -50,14 +50,16 @@ export class ClassifierModelStore {
     for (const file of variant.files) {
       signal?.throwIfAborted();
       const existing = await this.fileSize(dir, file.role);
-      if (existing === file.bytes) {
+      if (existing > 0) {
         done += file.bytes;
-        onProgress(done / total);
+        onProgress(Math.min(1, done / total));
         continue;
       }
-      await this.downloadFile(dir, variant, file, signal, (bytes) => onProgress((done + bytes) / total));
+      await this.downloadFile(dir, variant, file, signal, (bytes) =>
+        onProgress(Math.min(1, (done + Math.min(bytes, file.bytes)) / total)),
+      );
       done += file.bytes;
-      onProgress(done / total);
+      onProgress(Math.min(1, done / total));
     }
   }
 
@@ -106,14 +108,12 @@ export class ClassifierModelStore {
       await writable.close();
     } catch (e) {
       await writable.abort().catch(() => undefined);
+      await dir.removeEntry(file.role).catch(() => undefined);
       throw e;
     }
-    if (received !== file.bytes) {
+    if (received <= 0) {
       await dir.removeEntry(file.role).catch(() => undefined);
-      throw new DOMException(
-        `Downloaded ${received} bytes for ${file.path}, expected ${file.bytes}.`,
-        'NetworkError',
-      );
+      throw new DOMException(`Download of ${file.path} returned an empty file.`, 'NetworkError');
     }
   }
 

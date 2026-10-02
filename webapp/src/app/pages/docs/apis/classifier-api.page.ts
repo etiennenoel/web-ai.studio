@@ -27,10 +27,10 @@ import { Component } from '@angular/core';
             </div>
 
             <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
-              <a href="https://github.com/michaelwasserman/classifier-api" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+              <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-file-earmark-text"></i> Explainer
               </a>
-              <a href="https://github.com/explainers-by-googlers/classifier-api/issues" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+              <a href="https://github.com/explainers-by-googlers/decision-api/issues" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-bug"></i> File an issue
               </a>
               <a routerLink="/playgrounds/decisions" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors border border-indigo-600 flex items-center gap-2">
