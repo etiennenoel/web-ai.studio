@@ -20,7 +20,7 @@ export type ClassifierProvider = 'checking' | 'extension' | 'none';
 export class ExtensionLandingPage extends BasePage implements OnInit {
   readonly webStoreUrl = 'https://chromewebstore.google.com/detail/webai-extension/lmjgpcigjcffnphimblhcoccjfefamcp';
 
-  activeTab: string = 'classifier';
+  activeTab: string = 'overview';
 
   /** Live detection of the polyfill on this very page. */
   classifierProvider: ClassifierProvider = 'checking';
@@ -30,7 +30,7 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
     questions: [
       {
         id: 'command',
-        type: 'categorical',
+        type: 'choice',
         prompt: "Which command best fulfills the user's goal?",
         options: [
           { label: 'export_pdf', description: 'Download or save the document as a PDF' },
@@ -38,7 +38,7 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
           { label: 'archive_doc', description: 'Move the document to trash or archive' }
         ]
       },
-      { id: 'is_destructive', type: 'binary', prompt: 'Would this action delete or hide content?' }
+      { id: 'is_destructive', type: 'boolean', prompt: 'Would this action delete or hide content?' }
     ]
   };
   readonly demoSamples = [
@@ -58,7 +58,7 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
   questions: [
     {
       id: "command",
-      type: "categorical",
+      type: "choice",
       prompt: "Which command best fulfills the user's goal?",
       options: [
         { label: "export_pdf", description: "Download or save the document as a PDF" },
@@ -99,6 +99,15 @@ decisionModel.destroy();`;
 
   setTab(tab: string) {
     this.activeTab = tab;
+  }
+
+  scrollToSection(id: string, tab?: string) {
+    if (tab) {
+      this.activeTab = tab;
+    }
+    if (this.isBrowser) {
+      this.document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   detectClassifierProvider(): void {

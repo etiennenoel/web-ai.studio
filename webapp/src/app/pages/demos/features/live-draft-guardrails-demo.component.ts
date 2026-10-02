@@ -131,12 +131,12 @@ export class LiveDraftGuardrailsDemoComponent extends BaseClassifierDemoComponen
     questions: [
       {
         id: 'contains_secret',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Does this draft contain an API key, token, or phone number?'
       },
       {
         id: 'sounds_harsh',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Does the draft sound harsh, insulting, or passive-aggressive?'
       }
     ]

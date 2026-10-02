@@ -34,7 +34,7 @@ export class DemoAvailabilityService {
       const api = (globalThis as any).DecisionModel ?? (globalThis as any).Classifier;
       return api?.availability({
         context: 'Probe',
-        questions: [{ id: 'probe', type: 'binary', prompt: 'Is this text?' }]
+        questions: [{ id: 'probe', type: 'boolean', prompt: 'Is this text?' }]
       });
     });
     this.check('Semantic Embedder', () => (globalThis as any).SemanticEmbedder?.availability());

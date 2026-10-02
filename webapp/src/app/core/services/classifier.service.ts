@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type ClassifierQuestionModality = 'binary' | 'categorical' | 'ordinal' | 'boolean' | 'choice' | 'score';
+export type ClassifierQuestionModality = 'boolean' | 'choice' | 'score' | 'binary' | 'categorical' | 'ordinal';
 
 export interface ClassifierOption {
   label: string;
@@ -29,7 +29,7 @@ export interface ClassifierOptionProbability {
 
 export interface NormalizedDecision {
   id: string;
-  type: 'binary' | 'categorical' | 'ordinal';
+  type: 'boolean' | 'choice' | 'score';
   prompt: string;
   label: string;
   confidence: number;
@@ -77,7 +77,7 @@ export class ClassifierService {
     try {
       const targetSchema: ClassifierSchema = schema ?? {
         context: 'Availability check',
-        questions: [{ id: 'ready', type: 'binary', prompt: 'Is this valid?' }]
+        questions: [{ id: 'ready', type: 'boolean', prompt: 'Is this valid?' }]
       };
       return await api.availability(targetSchema);
     } catch {
@@ -129,10 +129,10 @@ export class ClassifierService {
     return this.normalizeResult(schema, raw, elapsedMs);
   }
 
-  private normalizeModality(type: ClassifierQuestionModality): 'binary' | 'categorical' | 'ordinal' {
-    if (type === 'boolean' || type === 'binary') return 'binary';
-    if (type === 'score' || type === 'ordinal') return 'ordinal';
-    return 'categorical';
+  private normalizeModality(type: ClassifierQuestionModality): 'boolean' | 'choice' | 'score' {
+    if (type === 'boolean' || type === 'binary') return 'boolean';
+    if (type === 'score' || type === 'ordinal') return 'score';
+    return 'choice';
   }
 
   normalizeResult(
@@ -166,7 +166,7 @@ export class ClassifierService {
         rawLabel = best?.label;
       }
 
-      if (modality === 'binary') {
+      if (modality === 'boolean') {
         if (typeof rawLabel === 'boolean') {
           rawLabel = rawLabel ? 'true' : 'false';
         } else if (typeof rawLabel === 'string') {
@@ -188,12 +188,14 @@ export class ClassifierService {
           ? entry.expectedScore
           : entry.score;
 
+      const topProb = probs.length > 0 ? Math.max(...probs.map((p) => p.probability)) : 0;
+
       const nd: NormalizedDecision = {
         id: q.id,
         type: modality,
         prompt: q.prompt,
         label: String(rawLabel ?? ''),
-        confidence: Number(entry.confidence ?? 0),
+        confidence: entry.confidence !== undefined && entry.confidence !== null ? Number(entry.confidence) : topProb,
         probability: entry.probability !== undefined && entry.probability !== null ? Number(entry.probability) : null,
         expectedScore: scoreVal !== undefined && scoreVal !== null ? Number(scoreVal) : null,
         probabilities: probs

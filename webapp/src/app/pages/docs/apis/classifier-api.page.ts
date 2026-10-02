@@ -27,10 +27,10 @@ import { Component } from '@angular/core';
             </div>
 
             <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
-              <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+              <a href="https://github.com/explainers-by-googlers/decisions-api" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-file-earmark-text"></i> Explainer
               </a>
-              <a href="https://github.com/explainers-by-googlers/decision-api/issues" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
+              <a href="https://github.com/explainers-by-googlers/decisions-api/issues" target="_blank" rel="noopener noreferrer" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-slate-200 dark:border-zinc-700 flex items-center gap-2">
                 <i class="bi bi-bug"></i> File an issue
               </a>
               <a routerLink="/playgrounds/decisions" class="!no-underline px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors border border-indigo-600 flex items-center gap-2">
@@ -40,14 +40,14 @@ import { Component } from '@angular/core';
           </div>
 
           <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
-            The Decisions API (<code class="text-sm font-mono text-indigo-600 dark:text-indigo-400">window.DecisionModel</code>) evaluates input text against a caller-defined schema of structured questions (<code class="text-sm font-mono">binary</code>, <code class="text-sm font-mono">categorical</code>, and <code class="text-sm font-mono">ordinal</code>) on the user's device, returning a selected option label, confidence score, and probability distribution for each question.
+            The Decisions API (<code class="text-sm font-mono text-indigo-600 dark:text-indigo-400">window.DecisionModel</code>) evaluates input text against a caller-defined schema of structured questions (<code class="text-sm font-mono">boolean</code>, <code class="text-sm font-mono">choice</code>, and <code class="text-sm font-mono">score</code>) on the user's device, returning a selected option label, confidence score, and probability distribution for each question.
           </p>
 
           <!-- Flag Notice -->
           <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl text-amber-800 dark:text-amber-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-exclamation-triangle-fill text-lg mt-0.5"></i>
             <div>
-              Enable <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">#decisions-api</code> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API.
+              Enable <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">#decisions-api</code> in <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">chrome://flags</code> to use this API. For the DevTrial prototype, cross-origin iframes reuse the <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">"language-model"</code> <code class="bg-amber-100 dark:bg-amber-900/30 px-1 py-0.5 rounded text-xs font-mono">Permissions-Policy</code> feature.
             </div>
           </div>
 
@@ -117,18 +117,18 @@ import { Component } from '@angular/core';
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-zinc-800 bg-[#ffffff] dark:bg-[#121212]">
                   <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">binary</td>
+                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">boolean</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">No (implicit <code class="text-xs font-mono">"true"</code> / <code class="text-xs font-mono">"false"</code>)</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns <code class="text-xs font-mono">label</code> (<code class="text-xs font-mono">"true"</code> or <code class="text-xs font-mono">"false"</code>), <code class="text-xs font-mono">probability</code>, <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code>.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns <code class="text-xs font-mono">label</code> (<code class="text-xs font-mono">"true"</code> or <code class="text-xs font-mono">"false"</code>), <code class="text-xs font-mono">probability</code> (<code class="text-xs font-mono">P("true")</code>), <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code>.</td>
                   </tr>
                   <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">categorical</td>
+                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">choice</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Yes (2 or more <code class="text-xs font-mono">&#123; label, description &#125;</code> items)</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns the top option <code class="text-xs font-mono">label</code>, <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code> across all options.</td>
                   </tr>
                   <tr>
-                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">ordinal</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Yes (ordered levels, e.g., <code class="text-xs font-mono">"1"</code> through <code class="text-xs font-mono">"5"</code>)</td>
+                    <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">score</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Optional (ordered levels; defaults to <code class="text-xs font-mono">"1"</code> through <code class="text-xs font-mono">"5"</code> when omitted)</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Returns <code class="text-xs font-mono">label</code>, <code class="text-xs font-mono">expectedScore</code> (weighted average across levels), <code class="text-xs font-mono">confidence</code>, and <code class="text-xs font-mono">probabilities</code>.</td>
                   </tr>
                 </tbody>
@@ -206,22 +206,22 @@ import { Component } from '@angular/core';
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">label</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">DOMString</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The highest-probability option label (<code class="text-xs font-mono">"true"</code>/<code class="text-xs font-mono">"false"</code> for binary, or one of the supplied <code class="text-xs font-mono">options</code>).</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">The highest-probability option label (<code class="text-xs font-mono">"true"</code>/<code class="text-xs font-mono">"false"</code> for <code class="text-xs font-mono">boolean</code>, or one of the <code class="text-xs font-mono">options</code>).</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">confidence</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double (0.0 – 1.0)</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Confidence score for the decision.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Always the winning <code class="text-xs font-mono">label</code>'s probability.</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">probability</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double? (0.0 – 1.0)</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Present for <code class="text-xs font-mono">binary</code> questions: probability of <code class="text-xs font-mono">"true"</code>.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Present for <code class="text-xs font-mono">boolean</code> questions: probability of <code class="text-xs font-mono">"true"</code> (<code class="text-xs font-mono">P("true")</code>).</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">expectedScore</td>
                     <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 font-mono">double?</td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Present for <code class="text-xs font-mono">ordinal</code> questions: weighted average across the ordered option levels.</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">Present for <code class="text-xs font-mono">score</code> questions: weighted by parsed numeric option <code class="text-xs font-mono">label</code>s when all labels are finite numbers, or <code class="text-xs font-mono">1..N</code> ordinal indices otherwise.</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-3 text-sm font-mono text-pink-600 dark:text-pink-400">probabilities</td>
@@ -273,7 +273,7 @@ export class ClassifierApiPage {
   snippetAvailability = `const schema = {
   context: "Customer support ticket router.",
   questions: [
-    { id: "is_urgent", type: "binary", prompt: "Does this ticket require immediate incident response?" }
+    { id: "is_urgent", type: "boolean", prompt: "Does this ticket require immediate incident response?" }
   ]
 };
 
@@ -285,12 +285,12 @@ console.log("Decisions API availability:", status);`;
   questions: [
     {
       id: "is_urgent",
-      type: "binary",
+      type: "boolean",
       prompt: "Does this ticket require immediate incident response?"
     },
     {
       id: "category",
-      type: "categorical",
+      type: "choice",
       prompt: "Select the primary support department.",
       options: [
         { label: "bug", description: "Production crash or software defect" },
@@ -300,7 +300,7 @@ console.log("Decisions API availability:", status);`;
     },
     {
       id: "severity",
-      type: "ordinal",
+      type: "score",
       prompt: "Rate the business impact from 1 (minimal) to 5 (critical).",
       options: [
         { label: "1", description: "Minimal impact" },
@@ -322,12 +322,12 @@ decisionModel.destroy();`;
   questions: [
     {
       id: "is_urgent",
-      type: "binary",
+      type: "boolean",
       prompt: "Does this ticket require immediate incident response?"
     },
     {
       id: "category",
-      type: "categorical",
+      type: "choice",
       prompt: "Select the primary support department.",
       options: [
         { label: "bug", description: "Production crash or software defect" },
@@ -355,7 +355,7 @@ if (status === "available" || status === "downloadable") {
   snippetDestroy = `const schema = {
   context: "Customer support ticket router.",
   questions: [
-    { id: "is_urgent", type: "binary", prompt: "Does this ticket require immediate incident response?" }
+    { id: "is_urgent", type: "boolean", prompt: "Does this ticket require immediate incident response?" }
   ]
 };
 
@@ -366,7 +366,7 @@ decisionModel.destroy();
 console.log("DecisionModel session destroyed.");`;
 
   snippetWebIdl = `enum Availability { "unavailable", "downloadable", "downloading", "available" };
-enum DecisionQuestionType { "binary", "categorical", "ordinal" };
+enum DecisionQuestionType { "boolean", "choice", "score" };
 
 [Exposed=Window, SecureContext]
 interface DecisionModel {
@@ -392,7 +392,7 @@ dictionary DecisionQuestion {
   required DOMString id;
   required DecisionQuestionType type;
   required DOMString prompt;
-  sequence<DecisionOption> options; // Required for "categorical" and "ordinal"
+  sequence<DecisionOption> options; // Required for "choice", optional for "score" (defaults to "1"-"5")
 };
 
 dictionary DecisionOption {

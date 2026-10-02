@@ -143,11 +143,11 @@
                             Well, you have it now in the WebAI Studio extension, all locally in your browser.
                             Every page you visit gets <code class="text-sm bg-gray-100 dark:bg-[#3c4043] px-1.5 py-0.5 rounded">window.DecisionModel</code>,
                             a polyfill of the proposed
-                            <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Decisions API</a>,
+                            <a href="https://github.com/explainers-by-googlers/decisions-api" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Decisions API</a>,
                             backed by the open Laya decision encoder running on LiteRT.js.
                         </p>
                         <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2 mb-6">
-                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Three question types: <code>binary</code>, <code>categorical</code>, <code>ordinal</code>. Any number of questions per call.</span></li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Three question types: <code>boolean</code>, <code>choice</code>, <code>score</code>. Any number of questions per call.</span></li>
                             <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Explainer-shaped results: a record keyed by question id with <code>label</code>, <code>confidence</code>, and <code>probabilities</code>.</span></li>
                             <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Model downloaded once from Hugging Face, then cached. Nothing you classify leaves the device.</span></li>
                             <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Full support in the DevTools panel: history, diagnosis, model management, and a playground.</span></li>

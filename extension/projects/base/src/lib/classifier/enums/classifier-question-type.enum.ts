@@ -1,9 +1,9 @@
 /**
- * Question modalities of the Classifier API explainer. `boolean`, `choice`
- * and `score` are accepted aliases and normalized to the canonical values.
+ * Question modalities of the Decisions API explainer. `binary`, `categorical`
+ * and `ordinal` are accepted aliases and normalized to the canonical values.
  */
 export enum ClassifierQuestionType {
-  BINARY = 'binary',
-  CATEGORICAL = 'categorical',
-  ORDINAL = 'ordinal',
+  BOOLEAN = 'boolean',
+  CHOICE = 'choice',
+  SCORE = 'score',
 }

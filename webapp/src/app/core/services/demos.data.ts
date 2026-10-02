@@ -1672,7 +1672,7 @@ const decisionModel = await DecisionModel.create({
   questions: [
     {
       id: "recommended_action",
-      type: "categorical",
+      type: "choice",
       prompt: "Which one-click resolution action should be offered to the support agent?",
       options: [
         { label: "issue_refund", description: "Refund a duplicate charge or billing error" },
@@ -1680,7 +1680,7 @@ const decisionModel = await DecisionModel.create({
         { label: "log_feature", description: "Add a customer feature request to the product roadmap" }
       ]
     },
-    { id: "is_urgent", type: "binary", prompt: "Is the customer blocked right now?" }
+    { id: "is_urgent", type: "boolean", prompt: "Is the customer blocked right now?" }
   ]
 });
 const decision = await decisionModel.classify(customerEmail);
@@ -1705,8 +1705,8 @@ const reply = await writer.write(
 const decisionModel = await DecisionModel.create({
   context: "Friendly writing coach and secret shield.",
   questions: [
-    { id: "contains_secret", type: "binary", prompt: "Does this draft contain an API key, token, or phone number?" },
-    { id: "sounds_harsh", type: "binary", prompt: "Does the draft sound harsh, insulting, or passive-aggressive?" }
+    { id: "contains_secret", type: "boolean", prompt: "Does this draft contain an API key, token, or phone number?" },
+    { id: "sounds_harsh", type: "boolean", prompt: "Does the draft sound harsh, insulting, or passive-aggressive?" }
   ]
 });
 const check = await decisionModel.classify(draftText);
@@ -1735,7 +1735,7 @@ const decisionModel = await DecisionModel.create({
   questions: [
     {
       id: "reading_mode",
-      type: "categorical",
+      type: "choice",
       prompt: "How would the user like to read this article?",
       options: [
         { label: "quick_tldr", description: "30-second executive TL;DR summary" },
@@ -1771,7 +1771,7 @@ if (reading_mode.label !== "full_article") {
   questions: [
     {
       id: "category",
-      type: "categorical",
+      type: "choice",
       prompt: "Which gear category matches the shopper query?",
       options: [
         { label: "outerwear", description: "Jackets, parkas, rain shells" },
@@ -1782,14 +1782,14 @@ if (reading_mode.label !== "full_article") {
     },
     {
       id: "budget_tier",
-      type: "categorical",
+      type: "choice",
       prompt: "Select the target budget tier.",
       options: [
         { label: "under_150", description: "Under $150" },
         { label: "premium", description: "$150 and above" }
       ]
     },
-    { id: "waterproof", type: "binary", prompt: "Does the shopper specifically want waterproof gear?" }
+    { id: "waterproof", type: "boolean", prompt: "Does the shopper specifically want waterproof gear?" }
   ]
 });
 
@@ -1810,7 +1810,7 @@ const filters = await decisionModel.classify(searchQuery);`,
   questions: [
     {
       id: "paste_type",
-      type: "categorical",
+      type: "choice",
       prompt: "What kind of content did the user paste from their clipboard?",
       options: [
         { label: "calendar_invite", description: "Meeting time, date, or call scheduling note" },
@@ -1840,7 +1840,7 @@ const { paste_type } = await decisionModel.classify(clipboardText);
   questions: [
     {
       id: "delivery_mode",
-      type: "categorical",
+      type: "choice",
       prompt: "Should this notification interrupt the user during Deep Work or wait for their 5 PM digest?",
       options: [
         { label: "break_through", description: "Critical production emergency or urgent personal safety alert" },
@@ -1867,7 +1867,7 @@ const decision = await shield.classify(notificationText);`,
   questions: [
     {
       id: "expense_category",
-      type: "categorical",
+      type: "choice",
       prompt: "Which accounting category fits this expense?",
       options: [
         { label: "ground_transport", description: "Uber, Lyft, taxi, train, or parking" },
@@ -1876,7 +1876,7 @@ const decision = await shield.classify(notificationText);`,
         { label: "software_saas", description: "Developer tool, cloud hosting, or software license" }
       ]
     },
-    { id: "client_billable", type: "binary", prompt: "Was this expense incurred directly for a client meeting?" }
+    { id: "client_billable", type: "boolean", prompt: "Was this expense incurred directly for a client meeting?" }
   ]
 });
 
@@ -1898,7 +1898,7 @@ const decisionModel = await DecisionModel.create({
   questions: [
     {
       id: "verdict",
-      type: "categorical",
+      type: "choice",
       prompt: "Classify this community comment.",
       options: [
         { label: "benign", description: "Helpful, friendly, or constructive comment" },

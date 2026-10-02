@@ -78,7 +78,7 @@ const DEFAULT_PROVIDERS: Provider[] = [
                 <div class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-white transition-colors">Enable Decisions API polyfill</div>
                 <div class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
                   Exposes <code>window.DecisionModel</code> on every page when Chrome has no native implementation, following the
-                  <a href="https://github.com/explainers-by-googlers/decision-api" target="_blank" class="text-blue-500 hover:underline">Decisions API explainer</a>.
+                  <a href="https://github.com/explainers-by-googlers/decisions-api" target="_blank" class="text-blue-500 hover:underline">Decisions API explainer</a>.
                   Inference runs locally with LiteRT.js; the model is downloaded from Hugging Face on first use.
                 </div>
               </div>

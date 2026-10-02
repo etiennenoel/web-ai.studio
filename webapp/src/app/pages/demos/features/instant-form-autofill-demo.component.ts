@@ -177,7 +177,7 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
     questions: [
       {
         id: 'expense_category',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Which accounting category fits this expense?',
         options: [
           { label: 'ground_transport', description: 'Uber, Lyft, taxi, train, or parking' },
@@ -188,7 +188,7 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
       },
       {
         id: 'cost_tier',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Select the cost approval tier.',
         options: [
           { label: 'under_75', description: 'Small expense under $75' },
@@ -198,7 +198,7 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
       },
       {
         id: 'client_billable',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Was this expense incurred directly for a client meeting or client project?'
       }
     ]

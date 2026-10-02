@@ -124,7 +124,7 @@ export class FocusNotificationShieldDemoComponent extends BaseClassifierDemoComp
     questions: [
       {
         id: 'delivery_mode',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Should this notification interrupt the user during Deep Work or wait for their 5 PM digest?',
         options: [
           { label: 'break_through', description: 'Critical production emergency or urgent personal safety alert' },

@@ -21,12 +21,12 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
     questions: [
       {
         id: 'is_urgent',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Does this ticket require immediate incident response?'
       },
       {
         id: 'category',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Select the primary support department.',
         options: [
           { label: 'bug', description: 'Production crash or software defect' },
@@ -36,7 +36,7 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
       },
       {
         id: 'severity',
-        type: 'ordinal',
+        type: 'score',
         prompt: 'Rate the business impact from 1 (minimal) to 5 (critical).',
         options: [
           { label: '1', description: 'Minimal impact' },
@@ -130,7 +130,7 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
     const idx = (this.schema.questions?.length || 0) + 1;
     this.schema.questions.push({
       id: `question_${idx}`,
-      type: 'binary',
+      type: 'boolean',
       prompt: 'Does this input satisfy the criterion?'
     });
     this.syncJsonFromVisual();

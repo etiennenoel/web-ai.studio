@@ -10,10 +10,10 @@ describe('ClassifierSchemaMapper', () => {
     {
       context: 'Router',
       questions: [
-        { id: 'urgent', type: 'binary', prompt: 'Urgent?' },
-        { id: 'dept', type: 'categorical', prompt: 'Dept?', options: [{ label: 'bug', description: 'Crash' }, { label: 'billing' }] },
-        { id: 'sev', type: 'ordinal', prompt: 'Sev?', options: [{ label: '1', description: 'Low' }, { label: '2' }, { label: '5' }] },
-        { id: 'mood', type: 'ordinal', prompt: 'Mood?', options: [{ label: 'sad' }, { label: 'ok' }, { label: 'happy' }] },
+        { id: 'urgent', type: 'boolean', prompt: 'Urgent?' },
+        { id: 'dept', type: 'choice', prompt: 'Dept?', options: [{ label: 'bug', description: 'Crash' }, { label: 'billing' }] },
+        { id: 'sev', type: 'score', prompt: 'Sev?', options: [{ label: '1', description: 'Low' }, { label: '2' }, { label: '5' }] },
+        { id: 'mood', type: 'score', prompt: 'Mood?', options: [{ label: 'sad' }, { label: 'ok' }, { label: 'happy' }] },
       ],
     },
     true,
@@ -32,15 +32,15 @@ describe('ClassifierSchemaMapper', () => {
     expect(ClassifierSchemaMapper.toLayaQuestion(schema.questions[2], '').type).toBe(LayaQuestionType.SCORE);
   });
 
-  it('uses numeric labels as levels, else zero-based indices', () => {
+  it('uses numeric labels as levels, else 1..N ordinal indices', () => {
     expect(ClassifierSchemaMapper.levels(schema.questions[2])).toEqual([1, 2, 5]);
-    expect(ClassifierSchemaMapper.levels(schema.questions[3])).toEqual([0, 1, 2]);
+    expect(ClassifierSchemaMapper.levels(schema.questions[3])).toEqual([1, 2, 3]);
     expect(ClassifierSchemaMapper.levels(schema.questions[1])).toBeUndefined();
   });
 
-  it('builds explainer-shaped decisions', () => {
+  it('builds explainer-shaped decisions with winning label probability as confidence', () => {
     const noul: LayaAnswer = { type: LayaQuestionType.NOUL, probabilities: [0.03, 0.97], argmaxIndex: 1, confidence: 0.97, actProbability: 1, inputTokens: 10 };
-    const urgent = ClassifierSchemaMapper.toDecision('urgent', ClassifierQuestionType.BINARY, ['true', 'false'], undefined, noul);
+    const urgent = ClassifierSchemaMapper.toDecision('urgent', ClassifierQuestionType.BOOLEAN, ['true', 'false'], undefined, noul);
     expect(urgent).toEqual({
       id: 'urgent',
       label: 'true',
@@ -50,8 +50,9 @@ describe('ClassifierSchemaMapper', () => {
     });
 
     const score: LayaAnswer = { type: LayaQuestionType.SCORE, probabilities: [0.1, 0.2, 0.7], argmaxIndex: 2, expectedIndex: 1.6, confidence: 0.4, actProbability: 1, inputTokens: 10 };
-    const sev = ClassifierSchemaMapper.toDecision('sev', ClassifierQuestionType.ORDINAL, ['1', '2', '5'], [1, 2, 5], score);
+    const sev = ClassifierSchemaMapper.toDecision('sev', ClassifierQuestionType.SCORE, ['1', '2', '5'], [1, 2, 5], score);
     expect(sev.label).toBe('5');
+    expect(sev.confidence).toBe(0.7);
     expect(sev.expectedScore).toBeCloseTo(0.1 + 0.4 + 3.5, 10);
     expect(sev.probability).toBeUndefined();
     expect(sev.probabilities.length).toBe(3);

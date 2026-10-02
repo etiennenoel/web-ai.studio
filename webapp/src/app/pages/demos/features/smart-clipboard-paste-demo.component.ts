@@ -110,7 +110,7 @@ export class SmartClipboardPasteDemoComponent extends BaseClassifierDemoComponen
     questions: [
       {
         id: 'paste_type',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'What kind of content did the user paste from their clipboard?',
         options: [
           { label: 'calendar_invite', description: 'Meeting time, date, or call scheduling note' },

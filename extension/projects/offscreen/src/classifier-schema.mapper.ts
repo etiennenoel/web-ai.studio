@@ -23,7 +23,7 @@ export class ClassifierSchemaMapper {
   static toLayaQuestion(question: ClassifierNormalizedQuestion, context: string): LayaQuestion {
     const instructions = ClassifierSchemaMapper.instructions(context, question.prompt);
     switch (question.type) {
-      case ClassifierQuestionType.BINARY: {
+      case ClassifierQuestionType.BOOLEAN: {
         const described = (label: string) => question.options.find((o) => o.label === label)?.description ?? null;
         return {
           type: LayaQuestionType.NOUL,
@@ -34,13 +34,13 @@ export class ClassifierSchemaMapper {
           ],
         };
       }
-      case ClassifierQuestionType.CATEGORICAL:
+      case ClassifierQuestionType.CHOICE:
         return {
           type: LayaQuestionType.CHOICE,
           instructions,
           options: question.options.map((o) => ({ label: o.label, description: o.description ?? null })),
         };
-      case ClassifierQuestionType.ORDINAL:
+      case ClassifierQuestionType.SCORE:
         return {
           type: LayaQuestionType.SCORE,
           instructions,
@@ -49,23 +49,23 @@ export class ClassifierSchemaMapper {
     }
   }
 
-  /** Labels in decision order. Binary decisions list `true` first, as in the explainer. */
+  /** Labels in decision order. Boolean decisions list `true` first, as in the explainer. */
   static labels(question: ClassifierNormalizedQuestion): string[] {
-    if (question.type === ClassifierQuestionType.BINARY) return ['true', 'false'];
+    if (question.type === ClassifierQuestionType.BOOLEAN) return ['true', 'false'];
     return question.options.map((o) => o.label);
   }
 
   /**
-   * Ordinal levels: the numeric labels when every label is a finite number
-   * (the explainer's `"1"`..`"5"` example gives 4.78), otherwise the zero-based index.
+   * Score levels: the numeric labels when every label is a finite number
+   * (the explainer's `"1"`..`"5"` example gives 4.78), otherwise 1-based `1..N` ordinal indices.
    */
   static levels(question: ClassifierNormalizedQuestion): number[] | undefined {
-    if (question.type !== ClassifierQuestionType.ORDINAL) return undefined;
+    if (question.type !== ClassifierQuestionType.SCORE) return undefined;
     const parsed = question.options.map((o) => Number(o.label));
     if (parsed.every((n) => Number.isFinite(n)) && question.options.every((o) => o.label.trim() !== '')) {
       return parsed;
     }
-    return question.options.map((_, i) => i);
+    return question.options.map((_, i) => i + 1);
   }
 
   static toDecision(
@@ -75,13 +75,13 @@ export class ClassifierSchemaMapper {
     levels: number[] | undefined,
     answer: LayaAnswer,
   ): ClassifierDecision {
-    if (type === ClassifierQuestionType.BINARY) {
+    if (type === ClassifierQuestionType.BOOLEAN) {
       const pTrue = answer.probabilities[1];
       return {
         id,
         label: pTrue >= 0.5 ? 'true' : 'false',
         probability: pTrue,
-        confidence: answer.confidence,
+        confidence: Math.max(pTrue, 1 - pTrue),
         probabilities: [
           { label: 'true', probability: pTrue },
           { label: 'false', probability: 1 - pTrue },
@@ -92,10 +92,10 @@ export class ClassifierSchemaMapper {
     const decision: ClassifierDecision = {
       id,
       label: labels[answer.argmaxIndex],
-      confidence: answer.confidence,
+      confidence: answer.probabilities[answer.argmaxIndex],
       probabilities: labels.map((label, i) => ({ label, probability: answer.probabilities[i] })),
     };
-    if (type === ClassifierQuestionType.ORDINAL && levels) {
+    if (type === ClassifierQuestionType.SCORE && levels) {
       decision.expectedScore = answer.probabilities.reduce((acc, p, i) => acc + levels[i] * p, 0);
     }
     return decision;

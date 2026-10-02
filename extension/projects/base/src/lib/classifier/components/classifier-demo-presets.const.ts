@@ -10,10 +10,10 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
       context: 'Enterprise customer support ticket router.',
       expectedInputs: [{ type: 'text', languages: ['en'] }],
       questions: [
-        { id: 'is_urgent', type: 'binary', prompt: 'Does this ticket require immediate incident response?' },
+        { id: 'is_urgent', type: 'boolean', prompt: 'Does this ticket require immediate incident response?' },
         {
           id: 'category',
-          type: 'categorical',
+          type: 'choice',
           prompt: 'Select the primary support department.',
           options: [
             { label: 'bug', description: 'Production crash or software defect' },
@@ -23,7 +23,7 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
         },
         {
           id: 'severity',
-          type: 'ordinal',
+          type: 'score',
           prompt: 'Rate the business impact from 1 (minimal) to 5 (critical).',
           options: [
             { label: '1', description: 'Minimal impact' },
@@ -50,7 +50,7 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
       questions: [
         {
           id: 'command',
-          type: 'categorical',
+          type: 'choice',
           prompt: "Which command best fulfills the user's goal?",
           options: [
             { label: 'export_pdf', description: 'Download or save the document as a PDF' },
@@ -69,11 +69,11 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
     schema: {
       context: 'Pre-send review of a chat message in a team workspace.',
       questions: [
-        { id: 'contains_secret', type: 'binary', prompt: 'Does the message contain a password, API key, or other secret?' },
-        { id: 'tone_constructive', type: 'binary', prompt: 'Is the tone constructive and respectful?' },
+        { id: 'contains_secret', type: 'boolean', prompt: 'Does the message contain a password, API key, or other secret?' },
+        { id: 'tone_constructive', type: 'boolean', prompt: 'Is the tone constructive and respectful?' },
         {
           id: 'frustration',
-          type: 'ordinal',
+          type: 'score',
           prompt: 'How frustrated does the author sound, from 1 (calm) to 5 (furious)?',
           options: [
             { label: '1', description: 'Calm' },
@@ -100,7 +100,7 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
       questions: [
         {
           id: 'department',
-          type: 'categorical',
+          type: 'choice',
           prompt: 'Which department should handle this request?',
           options: [
             { label: 'billing', description: 'invoices, payments, refunds' },
@@ -109,7 +109,7 @@ export const CLASSIFIER_DEMO_PRESETS: ClassifierDemoPreset[] = [
             { label: 'other', description: 'everything else' },
           ],
         },
-        { id: 'refund_requested', type: 'binary', prompt: 'Does the user explicitly request a refund?' },
+        { id: 'refund_requested', type: 'boolean', prompt: 'Does the user explicitly request a refund?' },
       ],
     },
     samples: [

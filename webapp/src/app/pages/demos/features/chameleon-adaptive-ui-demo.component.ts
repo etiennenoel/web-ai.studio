@@ -119,7 +119,7 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
     questions: [
       {
         id: 'reading_mode',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'How would the user like to read this article?',
         options: [
           { label: 'quick_tldr', description: '30-second executive TL;DR summary' },
