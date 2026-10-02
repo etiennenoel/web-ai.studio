@@ -131,7 +131,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     questions: [
       {
         id: 'recommended_action',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Which one-click resolution action should be offered to the support agent?',
         options: [
           { label: 'issue_refund', description: 'Refund a duplicate charge or billing error' },
@@ -141,7 +141,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
       },
       {
         id: 'is_urgent',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Is the customer blocked right now?'
       }
     ]

@@ -4,10 +4,11 @@ import { ClassifierOptionProbability } from './classifier-option-probability.int
 export interface ClassifierDecision {
   id: string;
   label: string;
+  /** Always the winning label's probability. */
   confidence: number;
-  /** Binary only: calibrated P(true). */
+  /** Boolean only: calibrated P("true"). */
   probability?: number;
-  /** Ordinal only: expected score, sum(level_i * p_i). */
+  /** Score only: expected score, sum(level_i * p_i). */
   expectedScore?: number;
   probabilities: ClassifierOptionProbability[];
 }

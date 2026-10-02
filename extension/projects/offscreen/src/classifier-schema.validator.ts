@@ -79,7 +79,7 @@ export class ClassifierSchemaValidator {
     const type = CLASSIFIER_QUESTION_TYPE_ALIASES[rawType];
     if (!type) {
       throw new TypeError(
-        `questions[${index}].type "${rawType}" is not a valid ClassifierQuestionType (binary, categorical, ordinal).`,
+        `questions[${index}].type "${rawType}" is not a valid ClassifierQuestionType (boolean, choice, score).`,
       );
     }
 
@@ -91,7 +91,10 @@ export class ClassifierSchemaValidator {
 
   private static options(value: unknown, type: ClassifierQuestionType, path: string): ClassifierOption[] {
     if (value === undefined) {
-      if (type === ClassifierQuestionType.BINARY) return [];
+      if (type === ClassifierQuestionType.BOOLEAN) return [];
+      if (type === ClassifierQuestionType.SCORE) {
+        return ['1', '2', '3', '4', '5'].map((label) => ({ label }));
+      }
       throw new TypeError(`${path}.options is required for ${type} questions.`);
     }
     if (!Array.isArray(value)) {
@@ -111,10 +114,10 @@ export class ClassifierSchemaValidator {
       return description === undefined ? { label } : { label, description };
     });
 
-    if (type === ClassifierQuestionType.BINARY) {
+    if (type === ClassifierQuestionType.BOOLEAN) {
       for (const o of options) {
         if (o.label !== 'true' && o.label !== 'false') {
-          throw new TypeError(`${path}.options for binary questions may only describe "true" and "false".`);
+          throw new TypeError(`${path}.options for boolean questions may only describe "true" and "false".`);
         }
       }
       return options;

@@ -154,7 +154,7 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
     questions: [
       {
         id: 'category',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Which gear category matches the shopper query?',
         options: [
           { label: 'outerwear', description: 'Jackets, parkas, rain shells' },
@@ -165,7 +165,7 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
       },
       {
         id: 'budget_tier',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Select the target budget tier.',
         options: [
           { label: 'under_150', description: 'Under $150' },
@@ -174,7 +174,7 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
       },
       {
         id: 'waterproof',
-        type: 'binary',
+        type: 'boolean',
         prompt: 'Does the shopper specifically want waterproof gear?'
       }
     ]

@@ -171,7 +171,7 @@ export class System1System2CascadeDemoComponent extends BaseClassifierDemoCompon
     questions: [
       {
         id: 'verdict',
-        type: 'categorical',
+        type: 'choice',
         prompt: 'Classify this community comment.',
         options: [
           { label: 'benign', description: 'Helpful, friendly, or constructive comment' },
