@@ -246,7 +246,7 @@ export class NlCatalogMatcherDemoComponent extends BaseClassifierDemoComponent i
     this.isFiltering = true;
     this.errorMessage = '';
     try {
-      this.result = await this.classifierService.classify(this.schema, this.queryText, {
+      this.result = await this.classifierService.decide(this.schema, this.queryText, {
         onDownloadProgress: this.onDownloadProgress
       });
       this.selectedCategory = this.result.byId['category']?.label || 'all';

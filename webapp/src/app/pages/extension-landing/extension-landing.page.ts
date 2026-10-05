@@ -70,7 +70,7 @@ export class ExtensionLandingPage extends BasePage implements OnInit {
 });
 
 // The result is a record keyed by question id, so destructure directly.
-const { command } = await decisionModel.classify("let my coworkers view this file");
+const { command } = await decisionModel.decide("let my coworkers view this file");
 // command -> { id: "command", label: "share_link", confidence: 0.93, probabilities: [...] }
 console.log(command.label, command.confidence.toFixed(3), command.probabilities);
 decisionModel.destroy();`;
@@ -128,7 +128,7 @@ decisionModel.destroy();`;
     this.demoResult = null;
     this.cdr.detectChanges();
     try {
-      this.demoResult = await this.classifierService.classify(this.demoSchema, this.demoInput, {
+      this.demoResult = await this.classifierService.decide(this.demoSchema, this.demoInput, {
         onDownloadProgress: (loaded) => this.ngZone.run(() => {
           this.demoDownloading = loaded < 1;
           this.demoProgress = Math.round(loaded * 100);

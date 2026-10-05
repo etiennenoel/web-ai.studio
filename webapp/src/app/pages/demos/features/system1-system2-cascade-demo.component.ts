@@ -267,7 +267,7 @@ export class System1System2CascadeDemoComponent extends BaseClassifierDemoCompon
   private async moderateSingle(comment: CascadeComment) {
     comment.isProcessing = true;
     try {
-      const res = await this.classifierService.classify(this.schema, comment.text, {
+      const res = await this.classifierService.decide(this.schema, comment.text, {
         onDownloadProgress: this.onDownloadProgress
       });
       const dec = res.byId['verdict'];

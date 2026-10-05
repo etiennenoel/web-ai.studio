@@ -111,7 +111,7 @@ export class ClassifierService {
     return session;
   }
 
-  async classify(
+  async decide(
     schema: ClassifierSchema,
     input: string,
     options: { signal?: AbortSignal; onDownloadProgress?: (loaded: number) => void } = {}
@@ -127,6 +127,15 @@ export class ClassifierService {
       : await classifier.classify(input, classifyOpts);
     const elapsedMs = Number((performance.now() - t0).toFixed(1));
     return this.normalizeResult(schema, raw, elapsedMs);
+  }
+
+  /** Backward-compatible alias for `decide`. */
+  classify(
+    schema: ClassifierSchema,
+    input: string,
+    options: { signal?: AbortSignal; onDownloadProgress?: (loaded: number) => void } = {}
+  ): Promise<NormalizedClassifierResult> {
+    return this.decide(schema, input, options);
   }
 
   private normalizeModality(type: ClassifierQuestionModality): 'boolean' | 'choice' | 'score' {

@@ -205,7 +205,7 @@ export class System1TicketRouterDemoComponent extends BaseClassifierDemoComponen
     if (!this.ticketText.trim() || this.classifierStatus === 'unavailable') return;
     this.errorMessage = '';
     try {
-      this.result = await this.classifierService.classify(this.schema, this.ticketText, {
+      this.result = await this.classifierService.decide(this.schema, this.ticketText, {
         onDownloadProgress: this.onDownloadProgress
       });
     } catch (e: any) {

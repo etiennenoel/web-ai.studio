@@ -1683,7 +1683,7 @@ const decisionModel = await DecisionModel.create({
     { id: "is_urgent", type: "boolean", prompt: "Is the customer blocked right now?" }
   ]
 });
-const decision = await decisionModel.classify(customerEmail);
+const decision = await decisionModel.decide(customerEmail);
 
 // 2. Draft a tailored response for that exact action (window.Writer)
 const writer = await Writer.create({ tone: "formal", length: "short" });
@@ -1709,7 +1709,7 @@ const decisionModel = await DecisionModel.create({
     { id: "sounds_harsh", type: "boolean", prompt: "Does the draft sound harsh, insulting, or passive-aggressive?" }
   ]
 });
-const check = await decisionModel.classify(draftText);
+const check = await decisionModel.decide(draftText);
 
 // 2. If it sounds harsh, offer a one-click polite rewrite (window.Rewriter)
 if (check.sounds_harsh.label === "true") {
@@ -1745,7 +1745,7 @@ const decisionModel = await DecisionModel.create({
     }
   ]
 });
-const { reading_mode } = await decisionModel.classify(userPreference);
+const { reading_mode } = await decisionModel.decide(userPreference);
 
 // 2. Transform the article automatically (window.Summarizer)
 if (reading_mode.label !== "full_article") {
@@ -1793,7 +1793,7 @@ if (reading_mode.label !== "full_article") {
   ]
 });
 
-const filters = await decisionModel.classify(searchQuery);`,
+const filters = await decisionModel.decide(searchQuery);`,
     promptRunOptions: {},
     initialPrompt: ''
   },
@@ -1822,7 +1822,7 @@ const filters = await decisionModel.classify(searchQuery);`,
   ]
 });
 
-const { paste_type } = await decisionModel.classify(clipboardText);
+const { paste_type } = await decisionModel.decide(clipboardText);
 // paste_type -> { id, label, confidence, probabilities }`,
     promptRunOptions: {},
     initialPrompt: ''
@@ -1850,7 +1850,7 @@ const { paste_type } = await decisionModel.classify(clipboardText);
   ]
 });
 
-const decision = await shield.classify(notificationText);`,
+const decision = await shield.decide(notificationText);`,
     promptRunOptions: {},
     initialPrompt: ''
   },
@@ -1880,7 +1880,7 @@ const decision = await shield.classify(notificationText);`,
   ]
 });
 
-const fields = await filler.classify(userNote);`,
+const fields = await filler.decide(userNote);`,
     promptRunOptions: {},
     initialPrompt: ''
   },
@@ -1909,7 +1909,7 @@ const decisionModel = await DecisionModel.create({
   ]
 });
 
-const s1 = await decisionModel.classify(comment.text);
+const s1 = await decisionModel.decide(comment.text);
 if (s1.verdict.confidence >= 0.80) {
   return { verdict: s1.verdict.label, stage: "DecisionModel" };
 }

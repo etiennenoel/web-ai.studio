@@ -46,9 +46,9 @@
                 <label class="text-xs text-gray-600 dark:text-gray-400 font-bold mt-3 mb-1 uppercase">Per-call context <span class="normal-case font-normal">(optional)</span></label>
                 <input [(ngModel)]="callContext" class="w-full bg-white dark:bg-[#202124] border border-gray-400 dark:border-[#5f6368] rounded p-2 text-sm text-gray-800 dark:text-gray-200 focus:border-blue-500 focus:outline-none" placeholder="e.g. Sent by a paying customer">
                 <div class="flex items-center gap-3 mt-4">
-                    <button (click)="classify()" [disabled]="busy || !inputText.trim() || !!schemaError" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                    <button (click)="decide()" [disabled]="busy || !inputText.trim() || !!schemaError" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
                         <i class="fa-solid" [ngClass]="busy ? 'fa-spinner fa-spin' : 'fa-play'"></i>
-                        {{ busy ? busyLabel : 'Classify' }}
+                        {{ busy ? busyLabel : 'Decide' }}
                     </button>
                     <button *ngIf="busy" (click)="cancel()" class="px-4 py-2 rounded border border-gray-300 dark:border-[#5f6368] text-sm">Cancel</button>
                     <span *ngIf="elapsedMs !== null" class="ml-auto text-xs font-mono text-gray-500">{{ elapsedMs }} ms</span>

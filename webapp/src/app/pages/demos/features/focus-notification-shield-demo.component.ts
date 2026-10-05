@@ -184,7 +184,7 @@ export class FocusNotificationShieldDemoComponent extends BaseClassifierDemoComp
     this.errorMessage = '';
     try {
       for (const ping of this.pings) {
-        const res = await this.classifierService.classify(this.schema, ping.text, {
+        const res = await this.classifierService.decide(this.schema, ping.text, {
           onDownloadProgress: this.onDownloadProgress
         });
         ping.deliveryMode = (res.byId['delivery_mode']?.label as any) || 'digest_5pm';

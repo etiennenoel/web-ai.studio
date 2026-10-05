@@ -498,7 +498,7 @@
                         </div>
                         <div class="relative">
                           <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-blue-300"></div>
-                          <div class="font-semibold">classify <span class="text-gray-500 font-normal ml-1"><i class="bi bi-clock"></i> 38ms</span></div>
+                          <div class="font-semibold">decide <span class="text-gray-500 font-normal ml-1"><i class="bi bi-clock"></i> 38ms</span></div>
                           <div class="mt-1 p-2 bg-gray-50 dark:bg-[#292a2d] rounded border border-gray-300 dark:border-[#3c4043] font-mono text-[11px]">
                             ["let my coworkers view this file"] → share_link (0.942)
                           </div>
@@ -862,7 +862,7 @@
               <button (click)="runDemo()" [disabled]="!demoAvailable || demoBusy || !demoInput.trim()"
                 class="ml-auto bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
                 <i class="bi" [ngClass]="demoBusy ? 'bi-arrow-repeat animate-spin' : 'bi-play-fill'"></i>
-                {{ demoBusy ? (demoDownloading ? 'Downloading ' + demoProgress + '%' : 'Running...') : 'Classify' }}
+                {{ demoBusy ? (demoDownloading ? 'Downloading ' + demoProgress + '%' : 'Deciding...') : 'Decide' }}
               </button>
             </div>
 

@@ -182,7 +182,7 @@ export class ChameleonAdaptiveUiDemoComponent extends BaseClassifierDemoComponen
     this.isAdapting = true;
     this.errorMessage = '';
     try {
-      this.result = await this.classifierService.classify(this.schema, this.userPrompt, {
+      this.result = await this.classifierService.decide(this.schema, this.userPrompt, {
         onDownloadProgress: this.onDownloadProgress
       });
       await this.runSummarizerIfNeeded();
