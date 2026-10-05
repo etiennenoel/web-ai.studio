@@ -173,15 +173,16 @@ import { Component } from '@angular/core';
             <app-code-snippet [code]="snippetCreate"></app-code-snippet>
           </section>
 
-          <!-- classify -->
-          <section id="classify" class="scroll-mt-6">
-            <app-docs-section-header anchorId="classify" title="decisionModel.classify()"></app-docs-section-header>
+          <!-- decide -->
+          <section id="decide" class="scroll-mt-6">
+            <a id="classify"></a>
+            <app-docs-section-header anchorId="decide" title="decisionModel.decide()"></app-docs-section-header>
             <p class="text-slate-600 dark:text-slate-400 mb-4">
-              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">DecisionResult</code>: a record keyed by question <code class="text-sm font-mono">id</code>, so you can read <code class="text-sm font-mono">result.category.label</code> or destructure <code class="text-sm font-mono">const &#123; command &#125; = await decisionModel.classify(input)</code>.
+              Evaluates the input string against all questions defined in the session schema and returns a <code class="text-sm font-mono">DecisionResult</code>: a record keyed by question <code class="text-sm font-mono">id</code>, so you can read <code class="text-sm font-mono">result.category.label</code> or destructure <code class="text-sm font-mono">const &#123; command &#125; = await decisionModel.decide(input)</code>. (A backward-compatible <code class="text-sm font-mono">.classify()</code> alias is also supported.)
             </p>
             <div class="bg-slate-900 rounded-xl p-4 overflow-x-auto mb-6">
               <code class="text-sm text-slate-300 font-mono">
-                <span class="text-blue-400">classify</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">DecisionModelClassifyOptions</span>): Promise&lt;<span class="text-emerald-400">DecisionResult</span>&gt;;
+                <span class="text-blue-400">decide</span>(input: <span class="text-emerald-400">DOMString</span>, options?: <span class="text-emerald-400">DecisionModelDecideOptions</span>): Promise&lt;<span class="text-emerald-400">DecisionResult</span>&gt;;
               </code>
             </div>
 
@@ -344,7 +345,7 @@ if (status === "available" || status === "downloadable") {
   const decisionModel = await DecisionModel.create(schema);
 
   const input = "Urgent: our production database pipeline crashes with a fatal segfault!";
-  const result = await decisionModel.classify(input);
+  const result = await decisionModel.decide(input);
   console.log("Decision result:", result);
 
   decisionModel.destroy();
@@ -360,7 +361,7 @@ if (status === "available" || status === "downloadable") {
 };
 
 const decisionModel = await DecisionModel.create(schema);
-const result = await decisionModel.classify("We were charged twice on invoice #4821");
+const result = await decisionModel.decide("We were charged twice on invoice #4821");
 console.log("Evaluated before destroy:", result);
 decisionModel.destroy();
 console.log("DecisionModel session destroyed.");`;
@@ -373,9 +374,12 @@ interface DecisionModel {
   static Promise<Availability> availability(optional DecisionModelCreateOptions options = {});
   static Promise<DecisionModel> create(DecisionModelCreateOptions options);
 
+  Promise<DecisionResult> decide(
+      DOMString input,
+      optional DecisionModelDecideOptions options = {});
   Promise<DecisionResult> classify(
       DOMString input,
-      optional DecisionModelClassifyOptions options = {});
+      optional DecisionModelDecideOptions options = {});
 
   undefined destroy();
 };
@@ -400,10 +404,12 @@ dictionary DecisionOption {
   DOMString description;
 };
 
-dictionary DecisionModelClassifyOptions {
+dictionary DecisionModelDecideOptions {
   DOMString context;
   AbortSignal signal;
 };
+
+typedef DecisionModelDecideOptions DecisionModelClassifyOptions;
 
 dictionary Decision {
   DOMString id;
@@ -414,6 +420,6 @@ dictionary Decision {
   sequence<DecisionOptionProbability> probabilities;
 };
 
-// classify() resolves to a record keyed by question id
+// decide() resolves to a record keyed by question id
 typedef record<DOMString, Decision> DecisionResult;`;
 }

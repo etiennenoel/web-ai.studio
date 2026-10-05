@@ -165,7 +165,7 @@ export class SmartClipboardPasteDemoComponent extends BaseClassifierDemoComponen
     this.completed = false;
     this.errorMessage = '';
     try {
-      this.result = await this.classifierService.classify(this.schema, this.pastedText, {
+      this.result = await this.classifierService.decide(this.schema, this.pastedText, {
         onDownloadProgress: this.onDownloadProgress
       });
     } catch (e: any) {

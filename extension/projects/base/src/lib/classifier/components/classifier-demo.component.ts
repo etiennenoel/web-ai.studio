@@ -68,7 +68,7 @@ import { findClassifierModelVariant, classifierModelTotalBytes } from '../regist
             <button (click)="run()" [disabled]="busy || !input.trim()"
               class="ml-auto bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2 rounded-lg flex items-center gap-2 transition-colors">
               <i class="fa-solid" [ngClass]="busy ? 'fa-spinner fa-spin' : 'fa-play'"></i>
-              {{ busy ? busyLabel : (availability === 'downloadable' ? 'Download model & classify' : 'Classify') }}
+              {{ busy ? busyLabel : (availability === 'downloadable' ? 'Download model & decide' : 'Decide') }}
             </button>
             <button *ngIf="busy" (click)="cancel()" class="text-sm px-3 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300">Cancel</button>
           </div>
@@ -197,10 +197,10 @@ export class ClassifierDemoComponent implements OnInit, OnDestroy {
     this.activeRequestId = requestId;
     try {
       const run = async (sessionId: string) => {
-        this.busyLabel = 'Classifying...';
+        this.busyLabel = 'Deciding...';
         this.cdr.detectChanges();
         const start = performance.now();
-        const result = await this.classifierManager.classify(sessionId, this.input, {}, requestId);
+        const result = await this.classifierManager.decide(sessionId, this.input, {}, requestId);
         this.elapsedMs = Math.round(performance.now() - start);
         return result;
       };

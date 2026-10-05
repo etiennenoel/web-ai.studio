@@ -144,7 +144,7 @@ export class ClassifierComponent implements OnInit, OnDestroy {
 
 
 
-  async classify(): Promise<void> {
+  async decide(): Promise<void> {
     const schema = this.parsedSchema;
     if (!schema || this.busy || !this.inputText.trim()) return;
 
@@ -161,11 +161,11 @@ export class ClassifierComponent implements OnInit, OnDestroy {
     try {
       const options = this.callContext.trim() ? { context: this.callContext } : {};
       const run = async (sessionId: string) => {
-        this.busyLabel = 'Classifying...';
+        this.busyLabel = 'Deciding...';
         this.cdr.detectChanges();
         this.inputUsage = await this.classifierManager.measureContextUsage(sessionId, this.inputText, options);
         const start = performance.now();
-        const result = await this.classifierManager.classify(sessionId, this.inputText, options, requestId);
+        const result = await this.classifierManager.decide(sessionId, this.inputText, options, requestId);
         this.elapsedMs = Math.round(performance.now() - start);
         return result;
       };
@@ -190,6 +190,11 @@ export class ClassifierComponent implements OnInit, OnDestroy {
       this.activeRequestId = null;
       this.cdr.detectChanges();
     }
+  }
+
+  /** Backward-compatible alias for decide(). */
+  classify(): Promise<void> {
+    return this.decide();
   }
 
   cancel(): void {

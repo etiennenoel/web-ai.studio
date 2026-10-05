@@ -307,9 +307,13 @@ export class ClassifierPlaygroundPage implements OnInit, OnDestroy {
 
     try {
       const t0 = performance.now();
-      const raw = await this.session.classify(this.inputText, {
-        signal: this.activeAbortController?.signal
-      });
+      const raw = typeof this.session.decide === 'function'
+        ? await this.session.decide(this.inputText, {
+            signal: this.activeAbortController?.signal
+          })
+        : await this.session.classify(this.inputText, {
+            signal: this.activeAbortController?.signal
+          });
       const elapsed = Number((performance.now() - t0).toFixed(1));
       this.result = this.classifierService.normalizeResult(this.schema, raw, elapsed);
       this.rawOutputJson = JSON.stringify(this.result.raw, null, 2);
@@ -363,7 +367,7 @@ const decisionModel = await DecisionModel.create({
 
     this.codeExecution = `const input = ${inputLiteral};
 
-const result = await decisionModel.classify(input);
+const result = await decisionModel.decide(input);
 
 // result is a record keyed by question id
 console.log(result);

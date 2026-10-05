@@ -48,7 +48,7 @@ export class ClassifierManager {
     );
   }
 
-  classify(
+  decide(
     sessionId: string,
     input: string,
     options: ClassifierClassifyOptions = {},
@@ -59,6 +59,15 @@ export class ClassifierManager {
       { sessionId, input, options },
       { requestId },
     );
+  }
+
+  classify(
+    sessionId: string,
+    input: string,
+    options: ClassifierClassifyOptions = {},
+    requestId?: string,
+  ): Promise<ClassifierResult> {
+    return this.decide(sessionId, input, options, requestId);
   }
 
   measureContextUsage(sessionId: string, input: string, options: ClassifierClassifyOptions = {}): Promise<number> {
@@ -134,7 +143,7 @@ if (status === "available" || status === "downloadable") {
     }
   });
 
-  const result = await decisionModel.classify(${JSON.stringify(input)});
+  const result = await decisionModel.decide(${JSON.stringify(input)});
   console.log(result);
 
   decisionModel.destroy();

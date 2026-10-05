@@ -242,7 +242,7 @@ export class InstantFormAutofillDemoComponent extends BaseClassifierDemoComponen
       const priceMatch = this.noteText.match(/\$\s*(\d+(?:\.\d{1,2})?)/);
       this.amount = priceMatch ? Number(priceMatch[1]).toFixed(2) : '';
 
-      this.result = await this.classifierService.classify(this.schema, this.noteText, {
+      this.result = await this.classifierService.decide(this.schema, this.noteText, {
         onDownloadProgress: this.onDownloadProgress
       });
       this.expenseCategory = this.result.byId['expense_category']?.label || 'ground_transport';

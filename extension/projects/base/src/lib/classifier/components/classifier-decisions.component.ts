@@ -4,7 +4,7 @@ import { ClassifierResult } from '../types/classifier-result.type';
 import { ClassifierDecision } from '../interfaces/classifier-decision.interface';
 
 /**
- * Renders a `classify()` result: one card per question with the chosen label,
+ * Renders a `decide()` (or `classify()`) result: one card per question with the chosen label,
  * confidence, and a probability bar per option.
  */
 @Component({

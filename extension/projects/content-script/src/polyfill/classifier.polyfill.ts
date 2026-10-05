@@ -107,9 +107,9 @@ export class DecisionModel {
     return this.contextUsageValue;
   }
 
-  async classify(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
-    this.assertAlive('classify');
-    const { signal, classifyOptions } = DecisionModel.toClassifyOptions(options);
+  async decide(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
+    this.assertAlive('decide');
+    const { signal, classifyOptions } = DecisionModel.toDecideOptions(options, 'decide');
     signal?.throwIfAborted();
 
     const requestId = crypto.randomUUID();
@@ -129,13 +129,14 @@ export class DecisionModel {
     }
   }
 
-  async decide(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
-    return this.classify(input, options);
+  /** Backward-compatible alias for `decide`. */
+  async classify(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
+    return this.decide(input, options);
   }
 
   async measureContextUsage(input: unknown, options: unknown = {}): Promise<number> {
     this.assertAlive('measureContextUsage');
-    const { signal, classifyOptions } = DecisionModel.toClassifyOptions(options);
+    const { signal, classifyOptions } = DecisionModel.toDecideOptions(options, 'measureContextUsage');
     signal?.throwIfAborted();
     return ClassifierPageBridge.request<number>(ClassifierRuntimeOp.MEASURE_CONTEXT_USAGE, {
       sessionId: this.sessionId,
@@ -169,13 +170,13 @@ export class DecisionModel {
     return JSON.parse(JSON.stringify({ context, expectedInputs, questions }));
   }
 
-  private static toClassifyOptions(options: unknown): {
+  private static toDecideOptions(options: unknown, method: string = 'decide'): {
     signal: AbortSignal | undefined;
     classifyOptions: ClassifierClassifyOptions;
   } {
     if (options === null || options === undefined) return { signal: undefined, classifyOptions: {} };
     if (typeof options !== 'object') {
-      throw new TypeError("Failed to execute 'classify' on 'DecisionModel': parameter 2 is not a dictionary.");
+      throw new TypeError(`Failed to execute '${method}' on 'DecisionModel': parameter 2 is not a dictionary.`);
     }
     const { signal, context } = options as { signal?: unknown; context?: unknown };
     if (signal !== undefined && !(signal instanceof AbortSignal)) {
@@ -184,6 +185,13 @@ export class DecisionModel {
     const classifyOptions: ClassifierClassifyOptions = {};
     if (context !== undefined) classifyOptions.context = DecisionModel.toDomString(context);
     return { signal: signal as AbortSignal | undefined, classifyOptions };
+  }
+
+  private static toClassifyOptions(options: unknown): {
+    signal: AbortSignal | undefined;
+    classifyOptions: ClassifierClassifyOptions;
+  } {
+    return this.toDecideOptions(options, 'classify');
   }
 
   /** WebIDL DOMString conversion. */

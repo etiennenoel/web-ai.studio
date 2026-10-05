@@ -196,7 +196,7 @@ export class LiveDraftGuardrailsDemoComponent extends BaseClassifierDemoComponen
     if (!this.draftText.trim() || this.classifierStatus === 'unavailable') return;
     this.errorMessage = '';
     try {
-      this.result = await this.classifierService.classify(this.schema, this.draftText, {
+      this.result = await this.classifierService.decide(this.schema, this.draftText, {
         onDownloadProgress: this.onDownloadProgress
       });
     } catch (e: any) {

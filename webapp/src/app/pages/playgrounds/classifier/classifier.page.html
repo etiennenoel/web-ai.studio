@@ -343,7 +343,7 @@
               <button type="button" (click)="runClassification()" [disabled]="isClassifying" class="rounded-lg flex-1 sm:flex-none px-6 py-2.5 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden disabled:opacity-50">
                 <span class="flex items-center justify-center gap-2">
                   <i class="bi" [ngClass]="isClassifying ? 'bi-hourglass-split animate-spin' : 'bi-play-fill text-lg'"></i>
-                  {{ isClassifying ? 'Classifying...' : 'Classify' }}
+                  {{ isClassifying ? 'Deciding...' : 'Decide' }}
                 </span>
               </button>
               @if (isClassifying) {
