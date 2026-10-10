@@ -1,7 +1,12 @@
-import { isWebGPUSupported, loadLiteRt } from '@litertjs/core';
+import { isWebGPUSupported, loadLiteRt, supportsFeature } from '@litertjs/core';
 import { ClassifierModelVariant } from '../../base/src/lib/classifier/interfaces/classifier-model-variant.interface';
 import { ClassifierModelFileRole } from '../../base/src/lib/classifier/enums/classifier-model-file-role.enum';
 import { ClassifierModelInputMode } from '../../base/src/lib/classifier/enums/classifier-model-input-mode.enum';
+import {
+  ClassifierAccelerator,
+  ClassifierAcceleratorPreference,
+  ClassifierWebNNDevicePreference,
+} from '../../base/src/lib/classifier/types/classifier-accelerator.type';
 import { LayaTokenizer } from '../../laya/src/laya-tokenizer';
 import { LayaSequenceBuilder } from '../../laya/src/laya-sequence.builder';
 import { LayaEmbeddingTable } from '../../laya/src/laya-embedding-table';
@@ -16,11 +21,20 @@ declare const chrome: any;
 
 const EMBEDDING_ROWS = 256000;
 
+export interface ClassifierModelLoaderOptions {
+  acceleratorPreference?: ClassifierAcceleratorPreference;
+  webnnDevicePreference?: ClassifierWebNNDevicePreference;
+}
+
 /** Builds a LayaHost for a cached variant: loads LiteRT.js, tokenizer, calibration, and both graphs. */
 export class ClassifierModelLoader {
   private static liteRtReady: Promise<void> | null = null;
 
-  static async load(variant: ClassifierModelVariant, store: ClassifierModelStore): Promise<ClassifierLoadedModel> {
+  static async load(
+    variant: ClassifierModelVariant,
+    store: ClassifierModelStore,
+    options: ClassifierModelLoaderOptions = {},
+  ): Promise<ClassifierLoadedModel> {
     await ClassifierModelLoader.ensureLiteRt();
 
     const tokenizerJson = JSON.parse(await store.readText(variant, ClassifierModelFileRole.TOKENIZER));
@@ -42,37 +56,132 @@ export class ClassifierModelLoader {
     const mainBytes = new Uint8Array(await store.read(variant, ClassifierModelFileRole.MAIN_GRAPH));
     const actBytes = new Uint8Array(await store.read(variant, ClassifierModelFileRole.ACT_HEAD));
 
-    const accelerators: Array<'webgpu' | 'wasm'> =
-      variant.gpuCompiles && isWebGPUSupported() ? ['webgpu', 'wasm'] : ['wasm'];
+    const acceleratorPreference: ClassifierAcceleratorPreference = options.acceleratorPreference ?? 'auto';
+    const webnnDevicePreference: ClassifierWebNNDevicePreference = options.webnnDevicePreference ?? 'auto';
+
+    const webgpuSupported = isWebGPUSupported();
+    const webnnSupported = await ClassifierModelLoader.isWebNNSupported();
+    const accelerators = ClassifierModelLoader.resolveAccelerators(
+      variant,
+      acceleratorPreference,
+      webgpuSupported,
+      webnnSupported,
+    );
+
+    const inputMode =
+      variant.inputMode === ClassifierModelInputMode.INPUTS_EMBEDS
+        ? LayaGraphInputMode.INPUTS_EMBEDS
+        : LayaGraphInputMode.TOKEN_IDS;
 
     let lastError: unknown;
     for (const accelerator of accelerators) {
-      try {
-        const runner = await LayaModelRunner.load(mainBytes, actBytes, {
-          window: variant.window,
-          hidden: variant.hidden,
-          padId: tokenizer.padId,
-          inputMode:
-            variant.inputMode === ClassifierModelInputMode.INPUTS_EMBEDS
-              ? LayaGraphInputMode.INPUTS_EMBEDS
-              : LayaGraphInputMode.TOKEN_IDS,
-          accelerator,
-          embeddingTable,
-        });
-        const host = new LayaHost(tokenizer, builder, runner, calibration, variant.window);
-        console.log(`WebAI Classifier: loaded ${variant.id} on ${accelerator}`);
-        return { variant, host, accelerator };
-      } catch (e) {
-        console.warn(`WebAI Classifier: ${accelerator} compilation failed for ${variant.id}`, e);
-        lastError = e;
+      const candidateDevices: ClassifierWebNNDevicePreference[] =
+        accelerator === 'webnn' && webnnDevicePreference !== 'auto'
+          ? [webnnDevicePreference, 'auto']
+          : [webnnDevicePreference];
+
+      for (const devicePref of candidateDevices) {
+        try {
+          const runner = await LayaModelRunner.load(mainBytes, actBytes, {
+            window: variant.window,
+            hidden: variant.hidden,
+            padId: tokenizer.padId,
+            inputMode,
+            accelerator,
+            webNNOptions:
+              accelerator === 'webnn' && devicePref !== 'auto'
+                ? { devicePreference: devicePref }
+                : undefined,
+            embeddingTable,
+          });
+          const host = new LayaHost(tokenizer, builder, runner, calibration, variant.window);
+          const resolvedDevicePref = accelerator === 'webnn' ? devicePref : undefined;
+          console.log(
+            `WebAI Classifier: loaded ${variant.id} on ${accelerator}${
+              resolvedDevicePref && resolvedDevicePref !== 'auto' ? ` (${resolvedDevicePref})` : ''
+            }`,
+          );
+          return {
+            variant,
+            host,
+            accelerator,
+            acceleratorPreference,
+            webnnDevicePreference: resolvedDevicePref,
+          };
+        } catch (e) {
+          console.warn(
+            `WebAI Classifier: ${accelerator}${
+              accelerator === 'webnn' && devicePref !== 'auto' ? ` (${devicePref})` : ''
+            } compilation failed for ${variant.id}`,
+            e,
+          );
+          lastError = e;
+        }
       }
     }
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
+  /**
+   * Resolves the ordered list of accelerators to attempt for a given model variant
+   * and user preference. Auto mode prioritizes WebGPU -> WebNN -> WASM.
+   */
+  static resolveAccelerators(
+    variant: ClassifierModelVariant,
+    preference: ClassifierAcceleratorPreference,
+    webgpuSupported: boolean,
+    webnnSupported: boolean,
+  ): ClassifierAccelerator[] {
+    const gpuOk = variant.gpuCompiles && webgpuSupported;
+    const webnnOk = variant.webnnCompiles !== false && webnnSupported;
+
+    const list: ClassifierAccelerator[] = [];
+    const pushUnique = (acc: ClassifierAccelerator) => {
+      if (!list.includes(acc)) list.push(acc);
+    };
+
+    if (preference === 'wasm') {
+      return ['wasm'];
+    }
+
+    if (preference === 'webgpu') {
+      if (webgpuSupported) pushUnique('webgpu');
+      if (webnnOk) pushUnique('webnn');
+      pushUnique('wasm');
+      return list;
+    }
+
+    if (preference === 'webnn') {
+      if (webnnSupported) pushUnique('webnn');
+      if (gpuOk) pushUnique('webgpu');
+      pushUnique('wasm');
+      return list;
+    }
+
+    // 'auto': WebGPU -> WebNN -> WASM
+    if (gpuOk) pushUnique('webgpu');
+    if (webnnOk) pushUnique('webnn');
+    pushUnique('wasm');
+    return list;
+  }
+
+  static async isWebNNSupported(): Promise<boolean> {
+    try {
+      const [webnn, jspi] = await Promise.all([
+        supportsFeature('webnn').catch(() => false),
+        supportsFeature('jspi').catch(() => false),
+      ]);
+      return webnn && jspi;
+    } catch {
+      return false;
+    }
+  }
+
   private static ensureLiteRt(): Promise<void> {
     if (!ClassifierModelLoader.liteRtReady) {
-      ClassifierModelLoader.liteRtReady = loadLiteRt(chrome.runtime.getURL('wasm/'))
+      ClassifierModelLoader.liteRtReady = supportsFeature('jspi')
+        .catch(() => false)
+        .then((jspi) => loadLiteRt(chrome.runtime.getURL('wasm/'), { jspi }))
         .then(() => undefined)
         .catch((e) => {
           ClassifierModelLoader.liteRtReady = null;

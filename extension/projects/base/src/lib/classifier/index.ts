@@ -6,6 +6,7 @@ export * from './enums/classifier-model-state.enum';
 export * from './enums/classifier-settings-key.enum';
 export * from './enums/classifier-runtime-op.enum';
 export * from './types/classifier-availability.type';
+export * from './types/classifier-accelerator.type';
 export * from './types/classifier-result.type';
 export * from './interfaces/classifier-option.interface';
 export * from './interfaces/classifier-question.interface';

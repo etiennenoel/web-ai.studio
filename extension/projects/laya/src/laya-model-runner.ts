@@ -1,4 +1,4 @@
-import { CompiledModel, Tensor, loadAndCompile } from '@litertjs/core';
+import { CompiledModel, CompileOptions, Tensor, loadAndCompile } from '@litertjs/core';
 import { LayaModelRunnerOptions } from './laya-model-runner-options.interface';
 import { LayaGraphInputMode } from './laya-graph-input-mode.enum';
 import { LayaMainOutput } from './laya-main-output.interface';
@@ -22,10 +22,20 @@ export class LayaModelRunner {
     if (options.inputMode === LayaGraphInputMode.INPUTS_EMBEDS && !options.embeddingTable) {
       throw new Error('LayaModelRunner: inputs_embeds graphs need an embedding table');
     }
-    const main = await loadAndCompile(mainBytes, { accelerator: options.accelerator });
+    const compileOptions: CompileOptions = {
+      accelerator: options.accelerator,
+      ...(options.gpuOptions ? { gpuOptions: options.gpuOptions } : {}),
+      ...(options.webNNOptions ? { webNNOptions: options.webNNOptions } : {}),
+    };
+    const main = await loadAndCompile(mainBytes, compileOptions);
     let act: CompiledModel;
     try {
-      act = await loadAndCompile(actBytes, { accelerator: options.accelerator });
+      try {
+        act = await loadAndCompile(actBytes, compileOptions);
+      } catch (actErr) {
+        if (options.accelerator === 'wasm') throw actErr;
+        act = await loadAndCompile(actBytes, { accelerator: 'wasm' });
+      }
     } catch (e) {
       main.delete();
       throw e;

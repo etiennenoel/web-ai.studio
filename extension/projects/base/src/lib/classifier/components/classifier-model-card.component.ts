@@ -6,6 +6,10 @@ import { ClassifierManager } from '../../managers/classifier.manager';
 import { ClassifierModelStatus } from '../interfaces/classifier-model-status.interface';
 import { ClassifierModelState } from '../enums/classifier-model-state.enum';
 import { ClassifierModelVariant } from '../interfaces/classifier-model-variant.interface';
+import {
+  ClassifierAcceleratorPreference,
+  ClassifierWebNNDevicePreference,
+} from '../types/classifier-accelerator.type';
 import { CLASSIFIER_MODEL_REGISTRY } from '../registry/classifier-model-registry.const';
 import { classifierModelTotalBytes, findClassifierModelVariant } from '../registry/classifier-model-registry.utils';
 
@@ -45,6 +49,30 @@ import { classifierModelTotalBytes, findClassifierModelVariant } from '../regist
         </select>
       </div>
 
+      <!-- Accelerator & WebNN device selectors -->
+      <div *ngIf="showAcceleratorSelector" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">LiteRT.js Accelerator</label>
+          <select [ngModel]="acceleratorPreference" (ngModelChange)="onAcceleratorChange($event)" [disabled]="downloading || busy"
+                  class="w-full bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#5f6368] text-gray-900 dark:text-[#e8eaed] text-xs rounded-lg p-2 outline-none disabled:opacity-50">
+            <option value="auto">Auto (WebGPU → WebNN → WASM)</option>
+            <option value="webgpu">WebGPU (with fallback)</option>
+            <option value="webnn">WebNN (with fallback)</option>
+            <option value="wasm">WASM (CPU)</option>
+          </select>
+        </div>
+        <div *ngIf="acceleratorPreference === 'webnn' || acceleratorPreference === 'auto'">
+          <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">WebNN Device Preference</label>
+          <select [ngModel]="webnnDevicePreference" (ngModelChange)="onWebNNDeviceChange($event)" [disabled]="downloading || busy"
+                  class="w-full bg-white dark:bg-[#202124] border border-gray-300 dark:border-[#5f6368] text-gray-900 dark:text-[#e8eaed] text-xs rounded-lg p-2 outline-none disabled:opacity-50">
+            <option value="auto">Auto / Default</option>
+            <option value="npu">NPU</option>
+            <option value="gpu">GPU</option>
+            <option value="cpu">CPU</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Runtime error -->
       <div *ngIf="runtimeError" class="text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg p-3 mb-3 font-mono whitespace-pre-wrap">{{ runtimeError }}</div>
 
@@ -80,18 +108,21 @@ import { classifierModelTotalBytes, findClassifierModelVariant } from '../regist
                 class="text-sm px-3 py-2 rounded-lg border border-gray-300 dark:border-[#5f6368] text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <i class="fa-solid fa-rotate-right"></i> Retry
         </button>
-        <span *ngIf="status?.loaded" class="ml-auto text-[11px] text-gray-500 font-mono">loaded on {{ status?.accelerator }}</span>
+        <span *ngIf="status?.loaded" class="ml-auto text-[11px] text-gray-500 font-mono">loaded on {{ loadedAcceleratorLabel }}</span>
       </div>
     </div>
   `,
 })
 export class ClassifierModelCardComponent implements OnInit, OnDestroy {
   @Input() showSelector = true;
+  @Input() showAcceleratorSelector = true;
 
   readonly variants: ClassifierModelVariant[] = CLASSIFIER_MODEL_REGISTRY;
   variantId = '';
   variant: ClassifierModelVariant | undefined;
   status: ClassifierModelStatus | undefined;
+  acceleratorPreference: ClassifierAcceleratorPreference = 'auto';
+  webnnDevicePreference: ClassifierWebNNDevicePreference = 'auto';
   runtimeError = '';
   downloading = false;
   progress = 0;
@@ -123,6 +154,18 @@ export class ClassifierModelCardComponent implements OnInit, OnDestroy {
     return this.variant ? this.size(this.variant) : '';
   }
 
+  get loadedAcceleratorLabel(): string {
+    if (!this.status?.accelerator) return '';
+    if (
+      this.status.accelerator === 'webnn' &&
+      this.status.webnnDevicePreference &&
+      this.status.webnnDevicePreference !== 'auto'
+    ) {
+      return `webnn (${this.status.webnnDevicePreference})`;
+    }
+    return this.status.accelerator;
+  }
+
   size(variant: ClassifierModelVariant): string {
     return `${Math.round(classifierModelTotalBytes(variant) / 1_000_000)} MB`;
   }
@@ -145,6 +188,12 @@ export class ClassifierModelCardComponent implements OnInit, OnDestroy {
 
   async refresh(): Promise<void> {
     if (this.downloading) return;
+    const [accPref, devPref] = await Promise.all([
+      this.classifierManager.getAcceleratorPreference().catch(() => 'auto' as const),
+      this.classifierManager.getWebNNDevicePreference().catch(() => 'auto' as const),
+    ]);
+    this.acceleratorPreference = accPref;
+    this.webnnDevicePreference = devPref;
     try {
       const { activeVariantId, models } = await this.classifierManager.listModels();
       this.variantId = activeVariantId;
@@ -162,6 +211,16 @@ export class ClassifierModelCardComponent implements OnInit, OnDestroy {
 
   async onVariantChange(variantId: string): Promise<void> {
     await this.classifierManager.setActiveVariantId(variantId);
+  }
+
+  async onAcceleratorChange(preference: ClassifierAcceleratorPreference): Promise<void> {
+    this.acceleratorPreference = preference;
+    await this.classifierManager.setAcceleratorPreference(preference);
+  }
+
+  async onWebNNDeviceChange(preference: ClassifierWebNNDevicePreference): Promise<void> {
+    this.webnnDevicePreference = preference;
+    await this.classifierManager.setWebNNDevicePreference(preference);
   }
 
   async download(): Promise<void> {
