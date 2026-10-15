@@ -88,26 +88,34 @@ export class LayaModelRunner {
 
   /**
    * Computes the optimal slot sizes `[S_0, S_1, ...]` for a schema's question head lengths.
+   * When all questions do not fit in a single window, computes a uniform multi-slot
+   * chunk template `[S_0, ..., S_{K-1}]` reused across `ceil(Q / K)` passes without recompilation.
    */
   computeOptimalSlots(headLengths: readonly number[]): number[] {
     const W = this.options.window;
     if (!this.patcher) return [W];
 
-    if (headLengths.length <= 1) {
+    const Q = headLengths.length;
+    if (Q <= 1) {
       const h = headLengths[0] ?? 0;
-      const target = Math.min(W, h + 20);
-      for (const b of SINGLE_BUCKETS) {
-        if (b <= W && b >= target) return [b];
-      }
-      return [W];
+      return [this.pickSingleSlotSize(Math.min(W, h + 20))];
     }
 
     if (this.patcher.supportsMultiSlot) {
-      const packed = this.computeMultiSlots(headLengths, 19);
-      if (packed) return packed;
+      let prevK = -1;
+      for (let passes = 1; passes <= Q; passes++) {
+        const K = Math.ceil(Q / passes);
+        if (K === prevK) continue;
+        prevK = K;
+        if (K === 1) break;
+        const maxHeadsPerSlot = LayaModelRunner.maxPerSlot(headLengths, K);
+        const packed = this.computeMultiSlots(maxHeadsPerSlot, 19);
+        if (packed) return packed;
+      }
     }
 
-    return [Math.min(64, W)];
+    const maxHead = Math.max(...headLengths);
+    return [this.pickSingleSlotSize(Math.min(W, maxHead + 20))];
   }
 
   /** Pre-compiles and warms up the given slot configuration. */
@@ -119,7 +127,8 @@ export class LayaModelRunner {
   /**
    * Fast batch execution path that returns `token_logits` per question without
    * reading `pooled_cls` or running the `act` head.
-   * Packs multiple questions into a single forward pass whenever they fit.
+   * Packs questions into one pass when they fit, or into `ceil(Q / K)` uniform
+   * multi-slot passes sharing a single compiled bucket when `Q` is large.
    */
   async runTokensBatch(
     items: ReadonlyArray<{ ids: number[]; qtypeIndex: number }>,
@@ -133,47 +142,27 @@ export class LayaModelRunner {
       }
     }
 
-    if (items.length === 1) {
-      const slotSize =
-        preferredSlots && preferredSlots.length === 1 && items[0].ids.length <= preferredSlots[0]
-          ? preferredSlots[0]
-          : this.pickSingleSlotSize(items[0].ids.length);
-      const bucket = await this.getOrCreateBucket([slotSize]);
-      const logits = await this.executeBucketTokensOnly(bucket, items);
-      return [logits];
-    }
+    const slots = this.resolveBatchSlots(
+      items.map((it) => it.ids.length),
+      preferredSlots,
+    );
+    const bucket = await this.getOrCreateBucket(slots);
+    const K = bucket.slotSizes.length;
+    const out: Float32Array[] = [];
 
-    if (this.patcher?.supportsMultiSlot) {
-      let slots: readonly number[] | null = null;
-      if (
-        preferredSlots &&
-        preferredSlots.length === items.length &&
-        items.every((it, idx) => it.ids.length <= preferredSlots[idx])
-      ) {
-        slots = preferredSlots;
+    for (let start = 0; start < items.length; start += K) {
+      const chunk = items.slice(start, start + K);
+      const logits = await this.executeBucketTokensOnly(bucket, chunk);
+      if (K === 1) {
+        out.push(logits);
       } else {
-        slots = this.computeSlotsForLengths(items.map((it) => it.ids.length));
-      }
-
-      if (slots) {
-        const bucket = await this.getOrCreateBucket(slots);
-        const logits = await this.executeBucketTokensOnly(bucket, items);
-        const out: Float32Array[] = [];
         let offset = 0;
-        for (let b = 0; b < slots.length; b++) {
-          const S = slots[b];
+        for (let b = 0; b < chunk.length; b++) {
+          const S = bucket.slotSizes[b];
           out.push(logits.subarray(offset, offset + S));
           offset += S;
         }
-        return out;
       }
-    }
-
-    // Fallback: run each question sequentially through single-slot buckets.
-    const out: Float32Array[] = [];
-    for (const item of items) {
-      const [singleLogits] = await this.runTokensBatch([item]);
-      out.push(singleLogits);
     }
     return out;
   }
@@ -212,6 +201,50 @@ export class LayaModelRunner {
       LayaModelRunner.destroyBucket(bucket);
     }
     this.buckets.clear();
+  }
+
+  private resolveBatchSlots(
+    seqLengths: readonly number[],
+    preferredSlots?: readonly number[],
+  ): readonly number[] {
+    const W = this.options.window;
+    if (!this.patcher) return [W];
+
+    const Q = seqLengths.length;
+    if (
+      preferredSlots &&
+      preferredSlots.length >= 1 &&
+      preferredSlots.length <= Q &&
+      (preferredSlots.length === 1 || this.patcher.supportsMultiSlot) &&
+      seqLengths.every((len, idx) => len <= preferredSlots[idx % preferredSlots.length])
+    ) {
+      return preferredSlots;
+    }
+
+    if (Q > 1 && this.patcher.supportsMultiSlot) {
+      let prevK = -1;
+      for (let passes = 1; passes <= Q; passes++) {
+        const K = Math.ceil(Q / passes);
+        if (K === prevK) continue;
+        prevK = K;
+        if (K === 1) break;
+        const maxLensPerSlot = LayaModelRunner.maxPerSlot(seqLengths, K);
+        const slots = this.computeSlotsForLengths(maxLensPerSlot);
+        if (slots) return slots;
+      }
+    }
+
+    const maxLen = Math.max(...seqLengths);
+    return [this.pickSingleSlotSize(maxLen)];
+  }
+
+  private static maxPerSlot(lengths: readonly number[], k: number): number[] {
+    const maxes = new Array<number>(k).fill(0);
+    for (let i = 0; i < lengths.length; i++) {
+      const slot = i % k;
+      if (lengths[i] > maxes[slot]) maxes[slot] = lengths[i];
+    }
+    return maxes;
   }
 
   private pickSingleSlotSize(seqLen: number): number {
@@ -410,21 +443,21 @@ export class LayaModelRunner {
     for (let b = 0; b < B; b++) {
       const S = bucket.slotSizes[b];
       const item = items[b];
-      if (item) {
-        const validLen = item.ids.length;
-        for (let r = 0; r < S; r++) {
-          const rowOff = (slotBase + r) * M + slotBase;
-          bucket.maskBuf.fill(1, rowOff, rowOff + validLen);
-        }
-        for (let i = 0; i < S; i++) {
-          bucket.qtypeBuf[(slotBase + i) * 3 + item.qtypeIndex] = 1;
-        }
-        if (this.options.inputMode === LayaGraphInputMode.TOKEN_IDS) {
-          bucket.inputIdsBuf!.fill(padId, slotBase, slotBase + S);
-          bucket.inputIdsBuf!.set(item.ids, slotBase);
-        } else {
-          this.options.embeddingTable!.gatherInto(item.ids, S, padId, bucket.embedsBuf!, slotBase * hidden);
-        }
+      const ids = item ? item.ids : [padId];
+      const qtypeIndex = item ? item.qtypeIndex : 0;
+      const validLen = ids.length;
+      for (let r = 0; r < S; r++) {
+        const rowOff = (slotBase + r) * M + slotBase;
+        bucket.maskBuf.fill(1, rowOff, rowOff + validLen);
+      }
+      for (let i = 0; i < S; i++) {
+        bucket.qtypeBuf[(slotBase + i) * 3 + qtypeIndex] = 1;
+      }
+      if (this.options.inputMode === LayaGraphInputMode.TOKEN_IDS) {
+        bucket.inputIdsBuf!.fill(padId, slotBase, slotBase + S);
+        bucket.inputIdsBuf!.set(ids, slotBase);
+      } else {
+        this.options.embeddingTable!.gatherInto(ids, S, padId, bucket.embedsBuf!, slotBase * hidden);
       }
       slotBase += S;
     }
