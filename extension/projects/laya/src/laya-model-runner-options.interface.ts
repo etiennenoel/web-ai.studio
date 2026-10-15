@@ -11,4 +11,6 @@ export interface LayaModelRunnerOptions {
   accelerator: 'webgpu' | 'wasm';
   /** Required when `inputMode` is INPUTS_EMBEDS. */
   embeddingTable?: LayaEmbeddingTable;
+  /** Optional question head token lengths used to compile the optimal bucket on initial load. */
+  initialHeadLengths?: readonly number[];
 }

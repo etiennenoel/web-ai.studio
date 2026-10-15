@@ -95,4 +95,14 @@ describe('LayaSequenceBuilder', () => {
     };
     expect(builder.buildHead(score).markers.length).toBe(3);
   });
+
+  it('produces identical sequences via buildFromHead and build', () => {
+    if (!en) return;
+    const builder = new LayaSequenceBuilder(en, 512, 192);
+    const head = builder.buildHead(DEPARTMENT_QUESTION);
+    const stateIds = builder.encodeState(EN_STATE);
+    const fromHead = builder.buildFromHead(head, stateIds);
+    const direct = builder.build(EN_STATE, DEPARTMENT_QUESTION);
+    expect(fromHead).toEqual(direct);
+  });
 });

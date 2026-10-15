@@ -1,4 +1,5 @@
 import { LayaQuestion } from '../../laya/src/laya-question.interface';
+import { LayaSequence } from '../../laya/src/laya-sequence.interface';
 import { ClassifierQuestionType } from '../../base/src/lib/classifier/enums/classifier-question-type.enum';
 
 /** A schema question translated into a Laya row plus what is needed to build its decision. */
@@ -10,6 +11,8 @@ export interface ClassifierCompiledQuestion {
   /** Ordinal only: numeric level per option, used for `expectedScore`. */
   levels?: number[];
   laya: LayaQuestion;
+  /** Pre-tokenized question head reused across every `classify()` call. */
+  head: LayaSequence;
   /** Token count of the question head; the static part of the context usage. */
   headTokens: number;
   /** Number of state tokens that fit without truncation. */

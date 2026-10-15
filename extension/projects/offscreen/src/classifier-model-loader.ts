@@ -9,6 +9,7 @@ import { LayaModelRunner } from '../../laya/src/laya-model-runner';
 import { LayaGraphInputMode } from '../../laya/src/laya-graph-input-mode.enum';
 import { LayaHost } from '../../laya/src/laya-host';
 import { LayaCalibration } from '../../laya/src/laya-calibration.interface';
+import { LayaQuestion } from '../../laya/src/laya-question.interface';
 import { ClassifierModelStore } from './classifier-model-store';
 import { ClassifierLoadedModel } from './classifier-loaded-model.interface';
 
@@ -20,7 +21,11 @@ const EMBEDDING_ROWS = 256000;
 export class ClassifierModelLoader {
   private static liteRtReady: Promise<void> | null = null;
 
-  static async load(variant: ClassifierModelVariant, store: ClassifierModelStore): Promise<ClassifierLoadedModel> {
+  static async load(
+    variant: ClassifierModelVariant,
+    store: ClassifierModelStore,
+    initialQuestions?: readonly LayaQuestion[],
+  ): Promise<ClassifierLoadedModel> {
     await ClassifierModelLoader.ensureLiteRt();
 
     const tokenizerJson = JSON.parse(await store.readText(variant, ClassifierModelFileRole.TOKENIZER));
@@ -29,6 +34,7 @@ export class ClassifierModelLoader {
 
     const tokenizer = new LayaTokenizer(tokenizerJson, tokenizerConfig);
     const builder = new LayaSequenceBuilder(tokenizer, variant.window, variant.headMaxLen);
+    const initialHeadLengths = initialQuestions?.map((q) => builder.buildHead(q).ids.length);
 
     const embeddingTable =
       variant.inputMode === ClassifierModelInputMode.INPUTS_EMBEDS
@@ -58,6 +64,7 @@ export class ClassifierModelLoader {
               : LayaGraphInputMode.TOKEN_IDS,
           accelerator,
           embeddingTable,
+          initialHeadLengths,
         });
         const host = new LayaHost(tokenizer, builder, runner, calibration, variant.window);
         console.log(`WebAI Classifier: loaded ${variant.id} on ${accelerator}`);

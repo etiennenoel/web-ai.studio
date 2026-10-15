@@ -63,14 +63,19 @@ export class LayaSequenceBuilder {
     return this.tokenizer.encode(this.replaceMask(state));
   }
 
+  /** Builds the full sequence from a pre-built head and pre-encoded state token IDs. */
+  buildFromHead(head: LayaSequence, stateIds: number[]): LayaSequence {
+    const room = this.roomFor(head);
+    const truncated = stateIds.length <= room ? stateIds : stateIds.slice(0, room);
+    const ids = [...head.ids, ...truncated, this.tokenizer.sepId].slice(0, this.maxLen);
+    const markers = head.markers.filter((m) => m < this.maxLen);
+    return { ids, markers };
+  }
+
   /** Builds the full sequence; the state is right-truncated to the available room. */
   build(state: string, question: LayaQuestion): LayaSequence {
     const head = this.buildHead(question);
-    const room = this.roomFor(head);
-    const stateIds = this.encodeState(state).slice(0, room);
-    const ids = [...head.ids, ...stateIds, this.tokenizer.sepId].slice(0, this.maxLen);
-    const markers = head.markers.filter((m) => m < this.maxLen);
-    return { ids, markers };
+    return this.buildFromHead(head, this.encodeState(state));
   }
 
   private replaceMask(text: string): string {
