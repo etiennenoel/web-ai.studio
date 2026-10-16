@@ -55,6 +55,12 @@ import {
   SummarizerLongNewsArticleSpeedWarmStartAxonTest
 } from './pages/cortex/axon/tests/summarizer/summarizer-long-news-article-speed-warm-start.axon-test';
 import {
+  SummarizerMaxContextColdStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-max-context-cold-start.axon-test';
+import {
+  SummarizerMaxContextWarmStartAxonTest
+} from './pages/cortex/axon/tests/summarizer/summarizer-max-context-warm-start.axon-test';
+import {
   PromptTextFactAnalysisColdStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
 import {
@@ -63,6 +69,12 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './pages/cortex/axon/tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import {
+  PromptTextLongDocumentSummarizationColdStartAxonTest
+} from './pages/cortex/axon/tests/prompt-text/prompt-text-long-document-summarization-cold-start.axon-test';
+import {
+  PromptTextLongDocumentSummarizationWarmStartAxonTest
+} from './pages/cortex/axon/tests/prompt-text/prompt-text-long-document-summarization-warm-start.axon-test';
 import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
 import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
 import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './pages/cortex/axon/tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
@@ -92,6 +104,8 @@ import { PrivacyPolicyPage } from './pages/privacy-policy/privacy-policy.page';
 import { TermsOfServicePage } from './pages/terms-of-service/terms-of-service.page';
 import { BugsPage } from './pages/bugs/bugs.page';
 import { FirstCreateShouldFullyLoadTheModelPage } from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
+import { LargeContextSummarizationLatencyPage } from './pages/bugs/large-context-summarization-latency/large-context-summarization-latency.page';
+import { ColdStartAvailabilityPage } from './pages/bugs/cold-start-availability/cold-start-availability.page';
 import {EvalsPage} from './pages/evals/evals.page';
 import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
 import {HistoryListComponent} from './components/history-list/history-list.component';
@@ -223,6 +237,8 @@ import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant
     ExtensionLandingPage,
     HistoryListComponent,
     FirstCreateShouldFullyLoadTheModelPage,
+    LargeContextSummarizationLatencyPage,
+    ColdStartAvailabilityPage,
     BugsPage,
     PromptCodeModal,
     TranslationCodeModal,
@@ -393,11 +409,15 @@ import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant
     SummarizerLongNewsArticleWarmStartAxonTest,
     SummarizerLongNewsArticleSpeedColdStartAxonTest,
     SummarizerLongNewsArticleSpeedWarmStartAxonTest,
+    SummarizerMaxContextColdStartAxonTest,
+    SummarizerMaxContextWarmStartAxonTest,
 
     // Prompt API Text
     PromptTextFactAnalysisColdStartAxonTest,
     PromptTextEthicalAndCreativeColdStartAxonTest,
     PromptTextTechnicalChallengeStartAxonTest,
+    PromptTextLongDocumentSummarizationColdStartAxonTest,
+    PromptTextLongDocumentSummarizationWarmStartAxonTest,
 
     // Prompt API Image
     PromptImageOcrHandwrittenLetter1ColdStartAxonTest,

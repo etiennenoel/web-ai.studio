@@ -12,6 +12,8 @@ import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
 import {TermsOfServicePage} from './pages/terms-of-service/terms-of-service.page';
 import {BugsPage} from './pages/bugs/bugs.page';
 import {FirstCreateShouldFullyLoadTheModelPage} from './pages/bugs/first-create-should-fully-load-the-model/first-create-should-fully-load-the-model.page';
+import {LargeContextSummarizationLatencyPage} from './pages/bugs/large-context-summarization-latency/large-context-summarization-latency.page';
+import {ColdStartAvailabilityPage} from './pages/bugs/cold-start-availability/cold-start-availability.page';
 import {EvalsPage} from './pages/evals/evals.page';
 import {ExtensionLandingPage} from './pages/extension-landing/extension-landing.page';
 import {DemosPage} from './pages/demos/demos.page';
@@ -149,6 +151,29 @@ const routes: Routes = [
     data: {
       route: RouteEnum.Bugs
     }
+  },
+  {
+    path: "bugs/large-context-summarization-latency",
+
+    title: "Bug: Large-Context Summarization Prefill & TTFT Latency",
+    component: LargeContextSummarizationLatencyPage,
+    data: {
+      route: RouteEnum.Bugs
+    }
+  },
+  {
+    path: "bugs/cold-start-availability",
+
+    title: "Bug: Built-In AI availability() Cold-Start Reproducer",
+    component: ColdStartAvailabilityPage,
+    data: {
+      route: RouteEnum.Bugs
+    }
+  },
+  {
+    path: "cold-start-availability",
+    redirectTo: "bugs/cold-start-availability",
+    pathMatch: "full"
   },
   {
     path: "",
