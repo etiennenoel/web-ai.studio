@@ -24,6 +24,18 @@ export class BugsPage extends BasePage implements OnInit {
       title: 'First create() should fully load the model',
       status: 'Open',
       reproPath: '/bugs/first-create-should-fully-load-the-model'
+    },
+    {
+      slug: 'large-context-summarization-latency',
+      title: 'Large-context summarization prefill (first_chunk_ms) & create() latency',
+      status: 'Investigating',
+      reproPath: '/bugs/large-context-summarization-latency'
+    },
+    {
+      slug: 'cold-start-availability',
+      title: 'Built-In AI availability() hangs on browser cold start',
+      status: 'Open',
+      reproPath: '/bugs/cold-start-availability'
     }
   ];
 

@@ -30,6 +30,12 @@ import {
   SummarizerLongNewsArticleSpeedWarmStartAxonTest
 } from './tests/summarizer/summarizer-long-news-article-speed-warm-start.axon-test';
 import {
+  SummarizerMaxContextColdStartAxonTest
+} from './tests/summarizer/summarizer-max-context-cold-start.axon-test';
+import {
+  SummarizerMaxContextWarmStartAxonTest
+} from './tests/summarizer/summarizer-max-context-warm-start.axon-test';
+import {
   PromptTextFactAnalysisColdStartAxonTest
 } from './tests/prompt-text/prompt-text-fact-analysis-cold-start.axon-test';
 import {
@@ -38,6 +44,12 @@ import {
 import {
   PromptTextTechnicalChallengeStartAxonTest
 } from './tests/prompt-text/prompt-text-technical-challenge-start.axon-test';
+import {
+  PromptTextLongDocumentSummarizationColdStartAxonTest
+} from './tests/prompt-text/prompt-text-long-document-summarization-cold-start.axon-test';
+import {
+  PromptTextLongDocumentSummarizationWarmStartAxonTest
+} from './tests/prompt-text/prompt-text-long-document-summarization-warm-start.axon-test';
 import { PromptImageOcrHandwrittenLetter1ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-1-cold-start.axon-test';
 import { PromptImageOcrHandwrittenLetter2ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-2-cold-start.axon-test';
 import { PromptImageOcrHandwrittenLetter3ColdStartAxonTest } from './tests/prompt-image/prompt-image-ocr-handwritten-letter-3-cold-start.axon-test';
@@ -68,9 +80,13 @@ export class AxonTestSuiteExecutor {
     AxonTestId.SummarizerLongNewsArticleWarmStart,
     AxonTestId.SummarizerLongNewsArticleSpeedColdStart,
     AxonTestId.SummarizerLongNewsArticleSpeedWarmStart,
+    AxonTestId.SummarizerMaxContextColdStart,
+    AxonTestId.SummarizerMaxContextWarmStart,
     AxonTestId.PromptTextFactAnalysisColdStart,
     AxonTestId.PromptTextEthicalAndCreativeColdStart,
     AxonTestId.PromptTextTechnicalChallengeColdStart,
+    AxonTestId.PromptTextLongDocumentSummarizationColdStart,
+    AxonTestId.PromptTextLongDocumentSummarizationWarmStart,
     AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart,
     AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart,
     AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart,
@@ -100,9 +116,13 @@ export class AxonTestSuiteExecutor {
     private readonly summarizerLongNewsArticleColdStartAxonTest: SummarizerLongNewsArticleColdStartAxonTest,
     private readonly summarizerLongNewsArticleSpeedColdStartAxonTest: SummarizerLongNewsArticleSpeedColdStartAxonTest,
     private readonly summarizerLongNewsArticleSpeedWarmStartAxonTest: SummarizerLongNewsArticleSpeedWarmStartAxonTest,
+    private readonly summarizerMaxContextColdStartAxonTest: SummarizerMaxContextColdStartAxonTest,
+    private readonly summarizerMaxContextWarmStartAxonTest: SummarizerMaxContextWarmStartAxonTest,
     private readonly promptTextFactAnalysisColdStartAxonTest: PromptTextFactAnalysisColdStartAxonTest,
     private readonly promptTextEthicalAndCreativeColdStartAxonTest: PromptTextEthicalAndCreativeColdStartAxonTest,
     private readonly promptTextTechnicalChallengeStartAxonTest: PromptTextTechnicalChallengeStartAxonTest,
+    private readonly promptTextLongDocumentSummarizationColdStartAxonTest: PromptTextLongDocumentSummarizationColdStartAxonTest,
+    private readonly promptTextLongDocumentSummarizationWarmStartAxonTest: PromptTextLongDocumentSummarizationWarmStartAxonTest,
     private readonly promptImageOcrHandwrittenLetter1ColdStartAxonTest: PromptImageOcrHandwrittenLetter1ColdStartAxonTest,
     private readonly promptImageOcrHandwrittenLetter2ColdStartAxonTest: PromptImageOcrHandwrittenLetter2ColdStartAxonTest,
     private readonly promptImageOcrHandwrittenLetter3ColdStartAxonTest: PromptImageOcrHandwrittenLetter3ColdStartAxonTest,
@@ -128,9 +148,13 @@ export class AxonTestSuiteExecutor {
       [AxonTestId.SummarizerLongNewsArticleWarmStart]: this.summarizerLongNewsArticleWarmStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleSpeedColdStart]: this.summarizerLongNewsArticleSpeedColdStartAxonTest,
       [AxonTestId.SummarizerLongNewsArticleSpeedWarmStart]: this.summarizerLongNewsArticleSpeedWarmStartAxonTest,
+      [AxonTestId.SummarizerMaxContextColdStart]: this.summarizerMaxContextColdStartAxonTest,
+      [AxonTestId.SummarizerMaxContextWarmStart]: this.summarizerMaxContextWarmStartAxonTest,
       [AxonTestId.PromptTextFactAnalysisColdStart]: this.promptTextFactAnalysisColdStartAxonTest,
       [AxonTestId.PromptTextEthicalAndCreativeColdStart]: this.promptTextEthicalAndCreativeColdStartAxonTest,
       [AxonTestId.PromptTextTechnicalChallengeColdStart]: this.promptTextTechnicalChallengeStartAxonTest,
+      [AxonTestId.PromptTextLongDocumentSummarizationColdStart]: this.promptTextLongDocumentSummarizationColdStartAxonTest,
+      [AxonTestId.PromptTextLongDocumentSummarizationWarmStart]: this.promptTextLongDocumentSummarizationWarmStartAxonTest,
       [AxonTestId.PromptImageOcrHandwrittenLetter1ColdStart]: this.promptImageOcrHandwrittenLetter1ColdStartAxonTest,
       [AxonTestId.PromptImageOcrHandwrittenLetter2ColdStart]: this.promptImageOcrHandwrittenLetter2ColdStartAxonTest,
       [AxonTestId.PromptImageOcrHandwrittenLetter3ColdStart]: this.promptImageOcrHandwrittenLetter3ColdStartAxonTest,
