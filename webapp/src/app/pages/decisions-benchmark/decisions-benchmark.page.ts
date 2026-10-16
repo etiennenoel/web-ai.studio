@@ -248,18 +248,23 @@ export class DecisionsBenchmarkPage extends BasePage implements OnInit, OnDestro
     this.isPolyfilled = this.classifierService.isPolyfilled();
     this.availabilityStatus = await this.classifierService.availability();
 
-    const extList = await this.classifierService.listExtensionModels();
-    if (extList) {
-      this.extensionModels = extList.models;
-      this.activeExtensionModelId = extList.activeVariantId;
-      this.selectedModelId = extList.activeVariantId;
+    if (this.isPolyfilled) {
+      const extList = await this.classifierService.listExtensionModels();
+      if (extList) {
+        this.extensionModels = extList.models;
+        this.activeExtensionModelId = extList.activeVariantId;
+        this.selectedModelId = extList.activeVariantId;
+      }
+    } else {
+      this.extensionModels = [];
+      this.activeExtensionModelId = '';
     }
     this.cdr.detectChanges();
   }
 
   async onModelSelectChange(newModelId: string): Promise<void> {
     this.selectedModelId = newModelId;
-    if (!this.isPolyfilled && this.extensionModels.length === 0) return;
+    if (!this.isPolyfilled) return;
 
     this.isSwitchingModel = true;
     this.errorMessage = '';
@@ -405,14 +410,18 @@ export class DecisionsBenchmarkPage extends BasePage implements OnInit, OnDestro
     const signal = this.abortController.signal;
 
     try {
-      // Ensure selected extension model is active if using extension
-      if (this.extensionModels.length > 0 && this.selectedModelId !== this.activeExtensionModelId) {
+      // Ensure selected extension model is active if using extension polyfill
+      if (
+        this.isPolyfilled &&
+        this.extensionModels.length > 0 &&
+        this.selectedModelId !== this.activeExtensionModelId
+      ) {
         this.runStatusText = `Switching active model to ${this.selectedModelId}...`;
         this.cdr.detectChanges();
         await this.onModelSelectChange(this.selectedModelId);
       }
 
-      if (this.forceColdStart && this.extensionModels.length > 0) {
+      if (this.forceColdStart && this.isPolyfilled && this.extensionModels.length > 0) {
         this.runStatusText = 'Unloading model for cold-start measurement...';
         this.cdr.detectChanges();
         await this.classifierService.unloadExtensionModel();
@@ -452,8 +461,8 @@ export class DecisionsBenchmarkPage extends BasePage implements OnInit, OnDestro
   ): Promise<DecisionBenchmarkSuiteRunResult | null> {
     let casesToRun = pack.cases.slice(0, Math.min(this.selectedSampleSize, pack.cases.length));
 
-    // For Parity Gate, filter to rows matching the active checkpoint family if possible
-    if (pack.id === 'litert-parity-gate') {
+    // For Parity Gate, filter to rows matching the active checkpoint family when using the extension polyfill
+    if (pack.id === 'litert-parity-gate' && this.isPolyfilled) {
       const targetTag = this.selectedModelId.startsWith('laya-td')
         ? 'laya-td-s256'
         : this.selectedModelId.startsWith('laya-ml')

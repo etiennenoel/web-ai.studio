@@ -96,39 +96,62 @@
       <!-- Model & Runtime Config Card -->
       <div class="lg:col-span-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-4 shadow-sm flex flex-col justify-between gap-4">
         <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-              <i class="bi bi-box-seam text-indigo-500"></i>
-              Decision Model Checkpoint
-            </label>
-            @if (getExtensionModelStatus(selectedModelId); as extStatus) {
+          @if (isPolyfilled) {
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <i class="bi bi-box-seam text-indigo-500"></i>
+                Extension Model Checkpoint
+              </label>
+              @if (getExtensionModelStatus(selectedModelId); as extStatus) {
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                  [ngClass]="extStatus.state === 'cached' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'">
+                  {{ extStatus.state === 'cached' ? (extStatus.loaded ? 'Loaded (' + (extStatus.accelerator || 'GPU') + ')' : 'Cached on Disk') : extStatus.state }}
+                </span>
+              }
+            </div>
+
+            <select
+              [ngModel]="selectedModelId"
+              (ngModelChange)="onModelSelectChange($event)"
+              [disabled]="isRunning || isSwitchingModel"
+              aria-label="Select Decision Model Checkpoint"
+              class="w-full px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              @for (m of modelCatalog; track m.id) {
+                <option [value]="m.id">
+                  {{ m.name }} — {{ m.badge }} ({{ m.totalMB }} MB)
+                </option>
+              }
+            </select>
+
+            @if (getSelectedModelCatalogItem(); as modelInfo) {
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+                {{ modelInfo.description }}
+                <span class="font-mono text-[10px] text-slate-400 dark:text-slate-500 ml-1">
+                  [window={{ modelInfo.window }}, head={{ modelInfo.headMaxLen }}, dim={{ modelInfo.hidden }}]
+                </span>
+              </p>
+            }
+          } @else {
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <i class="bi bi-cpu text-indigo-500"></i>
+                Active Runtime
+              </span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
-                [ngClass]="extStatus.state === 'cached' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'">
-                {{ extStatus.state === 'cached' ? (extStatus.loaded ? 'Loaded (' + (extStatus.accelerator || 'GPU') + ')' : 'Cached on Disk') : extStatus.state }}
+                [ngClass]="isSupported ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'">
+                {{ isSupported ? 'Chrome Built-In' : 'Unavailable' }}
               </span>
-            }
-          </div>
+            </div>
 
-          <select
-            [ngModel]="selectedModelId"
-            (ngModelChange)="onModelSelectChange($event)"
-            [disabled]="isRunning || isSwitchingModel"
-            aria-label="Select Decision Model Checkpoint"
-            class="w-full px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            @for (m of modelCatalog; track m.id) {
-              <option [value]="m.id">
-                {{ m.name }} — {{ m.badge }} ({{ m.totalMB }} MB)
-              </option>
-            }
-          </select>
-
-          @if (getSelectedModelCatalogItem(); as modelInfo) {
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-              {{ modelInfo.description }}
-              <span class="font-mono text-[10px] text-slate-400 dark:text-slate-500 ml-1">
-                [window={{ modelInfo.window }}, head={{ modelInfo.headMaxLen }}, dim={{ modelInfo.hidden }}]
-              </span>
-            </p>
+            <div class="px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800/70 border border-slate-200/80 dark:border-zinc-700/70">
+              <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <i class="bi bi-google text-indigo-500"></i>
+                Chrome Native <code>window.DecisionModel</code>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 mb-0 leading-relaxed">
+                Model checkpoint is managed directly by Chrome flags (<code class="text-[10px]">chrome://flags/#decisions-api</code>). Use a custom Run Label below to tag and compare different flag configurations.
+              </p>
+            </div>
           }
 
           <!-- Custom Run Label Input -->
@@ -175,26 +198,30 @@
               <span>Save Runs Locally</span>
             </label>
 
-            <label class="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                [(ngModel)]="forceColdStart"
-                [disabled]="isRunning"
-                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
-              <span>Cold Start</span>
-            </label>
+            @if (isPolyfilled) {
+              <label class="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="forceColdStart"
+                  [disabled]="isRunning"
+                  class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                <span>Cold Start</span>
+              </label>
+            }
           </div>
 
-          @if (getExtensionModelStatus(selectedModelId); as extStatus) {
-            @if (extStatus.state === 'downloadable') {
-              <button
-                type="button"
-                (click)="downloadSelectedModel()"
-                [disabled]="isDownloadingModel || isRunning"
-                class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white border-none cursor-pointer">
-                <i class="bi bi-cloud-arrow-down mr-1"></i>
-                {{ isDownloadingModel ? 'Downloading ' + downloadProgress + '%...' : 'Pre-Download Model' }}
-              </button>
+          @if (isPolyfilled) {
+            @if (getExtensionModelStatus(selectedModelId); as extStatus) {
+              @if (extStatus.state === 'downloadable') {
+                <button
+                  type="button"
+                  (click)="downloadSelectedModel()"
+                  [disabled]="isDownloadingModel || isRunning"
+                  class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white border-none cursor-pointer">
+                  <i class="bi bi-cloud-arrow-down mr-1"></i>
+                  {{ isDownloadingModel ? 'Downloading ' + downloadProgress + '%...' : 'Pre-Download Model' }}
+                </button>
+              }
             }
           }
         </div>
