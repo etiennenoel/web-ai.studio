@@ -172,7 +172,11 @@ export class LayaModelRunner {
     const W = this.options.window;
     if (ids.length > W) throw new Error(`LayaModelRunner: sequence of ${ids.length} exceeds window ${W}`);
 
-    const n = this.pickSingleSlotSize(ids.length);
+    const active = this.buckets.values().next().value as CompiledBucket | undefined;
+    const n =
+      active && active.slotSizes.length === 1 && ids.length <= active.slotSizes[0]
+        ? active.slotSizes[0]
+        : this.pickSingleSlotSize(ids.length);
     const bucket = await this.getOrCreateBucket([n]);
     return this.executeSingleWithPooled(bucket, ids, qtypeIndex);
   }
@@ -196,11 +200,16 @@ export class LayaModelRunner {
   }
 
   delete(): void {
-    this.act.delete();
+    try {
+      this.act.delete();
+    } catch {}
     for (const bucket of this.buckets.values()) {
       LayaModelRunner.destroyBucket(bucket);
     }
     this.buckets.clear();
+    try {
+      this.patcher?.restore();
+    } catch {}
   }
 
   private resolveBatchSlots(
@@ -211,17 +220,19 @@ export class LayaModelRunner {
     if (!this.patcher) return [W];
 
     const Q = seqLengths.length;
+    let candidate: readonly number[] | undefined;
+
     if (
       preferredSlots &&
       preferredSlots.length >= 1 &&
       preferredSlots.length <= Q &&
       (preferredSlots.length === 1 || this.patcher.supportsMultiSlot) &&
-      seqLengths.every((len, idx) => len <= preferredSlots[idx % preferredSlots.length])
+      LayaModelRunner.slotsFit(seqLengths, preferredSlots)
     ) {
-      return preferredSlots;
+      candidate = preferredSlots;
     }
 
-    if (Q > 1 && this.patcher.supportsMultiSlot) {
+    if (!candidate && Q > 1 && this.patcher.supportsMultiSlot) {
       let prevK = -1;
       for (let passes = 1; passes <= Q; passes++) {
         const K = Math.ceil(Q / passes);
@@ -230,12 +241,40 @@ export class LayaModelRunner {
         if (K === 1) break;
         const maxLensPerSlot = LayaModelRunner.maxPerSlot(seqLengths, K);
         const slots = this.computeSlotsForLengths(maxLensPerSlot);
-        if (slots) return slots;
+        if (slots) {
+          candidate = slots;
+          break;
+        }
       }
     }
 
-    const maxLen = Math.max(...seqLengths);
-    return [this.pickSingleSlotSize(maxLen)];
+    if (!candidate) {
+      const maxLen = Math.max(...seqLengths);
+      candidate = [this.pickSingleSlotSize(maxLen)];
+    }
+
+    // If an already-compiled bucket fits `seqLengths` in the same (or fewer) passes,
+    // reuse it to avoid a WebGPU shader recompilation when input lengths fluctuate.
+    const active = this.buckets.values().next().value as CompiledBucket | undefined;
+    if (
+      active &&
+      active.slotSizes.length >= 1 &&
+      active.slotSizes.length <= Q &&
+      Math.ceil(Q / active.slotSizes.length) <= Math.ceil(Q / candidate.length) &&
+      LayaModelRunner.slotsFit(seqLengths, active.slotSizes)
+    ) {
+      return active.slotSizes;
+    }
+
+    return candidate;
+  }
+
+  private static slotsFit(seqLengths: readonly number[], slots: readonly number[]): boolean {
+    const K = slots.length;
+    for (let i = 0; i < seqLengths.length; i++) {
+      if (seqLengths[i] > slots[i % K]) return false;
+    }
+    return true;
   }
 
   private static maxPerSlot(lengths: readonly number[], k: number): number[] {
@@ -278,7 +317,8 @@ export class LayaModelRunner {
     const sumL = seqLengths.reduce((acc, l) => acc + l, 0);
     if (sumL > W) return null;
 
-    const M = Math.min(W, Math.max(64, Math.ceil(sumL / 16) * 16));
+    const desired = sumL + Q * 16;
+    const M = Math.min(W, Math.max(64, Math.ceil(desired / 32) * 32));
     const totalExtra = M - sumL;
     const extraPerQ = Math.floor(totalExtra / Q);
     const rem = totalExtra - extraPerQ * Q;
@@ -312,7 +352,14 @@ export class LayaModelRunner {
     const compiled = await loadAndCompile(this.mainBytes, { accelerator: this.options.accelerator });
     const B = normalizedSlots.length;
     const totalLen = normalizedSlots.reduce((acc, s) => acc + s, 0);
-    this.validateSignatures(compiled, totalLen);
+    try {
+      this.validateSignatures(compiled, totalLen);
+    } catch (e) {
+      try {
+        compiled.delete();
+      } catch {}
+      throw e;
+    }
 
     const hidden = this.options.hidden;
     const maskBuf = new Float32Array(B > 1 ? totalLen * totalLen : totalLen);
@@ -404,10 +451,15 @@ export class LayaModelRunner {
       tokenLogitsOutputIndex,
     };
 
-    // Warm up WebGPU shader pipelines immediately so the first classify() call is fast.
-    if (bucket.gpuEmbedsTensor) {
-      const dummyItems = normalizedSlots.map(() => ({ ids: [this.options.padId], qtypeIndex: 0 }));
-      await this.executeBucketTokensOnly(bucket, dummyItems);
+    try {
+      // Warm up WebGPU shader pipelines immediately so the first classify() call is fast.
+      if (bucket.gpuEmbedsTensor) {
+        const dummyItems = normalizedSlots.map(() => ({ ids: [this.options.padId], qtypeIndex: 0 }));
+        await this.executeBucketTokensOnly(bucket, dummyItems);
+      }
+    } catch (e) {
+      LayaModelRunner.destroyBucket(bucket);
+      throw e;
     }
 
     this.buckets.set(key, bucket);

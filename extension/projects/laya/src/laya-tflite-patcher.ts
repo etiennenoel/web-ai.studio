@@ -263,6 +263,9 @@ export class LayaTflitePatcher {
    */
   patchSlots(slotSizes: readonly number[]): void {
     const B = slotSizes.length;
+    if (B === 0 || slotSizes.some((s) => !Number.isInteger(s) || s <= 0)) {
+      throw new Error(`LayaTflitePatcher: invalid slotSizes [${slotSizes.join(', ')}]`);
+    }
     if (B > 1 && !this.supportsMultiSlot) {
       throw new Error('LayaTflitePatcher: multi-slot packing is not supported for this graph');
     }
@@ -290,12 +293,17 @@ export class LayaTflitePatcher {
     }
 
     for (const m of this.maskBuffers) {
-      const f32 = new Float32Array(this.bytes.buffer, this.bytes.byteOffset + m.ptr, M * M);
+      const savedBytes = new Uint8Array(m.saved.buffer, m.saved.byteOffset, m.saved.byteLength);
       if (M === this.origWindow) {
-        f32.set(m.saved);
+        this.bytes.set(savedBytes, m.ptr);
       } else {
+        const rowBytes = M * 4;
+        const strideBytes = this.origWindow * 4;
         for (let r = 0; r < M; r++) {
-          f32.set(m.saved.subarray(r * this.origWindow, r * this.origWindow + M), r * M);
+          this.bytes.set(
+            savedBytes.subarray(r * strideBytes, r * strideBytes + rowBytes),
+            m.ptr + r * rowBytes,
+          );
         }
       }
       if (m.sizeOff) dv.setBigUint64(m.sizeOff, BigInt(M * M * 4), true);
@@ -303,14 +311,20 @@ export class LayaTflitePatcher {
     }
 
     for (const rb of this.ropeBuffers) {
-      const f32 = new Float32Array(this.bytes.buffer, this.bytes.byteOffset + rb.ptr, M * rb.dim);
-      let offset = 0;
+      const savedBytes = new Uint8Array(rb.saved.buffer, rb.saved.byteOffset, rb.saved.byteLength);
+      let offsetBytes = 0;
       for (const S of slotSizes) {
-        f32.set(rb.saved.subarray(0, S * rb.dim), offset * rb.dim);
-        offset += S;
+        const chunkBytes = S * rb.dim * 4;
+        this.bytes.set(savedBytes.subarray(0, chunkBytes), rb.ptr + offsetBytes);
+        offsetBytes += chunkBytes;
       }
       if (rb.sizeOff) dv.setBigUint64(rb.sizeOff, BigInt(M * rb.dim * 4), true);
       if (rb.dataOff) dv.setInt32(rb.dataOff, M * rb.dim * 4, true);
     }
+  }
+
+  /** Restores the FlatBuffer in-place to its original unpatched single-slot `[origWindow]` state. */
+  restore(): void {
+    this.patchSlots([this.origWindow]);
   }
 }
