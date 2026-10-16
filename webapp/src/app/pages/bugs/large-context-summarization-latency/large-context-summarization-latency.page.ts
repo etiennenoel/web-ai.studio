@@ -1,4 +1,10 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
 import { BasePage } from '../../base-page';
@@ -58,8 +64,14 @@ export class LargeContextSummarizationLatencyPage
   documentPreset: DocumentSizePreset = '10k';
   systemPromptPreset: SystemPromptPreset = '3.6k';
 
+  showReproCode = false;
   activeInspectorTab: InspectorTab = 'code';
   selectedRunId: RunPatternId = 'prompt-parallel';
+
+  inspectorHeight = 320;
+  private isResizingInspector = false;
+  private resizeStartY = 0;
+  private resizeStartHeight = 320;
 
   documentText = LARGE_TECHNICAL_DOCUMENT_10K;
   systemPromptText = LARGE_SUMMARIZATION_SYSTEM_PROMPT;
@@ -94,6 +106,33 @@ export class LargeContextSummarizationLatencyPage
       clearTimeout(this.copyTimer);
     }
     super.ngOnDestroy();
+  }
+
+  startInspectorResize(event: MouseEvent): void {
+    event.preventDefault();
+    this.isResizingInspector = true;
+    this.resizeStartY = event.clientY;
+    this.resizeStartHeight = this.inspectorHeight;
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ns-resize';
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  onWindowMouseMove(event: MouseEvent): void {
+    if (!this.isResizingInspector) return;
+    const delta = event.clientY - this.resizeStartY;
+    this.inspectorHeight = Math.max(
+      180,
+      Math.min(800, this.resizeStartHeight + delta)
+    );
+  }
+
+  @HostListener('window:mouseup')
+  onWindowMouseUp(): void {
+    if (!this.isResizingInspector) return;
+    this.isResizingInspector = false;
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
   }
 
   get selectedRun(): SummarizationTimingRun | undefined {
@@ -224,21 +263,19 @@ export class LargeContextSummarizationLatencyPage
     ];
   }
 
-  getCodeSnippet(patternId: RunPatternId, includeFullStrings = false): string {
-    const sysComment = `${this.systemPromptText.length.toLocaleString()} chars (~${this.estimatedSystemTokens} tokens)`;
-    const docComment = `${this.documentText.length.toLocaleString()} chars (~${this.estimatedDocumentTokens} tokens)`;
+  getCodeSnippet(patternId: RunPatternId, _includeFullStrings = true): string {
+    const toTemplateLiteral = (text: string): string =>
+      `\`${text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\``;
 
-    const sysLiteral = includeFullStrings
-      ? JSON.stringify(this.systemPromptText)
-      : `\`${this.systemPromptText.slice(0, 140).replace(/`/g, "\\`")}... [${sysComment}]\``;
-
-    const docLiteral = includeFullStrings
-      ? JSON.stringify(this.documentText)
-      : `\`${this.documentText.slice(0, 140).replace(/`/g, "\\`")}... [${docComment}]\``;
+    const sysLiteral = toTemplateLiteral(this.systemPromptText);
+    const docLiteral = toTemplateLiteral(this.documentText);
 
     if (patternId === 'prompt-parallel') {
       return `const SYSTEM_PROMPT = ${sysLiteral};
-const extractDocumentText = async () => ${docLiteral};
+
+const DOCUMENT_TEXT = ${docLiteral};
+
+const extractDocumentText = async () => DOCUMENT_TEXT;
 
 async function summarize() {
   const abortController = new AbortController();
@@ -886,21 +923,5 @@ await summarizeWithSummarizerApi(DOCUMENT_TEXT);`;
         } catch {}
       }
     }
-  }
-
-  getPhasePercentage(
-    run: SummarizationTimingRun,
-    part: 'create' | 'prefill' | 'decode'
-  ): number {
-    const total =
-      (run.createMs || 0) + (run.firstChunkMs || 0) + (run.decodeMs || 0);
-    if (total <= 0) return 0;
-    const value =
-      part === 'create'
-        ? run.createMs || 0
-        : part === 'prefill'
-        ? run.firstChunkMs || 0
-        : run.decodeMs || 0;
-    return Math.max(2, Math.round((value / total) * 100));
   }
 }
