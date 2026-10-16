@@ -6,72 +6,83 @@
   </div>
 
   <!-- Header & Action Controls -->
-  <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8">
+  <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-6">
     <div class="flex-1">
       <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
-        Built-In AI <code class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-2xl">availability()</code> Cold-Start Reproducer
+        Built-In AI <code class="px-2 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-2xl">availability()</code> Cold-Start Reproducer
       </h1>
-      <p class="text-lg text-gray-600 mb-3">
-        Fires <strong>Wave 1</strong> immediately on page load (<code class="text-sm bg-gray-100 px-1.5 py-0.5 rounded">t = 0ms</code>) and
-        <strong>Wave 2</strong> after <code class="text-sm bg-gray-100 px-1.5 py-0.5 rounded">4000ms</code>.
+      <p class="text-base text-gray-600 leading-relaxed mb-2">
+        Fires <strong>Wave 1</strong> immediately on page load (<code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">t = 0ms</code>) and
+        <strong>Wave 2</strong> after <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">4000ms</code>.
         On unpatched Chrome 154 cold start, Wave 1 hangs indefinitely in
-        <code class="text-sm bg-gray-100 px-1.5 py-0.5 rounded">ManifestBrokerState::init_callbacks_</code> while Wave 2 resolves immediately.
+        <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">ManifestBrokerState::init_callbacks_</code> while Wave 2 resolves immediately.
       </p>
       <p class="text-sm text-gray-500">
-        <i class="bi bi-info-circle mr-1 text-blue-600"></i>
-        <strong>Tip to reproduce Scenario A:</strong> Launch Chrome completely cold (quit the browser first) with this page's URL as the startup tab.
+        Launch Chrome completely cold (quit the browser first) with this page's URL as the startup tab to reproduce Scenario A.
       </p>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+    <div class="flex flex-wrap items-center gap-2 shrink-0">
+      <button
+        type="button"
+        (click)="showReproCode = !showReproCode"
+        class="inline-flex items-center px-3.5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+        <i class="bi bi-code-slash mr-1.5"></i>
+        {{ showReproCode ? 'Hide Repro Code' : 'Show Repro Code' }}
+        <i class="bi ml-1.5 text-xs text-gray-400" [class.bi-chevron-up]="showReproCode" [class.bi-chevron-down]="!showReproCode"></i>
+      </button>
       <button
         type="button"
         (click)="fireWave2Manual()"
-        class="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
         <i class="bi bi-lightning-charge-fill mr-1.5"></i> Fire Wave 2 Now
       </button>
       <button
         type="button"
         (click)="fireExtraProbe()"
-        class="inline-flex items-center px-4 py-2.5 border border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
-        <i class="bi bi-broadcast mr-1.5"></i> Fire Extra Probe
+        class="inline-flex items-center px-3.5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all">
+        <i class="bi bi-broadcast mr-1.5"></i> Extra Probe
       </button>
       <button
         type="button"
         (click)="startProbeSequence()"
-        class="inline-flex items-center px-3.5 py-2.5 border border-gray-200 text-sm font-medium rounded-lg text-gray-600 bg-gray-50 hover:bg-gray-100 transition-all"
+        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all"
         title="Restart Wave 1 and Wave 2 timers">
         <i class="bi bi-arrow-clockwise"></i>
       </button>
     </div>
   </div>
 
-  <!-- Repro Code Block -->
-  <div class="bg-gray-900 rounded-xl overflow-hidden shadow-lg mb-8 border border-gray-800">
-    <div class="px-4 py-2.5 bg-gray-800 border-b border-gray-700 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center">
-        <div class="flex space-x-2">
-          <div class="w-3 h-3 rounded-full bg-red-500"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div class="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
-        <span class="ml-4 text-xs font-mono text-gray-300">Repro Code (Wave 1 at t = 0ms vs. Wave 2 at t = +4000ms)</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-mono text-gray-400 hidden sm:inline">ManifestBrokerState::init_callbacks_</span>
+  <!-- Collapsible & Resizable Repro Code Block -->
+  @if (showReproCode) {
+    <div class="bg-[#282c34] rounded-xl overflow-hidden shadow-md mb-6 border border-gray-800">
+      <div class="px-4 py-2.5 bg-gray-900 border-b border-gray-800 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-mono text-gray-300">Repro Code (Wave 1 at t = 0ms vs. Wave 2 at t = +4000ms)</span>
         <button
           type="button"
           (click)="copyText(standaloneReproScript, 'repro-script')"
-          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors">
-          <i class="bi" [class.bi-check2]="copiedKey === 'repro-script'" [class.bi-clipboard]="copiedKey !== 'repro-script'"></i>
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700 transition-colors">
+          <i class="bi" [class.bi-check2]="copiedKey === 'repro-script'" [class.bi-terminal]="copiedKey !== 'repro-script'"></i>
           {{ copiedKey === 'repro-script' ? 'Copied Script!' : 'Copy Console Script' }}
         </button>
       </div>
+      <div [style.height.px]="inspectorHeight" class="w-full relative overflow-hidden">
+        <app-code-editor
+          [code]="standaloneReproScript"
+          language="javascript"
+          [readOnly]="true"
+          [darkTheme]="true"
+          [height]="inspectorHeight + 'px'">
+        </app-code-editor>
+      </div>
+      <div
+        (mousedown)="startInspectorResize($event)"
+        class="h-3 bg-gray-900 border-t border-gray-800 cursor-ns-resize flex items-center justify-center hover:bg-gray-800 transition-colors"
+        title="Drag to resize editor height">
+        <div class="w-8 h-1 rounded-full bg-gray-600"></div>
+      </div>
     </div>
-    <div class="p-4 max-h-64 overflow-y-auto">
-      <pre class="text-xs font-mono text-gray-200 leading-relaxed whitespace-pre">{{ standaloneReproScript }}</pre>
-    </div>
-  </div>
+  }
 
   <!-- Live Verdict Banner -->
   <div
