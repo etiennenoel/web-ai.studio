@@ -14,10 +14,16 @@ declare const Summarizer: any;
 
 export type DocumentSizePreset = '2k' | '10k' | 'max-quota';
 export type SystemPromptPreset = '3.6k' | 'minimal';
+export type InspectorTab = 'code' | 'document' | 'system-prompt' | 'config';
+export type RunPatternId =
+  | 'prompt-parallel'
+  | 'prompt-cloned'
+  | 'summarizer-api';
 
 export interface SummarizationTimingRun {
-  id: 'prompt-parallel' | 'prompt-cloned' | 'summarizer-api';
+  id: RunPatternId;
   label: string;
+  shortLabel: string;
   subtitle: string;
   status: 'pending' | 'running' | 'done' | 'error';
   phase: 'idle' | 'creating' | 'prefilling' | 'decoding' | 'done' | 'error';
@@ -52,12 +58,19 @@ export class LargeContextSummarizationLatencyPage
   documentPreset: DocumentSizePreset = '10k';
   systemPromptPreset: SystemPromptPreset = '3.6k';
 
+  activeInspectorTab: InspectorTab = 'code';
+  selectedRunId: RunPatternId = 'prompt-parallel';
+
+  documentText = LARGE_TECHNICAL_DOCUMENT_10K;
+  systemPromptText = LARGE_SUMMARIZATION_SYSTEM_PROMPT;
+
+  copiedKey: string | null = null;
+  private copyTimer: ReturnType<typeof setTimeout> | null = null;
+
   testRunning = false;
   activeAbortController: AbortController | null = null;
 
   runs: SummarizationTimingRun[] = [];
-  selectedRunId: 'prompt-parallel' | 'prompt-cloned' | 'summarizer-api' =
-    'prompt-parallel';
 
   readonly minimalSystemPrompt =
     'Summarize the provided technical document into concise bullet points highlighting key metrics and recommendations.';
@@ -67,6 +80,7 @@ export class LargeContextSummarizationLatencyPage
     this.setTitle(
       'Bug: Large-Context Summarization Prefill & TTFT Latency'
     );
+    this.syncInputsFromPresets();
     this.resetRuns();
   }
 
@@ -76,37 +90,69 @@ export class LargeContextSummarizationLatencyPage
 
   override ngOnDestroy(): void {
     this.stopTest();
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+    }
     super.ngOnDestroy();
-  }
-
-  get activeSystemPrompt(): string {
-    return this.systemPromptPreset === '3.6k'
-      ? LARGE_SUMMARIZATION_SYSTEM_PROMPT
-      : this.minimalSystemPrompt;
-  }
-
-  get previewDocumentLength(): number {
-    if (this.documentPreset === '2k') {
-      return 2100;
-    }
-    if (this.documentPreset === '10k') {
-      return LARGE_TECHNICAL_DOCUMENT_10K.length;
-    }
-    return LARGE_TECHNICAL_DOCUMENT_MAX_CONTEXT.length;
   }
 
   get selectedRun(): SummarizationTimingRun | undefined {
     return this.runs.find((r) => r.id === this.selectedRunId) || this.runs[0];
   }
 
+  get estimatedDocumentTokens(): number {
+    return Math.round((this.documentText?.length || 0) / 4.2);
+  }
+
+  get estimatedSystemTokens(): number {
+    return Math.round((this.systemPromptText?.length || 0) / 4.2);
+  }
+
+  syncInputsFromPresets(): void {
+    if (this.documentPreset === '2k') {
+      this.documentText = LARGE_TECHNICAL_DOCUMENT_10K.slice(0, 2100).trim();
+    } else if (this.documentPreset === '10k') {
+      this.documentText = LARGE_TECHNICAL_DOCUMENT_10K;
+    } else {
+      this.documentText = LARGE_TECHNICAL_DOCUMENT_MAX_CONTEXT;
+    }
+
+    this.systemPromptText =
+      this.systemPromptPreset === '3.6k'
+        ? LARGE_SUMMARIZATION_SYSTEM_PROMPT
+        : this.minimalSystemPrompt;
+  }
+
+  onPresetChange(): void {
+    this.syncInputsFromPresets();
+    if (!this.testRunning) {
+      this.resetRuns();
+    }
+  }
+
+  onCustomInputEdited(): void {
+    if (!this.testRunning) {
+      for (const run of this.runs) {
+        run.inputChars = this.documentText.length;
+        run.systemPromptChars =
+          run.id === 'summarizer-api' ? 0 : this.systemPromptText.length;
+      }
+    }
+  }
+
+  selectRun(runId: RunPatternId): void {
+    this.selectedRunId = runId;
+  }
+
   resetRuns(): void {
-    const sysLen = this.activeSystemPrompt.length;
-    const docLen = this.previewDocumentLength;
+    const sysLen = this.systemPromptText.length;
+    const docLen = this.documentText.length;
 
     this.runs = [
       {
         id: 'prompt-parallel',
         label: '1. Prompt API (Fresh Session + System Prompt + Document)',
+        shortLabel: 'Pattern 1: Prompt API (Fresh)',
         subtitle:
           'LanguageModel.create({ initialPrompts }) in parallel with text extraction, then session.promptStreaming(doc)',
         status: 'pending',
@@ -130,6 +176,7 @@ export class LargeContextSummarizationLatencyPage
       {
         id: 'prompt-cloned',
         label: '2. Prompt API (Warm Cloned Session — System Prompt Cached)',
+        shortLabel: 'Pattern 2: Prompt API (Cloned)',
         subtitle:
           'Clones a pre-initialized session so the ~3.6k system prompt is not re-prefilled on each document',
         status: 'pending',
@@ -153,6 +200,7 @@ export class LargeContextSummarizationLatencyPage
       {
         id: 'summarizer-api',
         label: '3. Built-in Summarizer API (summarizeStreaming)',
+        shortLabel: 'Pattern 3: Summarizer API',
         subtitle:
           'Summarizer.create({ type: "key-points", length: "medium" }) + summarizer.summarizeStreaming(doc)',
         status: 'pending',
@@ -176,9 +224,229 @@ export class LargeContextSummarizationLatencyPage
     ];
   }
 
-  onPresetChange(): void {
-    if (!this.testRunning) {
-      this.resetRuns();
+  getCodeSnippet(patternId: RunPatternId, includeFullStrings = false): string {
+    const sysComment = `${this.systemPromptText.length.toLocaleString()} chars (~${this.estimatedSystemTokens} tokens)`;
+    const docComment = `${this.documentText.length.toLocaleString()} chars (~${this.estimatedDocumentTokens} tokens)`;
+
+    const sysLiteral = includeFullStrings
+      ? JSON.stringify(this.systemPromptText)
+      : `\`${this.systemPromptText.slice(0, 140).replace(/`/g, "\\`")}... [${sysComment}]\``;
+
+    const docLiteral = includeFullStrings
+      ? JSON.stringify(this.documentText)
+      : `\`${this.documentText.slice(0, 140).replace(/`/g, "\\`")}... [${docComment}]\``;
+
+    if (patternId === 'prompt-parallel') {
+      return `const SYSTEM_PROMPT = ${sysLiteral};
+const extractDocumentText = async () => ${docLiteral};
+
+async function summarize() {
+  const abortController = new AbortController();
+  const { signal } = abortController;
+  const timings = {};
+
+  // Session creation and text extraction start together
+  const createStart = performance.now();
+  const sessionPromise = LanguageModel.create({
+    signal,
+    expectedInputs: [{ type: "text", languages: ["en"] }],
+    expectedOutputs: [{ type: "text", languages: ["en"] }],
+    initialPrompts: [{ role: "system", content: SYSTEM_PROMPT }],
+  }).finally(() => {
+    timings.create_ms = Math.round(performance.now() - createStart);
+  });
+
+  const [documentText, session] = await Promise.all([
+    extractDocumentText(),
+    sessionPromise,
+  ]);
+
+  try {
+    const promptStart = performance.now();
+    let lastChunkAt = promptStart;
+    let summary = "";
+    timings.chunks = 0;
+    timings.max_gap_ms = 0;
+
+    for await (const chunk of session.promptStreaming(documentText, { signal })) {
+      const now = performance.now();
+      if (timings.chunks === 0) {
+        timings.first_chunk_ms = Math.round(now - promptStart);
+      } else {
+        timings.max_gap_ms = Math.max(timings.max_gap_ms, Math.round(now - lastChunkAt));
+      }
+      lastChunkAt = now;
+      timings.chunks++;
+      summary += chunk;
+    }
+
+    timings.streaming_ms = Math.round(performance.now() - promptStart);
+    timings.input_chars = documentText.length;
+    timings.output_chars = summary.length;
+    console.table(timings);
+    return { summary, timings };
+  } finally {
+    session.destroy();
+  }
+}
+
+await summarize();`;
+    }
+
+    if (patternId === 'prompt-cloned') {
+      return `const SYSTEM_PROMPT = ${sysLiteral};
+const DOCUMENT_TEXT = ${docLiteral};
+
+// 1. Pre-warm a parent session once with the ~3.6k system prompt
+const baseSession = await LanguageModel.create({
+  expectedInputs: [{ type: "text", languages: ["en"] }],
+  expectedOutputs: [{ type: "text", languages: ["en"] }],
+  initialPrompts: [{ role: "system", content: SYSTEM_PROMPT }],
+});
+
+async function summarizeWithClonedSession(documentText) {
+  const timings = {};
+  const cloneStart = performance.now();
+  const session = await baseSession.clone();
+  timings.create_ms = Math.round(performance.now() - cloneStart);
+
+  try {
+    const promptStart = performance.now();
+    let lastChunkAt = promptStart;
+    let summary = "";
+    timings.chunks = 0;
+    timings.max_gap_ms = 0;
+
+    for await (const chunk of session.promptStreaming(documentText)) {
+      const now = performance.now();
+      if (timings.chunks === 0) {
+        timings.first_chunk_ms = Math.round(now - promptStart);
+      } else {
+        timings.max_gap_ms = Math.max(timings.max_gap_ms, Math.round(now - lastChunkAt));
+      }
+      lastChunkAt = now;
+      timings.chunks++;
+      summary += chunk;
+    }
+
+    timings.streaming_ms = Math.round(performance.now() - promptStart);
+    timings.input_chars = documentText.length;
+    timings.output_chars = summary.length;
+    console.table(timings);
+    return { summary, timings };
+  } finally {
+    session.destroy();
+  }
+}
+
+await summarizeWithClonedSession(DOCUMENT_TEXT);`;
+    }
+
+    return `const DOCUMENT_TEXT = ${docLiteral};
+
+async function summarizeWithSummarizerApi(documentText) {
+  const timings = {};
+  const createStart = performance.now();
+  const summarizer = await Summarizer.create({
+    type: "key-points",
+    format: "plain-text",
+    length: "medium",
+    expectedInputLanguages: ["en"],
+    outputLanguage: "en",
+  });
+  timings.create_ms = Math.round(performance.now() - createStart);
+  timings.input_quota = summarizer.inputQuota;
+
+  try {
+    const promptStart = performance.now();
+    let lastChunkAt = promptStart;
+    let summary = "";
+    timings.chunks = 0;
+    timings.max_gap_ms = 0;
+
+    for await (const chunk of summarizer.summarizeStreaming(documentText)) {
+      const now = performance.now();
+      if (timings.chunks === 0) {
+        timings.first_chunk_ms = Math.round(now - promptStart);
+      } else {
+        timings.max_gap_ms = Math.max(timings.max_gap_ms, Math.round(now - lastChunkAt));
+      }
+      lastChunkAt = now;
+      timings.chunks++;
+      summary += chunk;
+    }
+
+    timings.streaming_ms = Math.round(performance.now() - promptStart);
+    timings.input_chars = documentText.length;
+    timings.output_chars = summary.length;
+    console.table(timings);
+    return { summary, timings };
+  } finally {
+    summarizer.destroy();
+  }
+}
+
+await summarizeWithSummarizerApi(DOCUMENT_TEXT);`;
+  }
+
+  getInspectorConfigJson(): string {
+    const run = this.selectedRun;
+    const payload = {
+      pattern: run?.id,
+      createOptions:
+        run?.id === 'summarizer-api'
+          ? {
+              type: 'key-points',
+              format: 'plain-text',
+              length: 'medium',
+              expectedInputLanguages: ['en'],
+              outputLanguage: 'en',
+            }
+          : {
+              expectedInputs: [{ type: 'text', languages: ['en'] }],
+              expectedOutputs: [{ type: 'text', languages: ['en'] }],
+              initialPrompts: [
+                {
+                  role: 'system',
+                  content: `<${this.systemPromptText.length} chars>`,
+                },
+              ],
+            },
+      payloadStats: {
+        systemPromptChars:
+          run?.id === 'summarizer-api' ? 0 : this.systemPromptText.length,
+        documentChars: run?.inputChars ?? this.documentText.length,
+        measuredInputTokens: run?.inputTokens ?? null,
+        sessionInputQuota: run?.inputQuota ?? null,
+      },
+      timings: {
+        create_ms: run?.createMs ?? null,
+        first_chunk_ms: run?.firstChunkMs ?? null,
+        decode_ms: run?.decodeMs ?? null,
+        streaming_ms: run?.streamingMs ?? null,
+        max_gap_ms: run?.maxGapMs ?? null,
+        chunks: run?.chunks ?? 0,
+        prefill_tok_per_sec: run?.prefillTokensPerSec ?? null,
+        decode_chunks_per_sec: run?.decodeChunksPerSec ?? null,
+        input_chars: run?.inputChars ?? this.documentText.length,
+        output_chars: run?.outputChars ?? 0,
+      },
+    };
+    return JSON.stringify(payload, null, 2);
+  }
+
+  async copyText(text: string, key: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copiedKey = key;
+      if (this.copyTimer) {
+        clearTimeout(this.copyTimer);
+      }
+      this.copyTimer = setTimeout(() => {
+        this.copiedKey = null;
+      }, 2000);
+    } catch {
+      // Ignore clipboard failures
     }
   }
 
@@ -209,9 +477,7 @@ export class LargeContextSummarizationLatencyPage
     }
   }
 
-  async runSingle(
-    runId: 'prompt-parallel' | 'prompt-cloned' | 'summarizer-api'
-  ): Promise<void> {
+  async runSingle(runId: RunPatternId): Promise<void> {
     if (this.testRunning) return;
     this.testRunning = true;
     this.selectedRunId = runId;
@@ -250,9 +516,9 @@ export class LargeContextSummarizationLatencyPage
     run.totalEndToEndMs = null;
     run.maxGapMs = null;
     run.chunks = 0;
-    run.inputChars = this.previewDocumentLength;
+    run.inputChars = this.documentText.length;
     run.systemPromptChars =
-      run.id === 'summarizer-api' ? 0 : this.activeSystemPrompt.length;
+      run.id === 'summarizer-api' ? 0 : this.systemPromptText.length;
     run.inputTokens = null;
     run.inputQuota = null;
     run.outputChars = 0;
@@ -265,32 +531,30 @@ export class LargeContextSummarizationLatencyPage
   private async resolveDocumentForInstance(
     instance: any,
     systemPromptChars = 0
-  ): Promise<{ text: string; measuredTokens: number | null; quota: number | null }> {
+  ): Promise<{
+    text: string;
+    measuredTokens: number | null;
+    quota: number | null;
+  }> {
     const quota: number | null =
       typeof instance?.inputQuota === 'number' && instance.inputQuota > 0
         ? instance.inputQuota
         : null;
 
-    if (this.documentPreset === '2k') {
-      const text = LARGE_TECHNICAL_DOCUMENT_10K.slice(0, 2100).trim();
-      const measuredTokens = await this.measureTokensSafe(instance, text);
-      return { text, measuredTokens, quota };
+    if (this.documentPreset === 'max-quota') {
+      const ratio = systemPromptChars > 0 ? 0.72 : 0.85;
+      const fitted = await fitDocumentToInputQuota(instance, ratio);
+      this.documentText = fitted.text;
+      return {
+        text: fitted.text,
+        measuredTokens: fitted.measuredTokens,
+        quota: fitted.inputQuota ?? quota,
+      };
     }
 
-    if (this.documentPreset === '10k') {
-      const text = LARGE_TECHNICAL_DOCUMENT_10K;
-      const measuredTokens = await this.measureTokensSafe(instance, text);
-      return { text, measuredTokens, quota };
-    }
-
-    // max-quota mode: fill up to ~82% of remaining inputQuota
-    const ratio = systemPromptChars > 0 ? 0.72 : 0.85;
-    const fitted = await fitDocumentToInputQuota(instance, ratio);
-    return {
-      text: fitted.text,
-      measuredTokens: fitted.measuredTokens,
-      quota: fitted.inputQuota ?? quota,
-    };
+    const text = this.documentText;
+    const measuredTokens = await this.measureTokensSafe(instance, text);
+    return { text, measuredTokens, quota };
   }
 
   private async measureTokensSafe(
@@ -324,7 +588,7 @@ export class LargeContextSummarizationLatencyPage
         throw new Error('LanguageModel API is not available in this browser.');
       }
 
-      const systemPrompt = this.activeSystemPrompt;
+      const systemPrompt = this.systemPromptText;
       run.systemPromptChars = systemPrompt.length;
 
       const endToEndStart = performance.now();
@@ -431,10 +695,9 @@ export class LargeContextSummarizationLatencyPage
         throw new Error('LanguageModel API is not available in this browser.');
       }
 
-      const systemPrompt = this.activeSystemPrompt;
+      const systemPrompt = this.systemPromptText;
       run.systemPromptChars = systemPrompt.length;
 
-      // Pre-warm base session with the system prompt
       baseSession = await LanguageModel.create({
         signal,
         expectedInputs: [{ type: 'text', languages: ['en'] }],
@@ -451,7 +714,6 @@ export class LargeContextSummarizationLatencyPage
       run.inputQuota = resolved.quota;
       run.inputTokens = resolved.measuredTokens;
 
-      // Timed section: cloning the pre-warmed session + streaming the document
       const endToEndStart = performance.now();
       const cloneStart = performance.now();
 
@@ -546,7 +808,6 @@ export class LargeContextSummarizationLatencyPage
         throw new Error('Summarizer API is not available in this browser.');
       }
 
-      const endToEndStart = performance.now();
       const createStart = performance.now();
 
       summarizer = await Summarizer.create({
@@ -600,8 +861,7 @@ export class LargeContextSummarizationLatencyPage
 
       run.streamingMs = Math.round(performance.now() - promptStart);
       run.decodeMs = Math.max(0, run.streamingMs - (run.firstChunkMs || 0));
-      run.totalEndToEndMs =
-        (run.createMs || 0) + (run.streamingMs || 0);
+      run.totalEndToEndMs = (run.createMs || 0) + (run.streamingMs || 0);
 
       if (run.decodeMs > 0 && run.chunks > 1) {
         run.decodeChunksPerSec =

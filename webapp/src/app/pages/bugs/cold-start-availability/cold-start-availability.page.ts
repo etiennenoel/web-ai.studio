@@ -57,7 +57,10 @@ export class ColdStartAvailabilityPage
   t0 = 0;
   private wave2TimerId: ReturnType<typeof setTimeout> | null = null;
   private statusIntervalId: ReturnType<typeof setInterval> | null = null;
+  private copyTimer: ReturnType<typeof setTimeout> | null = null;
   private nextLogId = 1;
+
+  copiedKey: string | null = null;
 
   wave1Records: ProbeRecord[] = [];
   wave2Records: ProbeRecord[] = [];
@@ -69,6 +72,36 @@ export class ColdStartAvailabilityPage
   wave1SummaryText = '0 / 0 settled';
   wave2SummaryText = 'Scheduled in 4.0s';
   logs: TimelineLogEntry[] = [];
+
+  readonly standaloneReproScript = `// Built-In AI availability() Cold-Start Reproducer
+const APIS = [
+  ["Summarizer", () => globalThis.Summarizer?.availability()],
+  ["LanguageModel", () => globalThis.LanguageModel?.availability()],
+  ["Writer", () => globalThis.Writer?.availability()],
+  ["Rewriter", () => globalThis.Rewriter?.availability()],
+  ["Proofreader", () => globalThis.Proofreader?.availability()],
+  ["LanguageDetector [control]", () => globalThis.LanguageDetector?.availability()],
+  ["Translator [control]", () => globalThis.Translator?.availability({ sourceLanguage: "en", targetLanguage: "es" })],
+];
+
+function runWave(waveName) {
+  for (const [name, fn] of APIS) {
+    const start = performance.now();
+    const p = fn();
+    if (!p) {
+      console.log(\`[\${waveName}] \${name}: UNEXPOSED\`);
+      continue;
+    }
+    p.then(
+      res => console.log(\`[\${waveName}] \${name} resolved -> "\${res}" in \${Math.round(performance.now() - start)}ms\`),
+      err => console.error(\`[\${waveName}] \${name} rejected ->\`, err)
+    );
+  }
+}
+
+// Wave 1 at t = 0ms, Wave 2 at t = +4000ms
+runWave("Wave 1 (0ms)");
+setTimeout(() => runWave("Wave 2 (+4000ms)"), 4000);`;
 
   readonly apis: ProbeApiDefinition[] = [
     {
@@ -170,7 +203,31 @@ export class ColdStartAvailabilityPage
 
   override ngOnDestroy(): void {
     this.clearTimers();
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+    }
     super.ngOnDestroy();
+  }
+
+  async copyText(text: string, key: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copiedKey = key;
+      if (this.copyTimer) {
+        clearTimeout(this.copyTimer);
+      }
+      this.copyTimer = setTimeout(() => {
+        this.copiedKey = null;
+      }, 2000);
+    } catch {
+      // Ignore clipboard failures
+    }
+  }
+
+  getFormattedLogs(): string {
+    return this.logs
+      .map((entry) => `[+${entry.timestampMs}ms] ${entry.message}`)
+      .join('\n');
   }
 
   private clearTimers(): void {
@@ -356,7 +413,9 @@ export class ColdStartAvailabilityPage
       );
     }
 
-    this.logEvent(`Started ${waveName} (${this.apis.length} availability probes).`);
+    this.logEvent(
+      `Started ${waveName} (${this.apis.length} availability probes).`
+    );
     this.updateAllStatuses();
   }
 
