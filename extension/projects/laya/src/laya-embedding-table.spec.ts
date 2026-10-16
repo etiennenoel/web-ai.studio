@@ -42,4 +42,11 @@ describe('LayaEmbeddingTable', () => {
       40, 41, 42,
     ]);
   });
+
+  it('throws RangeError for out-of-range token IDs', () => {
+    const raw = new Uint16Array(4 * 2);
+    const table = new LayaEmbeddingTable(raw.buffer, 4, 2);
+    expect(() => table.gather([-1], 1, 0)).toThrow(RangeError);
+    expect(() => table.gather([4], 1, 0)).toThrow(RangeError);
+  });
 });

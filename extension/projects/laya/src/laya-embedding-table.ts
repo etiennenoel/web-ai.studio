@@ -52,7 +52,14 @@ export class LayaEmbeddingTable {
 
   private getRow(id: number): Float32Array {
     let row = this.rowCache.get(id);
-    if (row) return row;
+    if (row) {
+      this.rowCache.delete(id);
+      this.rowCache.set(id, row);
+      return row;
+    }
+    if (id < 0 || id >= this.rows) {
+      throw new RangeError(`LayaEmbeddingTable: token id ${id} out of range [0, ${this.rows})`);
+    }
 
     const dim = this.dim;
     row = new Float32Array(dim);
