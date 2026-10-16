@@ -77,4 +77,12 @@ describe('LayaDecoder', () => {
     expect(noul.probabilities[1]).toBeCloseTo(0.75, 6);
     expect(noul.confidence).toBeCloseTo(0.75, 6);
   });
+
+  it('defaults actProbability to 0 when actLogits is omitted', () => {
+    const raw = [1.0703915357589722, -1.8068784475326538, -2.2441372871398926, -2.46530818939209];
+    const answer = LayaDecoder.decode(raw, undefined, LayaQuestionType.CHOICE, EN_CALIBRATION, 73);
+    expect(answer.actProbability).toBe(0);
+    expect(answer.argmaxIndex).toBe(0);
+    expect(answer.confidence).toBeCloseTo(0.2906, 4);
+  });
 });

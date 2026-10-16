@@ -1,5 +1,6 @@
 import { LayaTokenizer } from './laya-tokenizer';
 import { LayaSequenceBuilder } from './laya-sequence.builder';
+import { LayaSequence } from './laya-sequence.interface';
 import { LayaModelRunner } from './laya-model-runner';
 import { LayaCalibration } from './laya-calibration.interface';
 import { LayaQuestion } from './laya-question.interface';
@@ -34,6 +35,11 @@ export class LayaHost {
     return this.builder.encodeState(state).length;
   }
 
+  /** Encodes a serialized state into token IDs once for reuse across a multi-question batch. */
+  encodeState(state: string): number[] {
+    return this.builder.encodeState(state);
+  }
+
   /** Number of state tokens that fit for the question without truncation. */
   stateRoom(question: LayaQuestion): number {
     return this.builder.roomFor(this.builder.buildHead(question));
@@ -41,15 +47,49 @@ export class LayaHost {
 
   /** Throws when the options do not all fit in the head budget (upstream `Agent.system_one` rule). */
   assertOptionsFit(question: LayaQuestion): void {
+    this.compileHead(question);
+  }
+
+  /** Builds and validates the static question head once at session creation time. */
+  compileHead(question: LayaQuestion): LayaSequence {
     const head = this.builder.buildHead(question);
     const expected = LayaOptionRenderer.render(question).length;
     if (head.markers.length !== expected) {
       throw new Error(`question options exceed head_max_len`);
     }
+    return head;
+  }
+
+  /**
+   * Computes optimal slot lengths for a session's questions and pre-warms the
+   * corresponding compiled model bucket so the first `classify()` call is warm.
+   */
+  async prepareSession(headLengths: readonly number[]): Promise<number[]> {
+    const run = this.queue.then(async () => {
+      const slots = this.runner.computeOptimalSlots(headLengths);
+      await this.runner.prepareSlots(slots);
+      return slots;
+    });
+    this.queue = run.catch(() => undefined);
+    return run;
   }
 
   async predict(state: string, question: LayaQuestion): Promise<LayaAnswer> {
     const run = this.queue.then(() => this.predictUnlocked(state, question));
+    this.queue = run.catch(() => undefined);
+    return run;
+  }
+
+  /**
+   * Evaluates one or more pre-compiled questions for the same encoded state in a
+   * single packed forward pass when possible.
+   */
+  async predictBatch(
+    stateIds: number[],
+    items: ReadonlyArray<{ question: LayaQuestion; head: LayaSequence }>,
+    preferredSlots?: readonly number[],
+  ): Promise<LayaAnswer[]> {
+    const run = this.queue.then(() => this.predictBatchUnlocked(stateIds, items, preferredSlots));
     this.queue = run.catch(() => undefined);
     return run;
   }
@@ -65,6 +105,24 @@ export class LayaHost {
     const raw = LayaDecoder.gatherMarkers(main.tokenLogits, markers);
     const actLogits = await this.runner.runAct(main.pooledCls, LayaDecoder.actFeatures(raw));
     return LayaDecoder.decode(raw, actLogits, question.type, this.calibration, ids.length);
+  }
+
+  private async predictBatchUnlocked(
+    stateIds: number[],
+    items: ReadonlyArray<{ question: LayaQuestion; head: LayaSequence }>,
+    preferredSlots?: readonly number[],
+  ): Promise<LayaAnswer[]> {
+    if (items.length === 0) return [];
+    const sequences = items.map((item) => this.builder.buildFromHead(item.head, stateIds));
+    const batchInputs = items.map((item, i) => ({
+      ids: sequences[i].ids,
+      qtypeIndex: LAYA_QUESTION_TYPE_INDEX[item.question.type],
+    }));
+    const tokenLogitsPerQ = await this.runner.runTokensBatch(batchInputs, preferredSlots);
+    return items.map((item, i) => {
+      const raw = LayaDecoder.gatherMarkers(tokenLogitsPerQ[i], sequences[i].markers);
+      return LayaDecoder.decode(raw, undefined, item.question.type, this.calibration, sequences[i].ids.length);
+    });
   }
 
   delete(): void {

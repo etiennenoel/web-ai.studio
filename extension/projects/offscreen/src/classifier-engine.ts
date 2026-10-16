@@ -6,6 +6,8 @@ import { ClassifierLoadedModel } from './classifier-loaded-model.interface';
 import { ClassifierSession } from './classifier-session.interface';
 import { ClassifierCompiledQuestion } from './classifier-compiled-question.interface';
 import { ClassifierNormalizedSchema } from './classifier-normalized-schema.interface';
+import { LayaQuestion } from '../../laya/src/laya-question.interface';
+import { LayaSequence } from '../../laya/src/laya-sequence.interface';
 import { ClassifierAvailability } from '../../base/src/lib/classifier/types/classifier-availability.type';
 import { ClassifierSessionInfo } from '../../base/src/lib/classifier/interfaces/classifier-session-info.interface';
 import { ClassifierResult } from '../../base/src/lib/classifier/types/classifier-result.type';
@@ -64,17 +66,25 @@ export class ClassifierEngine {
       throw new DOMException('The requested expectedInputs are not supported by the active classifier model.', 'NotSupportedError');
     }
 
+    const layaQuestions = normalized.questions.map((q) =>
+      ClassifierSchemaMapper.toLayaQuestion(q, normalized.context),
+    );
+
     await this.ensureDownloaded(variant, onProgress, signal);
     signal?.throwIfAborted();
-    const model = await this.ensureLoaded(variant);
+    const model = await this.ensureLoaded(variant, layaQuestions);
+    signal?.throwIfAborted();
+
+    const questions = normalized.questions.map((q, i) => this.compile(q, layaQuestions[i], model));
+    const slotSizes = await model.host.prepareSession(questions.map((q) => q.headTokens));
     signal?.throwIfAborted();
     onProgress(1);
 
-    const questions = normalized.questions.map((q) => this.compile(q, normalized.context, model));
     const session: ClassifierSession = {
       id: crypto.randomUUID(),
       variantId: variant.id,
       questions,
+      slotSizes,
       contextWindow: model.host.window,
       contextUsage: Math.max(0, ...questions.map((q) => q.headTokens)),
     };
@@ -90,8 +100,12 @@ export class ClassifierEngine {
   ): Promise<ClassifierResult> {
     const session = this.session(sessionId);
     const state = this.state(input, options);
-    const model = await this.ensureLoaded(this.variantOf(session));
-    const stateTokens = model.host.measureState(state);
+    const model = await this.ensureLoaded(
+      this.variantOf(session),
+      session.questions.map((q) => q.laya),
+    );
+    const stateIds = model.host.encodeState(state);
+    const stateTokens = stateIds.length;
 
     for (const q of session.questions) {
       if (stateTokens > q.stateRoom) {
@@ -102,11 +116,18 @@ export class ClassifierEngine {
       }
     }
 
+    signal?.throwIfAborted();
+    const answers = await model.host.predictBatch(
+      stateIds,
+      session.questions.map((q) => ({ question: q.laya, head: q.head })),
+      session.slotSizes,
+    );
+    signal?.throwIfAborted();
+
     const result: ClassifierResult = {};
-    for (const q of session.questions) {
-      signal?.throwIfAborted();
-      const answer = await model.host.predict(state, q.laya);
-      result[q.id] = ClassifierSchemaMapper.toDecision(q.id, q.type, q.labels, q.levels, answer);
+    for (let i = 0; i < session.questions.length; i++) {
+      const q = session.questions[i];
+      result[q.id] = ClassifierSchemaMapper.toDecision(q.id, q.type, q.labels, q.levels, answers[i]);
     }
     return result;
   }
@@ -169,12 +190,12 @@ export class ClassifierEngine {
 
   private compile(
     question: ClassifierNormalizedSchema['questions'][number],
-    context: string,
+    laya: LayaQuestion,
     model: ClassifierLoadedModel,
   ): ClassifierCompiledQuestion {
-    const laya = ClassifierSchemaMapper.toLayaQuestion(question, context);
+    let head: LayaSequence;
     try {
-      model.host.assertOptionsFit(laya);
+      head = model.host.compileHead(laya);
     } catch {
       throw new DOMException(
         `Question "${question.id}" has more options than fit in the model's head budget (${model.variant.headMaxLen} tokens).`,
@@ -187,8 +208,9 @@ export class ClassifierEngine {
       labels: ClassifierSchemaMapper.labels(question),
       levels: ClassifierSchemaMapper.levels(question),
       laya,
-      headTokens: model.host.measureHead(laya),
-      stateRoom: model.host.stateRoom(laya),
+      head,
+      headTokens: head.ids.length,
+      stateRoom: model.host.builder.roomFor(head),
     };
   }
 
@@ -262,12 +284,15 @@ export class ClassifierEngine {
     await download;
   }
 
-  private ensureLoaded(variant: ClassifierModelVariant): Promise<ClassifierLoadedModel> {
+  private ensureLoaded(
+    variant: ClassifierModelVariant,
+    initialQuestions?: readonly LayaQuestion[],
+  ): Promise<ClassifierLoadedModel> {
     if (this.loaded?.variant.id === variant.id) return Promise.resolve(this.loaded);
     if (this.loading && this.loaded === null) return this.loading;
 
     this.unloadModel();
-    this.loading = ClassifierModelLoader.load(variant, this.store)
+    this.loading = ClassifierModelLoader.load(variant, this.store, initialQuestions)
       .then((model) => {
         this.loaded = model;
         return model;

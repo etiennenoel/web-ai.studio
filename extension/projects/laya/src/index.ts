@@ -14,5 +14,6 @@ export * from './laya-embedding-table';
 export * from './laya-graph-input-mode.enum';
 export * from './laya-model-runner-options.interface';
 export * from './laya-main-output.interface';
+export * from './laya-tflite-patcher';
 export * from './laya-model-runner';
 export * from './laya-host';

@@ -79,13 +79,13 @@ export class LayaDecoder {
 
   static decode(
     rawLogits: number[],
-    actLogits: ArrayLike<number>,
+    actLogits: ArrayLike<number> | undefined,
     type: LayaQuestionType,
     calibration: LayaCalibration,
     inputTokens: number,
   ): LayaAnswer {
     const p = LayaDecoder.calibratedProbabilities(rawLogits, type, calibration);
-    const actProbability = LayaDecoder.softmax(actLogits)[0];
+    const actProbability = actLogits && actLogits.length >= 2 ? LayaDecoder.softmax(actLogits)[0] : 0;
     const argmaxIndex = LayaDecoder.argmax(p);
 
     if (type === LayaQuestionType.NOUL) {

@@ -4,6 +4,7 @@ export interface ClassifierSession {
   id: string;
   variantId: string;
   questions: ClassifierCompiledQuestion[];
+  slotSizes: readonly number[];
   contextWindow: number;
   contextUsage: number;
 }
