@@ -25,10 +25,13 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   @Input() height: string = '400px';
   @Input() language: string = 'typescript';
   @Input() readOnly: boolean = true;
+  @Input() darkTheme: boolean = false;
+  @Input() wrap: boolean = false;
   @Output() codeChange = new EventEmitter<string>();
 
   private editor: any;
   private themeObserver?: MutationObserver;
+  private resizeObserver?: ResizeObserver;
   private isInternalChange = false;
   copyText = 'Copy';
 
@@ -52,6 +55,7 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
       await import('ace-builds/src-noconflict/mode-javascript');
       await import('ace-builds/src-noconflict/mode-typescript');
       await import('ace-builds/src-noconflict/mode-json');
+      await import('ace-builds/src-noconflict/mode-markdown');
       await import('ace-builds/src-noconflict/theme-chrome');
       await import('ace-builds/src-noconflict/theme-one_dark');
 
@@ -59,6 +63,7 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
       
       this.updateTheme();
       this.editor.session.setMode(`ace/mode/${this.language}`);
+      this.editor.session.setUseWrapMode(this.wrap);
       this.editor.setValue(this.code, -1);
       this.editor.setReadOnly(this.readOnly);
       
@@ -86,12 +91,21 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
         attributes: true,
         attributeFilter: ['data-bs-theme']
       });
+
+      if (typeof ResizeObserver !== 'undefined') {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (this.editor) {
+            this.editor.resize();
+          }
+        });
+        this.resizeObserver.observe(this.editorRef.nativeElement);
+      }
     }
   }
 
   private updateTheme() {
     if (!this.editor) return;
-    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const isDark = this.darkTheme || document.documentElement.getAttribute('data-bs-theme') === 'dark';
     // 'one_dark' or 'twilight' or 'tomorrow_night' are good for dark mode. 'github' or 'chrome' for light mode.
     this.editor.setTheme(isDark ? 'ace/theme/one_dark' : 'ace/theme/chrome');
   }
@@ -110,6 +124,12 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
     if(this.editor && changes['readOnly']) {
       this.editor.setReadOnly(this.readOnly);
     }
+    if (this.editor && changes['darkTheme']) {
+      this.updateTheme();
+    }
+    if (this.editor && changes['wrap']) {
+      this.editor.session.setUseWrapMode(this.wrap);
+    }
     if (this.editor && changes['height']) {
       this.editorRef.nativeElement.style.height = this.height;
       this.editor.resize();
@@ -119,6 +139,9 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   ngOnDestroy(): void {
     if (this.themeObserver) {
       this.themeObserver.disconnect();
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
     }
     if (this.editor) {
       this.editor.destroy();

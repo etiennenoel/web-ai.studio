@@ -1,53 +1,32 @@
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
   <div class="mb-6 flex items-center justify-between">
     <a routerLink="/bugs" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
       <i class="bi bi-arrow-left mr-1"></i> Return to Bugs
     </a>
-    <a routerLink="/cortex" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+    <a routerLink="/cortex" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
       <i class="bi bi-speedometer2 mr-1.5"></i> Open Cortex Benchmark Suite
     </a>
   </div>
 
+  <!-- Minimal Header with Code Pills -->
   <div class="mb-8">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 mb-3">
-      <i class="bi bi-hourglass-split"></i> Performance &amp; Context Window Prefill Analysis
-    </div>
-    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-4">
-      Large-Context Summarization Latency (<code class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-2xl">create_ms</code> &amp; <code class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-2xl">first_chunk_ms</code>)
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
+      Large-Context Summarization Latency
     </h1>
-    <p class="text-lg text-gray-600 mb-4">
-      When summarizing a large plain-English document (~10,000+ characters or filling the context window) using either
-      <code>LanguageModel.promptStreaming()</code> with a multi-thousand-character <code>initialPrompts</code> system rubric
-      or <code>Summarizer.summarizeStreaming()</code>, end-to-end latency is heavily dominated by two pre-generation phases:
+    <p class="text-base text-gray-600 leading-relaxed">
+      Measures <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">create_ms</code>,
+      <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">first_chunk_ms</code> (TTFT / prefill),
+      <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">max_gap_ms</code>, and
+      <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">streaming_ms</code> when summarizing a long document with
+      <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">LanguageModel.promptStreaming()</code>
+      (with <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">initialPrompts</code>) vs.
+      <code class="px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 border border-gray-200 font-mono text-sm">Summarizer.summarizeStreaming()</code>.
     </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Phase 1 · Session Init</div>
-        <div class="text-base font-bold text-gray-900 mb-1"><code>create_ms</code> (Cold vs Warm)</div>
-        <p class="text-xs text-gray-600 leading-relaxed">
-          Loading model weights into memory after idle eviction plus evaluating <code>initialPrompts</code> can take <strong>10–13s cold</strong>, dropping to tens of milliseconds once warm or cloned.
-        </p>
-      </div>
-      <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
-        <div class="text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">Phase 2 · Input Prefill (TTFT)</div>
-        <div class="text-base font-bold text-gray-900 mb-1"><code>first_chunk_ms</code> (O(N) Prefill)</div>
-        <p class="text-xs text-gray-600 leading-relaxed">
-          Before emitting chunk #1, the runtime must prefill the entire 3,000–6,000+ token input into the KV cache. This scales linearly with input length (<strong>25–40s</strong> on constrained/CPU-fallback systems).
-        </p>
-      </div>
-      <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
-        <div class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Phase 3 · Token Decode</div>
-        <div class="text-base font-bold text-gray-900 mb-1"><code>max_gap_ms</code> &amp; Streaming</div>
-        <p class="text-xs text-gray-600 leading-relaxed">
-          Once the KV cache is populated, output tokens stream steadily with inter-chunk gaps typically <strong>under 500 ms</strong> (~100 chunks over 4–10s).
-        </p>
-      </div>
-    </div>
   </div>
 
-  <!-- Interactive Controls -->
+  <!-- Controls Bar + Show Repro Code Toggle + Run Button -->
   <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
         <div>
           <label for="docPresetSelect" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
@@ -58,277 +37,247 @@
             [(ngModel)]="documentPreset"
             (ngModelChange)="onPresetChange()"
             [disabled]="testRunning"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-900 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
-            <option value="2k">~2,100 chars (~500 tokens — Short Article)</option>
-            <option value="10k">~10,200 chars (~2,400 tokens — Reported 10k Pattern)</option>
+            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50">
+            <option value="2k">~2,100 chars (~500 tokens)</option>
+            <option value="10k">~10,200 chars (~2,400 tokens — Default)</option>
             <option value="max-quota">Fill Context Window (~85% of inputQuota)</option>
           </select>
         </div>
 
         <div>
           <label for="sysPresetSelect" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-            System Prompt Size (Prompt API)
+            System Prompt Size
           </label>
           <select
             id="sysPresetSelect"
             [(ngModel)]="systemPromptPreset"
             (ngModelChange)="onPresetChange()"
             [disabled]="testRunning"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-900 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
-            <option value="3.6k">~3,600 chars (~800 tokens — Detailed Rubric)</option>
-            <option value="minimal">~115 chars (~25 tokens — Minimal Instruction)</option>
+            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50">
+            <option value="3.6k">~3,600 chars (~800 tokens — Default)</option>
+            <option value="minimal">~115 chars (~25 tokens)</option>
           </select>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <button
+          type="button"
+          (click)="showReproCode = !showReproCode"
+          class="inline-flex items-center px-3.5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+          <i class="bi bi-code-slash mr-1.5"></i>
+          {{ showReproCode ? 'Hide Repro Code' : 'Show Repro Code' }}
+          <i class="bi ml-1.5 text-xs text-gray-400" [class.bi-chevron-up]="showReproCode" [class.bi-chevron-down]="!showReproCode"></i>
+        </button>
+
         @if (testRunning) {
           <button
             type="button"
             (click)="stopTest()"
-            class="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-red-50 hover:bg-red-100 transition-all">
-            <i class="bi bi-stop-fill mr-1.5 text-base"></i> Abort
+            class="inline-flex items-center px-3.5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="bi bi-stop-fill mr-1.5"></i> Abort
           </button>
         }
+
         <button
           type="button"
           (click)="runAllTests()"
           [disabled]="testRunning"
-          class="inline-flex items-center px-5 py-2 border border-transparent text-sm font-semibold rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          class="inline-flex items-center px-5 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
           @if (testRunning) {
             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Running Profiler...
+            Running...
           } @else {
-            <i class="bi bi-play-fill mr-1.5 text-lg"></i> Run All 3 Patterns
+            <i class="bi bi-play-fill mr-1.5 text-base"></i> Run Test
           }
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Compact Tabbed Repro Inspector (Code, Document Input, System Prompt, Options/Timings JSON) -->
-  <div class="bg-gray-900 rounded-xl overflow-hidden shadow-lg mb-8 border border-gray-800">
-    <!-- Top Bar: Inspector Tabs + Pattern Switcher + One-Click Copy Actions -->
-    <div class="px-4 py-2.5 bg-gray-800 border-b border-gray-700 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-1.5 flex-wrap">
-        <div class="flex space-x-1.5 mr-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+  <!-- Collapsible & Resizable Repro Code & Input Inspector -->
+  @if (showReproCode) {
+    <div class="bg-[#282c34] rounded-xl overflow-hidden shadow-md mb-6 border border-gray-800">
+      <div class="px-4 py-2.5 bg-gray-900 border-b border-gray-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1 flex-wrap">
+          <button
+            type="button"
+            (click)="activeInspectorTab = 'code'"
+            class="px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            [class.bg-gray-700]="activeInspectorTab === 'code'"
+            [class.text-white]="activeInspectorTab === 'code'"
+            [class.text-gray-400]="activeInspectorTab !== 'code'"
+            [class.hover:text-gray-200]="activeInspectorTab !== 'code'">
+            <i class="bi bi-code-slash"></i> Repro Code
+          </button>
+
+          <button
+            type="button"
+            (click)="activeInspectorTab = 'document'"
+            class="px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            [class.bg-gray-700]="activeInspectorTab === 'document'"
+            [class.text-white]="activeInspectorTab === 'document'"
+            [class.text-gray-400]="activeInspectorTab !== 'document'"
+            [class.hover:text-gray-200]="activeInspectorTab !== 'document'">
+            <i class="bi bi-file-earmark-text"></i>
+            Document ({{ documentText.length | number }} chars)
+          </button>
+
+          <button
+            type="button"
+            (click)="activeInspectorTab = 'system-prompt'"
+            class="px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            [class.bg-gray-700]="activeInspectorTab === 'system-prompt'"
+            [class.text-white]="activeInspectorTab === 'system-prompt'"
+            [class.text-gray-400]="activeInspectorTab !== 'system-prompt'"
+            [class.hover:text-gray-200]="activeInspectorTab !== 'system-prompt'">
+            <i class="bi bi-sliders"></i>
+            System Prompt ({{ systemPromptText.length | number }} chars)
+          </button>
+
+          <button
+            type="button"
+            (click)="activeInspectorTab = 'config'"
+            class="px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            [class.bg-gray-700]="activeInspectorTab === 'config'"
+            [class.text-white]="activeInspectorTab === 'config'"
+            [class.text-gray-400]="activeInspectorTab !== 'config'"
+            [class.hover:text-gray-200]="activeInspectorTab !== 'config'">
+            <i class="bi bi-braces"></i> Timings JSON
+          </button>
         </div>
 
-        <button
-          type="button"
-          (click)="activeInspectorTab = 'code'"
-          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
-          [class.bg-blue-600]="activeInspectorTab === 'code'"
-          [class.text-white]="activeInspectorTab === 'code'"
-          [class.text-gray-300]="activeInspectorTab !== 'code'"
-          [class.hover:bg-gray-700]="activeInspectorTab !== 'code'">
-          <i class="bi bi-code-slash"></i> Repro Code
-        </button>
+        <div class="flex items-center gap-2 flex-wrap">
+          @if (activeInspectorTab === 'code' || activeInspectorTab === 'config') {
+            <select
+              aria-label="Select Pattern"
+              [(ngModel)]="selectedRunId"
+              class="rounded-md bg-gray-800 border border-gray-700 text-gray-200 text-xs px-2.5 py-1 font-medium focus:outline-none">
+              @for (run of runs; track run.id) {
+                <option [value]="run.id">{{ run.shortLabel }}</option>
+              }
+            </select>
+          }
 
-        <button
-          type="button"
-          (click)="activeInspectorTab = 'document'"
-          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
-          [class.bg-blue-600]="activeInspectorTab === 'document'"
-          [class.text-white]="activeInspectorTab === 'document'"
-          [class.text-gray-300]="activeInspectorTab !== 'document'"
-          [class.hover:bg-gray-700]="activeInspectorTab !== 'document'">
-          <i class="bi bi-file-earmark-text"></i>
-          Document Input
-          <span class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-black/30 text-gray-200">
-            {{ documentText.length | number }} chars
-          </span>
-        </button>
-
-        <button
-          type="button"
-          (click)="activeInspectorTab = 'system-prompt'"
-          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
-          [class.bg-blue-600]="activeInspectorTab === 'system-prompt'"
-          [class.text-white]="activeInspectorTab === 'system-prompt'"
-          [class.text-gray-300]="activeInspectorTab !== 'system-prompt'"
-          [class.hover:bg-gray-700]="activeInspectorTab !== 'system-prompt'">
-          <i class="bi bi-sliders"></i>
-          System Prompt
-          <span class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-black/30 text-gray-200">
-            {{ systemPromptText.length | number }} chars
-          </span>
-        </button>
-
-        <button
-          type="button"
-          (click)="activeInspectorTab = 'config'"
-          class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
-          [class.bg-blue-600]="activeInspectorTab === 'config'"
-          [class.text-white]="activeInspectorTab === 'config'"
-          [class.text-gray-300]="activeInspectorTab !== 'config'"
-          [class.hover:bg-gray-700]="activeInspectorTab !== 'config'">
-          <i class="bi bi-braces"></i> Options &amp; Timings JSON
-        </button>
+          @if (activeInspectorTab === 'code') {
+            <button
+              type="button"
+              (click)="copyText(getCodeSnippet(selectedRunId, true), 'full-script')"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700 transition-colors"
+              title="Copies a standalone script with the full SYSTEM_PROMPT and DOCUMENT_TEXT embedded for Chrome DevTools Console">
+              <i class="bi" [class.bi-check2]="copiedKey === 'full-script'" [class.bi-terminal]="copiedKey !== 'full-script'"></i>
+              {{ copiedKey === 'full-script' ? 'Copied!' : 'Copy Full DevTools Script' }}
+            </button>
+          } @else if (activeInspectorTab === 'document' || activeInspectorTab === 'system-prompt') {
+            <button
+              type="button"
+              (click)="syncInputsFromPresets()"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 transition-colors">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+          }
+        </div>
       </div>
 
-      <!-- Pattern Selector & Copy Buttons -->
-      <div class="flex items-center gap-2 flex-wrap">
-        @if (activeInspectorTab === 'code' || activeInspectorTab === 'config') {
-          <select
-            aria-label="Select Pattern"
-            [(ngModel)]="selectedRunId"
-            class="rounded-md bg-gray-900 border border-gray-600 text-gray-200 text-xs px-2.5 py-1 font-medium focus:outline-none focus:border-blue-400">
-            @for (run of runs; track run.id) {
-              <option [value]="run.id">{{ run.shortLabel }}</option>
-            }
-          </select>
-        }
-
+      <!-- Syntax-Colored & Vertically Resizable Inspector Body -->
+      <div [style.height.px]="inspectorHeight" class="w-full relative overflow-hidden">
         @if (activeInspectorTab === 'code') {
-          <button
-            type="button"
-            (click)="copyText(getCodeSnippet(selectedRunId, false), 'snippet')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors">
-            <i class="bi" [class.bi-check2]="copiedKey === 'snippet'" [class.bi-clipboard]="copiedKey !== 'snippet'"></i>
-            {{ copiedKey === 'snippet' ? 'Copied!' : 'Copy Snippet' }}
-          </button>
-          <button
-            type="button"
-            (click)="copyText(getCodeSnippet(selectedRunId, true), 'full-script')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
-            title="Copies a 100% standalone script with the full SYSTEM_PROMPT and DOCUMENT_TEXT embedded for Chrome DevTools Console">
-            <i class="bi" [class.bi-check2]="copiedKey === 'full-script'" [class.bi-terminal]="copiedKey !== 'full-script'"></i>
-            {{ copiedKey === 'full-script' ? 'Copied Full Script!' : 'Copy DevTools Console Script' }}
-          </button>
+          <app-code-editor
+            [code]="getCodeSnippet(selectedRunId, false)"
+            language="javascript"
+            [readOnly]="true"
+            [darkTheme]="true"
+            [height]="inspectorHeight + 'px'">
+          </app-code-editor>
         } @else if (activeInspectorTab === 'document') {
-          <button
-            type="button"
-            (click)="syncInputsFromPresets()"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors">
-            <i class="bi bi-arrow-counterclockwise"></i> Reset
-          </button>
-          <button
-            type="button"
-            (click)="copyText(documentText, 'doc')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-600 text-white hover:bg-blue-500 transition-colors">
-            <i class="bi" [class.bi-check2]="copiedKey === 'doc'" [class.bi-clipboard]="copiedKey !== 'doc'"></i>
-            {{ copiedKey === 'doc' ? 'Copied Document!' : 'Copy Document' }}
-          </button>
+          <app-code-editor
+            [code]="documentText"
+            (codeChange)="documentText = $event; onCustomInputEdited()"
+            language="markdown"
+            [wrap]="true"
+            [readOnly]="testRunning"
+            [darkTheme]="true"
+            [height]="inspectorHeight + 'px'">
+          </app-code-editor>
         } @else if (activeInspectorTab === 'system-prompt') {
-          <button
-            type="button"
-            (click)="syncInputsFromPresets()"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors">
-            <i class="bi bi-arrow-counterclockwise"></i> Reset
-          </button>
-          <button
-            type="button"
-            (click)="copyText(systemPromptText, 'sys')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-600 text-white hover:bg-blue-500 transition-colors">
-            <i class="bi" [class.bi-check2]="copiedKey === 'sys'" [class.bi-clipboard]="copiedKey !== 'sys'"></i>
-            {{ copiedKey === 'sys' ? 'Copied System Prompt!' : 'Copy System Prompt' }}
-          </button>
+          <app-code-editor
+            [code]="systemPromptText"
+            (codeChange)="systemPromptText = $event; onCustomInputEdited()"
+            language="markdown"
+            [wrap]="true"
+            [readOnly]="testRunning"
+            [darkTheme]="true"
+            [height]="inspectorHeight + 'px'">
+          </app-code-editor>
         } @else if (activeInspectorTab === 'config') {
-          <button
-            type="button"
-            (click)="copyText(getInspectorConfigJson(), 'json')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-600 text-white hover:bg-blue-500 transition-colors">
-            <i class="bi" [class.bi-check2]="copiedKey === 'json'" [class.bi-clipboard]="copiedKey !== 'json'"></i>
-            {{ copiedKey === 'json' ? 'Copied JSON!' : 'Copy JSON' }}
-          </button>
+          <app-code-editor
+            [code]="getInspectorConfigJson()"
+            language="json"
+            [readOnly]="true"
+            [darkTheme]="true"
+            [height]="inspectorHeight + 'px'">
+          </app-code-editor>
         }
+      </div>
+
+      <!-- Drag-to-Resize Handle Bar -->
+      <div
+        (mousedown)="startInspectorResize($event)"
+        class="h-3 bg-gray-900 border-t border-gray-800 cursor-ns-resize flex items-center justify-center hover:bg-gray-800 transition-colors"
+        title="Drag to resize editor height">
+        <div class="w-8 h-1 rounded-full bg-gray-600"></div>
       </div>
     </div>
+  }
 
-    <!-- Tab Body (Constrained Height so UI stays compact and clean) -->
-    @if (activeInspectorTab === 'code') {
-      <div class="p-4 max-h-72 overflow-y-auto">
-        <pre class="text-xs font-mono text-gray-200 leading-relaxed whitespace-pre">{{ getCodeSnippet(selectedRunId, false) }}</pre>
-      </div>
-    } @else if (activeInspectorTab === 'document') {
-      <div class="p-4">
-        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
-          <span>Exact document text passed to <code>promptStreaming()</code> / <code>summarizeStreaming()</code> (editable):</span>
-          <span class="font-mono">{{ documentText.length | number }} chars · ~{{ estimatedDocumentTokens | number }} est. tokens</span>
-        </div>
-        <textarea
-          aria-label="Document Input Text"
-          [(ngModel)]="documentText"
-          (ngModelChange)="onCustomInputEdited()"
-          [disabled]="testRunning"
-          rows="9"
-          class="w-full rounded-lg bg-gray-950 border border-gray-700 p-3 font-mono text-xs text-gray-200 leading-relaxed focus:outline-none focus:border-blue-500 resize-y"></textarea>
-      </div>
-    } @else if (activeInspectorTab === 'system-prompt') {
-      <div class="p-4">
-        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
-          <span>System rubric passed in <code>initialPrompts: [{{ '{' }} role: "system", content {{ '}' }}]</code> for Prompt API (editable):</span>
-          <span class="font-mono">{{ systemPromptText.length | number }} chars · ~{{ estimatedSystemTokens | number }} est. tokens</span>
-        </div>
-        <textarea
-          aria-label="System Prompt Text"
-          [(ngModel)]="systemPromptText"
-          (ngModelChange)="onCustomInputEdited()"
-          [disabled]="testRunning"
-          rows="9"
-          class="w-full rounded-lg bg-gray-950 border border-gray-700 p-3 font-mono text-xs text-gray-200 leading-relaxed focus:outline-none focus:border-blue-500 resize-y"></textarea>
-      </div>
-    } @else if (activeInspectorTab === 'config') {
-      <div class="p-4 max-h-72 overflow-y-auto">
-        <pre class="text-xs font-mono text-emerald-300 leading-relaxed whitespace-pre">{{ getInspectorConfigJson() }}</pre>
-      </div>
-    }
-  </div>
-
-  <!-- Execution Results Table -->
-  <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+  <!-- Clean, Neutral Execution Results Table -->
+  <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-bold text-gray-900">Phase-by-Phase Timing Breakdown</h2>
-        <p class="text-xs text-gray-500">Click any row to inspect its code pattern, live streaming output, and phase proportions.</p>
-      </div>
+      <h2 class="text-lg font-bold text-gray-900">Execution Results</h2>
+      <span class="text-xs text-gray-500">Click any row to view its output</span>
     </div>
 
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200 text-sm">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Execution Pattern</th>
-            <th scope="col" class="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Input Tokens</th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider"><code>create_ms</code></th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-amber-700 uppercase tracking-wider"><code>first_chunk_ms</code> (TTFT)</th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider"><code>max_gap_ms</code></th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider"><code>streaming_ms</code></th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Prefill / Decode</th>
-            <th scope="col" class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pattern</th>
+            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Input</th>
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <code class="px-1.5 py-0.5 rounded bg-gray-200/70 text-gray-700 font-mono text-[11px] lowercase">create_ms</code>
+            </th>
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <code class="px-1.5 py-0.5 rounded bg-gray-200/70 text-gray-700 font-mono text-[11px] lowercase">first_chunk_ms</code>
+            </th>
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <code class="px-1.5 py-0.5 rounded bg-gray-200/70 text-gray-700 font-mono text-[11px] lowercase">max_gap_ms</code>
+            </th>
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <code class="px-1.5 py-0.5 rounded bg-gray-200/70 text-gray-700 font-mono text-[11px] lowercase">streaming_ms</code>
+            </th>
+            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="bg-[#ffffff] divide-y divide-gray-200">
           @for (run of runs; track run.id) {
             <tr
               (click)="selectRun(run.id)"
-              class="transition-colors cursor-pointer hover:bg-blue-50/40"
-              [class.bg-blue-50/60]="selectedRunId === run.id">
+              class="transition-colors cursor-pointer hover:bg-gray-50"
+              [class.bg-gray-50]="selectedRunId === run.id">
               <td class="px-4 py-4">
-                <div class="font-semibold text-gray-900">{{ run.label }}</div>
+                <div class="font-medium text-gray-900">{{ run.label }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">{{ run.subtitle }}</div>
-                @if (run.status === 'done') {
-                  <div class="mt-2 w-full bg-gray-100 rounded-full h-2 overflow-hidden flex" title="Blue: create_ms | Amber: first_chunk_ms (Prefill) | Emerald: Decode">
-                    <div class="bg-blue-500 h-2" [style.width.%]="getPhasePercentage(run, 'create')"></div>
-                    <div class="bg-amber-500 h-2" [style.width.%]="getPhasePercentage(run, 'prefill')"></div>
-                    <div class="bg-emerald-500 h-2" [style.width.%]="getPhasePercentage(run, 'decode')"></div>
-                  </div>
-                }
               </td>
 
               <td class="px-3 py-4 whitespace-nowrap">
                 @if (run.status === 'pending') {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Pending</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Pending</span>
                 } @else if (run.status === 'running') {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     <svg class="animate-spin -ml-0.5 mr-1.5 h-3 w-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -336,69 +285,56 @@
                     {{ run.phase }}
                   </span>
                 } @else if (run.status === 'done') {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">Done</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">Done</span>
                 } @else if (run.status === 'error') {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Error</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Error</span>
                 }
               </td>
 
               <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-xs text-gray-700">
                 <div>{{ (run.inputChars + run.systemPromptChars) | number }} chars</div>
                 @if (run.inputTokens !== null) {
-                  <div class="text-gray-500">
-                    {{ run.inputTokens | number }}
-                    @if (run.inputQuota) {
-                      <span>/ {{ run.inputQuota | number }}</span>
-                    }
-                    tok
+                  <div class="text-gray-400">
+                    {{ run.inputTokens | number }}@if (run.inputQuota) {<span> / {{ run.inputQuota | number }}</span>} tok
                   </div>
                 }
               </td>
 
-              <td class="px-3 py-4 whitespace-nowrap text-right font-mono">
+              <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-gray-900">
                 @if (run.createMs !== null) {
-                  <span class="font-semibold text-blue-700">{{ run.createMs | number }} ms</span>
+                  <span class="font-semibold">{{ run.createMs | number }} ms</span>
                 } @else {
                   <span class="text-gray-400">---</span>
                 }
               </td>
 
-              <td class="px-3 py-4 whitespace-nowrap text-right font-mono">
+              <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-gray-900">
                 @if (run.firstChunkMs !== null) {
-                  <span class="font-bold text-amber-700">{{ run.firstChunkMs | number }} ms</span>
-                } @else {
-                  <span class="text-gray-400">---</span>
-                }
-              </td>
-
-              <td class="px-3 py-4 whitespace-nowrap text-right font-mono">
-                @if (run.maxGapMs !== null && run.chunks > 0) {
-                  <span class="text-gray-800">{{ run.maxGapMs | number }} ms</span>
-                  <div class="text-xs text-gray-400">{{ run.chunks }} chunks</div>
-                } @else {
-                  <span class="text-gray-400">---</span>
-                }
-              </td>
-
-              <td class="px-3 py-4 whitespace-nowrap text-right font-mono">
-                @if (run.streamingMs !== null) {
-                  <span class="font-semibold text-gray-900">{{ run.streamingMs | number }} ms</span>
-                  @if (run.decodeMs !== null) {
-                    <div class="text-xs text-emerald-700">decode: {{ run.decodeMs | number }} ms</div>
+                  <span class="font-semibold">{{ run.firstChunkMs | number }} ms</span>
+                  @if (run.prefillTokensPerSec !== null) {
+                    <div class="text-xs text-gray-400">{{ run.prefillTokensPerSec }} tok/s</div>
                   }
                 } @else {
                   <span class="text-gray-400">---</span>
                 }
               </td>
 
-              <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-xs">
-                @if (run.prefillTokensPerSec !== null) {
-                  <div class="text-amber-700 font-semibold">{{ run.prefillTokensPerSec }} tok/s prefill</div>
+              <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-gray-900">
+                @if (run.maxGapMs !== null && run.chunks > 0) {
+                  <span class="font-semibold">{{ run.maxGapMs | number }} ms</span>
+                  <div class="text-xs text-gray-400">{{ run.chunks }} chunks</div>
+                } @else {
+                  <span class="text-gray-400">---</span>
                 }
-                @if (run.decodeChunksPerSec !== null) {
-                  <div class="text-emerald-700 font-semibold">{{ run.decodeChunksPerSec }} ch/s decode</div>
-                }
-                @if (run.prefillTokensPerSec === null && run.decodeChunksPerSec === null) {
+              </td>
+
+              <td class="px-3 py-4 whitespace-nowrap text-right font-mono text-gray-900">
+                @if (run.streamingMs !== null) {
+                  <span class="font-semibold">{{ run.streamingMs | number }} ms</span>
+                  @if (run.decodeChunksPerSec !== null) {
+                    <div class="text-xs text-gray-400">{{ run.decodeChunksPerSec }} ch/s</div>
+                  }
+                } @else {
                   <span class="text-gray-400">---</span>
                 }
               </td>
@@ -408,14 +344,14 @@
                   type="button"
                   (click)="runSingle(run.id)"
                   [disabled]="testRunning"
-                  class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                   Run
                 </button>
               </td>
             </tr>
             @if (run.errorMessage) {
-              <tr class="bg-red-50/60">
-                <td colspan="9" class="px-6 py-3 text-xs text-red-700 border-l-4 border-red-500">
+              <tr class="bg-red-50/50">
+                <td colspan="8" class="px-6 py-3 text-xs text-red-700 border-l-4 border-red-500">
                   <i class="bi bi-exclamation-triangle-fill mr-1"></i> <strong>Error:</strong> {{ run.errorMessage }}
                 </td>
               </tr>
@@ -426,75 +362,37 @@
     </div>
   </div>
 
-  <!-- Live Streaming Output & Diagnostic Answers -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-      <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-        <div>
-          <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">
-            Progressive Streaming Output ({{ selectedRun?.shortLabel }})
-          </h3>
-          <p class="text-xs text-gray-500 mt-0.5">
-            Output characters: {{ selectedRun?.outputChars || 0 }} · Streamed chunks: {{ selectedRun?.chunks || 0 }}
-          </p>
-        </div>
-        @if (selectedRun?.outputPreview) {
-          <button
-            type="button"
-            (click)="copyText(selectedRun!.outputPreview, 'output')"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-            <i class="bi" [class.bi-check2]="copiedKey === 'output'" [class.bi-clipboard]="copiedKey !== 'output'"></i>
-            {{ copiedKey === 'output' ? 'Copied' : 'Copy Output' }}
-          </button>
-        }
+  <!-- Full-Width, Resizable Streaming Output Card -->
+  <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+      <div class="flex items-center gap-3">
+        <h3 class="text-sm font-bold text-gray-900">
+          Streaming Output ({{ selectedRun?.shortLabel }})
+        </h3>
+        <span class="text-xs text-gray-500 font-mono">
+          {{ selectedRun?.outputChars || 0 }} chars · {{ selectedRun?.chunks || 0 }} chunks
+        </span>
       </div>
-      <div class="p-5 flex-1 min-h-[260px] max-h-[380px] overflow-y-auto font-mono text-xs text-gray-800 whitespace-pre-wrap leading-relaxed bg-slate-50/50">
-        @if (selectedRun?.outputPreview) {
-          {{ selectedRun?.outputPreview }}
-        } @else if (selectedRun?.status === 'running') {
-          <div class="text-amber-700 font-sans text-sm flex items-center gap-2">
-            <i class="bi bi-cpu animate-pulse"></i>
-            Waiting for <code>first_chunk_ms</code> (prefilling {{ (selectedRun?.inputChars || 0) + (selectedRun?.systemPromptChars || 0) | number }} characters into KV cache)...
-          </div>
-        } @else {
-          <span class="text-gray-400">Run a test pattern above to watch progressive chunk streaming and inspect prefill vs. decode latency.</span>
-        }
-      </div>
+      @if (selectedRun?.outputPreview) {
+        <button
+          type="button"
+          (click)="copyText(selectedRun!.outputPreview, 'output')"
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+          <i class="bi" [class.bi-check2]="copiedKey === 'output'" [class.bi-clipboard]="copiedKey !== 'output'"></i>
+          {{ copiedKey === 'output' ? 'Copied' : 'Copy Output' }}
+        </button>
+      }
     </div>
-
-    <!-- Engineering Q&A / Root Cause Breakdown -->
-    <div class="bg-[#ffffff] rounded-xl shadow-sm border border-gray-200 p-6">
-      <h3 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <i class="bi bi-lightbulb text-amber-500"></i>
-        Why Large-Context Summarization Exhibits High TTFT
-      </h3>
-      <div class="space-y-4 text-xs text-gray-600 leading-relaxed">
-        <div>
-          <div class="font-bold text-gray-900 mb-0.5">1. Why does <code>first_chunk_ms</code> take 25–40s while subsequent chunks arrive in &lt; 500ms?</div>
-          <p>
-            Transformer inference has two distinct regimes: <strong>Prefill</strong> and <strong>Decode</strong>. During prefill, the model must compute attention across all input tokens (~800 system tokens + ~2,400 document tokens = ~3,200+ tokens) before emitting the first summary token. Once the Key-Value (KV) cache is populated, decoding each output token only attends to cached states and emits chunks every 30–200 ms.
-          </p>
-        </div>
-        <div>
-          <div class="font-bold text-gray-900 mb-0.5">2. Why does <code>create()</code> take 11–13s after idle periods?</div>
-          <p>
-            To conserve system RAM/VRAM across browser tabs, Chrome unloads the on-device model weights after a few minutes of inactivity. A cold <code>create()</code> must reload several gigabytes of weights from disk and initialize the execution backend.
-          </p>
-        </div>
-        <div>
-          <div class="font-bold text-gray-900 mb-0.5">3. Why can Windows be ~2.5× slower than macOS?</div>
-          <p>
-            Apple Silicon Macs use high-bandwidth unified memory shared directly between CPU/GPU/NPU. On Windows machines with integrated GPUs, driver blocklists, or limited dedicated VRAM, inference can experience slower DirectML/Vulkan prefill throughput or fall back to CPU execution.
-          </p>
-        </div>
-        <div>
-          <div class="font-bold text-gray-900 mb-0.5">4. Recommended Mitigations</div>
-          <ul class="list-disc pl-4 space-y-1 mt-1">
-            <li><strong>Cache the System Prompt via <code>session.clone()</code>:</strong> Pre-create a base session with your 3.6k-char <code>initialPrompts</code> rubric and clone it per document (Pattern 2 above) to avoid re-prefilling ~800 system tokens every run.</li>
-            <li><strong>Compact Input Text:</strong> Strip boilerplate, repeated headers, and low-signal sections before calling <code>promptStreaming()</code> since prefill latency grows linearly with input token count.</li>
-          </ul>
-        </div>
-      </div>
+    <div class="p-5 min-h-[180px] h-56 resize-y overflow-y-auto font-mono text-xs text-gray-800 whitespace-pre-wrap leading-relaxed">
+      @if (selectedRun?.outputPreview) {
+        {{ selectedRun?.outputPreview }}
+      } @else if (selectedRun?.status === 'running') {
+        <span class="text-gray-500 font-sans text-sm">
+          Waiting for <code class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-800 border border-gray-200 font-mono text-xs">first_chunk_ms</code> (prefilling {{ (selectedRun?.inputChars || 0) + (selectedRun?.systemPromptChars || 0) | number }} characters)...
+        </span>
+      } @else {
+        <span class="text-gray-400 font-sans text-sm">Run a test pattern above to watch progressive chunk streaming.</span>
+      }
     </div>
   </div>
 </div>

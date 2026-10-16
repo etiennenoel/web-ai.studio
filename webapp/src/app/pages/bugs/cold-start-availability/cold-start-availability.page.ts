@@ -61,6 +61,12 @@ export class ColdStartAvailabilityPage
   private nextLogId = 1;
 
   copiedKey: string | null = null;
+  showReproCode = false;
+  inspectorHeight = 280;
+  private resizeStartY = 0;
+  private resizeStartHeight = 280;
+  private boundOnResizeMove = (e: MouseEvent) => this.onInspectorResizeMove(e);
+  private boundOnResizeEnd = () => this.onInspectorResizeEnd();
 
   wave1Records: ProbeRecord[] = [];
   wave2Records: ProbeRecord[] = [];
@@ -203,10 +209,34 @@ setTimeout(() => runWave("Wave 2 (+4000ms)"), 4000);`;
 
   override ngOnDestroy(): void {
     this.clearTimers();
+    this.onInspectorResizeEnd();
     if (this.copyTimer) {
       clearTimeout(this.copyTimer);
     }
     super.ngOnDestroy();
+  }
+
+  startInspectorResize(event: MouseEvent): void {
+    if (typeof window === 'undefined') return;
+    event.preventDefault();
+    this.resizeStartY = event.clientY;
+    this.resizeStartHeight = this.inspectorHeight;
+    window.addEventListener('mousemove', this.boundOnResizeMove);
+    window.addEventListener('mouseup', this.boundOnResizeEnd);
+  }
+
+  private onInspectorResizeMove(event: MouseEvent): void {
+    const delta = event.clientY - this.resizeStartY;
+    this.inspectorHeight = Math.max(
+      180,
+      Math.min(800, this.resizeStartHeight + delta)
+    );
+  }
+
+  private onInspectorResizeEnd(): void {
+    if (typeof window === 'undefined') return;
+    window.removeEventListener('mousemove', this.boundOnResizeMove);
+    window.removeEventListener('mouseup', this.boundOnResizeEnd);
   }
 
   async copyText(text: string, key: string): Promise<void> {
