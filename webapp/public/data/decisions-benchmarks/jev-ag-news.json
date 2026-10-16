@@ -1,0 +1,1112 @@
+{
+  "id": "jev-ag-news",
+  "name": "JEV-Bench: AG News (Topic)",
+  "shortName": "AG News",
+  "category": "jev-bench",
+  "badge": "JEV-Bench",
+  "icon": "bi-newspaper",
+  "description": "4-way zero-shot news topic classification from AbdelStark/jev-benchmarks (fancyzhx/ag_news test split) evaluating discrimination and probability calibration.",
+  "sourceUrl": "https://github.com/AbdelStark/jev-benchmarks",
+  "datasetUrl": "https://huggingface.co/datasets/fancyzhx/ag_news",
+  "evaluationMode": "standard",
+  "sharedSchema": {
+    "context": "Classify news articles by primary topic.",
+    "expectedInputs": [
+      {
+        "type": "text",
+        "languages": [
+          "en"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "id": "topic",
+        "type": "choice",
+        "prompt": "What is the topic of `article`?",
+        "options": [
+          {
+            "label": "world",
+            "description": "world news and international politics"
+          },
+          {
+            "label": "sports",
+            "description": "sports"
+          },
+          {
+            "label": "business",
+            "description": "business and economy"
+          },
+          {
+            "label": "sci_tech",
+            "description": "science and technology"
+          }
+        ]
+      }
+    ]
+  },
+  "baselines": [
+    {
+      "id": "laya-td-published",
+      "name": "Laya Typed-Decisions (Reference)",
+      "provider": "Laya 421M",
+      "accuracy": 0.9525,
+      "macroF1": 0.9468,
+      "brierScore": 0.1137,
+      "nll": 0.2801,
+      "ece": 0.155,
+      "meanConfidence": 0.7975,
+      "latencyP50Ms": 103.6,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-en-published",
+      "name": "Laya English Base (Reference)",
+      "provider": "Laya 421M",
+      "accuracy": 0.95,
+      "macroF1": 0.9439,
+      "brierScore": 0.0808,
+      "nll": 0.1637,
+      "ece": 0.0316,
+      "meanConfidence": 0.922,
+      "latencyP50Ms": 64.8,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-ml-published",
+      "name": "Laya Multilingual Base (Reference)",
+      "provider": "Laya 322M",
+      "accuracy": 0.93,
+      "macroF1": 0.925,
+      "brierScore": 0.1092,
+      "nll": 0.2329,
+      "ece": 0.042,
+      "meanConfidence": 0.967,
+      "latencyP50Ms": 35.8,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "jev-0.1-published",
+      "name": "TypeSafe Jev v0.1.0 (Cloud API)",
+      "provider": "TypeSafe AI",
+      "accuracy": 0.91,
+      "coverageAt5PctRisk": 0.83,
+      "latencyP50Ms": 236.0,
+      "source": "AbdelStark/jev-benchmarks"
+    },
+    {
+      "id": "uniform-random",
+      "name": "Uniform Random Baseline",
+      "provider": "Baseline",
+      "accuracy": 0.25,
+      "macroF1": 0.25,
+      "brierScore": 0.75,
+      "nll": 1.3863,
+      "ece": 0.0,
+      "meanConfidence": 0.25,
+      "source": "Analytical (K=4)"
+    }
+  ],
+  "cases": [
+    {
+      "id": "ag_news_001",
+      "input": "{\"article\": \"Fears for T N pension after talks Unions representing workers at Turner   Newall say they are 'disappointed' after talks with stricken parent firm Federal Mogul.\"}",
+      "displayText": "Fears for T N pension after talks Unions representing workers at Turner   Newall say they are 'disappointed' after talks with stricken parent firm Federal Mogul.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_002",
+      "input": "{\"article\": \"The Race is On: Second Private Team Sets Launch Date for Human Spaceflight (SPACE.com) SPACE.com - TORONTO, Canada -- A second\\\\team of rocketeers competing for the  #36;10 million Ansari X Prize, a contest for\\\\privately funded suborbital space flight, has officially announced the first\\\\launch date for its manned rocket.\"}",
+      "displayText": "The Race is On: Second Private Team Sets Launch Date for Human Spaceflight (SPACE.com) SPACE.com - TORONTO, Canada -- A second\\team of rocketeers competing for the  #36;10 million Ansari X Prize, a contest for\\privately funded suborbital space flight, has officially announced the first\\launch date for its manned rocket.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_003",
+      "input": "{\"article\": \"Ky. Company Wins Grant to Study Peptides (AP) AP - A company founded by a chemistry researcher at the University of Louisville won a grant to develop a method of producing better peptides, which are short chains of amino acids, the building blocks of proteins.\"}",
+      "displayText": "Ky. Company Wins Grant to Study Peptides (AP) AP - A company founded by a chemistry researcher at the University of Louisville won a grant to develop a method of producing better peptides, which are short chains of amino acids, the building blocks of proteins.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_004",
+      "input": "{\"article\": \"Prediction Unit Helps Forecast Wildfires (AP) AP - It's barely dawn when Mike Fitzpatrick starts his shift with a blur of colorful maps, figures and endless charts, but already he knows what the day will bring. Lightning will strike in places he expects. Winds will pick up, moist places will dry and flames will roar.\"}",
+      "displayText": "Prediction Unit Helps Forecast Wildfires (AP) AP - It's barely dawn when Mike Fitzpatrick starts his shift with a blur of colorful maps, figures and endless charts, but already he knows what the day will bring. Lightning will strike in places he expects. Winds will pick up, moist places will dry and flames will roar.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_005",
+      "input": "{\"article\": \"Calif. Aims to Limit Farm-Related Smog (AP) AP - Southern California's smog-fighting agency went after emissions of the bovine variety Friday, adopting the nation's first rules to reduce air pollution from dairy cow manure.\"}",
+      "displayText": "Calif. Aims to Limit Farm-Related Smog (AP) AP - Southern California's smog-fighting agency went after emissions of the bovine variety Friday, adopting the nation's first rules to reduce air pollution from dairy cow manure.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_006",
+      "input": "{\"article\": \"Open Letter Against British Copyright Indoctrination in Schools The British Department for Education and Skills (DfES) recently launched a \\\"Music Manifesto\\\" campaign, with the ostensible intention of educating the next generation of British musicians. Unfortunately, they also teamed up with the music industry (EMI, and various artists) to make this popular. EMI has apparently negotiated their end well, so that children in our schools will now be indoctrinated about the illegality of downloading music.The ignorance and audacity of this got to me a little, so I wrote an open letter to the DfES about it. Unfortunately, it's pedantic, as I suppose you have to be when writing to goverment representatives. But I hope you find it useful, and perhaps feel inspired to do something similar, if or when the same thing has happened in your area.\"}",
+      "displayText": "Open Letter Against British Copyright Indoctrination in Schools The British Department for Education and Skills (DfES) recently launched a \"Music Manifesto\" campaign, with the ostensible intention of educating the next generation of British musicians. Unfortunately, they also teamed up with the music industry (EMI, and various artists) to make this popular. EMI has apparently negotiated their end well, so that children in our schools will now be indoctrinated about the illegality of downloading music.The ignorance and audacity of this got to me a little, so I wrote an open letter to the DfES about it. Unfortunately, it's pedantic, as I suppose you have to be when writing to goverment representatives. But I hope you find it useful, and perhaps feel inspired to do something similar, if or when the same thing has happened in your area.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_007",
+      "input": "{\"article\": \"Loosing the War on Terrorism \\\\\\\\\\\"Sven Jaschan, self-confessed author of the Netsky and Sasser viruses, is\\\\responsible for 70 percent of virus infections in 2004, according to a six-month\\\\virus roundup published Wednesday by antivirus company Sophos.\\\"\\\\\\\\\\\"The 18-year-old Jaschan was taken into custody in Germany in May by police who\\\\said he had admitted programming both the Netsky and Sasser worms, something\\\\experts at Microsoft confirmed. (A Microsoft antivirus reward program led to the\\\\teenager's arrest.) During the five months preceding Jaschan's capture, there\\\\were at least 25 variants of Netsky and one of the port-scanning network worm\\\\Sasser.\\\"\\\\\\\\\\\"Graham Cluley, senior technology consultant at Sophos, said it was staggeri ...\\\\\\\\\"}",
+      "displayText": "Loosing the War on Terrorism \\\\\"Sven Jaschan, self-confessed author of the Netsky and Sasser viruses, is\\responsible for 70 percent of virus infections in 2004, according to a six-month\\virus roundup published Wednesday by antivirus company Sophos.\"\\\\\"The 18-year-old Jaschan was taken into custody in Germany in May by police who\\said he had admitted programming both the Netsky and Sasser worms, something\\experts at Microsoft confirmed. (A Microsoft antivirus reward program led to the\\teenager's arrest.) During the five months preceding Jaschan's capture, there\\were at least 25 variants of Netsky and one of the port-scanning network worm\\Sasser.\"\\\\\"Graham Cluley, senior technology consultant at Sophos, said it was staggeri ...\\\\",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_008",
+      "input": "{\"article\": \"FOAFKey: FOAF, PGP, Key Distribution, and Bloom Filters \\\\\\\\FOAF/LOAF  and bloom filters have a lot of interesting properties for social\\\\network and whitelist distribution.\\\\\\\\I think we can go one level higher though and include GPG/OpenPGP key\\\\fingerpring distribution in the FOAF file for simple web-of-trust based key\\\\distribution.\\\\\\\\What if we used FOAF and included the PGP key fingerprint(s) for identities?\\\\This could mean a lot.  You include the PGP key fingerprints within the FOAF\\\\file of your direct friends and then include a bloom filter of the PGP key\\\\fingerprints of your entire whitelist (the source FOAF file would of course need\\\\to be encrypted ).\\\\\\\\Your whitelist would be populated from the social network as your client\\\\discovered new identit ...\\\\\\\\\"}",
+      "displayText": "FOAFKey: FOAF, PGP, Key Distribution, and Bloom Filters \\\\FOAF/LOAF  and bloom filters have a lot of interesting properties for social\\network and whitelist distribution.\\\\I think we can go one level higher though and include GPG/OpenPGP key\\fingerpring distribution in the FOAF file for simple web-of-trust based key\\distribution.\\\\What if we used FOAF and included the PGP key fingerprint(s) for identities?\\This could mean a lot.  You include the PGP key fingerprints within the FOAF\\file of your direct friends and then include a bloom filter of the PGP key\\fingerprints of your entire whitelist (the source FOAF file would of course need\\to be encrypted ).\\\\Your whitelist would be populated from the social network as your client\\discovered new identit ...\\\\",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_009",
+      "input": "{\"article\": \"E-mail scam targets police chief Wiltshire Police warns about \\\"phishing\\\" after its fraud squad chief was targeted.\"}",
+      "displayText": "E-mail scam targets police chief Wiltshire Police warns about \"phishing\" after its fraud squad chief was targeted.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_010",
+      "input": "{\"article\": \"Card fraud unit nets 36,000 cards In its first two years, the UK's dedicated card fraud unit, has recovered 36,000 stolen cards and 171 arrests - and estimates it saved 65m.\"}",
+      "displayText": "Card fraud unit nets 36,000 cards In its first two years, the UK's dedicated card fraud unit, has recovered 36,000 stolen cards and 171 arrests - and estimates it saved 65m.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_011",
+      "input": "{\"article\": \"Group to Propose New High-Speed Wireless Format  LOS ANGELES (Reuters) - A group of technology companies  including Texas Instruments Inc. &lt;TXN.N&gt;, STMicroelectronics  &lt;STM.PA&gt; and Broadcom Corp. &lt;BRCM.O&gt;, on Thursday said they  will propose a new wireless networking standard up to 10 times  the speed of the current generation.\"}",
+      "displayText": "Group to Propose New High-Speed Wireless Format  LOS ANGELES (Reuters) - A group of technology companies  including Texas Instruments Inc. &lt;TXN.N&gt;, STMicroelectronics  &lt;STM.PA&gt; and Broadcom Corp. &lt;BRCM.O&gt;, on Thursday said they  will propose a new wireless networking standard up to 10 times  the speed of the current generation.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_012",
+      "input": "{\"article\": \"Apple Launches Graphics Software, Video Bundle  LOS ANGELES (Reuters) - Apple Computer Inc.&lt;AAPL.O&gt; on  Tuesday began shipping a new program designed to let users  create real-time motion graphics and unveiled a discount  video-editing software bundle featuring its flagship Final Cut  Pro software.\"}",
+      "displayText": "Apple Launches Graphics Software, Video Bundle  LOS ANGELES (Reuters) - Apple Computer Inc.&lt;AAPL.O&gt; on  Tuesday began shipping a new program designed to let users  create real-time motion graphics and unveiled a discount  video-editing software bundle featuring its flagship Final Cut  Pro software.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_013",
+      "input": "{\"article\": \"Dutch Retailer Beats Apple to Local Download Market  AMSTERDAM (Reuters) - Free Record Shop, a Dutch music  retail chain, beat Apple Computer Inc. to market on Tuesday  with the launch of a new download service in Europe's latest  battleground for digital song services.\"}",
+      "displayText": "Dutch Retailer Beats Apple to Local Download Market  AMSTERDAM (Reuters) - Free Record Shop, a Dutch music  retail chain, beat Apple Computer Inc. to market on Tuesday  with the launch of a new download service in Europe's latest  battleground for digital song services.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_014",
+      "input": "{\"article\": \"Super ant colony hits Australia A giant 100km colony of ants  which has been discovered in Melbourne, Australia, could threaten local insect species.\"}",
+      "displayText": "Super ant colony hits Australia A giant 100km colony of ants  which has been discovered in Melbourne, Australia, could threaten local insect species.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_015",
+      "input": "{\"article\": \"Socialites unite dolphin groups Dolphin groups, or \\\"pods\\\", rely on socialites to keep them from collapsing, scientists claim.\"}",
+      "displayText": "Socialites unite dolphin groups Dolphin groups, or \"pods\", rely on socialites to keep them from collapsing, scientists claim.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_016",
+      "input": "{\"article\": \"Teenage T. rex's monster growth Tyrannosaurus rex achieved its massive size due to an enormous growth spurt during its adolescent years.\"}",
+      "displayText": "Teenage T. rex's monster growth Tyrannosaurus rex achieved its massive size due to an enormous growth spurt during its adolescent years.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_017",
+      "input": "{\"article\": \"Scientists Discover Ganymede has a Lumpy Interior Jet Propulsion Lab -- Scientists have discovered irregular lumps beneath the icy surface of Jupiter's largest moon, Ganymede. These irregular masses may be rock formations, supported by Ganymede's icy shell for billions of years...\"}",
+      "displayText": "Scientists Discover Ganymede has a Lumpy Interior Jet Propulsion Lab -- Scientists have discovered irregular lumps beneath the icy surface of Jupiter's largest moon, Ganymede. These irregular masses may be rock formations, supported by Ganymede's icy shell for billions of years...",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_018",
+      "input": "{\"article\": \"Mars Rovers Relay Images Through Mars Express European Space Agency -- ESAs Mars Express has relayed pictures from one of NASA's Mars rovers for the first time, as part of a set of interplanetary networking demonstrations.     The demonstrations pave the way for future Mars missions to draw on joint interplanetary networking capabilities...\"}",
+      "displayText": "Mars Rovers Relay Images Through Mars Express European Space Agency -- ESAs Mars Express has relayed pictures from one of NASA's Mars rovers for the first time, as part of a set of interplanetary networking demonstrations.     The demonstrations pave the way for future Mars missions to draw on joint interplanetary networking capabilities...",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_019",
+      "input": "{\"article\": \"Rocking the Cradle of Life When did life begin? One evidential clue stems from the fossil records in Western Australia, although whether these layered sediments are biological or chemical has spawned a spirited debate. Oxford researcher, Nicola McLoughlin, describes some of the issues in contention.\"}",
+      "displayText": "Rocking the Cradle of Life When did life begin? One evidential clue stems from the fossil records in Western Australia, although whether these layered sediments are biological or chemical has spawned a spirited debate. Oxford researcher, Nicola McLoughlin, describes some of the issues in contention.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_020",
+      "input": "{\"article\": \"Storage, servers bruise HP earnings update Earnings per share rise compared with a year ago, but company misses analysts' expectations by a long shot.\"}",
+      "displayText": "Storage, servers bruise HP earnings update Earnings per share rise compared with a year ago, but company misses analysts' expectations by a long shot.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_021",
+      "input": "{\"article\": \"IBM to hire even more new workers By the end of the year, the computing giant plans to have its biggest headcount since 1991.\"}",
+      "displayText": "IBM to hire even more new workers By the end of the year, the computing giant plans to have its biggest headcount since 1991.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_022",
+      "input": "{\"article\": \"Sun's Looking Glass Provides 3D View Developers get early code for new operating system 'skin' still being crafted.\"}",
+      "displayText": "Sun's Looking Glass Provides 3D View Developers get early code for new operating system 'skin' still being crafted.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_023",
+      "input": "{\"article\": \"IBM Chips May Someday Heal Themselves New technology applies electrical fuses to help identify and repair faults.\"}",
+      "displayText": "IBM Chips May Someday Heal Themselves New technology applies electrical fuses to help identify and repair faults.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_024",
+      "input": "{\"article\": \"Some People Not Eligible to Get in on Google IPO Google has billed its IPO as a way for everyday people to get in on the process, denying Wall Street the usual stranglehold it's had on IPOs. Public bidding, a minimum of just five shares, an open process with 28 underwriters - all this pointed to a new level of public participation. But this isn't the case.\"}",
+      "displayText": "Some People Not Eligible to Get in on Google IPO Google has billed its IPO as a way for everyday people to get in on the process, denying Wall Street the usual stranglehold it's had on IPOs. Public bidding, a minimum of just five shares, an open process with 28 underwriters - all this pointed to a new level of public participation. But this isn't the case.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_025",
+      "input": "{\"article\": \"Rivals Try to Turn Tables on Charles Schwab By MICHAEL LIEDTKE     SAN FRANCISCO (AP) -- With its low prices and iconoclastic attitude, discount stock broker Charles Schwab Corp. (SCH) represented an annoying stone in Wall Street's wing-tipped shoes for decades...\"}",
+      "displayText": "Rivals Try to Turn Tables on Charles Schwab By MICHAEL LIEDTKE     SAN FRANCISCO (AP) -- With its low prices and iconoclastic attitude, discount stock broker Charles Schwab Corp. (SCH) represented an annoying stone in Wall Street's wing-tipped shoes for decades...",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_026",
+      "input": "{\"article\": \"News: Sluggish movement on power grid cyber security Industry cyber security standards fail to reach some of the most vulnerable components of the power grid.\\\\\"}",
+      "displayText": "News: Sluggish movement on power grid cyber security Industry cyber security standards fail to reach some of the most vulnerable components of the power grid.\\",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_027",
+      "input": "{\"article\": \"Giddy Phelps Touches Gold for First Time Michael Phelps won the gold medal in the 400 individual medley and set a world record in a time of 4 minutes 8.26 seconds.\"}",
+      "displayText": "Giddy Phelps Touches Gold for First Time Michael Phelps won the gold medal in the 400 individual medley and set a world record in a time of 4 minutes 8.26 seconds.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_028",
+      "input": "{\"article\": \"Tougher rules won't soften Law's game FOXBOROUGH -- Looking at his ridiculously developed upper body, with huge biceps and hardly an ounce of fat, it's easy to see why Ty Law, arguably the best cornerback in football, chooses physical play over finesse. That's not to imply that he's lacking a finesse component, because he can shut down his side of the field much as Deion Sanders ...\"}",
+      "displayText": "Tougher rules won't soften Law's game FOXBOROUGH -- Looking at his ridiculously developed upper body, with huge biceps and hardly an ounce of fat, it's easy to see why Ty Law, arguably the best cornerback in football, chooses physical play over finesse. That's not to imply that he's lacking a finesse component, because he can shut down his side of the field much as Deion Sanders ...",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_029",
+      "input": "{\"article\": \"Shoppach doesn't appear ready to hit the next level With the weeks dwindling until Jason Varitek enters free agency, the Red Sox continue to carefully monitor Kelly Shoppach , their catcher of the future, in his climb toward the majors. The Sox like most of what they have seen at Triple A Pawtucket from Shoppach, though it remains highly uncertain whether he can make the adjustments at the plate ...\"}",
+      "displayText": "Shoppach doesn't appear ready to hit the next level With the weeks dwindling until Jason Varitek enters free agency, the Red Sox continue to carefully monitor Kelly Shoppach , their catcher of the future, in his climb toward the majors. The Sox like most of what they have seen at Triple A Pawtucket from Shoppach, though it remains highly uncertain whether he can make the adjustments at the plate ...",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_030",
+      "input": "{\"article\": \"Mighty Ortiz makes sure Sox can rest easy Just imagine what David Ortiz could do on a good night's rest. Ortiz spent the night before last with his baby boy, D'Angelo, who is barely 1 month old. He had planned on attending the Red Sox' Family Day at Fenway Park yesterday morning, but he had to sleep in. After all, Ortiz had a son at home, and he ...\"}",
+      "displayText": "Mighty Ortiz makes sure Sox can rest easy Just imagine what David Ortiz could do on a good night's rest. Ortiz spent the night before last with his baby boy, D'Angelo, who is barely 1 month old. He had planned on attending the Red Sox' Family Day at Fenway Park yesterday morning, but he had to sleep in. After all, Ortiz had a son at home, and he ...",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_031",
+      "input": "{\"article\": \"They've caught his eye In  quot;helping themselves, quot; Ricky Bryant, Chas Gessner, Michael Jennings, and David Patten did nothing Friday night to make Bill Belichick's decision on what to do with his receivers any easier.\"}",
+      "displayText": "They've caught his eye In  quot;helping themselves, quot; Ricky Bryant, Chas Gessner, Michael Jennings, and David Patten did nothing Friday night to make Bill Belichick's decision on what to do with his receivers any easier.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_032",
+      "input": "{\"article\": \"Indians Mount Charge The Cleveland Indians pulled within one game of the AL Central lead by beating the Minnesota Twins, 7-1, Saturday night with home runs by Travis Hafner and Victor Martinez.\"}",
+      "displayText": "Indians Mount Charge The Cleveland Indians pulled within one game of the AL Central lead by beating the Minnesota Twins, 7-1, Saturday night with home runs by Travis Hafner and Victor Martinez.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_033",
+      "input": "{\"article\": \"Sister of man who died in Vancouver police custody slams chief (Canadian Press) Canadian Press - VANCOUVER (CP) - The sister of a man who died after a violent confrontation with police has demanded the city's chief constable resign for defending the officer involved.\"}",
+      "displayText": "Sister of man who died in Vancouver police custody slams chief (Canadian Press) Canadian Press - VANCOUVER (CP) - The sister of a man who died after a violent confrontation with police has demanded the city's chief constable resign for defending the officer involved.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_034",
+      "input": "{\"article\": \"Man Sought  #36;50M From McGreevey, Aides Say (AP) AP - The man who claims Gov. James E. McGreevey sexually harassed him was pushing for a cash settlement of up to  #36;50 million before the governor decided to announce that he was gay and had an extramarital affair, sources told The Associated Press.\"}",
+      "displayText": "Man Sought  #36;50M From McGreevey, Aides Say (AP) AP - The man who claims Gov. James E. McGreevey sexually harassed him was pushing for a cash settlement of up to  #36;50 million before the governor decided to announce that he was gay and had an extramarital affair, sources told The Associated Press.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_035",
+      "input": "{\"article\": \"Explosions Echo Throughout Najaf NAJAF, Iraq - Explosions and gunfire rattled through the city of Najaf as U.S. troops in armored vehicles and tanks rolled back into the streets here Sunday, a day after the collapse of talks - and with them a temporary cease-fire - intended to end the fighting in this holy city...\"}",
+      "displayText": "Explosions Echo Throughout Najaf NAJAF, Iraq - Explosions and gunfire rattled through the city of Najaf as U.S. troops in armored vehicles and tanks rolled back into the streets here Sunday, a day after the collapse of talks - and with them a temporary cease-fire - intended to end the fighting in this holy city...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_036",
+      "input": "{\"article\": \"Frail Pope Celebrates Mass at Lourdes LOURDES, France - A frail Pope John Paul II, breathing heavily and gasping at times, celebrated an open-air Mass on Sunday for several hundred thousand pilgrims, many in wheelchairs, at a shrine to the Virgin Mary that is associated with miraculous cures.    At one point he said \\\"help me\\\" in Polish while struggling through his homily in French...\"}",
+      "displayText": "Frail Pope Celebrates Mass at Lourdes LOURDES, France - A frail Pope John Paul II, breathing heavily and gasping at times, celebrated an open-air Mass on Sunday for several hundred thousand pilgrims, many in wheelchairs, at a shrine to the Virgin Mary that is associated with miraculous cures.    At one point he said \"help me\" in Polish while struggling through his homily in French...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_037",
+      "input": "{\"article\": \"Venezuela Prepares for Chavez Recall Vote Supporters and rivals warn of possible fraud; government says Chavez's defeat could produce turmoil in world oil market.\"}",
+      "displayText": "Venezuela Prepares for Chavez Recall Vote Supporters and rivals warn of possible fraud; government says Chavez's defeat could produce turmoil in world oil market.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_038",
+      "input": "{\"article\": \"1994 Law Designed to Preserve Guard Jobs (AP) AP - A 1994 law strengthened job protections for National Guard and Reserve troops called to active duty. Here are major provisions of the Uniformed Services Employment and Reemployment Rights Act (USERRA).\"}",
+      "displayText": "1994 Law Designed to Preserve Guard Jobs (AP) AP - A 1994 law strengthened job protections for National Guard and Reserve troops called to active duty. Here are major provisions of the Uniformed Services Employment and Reemployment Rights Act (USERRA).",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_039",
+      "input": "{\"article\": \"Iran Warns Its Missiles Can Hit Anywhere in Israel  TEHRAN (Reuters) - A senior Iranian military official said  Sunday Israel and the United States would not dare attack Iran  since it could strike back anywhere in Israel with its latest  missiles, news agencies reported.\"}",
+      "displayText": "Iran Warns Its Missiles Can Hit Anywhere in Israel  TEHRAN (Reuters) - A senior Iranian military official said  Sunday Israel and the United States would not dare attack Iran  since it could strike back anywhere in Israel with its latest  missiles, news agencies reported.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_040",
+      "input": "{\"article\": \"Afghan Army Dispatched to Calm Violence KABUL, Afghanistan - Government troops intervened in Afghanistan's latest outbreak of deadly fighting between warlords, flying from the capital to the far west on U.S. and NATO airplanes to retake an air base contested in the violence, officials said Sunday...\"}",
+      "displayText": "Afghan Army Dispatched to Calm Violence KABUL, Afghanistan - Government troops intervened in Afghanistan's latest outbreak of deadly fighting between warlords, flying from the capital to the far west on U.S. and NATO airplanes to retake an air base contested in the violence, officials said Sunday...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_041",
+      "input": "{\"article\": \"Johnson Helps D-Backs End Nine-Game Slide (AP) AP - Randy Johnson took a four-hitter into the ninth inning to help the Arizona Diamondbacks end a nine-game losing streak Sunday, beating Steve Trachsel and the New York Mets 2-0.\"}",
+      "displayText": "Johnson Helps D-Backs End Nine-Game Slide (AP) AP - Randy Johnson took a four-hitter into the ninth inning to help the Arizona Diamondbacks end a nine-game losing streak Sunday, beating Steve Trachsel and the New York Mets 2-0.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_042",
+      "input": "{\"article\": \"Retailers Vie for Back-To-School Buyers (Reuters) Reuters - Apparel retailers are hoping their\\\\back-to-school fashions will make the grade among\\\\style-conscious teens and young adults this fall, but it could\\\\be a tough sell, with students and parents keeping a tighter\\\\hold on their wallets.\"}",
+      "displayText": "Retailers Vie for Back-To-School Buyers (Reuters) Reuters - Apparel retailers are hoping their\\back-to-school fashions will make the grade among\\style-conscious teens and young adults this fall, but it could\\be a tough sell, with students and parents keeping a tighter\\hold on their wallets.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_043",
+      "input": "{\"article\": \"Politics an Afterthought Amid Hurricane (AP) AP - If Hurricane Charley had struck three years ago, President Bush's tour through the wreckage of this coastal city would have been just the sort of post-disaster visit that other presidents have made to the scenes of storms, earthquakes, floods and fires.\"}",
+      "displayText": "Politics an Afterthought Amid Hurricane (AP) AP - If Hurricane Charley had struck three years ago, President Bush's tour through the wreckage of this coastal city would have been just the sort of post-disaster visit that other presidents have made to the scenes of storms, earthquakes, floods and fires.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_044",
+      "input": "{\"article\": \"Spam suspension hits Sohu.com shares (FT.com) FT.com - Shares in Sohu.com, a leading US-listed Chinese internet portal, fell more than 10 per cent on Friday after China's biggest mobile phone network operator imposed a one-year suspension on its multimedia messaging services because of customers being sent spam.\"}",
+      "displayText": "Spam suspension hits Sohu.com shares (FT.com) FT.com - Shares in Sohu.com, a leading US-listed Chinese internet portal, fell more than 10 per cent on Friday after China's biggest mobile phone network operator imposed a one-year suspension on its multimedia messaging services because of customers being sent spam.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_045",
+      "input": "{\"article\": \"Erstad's Double Lifts Angels to Win (AP) AP - Darin Erstad doubled in the go-ahead run in the eighth inning, lifting the Anaheim Angels to a 3-2 victory over the Detroit Tigers on Sunday. The win pulled Anaheim within a percentage point of Boston and Texas in the AL wild-card race.\"}",
+      "displayText": "Erstad's Double Lifts Angels to Win (AP) AP - Darin Erstad doubled in the go-ahead run in the eighth inning, lifting the Anaheim Angels to a 3-2 victory over the Detroit Tigers on Sunday. The win pulled Anaheim within a percentage point of Boston and Texas in the AL wild-card race.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_046",
+      "input": "{\"article\": \"Drew Out of Braves' Lineup After Injury (AP) AP - Outfielder J.D. Drew missed the Atlanta Braves' game against the St. Louis Cardinals on Sunday night with a sore right quadriceps.\"}",
+      "displayText": "Drew Out of Braves' Lineup After Injury (AP) AP - Outfielder J.D. Drew missed the Atlanta Braves' game against the St. Louis Cardinals on Sunday night with a sore right quadriceps.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_047",
+      "input": "{\"article\": \"Venezuelans Flood Polls, Voting Extended  CARACAS, Venezuela (Reuters) - Venezuelans voted in huge  numbers on Sunday in a historic referendum on whether to recall  left-wing President Hugo Chavez and electoral authorities  prolonged voting well into the night.\"}",
+      "displayText": "Venezuelans Flood Polls, Voting Extended  CARACAS, Venezuela (Reuters) - Venezuelans voted in huge  numbers on Sunday in a historic referendum on whether to recall  left-wing President Hugo Chavez and electoral authorities  prolonged voting well into the night.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_048",
+      "input": "{\"article\": \"Dell Exits Low-End China Consumer PC Market  HONG KONG (Reuters) - Dell Inc. &lt;DELL.O&gt;, the world's  largest PC maker, said on Monday it has left the low-end  consumer PC market in China and cut its overall growth target  for the country this year due to stiff competition in the  segment.\"}",
+      "displayText": "Dell Exits Low-End China Consumer PC Market  HONG KONG (Reuters) - Dell Inc. &lt;DELL.O&gt;, the world's  largest PC maker, said on Monday it has left the low-end  consumer PC market in China and cut its overall growth target  for the country this year due to stiff competition in the  segment.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_049",
+      "input": "{\"article\": \"China Says Taiwan Spy Also Operated in U.S. - Media  BEIJING (Reuters) - Beijing on Monday accused a  Chinese-American arrested for spying for Taiwan of building an  espionage network in the United States, and said he could go on  trial very soon.\"}",
+      "displayText": "China Says Taiwan Spy Also Operated in U.S. - Media  BEIJING (Reuters) - Beijing on Monday accused a  Chinese-American arrested for spying for Taiwan of building an  espionage network in the United States, and said he could go on  trial very soon.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_050",
+      "input": "{\"article\": \"Another Major Non-Factor Another major, another disappointment for Tiger Woods, the No. 1 ranked player in the world who has not won a major championship since his triumph at the 2002 U.S. Open.\"}",
+      "displayText": "Another Major Non-Factor Another major, another disappointment for Tiger Woods, the No. 1 ranked player in the world who has not won a major championship since his triumph at the 2002 U.S. Open.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_051",
+      "input": "{\"article\": \"US fighter squadron to be deployed in South Korea next month (AFP) AFP - A squadron of US Air Force F-15E fighters based in Alaska will fly to South Korea next month for temporary deployment aimed at enhancing US firepower on the Korean peninsula, US authorities said.\"}",
+      "displayText": "US fighter squadron to be deployed in South Korea next month (AFP) AFP - A squadron of US Air Force F-15E fighters based in Alaska will fly to South Korea next month for temporary deployment aimed at enhancing US firepower on the Korean peninsula, US authorities said.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_052",
+      "input": "{\"article\": \"Johnson Back to His Best as D-Backs End Streak  NEW YORK (Reuters) - Randy Johnson struck out 14 batters in  8 1/3 innings to help the Arizona Diamondbacks end a nine-game  losing streak with a 2-0 win over the host New York Mets in the  National League Sunday.\"}",
+      "displayText": "Johnson Back to His Best as D-Backs End Streak  NEW YORK (Reuters) - Randy Johnson struck out 14 batters in  8 1/3 innings to help the Arizona Diamondbacks end a nine-game  losing streak with a 2-0 win over the host New York Mets in the  National League Sunday.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_053",
+      "input": "{\"article\": \"Restive Maldives eases curfew after rounding up dissidents (AFP) AFP - A curfew in the capital of the Maldives was eased but parliament sessions were put off indefinitely and emergency rule continued following last week's riots, officials and residents said.\"}",
+      "displayText": "Restive Maldives eases curfew after rounding up dissidents (AFP) AFP - A curfew in the capital of the Maldives was eased but parliament sessions were put off indefinitely and emergency rule continued following last week's riots, officials and residents said.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_054",
+      "input": "{\"article\": \"Vodafone hires Citi for Cesky bid (TheDeal.com) TheDeal.com - The U.K. mobile giant wants to find a way to disentagle the Czech wireless and fixed-line businesses.\"}",
+      "displayText": "Vodafone hires Citi for Cesky bid (TheDeal.com) TheDeal.com - The U.K. mobile giant wants to find a way to disentagle the Czech wireless and fixed-line businesses.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_055",
+      "input": "{\"article\": \"Dollar Briefly Hits 4-Wk Low Vs Euro  LONDON (Reuters) - The dollar dipped to a four-week low  against the euro on Monday before rising slightly on  profit-taking, but steep oil prices and weak U.S. data  continued to fan worries about the health of the world's  largest economy.\"}",
+      "displayText": "Dollar Briefly Hits 4-Wk Low Vs Euro  LONDON (Reuters) - The dollar dipped to a four-week low  against the euro on Monday before rising slightly on  profit-taking, but steep oil prices and weak U.S. data  continued to fan worries about the health of the world's  largest economy.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_056",
+      "input": "{\"article\": \"Promoting a Shared Vision As Michael Kaleko kept running into people who were getting older and having more vision problems, he realized he could do something about it.\"}",
+      "displayText": "Promoting a Shared Vision As Michael Kaleko kept running into people who were getting older and having more vision problems, he realized he could do something about it.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_057",
+      "input": "{\"article\": \"India's Tata expands regional footprint via NatSteel buyout (AFP) AFP - India's Tata Iron and Steel Company Ltd. took a strategic step to expand its Asian footprint with the announcement it will buy the Asia-Pacific steel operations of Singapore's NatSteel Ltd.\"}",
+      "displayText": "India's Tata expands regional footprint via NatSteel buyout (AFP) AFP - India's Tata Iron and Steel Company Ltd. took a strategic step to expand its Asian footprint with the announcement it will buy the Asia-Pacific steel operations of Singapore's NatSteel Ltd.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_058",
+      "input": "{\"article\": \"Delegates Urge Cleric to Pull Out of Najaf BAGHDAD, Iraq - Delegates at Iraq's National Conference called on radical Shiite cleric Muqtada al-Sadr to abandon his uprising against U.S. and Iraqi troops and pull his fighters out of a holy shrine in Najaf...\"}",
+      "displayText": "Delegates Urge Cleric to Pull Out of Najaf BAGHDAD, Iraq - Delegates at Iraq's National Conference called on radical Shiite cleric Muqtada al-Sadr to abandon his uprising against U.S. and Iraqi troops and pull his fighters out of a holy shrine in Najaf...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_059",
+      "input": "{\"article\": \"Treasuries Slip as Stocks Rally  NEW YORK (Reuters) - U.S. Treasury debt prices slipped on  Monday, though traders characterized the move as profit-taking  rather than any fundamental change in sentiment.\"}",
+      "displayText": "Treasuries Slip as Stocks Rally  NEW YORK (Reuters) - U.S. Treasury debt prices slipped on  Monday, though traders characterized the move as profit-taking  rather than any fundamental change in sentiment.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_060",
+      "input": "{\"article\": \"Dollar Rises Vs Euro on Asset Flows Data  NEW YORK (Reuters) - The dollar extended gains against the  euro on Monday after a report on flows into U.S. assets showed  enough of a rise in foreign investments to offset the current  account gap for the month.\"}",
+      "displayText": "Dollar Rises Vs Euro on Asset Flows Data  NEW YORK (Reuters) - The dollar extended gains against the  euro on Monday after a report on flows into U.S. assets showed  enough of a rise in foreign investments to offset the current  account gap for the month.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_061",
+      "input": "{\"article\": \"Sutton Adds Haas, Cink to Ryder Cup Team  MILWAUKEE (Sports Network) - U.S. Ryder Cup captain Hal  Sutton finalized his team on Monday when he announced the  selections of Jay Haas and Stewart Cink as his captain's picks.\"}",
+      "displayText": "Sutton Adds Haas, Cink to Ryder Cup Team  MILWAUKEE (Sports Network) - U.S. Ryder Cup captain Hal  Sutton finalized his team on Monday when he announced the  selections of Jay Haas and Stewart Cink as his captain's picks.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_062",
+      "input": "{\"article\": \"Haas and Cink Selected for Ryder Cup Team Jay Haas joined Stewart Cink as the two captain's picks for a U.S. team that will try to regain the cup from Europe next month.\"}",
+      "displayText": "Haas and Cink Selected for Ryder Cup Team Jay Haas joined Stewart Cink as the two captain's picks for a U.S. team that will try to regain the cup from Europe next month.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_063",
+      "input": "{\"article\": \"Natalie Coughlin Wins 100M Backstroke (AP) AP - American Natalie Coughlin won Olympic gold in the 100-meter backstroke Monday night. Coughlin, the only woman ever to swim under 1 minute in the event, finished first in 1 minute, 0.37 seconds. Kirsty Coventry of Zimbabwe, who swims at Auburn University in Alabama, earned the silver in 1:00.50. Laure Manaudou of France took bronze in 1:00.88.\"}",
+      "displayText": "Natalie Coughlin Wins 100M Backstroke (AP) AP - American Natalie Coughlin won Olympic gold in the 100-meter backstroke Monday night. Coughlin, the only woman ever to swim under 1 minute in the event, finished first in 1 minute, 0.37 seconds. Kirsty Coventry of Zimbabwe, who swims at Auburn University in Alabama, earned the silver in 1:00.50. Laure Manaudou of France took bronze in 1:00.88.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_064",
+      "input": "{\"article\": \"Oracle Overhauls Sales-Side Apps for CRM Suite (NewsFactor) NewsFactor - Oracle (Nasdaq: ORCL) has revamped its sales-side CRM applications in version 11i.10 of its sales, marketing, partner relationship management and e-commerce application.\"}",
+      "displayText": "Oracle Overhauls Sales-Side Apps for CRM Suite (NewsFactor) NewsFactor - Oracle (Nasdaq: ORCL) has revamped its sales-side CRM applications in version 11i.10 of its sales, marketing, partner relationship management and e-commerce application.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_065",
+      "input": "{\"article\": \"UN launches 210-million-dollar appeal for flood-hit Bangladesh (AFP) AFP - The United Nations launched an appeal here for 210 million dollars to help flood victims facing \\\"grave\\\" food shortages after two-thirds of Bangladesh was submerged, destroying crops and killing more than 700 people.\"}",
+      "displayText": "UN launches 210-million-dollar appeal for flood-hit Bangladesh (AFP) AFP - The United Nations launched an appeal here for 210 million dollars to help flood victims facing \"grave\" food shortages after two-thirds of Bangladesh was submerged, destroying crops and killing more than 700 people.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_066",
+      "input": "{\"article\": \"Indian state rolls out wireless broadband Government in South Indian state of Kerala sets up wireless kiosks as part of initiative to bridge digital divide.\"}",
+      "displayText": "Indian state rolls out wireless broadband Government in South Indian state of Kerala sets up wireless kiosks as part of initiative to bridge digital divide.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_067",
+      "input": "{\"article\": \"Hurricane Survivors Wait for Water, Gas PUNTA GORDA, Fla. - Urban rescue teams, insurance adjusters and National Guard troops scattered across Florida Monday to help victims of Hurricane Charley and deliver water and other supplies to thousands of people left homeless...\"}",
+      "displayText": "Hurricane Survivors Wait for Water, Gas PUNTA GORDA, Fla. - Urban rescue teams, insurance adjusters and National Guard troops scattered across Florida Monday to help victims of Hurricane Charley and deliver water and other supplies to thousands of people left homeless...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_068",
+      "input": "{\"article\": \"Jackson Squares Off With Prosecutor SANTA MARIA, Calif. - Fans of Michael Jackson erupted in cheers Monday as the pop star emerged from a double-decker tour bus and went into court for a showdown with the prosecutor who has pursued him for years on child molestation charges...\"}",
+      "displayText": "Jackson Squares Off With Prosecutor SANTA MARIA, Calif. - Fans of Michael Jackson erupted in cheers Monday as the pop star emerged from a double-decker tour bus and went into court for a showdown with the prosecutor who has pursued him for years on child molestation charges...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_069",
+      "input": "{\"article\": \"Bobcats Trade Drobnjak to Hawks for Pick (AP) AP - The Charlotte Bobcats traded center Predrag Drobnjak to the Atlanta Hawks on Monday for a second round pick in the 2005 NBA draft.\"}",
+      "displayText": "Bobcats Trade Drobnjak to Hawks for Pick (AP) AP - The Charlotte Bobcats traded center Predrag Drobnjak to the Atlanta Hawks on Monday for a second round pick in the 2005 NBA draft.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_070",
+      "input": "{\"article\": \"Suspect charged in abduction, sexual assault of 11-year-old girl (Canadian Press) Canadian Press - LANGLEY, B.C. (CP) - Police have arrested a man in the kidnapping and sexual assault of an 11-year-old girl that frightened this suburban Vancouver community last week.\"}",
+      "displayText": "Suspect charged in abduction, sexual assault of 11-year-old girl (Canadian Press) Canadian Press - LANGLEY, B.C. (CP) - Police have arrested a man in the kidnapping and sexual assault of an 11-year-old girl that frightened this suburban Vancouver community last week.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_071",
+      "input": "{\"article\": \"China's Red Flag Linux to focus on enterprise Red Flag Software Co., the company behind China's leading Linux client distribution, plans to focus more on its server operating system and enterprise customers, the company's acting president said.\"}",
+      "displayText": "China's Red Flag Linux to focus on enterprise Red Flag Software Co., the company behind China's leading Linux client distribution, plans to focus more on its server operating system and enterprise customers, the company's acting president said.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_072",
+      "input": "{\"article\": \"AOL Properties Sign Girafa For Thumbnail Search Images AOL Properties Sign Girafa For Thumbnail Search Images\\\\\\\\Girafa.com Inc. announced today that the CompuServe, Netscape, AIM and ICQ properties of America Online, Inc., have signed an agreement with Girafa to use Girafa's thumbnail search images as an integrated part of their search results.\\\\\\\\Using Girafa's thumbnail search service, search users can ...\"}",
+      "displayText": "AOL Properties Sign Girafa For Thumbnail Search Images AOL Properties Sign Girafa For Thumbnail Search Images\\\\Girafa.com Inc. announced today that the CompuServe, Netscape, AIM and ICQ properties of America Online, Inc., have signed an agreement with Girafa to use Girafa's thumbnail search images as an integrated part of their search results.\\\\Using Girafa's thumbnail search service, search users can ...",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_073",
+      "input": "{\"article\": \"Cassini Spies Two Little Saturn Moons (AP) AP - NASA's Cassini spacecraft has spied two new little moons around satellite-rich Saturn, the space agency said Monday.\"}",
+      "displayText": "Cassini Spies Two Little Saturn Moons (AP) AP - NASA's Cassini spacecraft has spied two new little moons around satellite-rich Saturn, the space agency said Monday.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_074",
+      "input": "{\"article\": \"On front line of AIDS in Russia An industrial city northwest of Moscow struggles as AIDS hits a broader population.\"}",
+      "displayText": "On front line of AIDS in Russia An industrial city northwest of Moscow struggles as AIDS hits a broader population.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_075",
+      "input": "{\"article\": \"Nobel Laureate Decries Stem Cell Limits (AP) AP - A Nobel laureate in medicine said Monday the Bush administration's limits on funding for embryonic stem cell research effectively have stopped the clock on American scientists' efforts to develop treatments for a host of chronic, debilitating diseases.\"}",
+      "displayText": "Nobel Laureate Decries Stem Cell Limits (AP) AP - A Nobel laureate in medicine said Monday the Bush administration's limits on funding for embryonic stem cell research effectively have stopped the clock on American scientists' efforts to develop treatments for a host of chronic, debilitating diseases.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_076",
+      "input": "{\"article\": \"Jury Can Hear of Kobe Accuser's Sex Life (AP) AP - Prosecutors suffered another setback Monday in the Kobe Bryant sexual assault case, losing a last-ditch attempt to keep the NBA star's lawyers from telling jurors about the alleged victim's sex life.\"}",
+      "displayText": "Jury Can Hear of Kobe Accuser's Sex Life (AP) AP - Prosecutors suffered another setback Monday in the Kobe Bryant sexual assault case, losing a last-ditch attempt to keep the NBA star's lawyers from telling jurors about the alleged victim's sex life.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_077",
+      "input": "{\"article\": \"North Korea Talks Still On, China Tells Downer (Reuters) Reuters - China has said no date has been set for\\\\working-level talks on the North Korean nuclear crisis and gave\\\\no indication that the meeting has been canceled, Australian\\\\Foreign Minister Alexander Downer said on Tuesday.\"}",
+      "displayText": "North Korea Talks Still On, China Tells Downer (Reuters) Reuters - China has said no date has been set for\\working-level talks on the North Korean nuclear crisis and gave\\no indication that the meeting has been canceled, Australian\\Foreign Minister Alexander Downer said on Tuesday.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_078",
+      "input": "{\"article\": \"Griffin to Anchor D-Line The Redskins expect huge things from 300-pound Cornelius Griffin, who was signed to aid the team's weakest unit - the defensive line.\"}",
+      "displayText": "Griffin to Anchor D-Line The Redskins expect huge things from 300-pound Cornelius Griffin, who was signed to aid the team's weakest unit - the defensive line.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_079",
+      "input": "{\"article\": \"Last American defector in North Korea agrees to tell story (AFP) AFP - The last surviving American defector to communist North Korea wants to tell his story to put a human face on the Stalinist state which he believes is unfairly vilified abroad, British film-makers said.\"}",
+      "displayText": "Last American defector in North Korea agrees to tell story (AFP) AFP - The last surviving American defector to communist North Korea wants to tell his story to put a human face on the Stalinist state which he believes is unfairly vilified abroad, British film-makers said.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_080",
+      "input": "{\"article\": \"Live: Olympics day four Richard Faulds and Stephen Parry are going for gold for Great Britain on day four in Athens.\"}",
+      "displayText": "Live: Olympics day four Richard Faulds and Stephen Parry are going for gold for Great Britain on day four in Athens.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_081",
+      "input": "{\"article\": \"Kerry Widens Lead in California, Poll Finds (Reuters) Reuters - Democratic challenger John Kerry\\\\has a commanding lead over President Bush in California of 54\\\\percent to 38 percent among likely voters, a poll released on\\\\Tuesday found.\"}",
+      "displayText": "Kerry Widens Lead in California, Poll Finds (Reuters) Reuters - Democratic challenger John Kerry\\has a commanding lead over President Bush in California of 54\\percent to 38 percent among likely voters, a poll released on\\Tuesday found.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_082",
+      "input": "{\"article\": \"Capacity Crowds at Beach Volleyball Rock the Joint  ATHENS (Reuters) - At the beach volleyball, the 2004  Olympics is a sell-out, foot-stomping success.\"}",
+      "displayText": "Capacity Crowds at Beach Volleyball Rock the Joint  ATHENS (Reuters) - At the beach volleyball, the 2004  Olympics is a sell-out, foot-stomping success.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_083",
+      "input": "{\"article\": \"Dollar Near Recent Lows, Awaits ZEW/CPI  LONDON (Reuters) - The dollar held steady near this week's  four-week low against the euro on Tuesday with investors  awaiting a German investor confidence survey and U.S. consumer  inflation numbers to shed light on the direction.\"}",
+      "displayText": "Dollar Near Recent Lows, Awaits ZEW/CPI  LONDON (Reuters) - The dollar held steady near this week's  four-week low against the euro on Tuesday with investors  awaiting a German investor confidence survey and U.S. consumer  inflation numbers to shed light on the direction.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_084",
+      "input": "{\"article\": \"Intel to delay product aimed for high-definition TVs SAN FRANCISCO -- In the latest of a series of product delays, Intel Corp. has postponed the launch of a video display chip it had previously planned to introduce by year end, putting off a showdown with Texas Instruments Inc. in the fast-growing market for high-definition television displays.\"}",
+      "displayText": "Intel to delay product aimed for high-definition TVs SAN FRANCISCO -- In the latest of a series of product delays, Intel Corp. has postponed the launch of a video display chip it had previously planned to introduce by year end, putting off a showdown with Texas Instruments Inc. in the fast-growing market for high-definition television displays.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_085",
+      "input": "{\"article\": \"Venezuela vote keeps Chavez as president CARACAS -- Venezuelans voted resoundingly to keep firebrand populist Hugo Chavez as their president in a victory that drew noisy reactions yesterday from both sides in the streets. International observers certified the results as clean and accurate.\"}",
+      "displayText": "Venezuela vote keeps Chavez as president CARACAS -- Venezuelans voted resoundingly to keep firebrand populist Hugo Chavez as their president in a victory that drew noisy reactions yesterday from both sides in the streets. International observers certified the results as clean and accurate.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_086",
+      "input": "{\"article\": \"Jailing of HK democrat in China 'politically motivated' (AFP) AFP - Hong Kong democrats accused China of jailing one of their members on trumped-up prostitution charges in a bid to disgrace a political movement Beijing has been feuding with for seven years.\"}",
+      "displayText": "Jailing of HK democrat in China 'politically motivated' (AFP) AFP - Hong Kong democrats accused China of jailing one of their members on trumped-up prostitution charges in a bid to disgrace a political movement Beijing has been feuding with for seven years.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_087",
+      "input": "{\"article\": \"Kmart Swings to Profit in 2Q; Stock Surges (AP) AP - Shares of Kmart Holding Corp. surged 17 percent Monday after the discount retailer reported a profit for the second quarter and said chairman and majority owner Edward Lampert is now free to invest the company's  #36;2.6 billion in surplus cash.\"}",
+      "displayText": "Kmart Swings to Profit in 2Q; Stock Surges (AP) AP - Shares of Kmart Holding Corp. surged 17 percent Monday after the discount retailer reported a profit for the second quarter and said chairman and majority owner Edward Lampert is now free to invest the company's  #36;2.6 billion in surplus cash.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_088",
+      "input": "{\"article\": \"Fischer's Fiancee: Marriage Plans Genuine (AP) AP - Former chess champion Bobby Fischer's announcement thathe is engaged to a Japanese woman could win him sympathy among Japanese officials and help him avoid deportation to the United States, his fiancee and one of his supporters said Tuesday.\"}",
+      "displayText": "Fischer's Fiancee: Marriage Plans Genuine (AP) AP - Former chess champion Bobby Fischer's announcement thathe is engaged to a Japanese woman could win him sympathy among Japanese officials and help him avoid deportation to the United States, his fiancee and one of his supporters said Tuesday.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_089",
+      "input": "{\"article\": \"U.S. Misses Cut in Olympic 100 Free ATHENS, Greece - Top American sprinters Jason Lezak and Ian Crocker missed the cut in the Olympic 100-meter freestyle preliminaries Tuesday, a stunning blow for a country that had always done well in the event.    Pieter van den Hoogenband of the Netherlands and Australian Ian Thorpe advanced to the evening semifinal a day after dueling teenager Michael Phelps in the 200 freestyle, won by Thorpe...\"}",
+      "displayText": "U.S. Misses Cut in Olympic 100 Free ATHENS, Greece - Top American sprinters Jason Lezak and Ian Crocker missed the cut in the Olympic 100-meter freestyle preliminaries Tuesday, a stunning blow for a country that had always done well in the event.    Pieter van den Hoogenband of the Netherlands and Australian Ian Thorpe advanced to the evening semifinal a day after dueling teenager Michael Phelps in the 200 freestyle, won by Thorpe...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_090",
+      "input": "{\"article\": \"Consumers Would Pay In Phone Proposal A proposal backed by a coalition of telephone carriers would cut billions of dollars in fees owed by long-distance companies to regional phone giants but would allow the regional companies to make up some of the difference by raising monthly phone bills for millions of consumers. &lt;FONT face=\\\"verdana,MS Sans Serif,arial,helvetica\\\" size=\\\"-2\\\"\\\\ color=\\\"#666666\\\"&gt;&lt;B&gt;-The Washington Post&lt;/B&gt;&lt;/FONT&gt;\"}",
+      "displayText": "Consumers Would Pay In Phone Proposal A proposal backed by a coalition of telephone carriers would cut billions of dollars in fees owed by long-distance companies to regional phone giants but would allow the regional companies to make up some of the difference by raising monthly phone bills for millions of consumers. &lt;FONT face=\"verdana,MS Sans Serif,arial,helvetica\" size=\"-2\"\\ color=\"#666666\"&gt;&lt;B&gt;-The Washington Post&lt;/B&gt;&lt;/FONT&gt;",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_091",
+      "input": "{\"article\": \"U.S. Brokers Cease-fire in Western Afghanistan  KABUL (Reuters) - The United States has brokered a  cease-fire between a renegade Afghan militia leader and the  embattled governor of the western province of Herat,  Washington's envoy to Kabul said Tuesday.\"}",
+      "displayText": "U.S. Brokers Cease-fire in Western Afghanistan  KABUL (Reuters) - The United States has brokered a  cease-fire between a renegade Afghan militia leader and the  embattled governor of the western province of Herat,  Washington's envoy to Kabul said Tuesday.",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_092",
+      "input": "{\"article\": \"Sneaky Credit Card Tactics Keep an eye on your credit card issuers -- they may be about to raise your rates.\"}",
+      "displayText": "Sneaky Credit Card Tactics Keep an eye on your credit card issuers -- they may be about to raise your rates.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_093",
+      "input": "{\"article\": \"Intel Delays Launch of Projection TV Chip In another product postponement, semiconductor giant Intel Corp. said it won't be offering a chip for projection TVs by the end of 2004 as it had announced earlier this year.\"}",
+      "displayText": "Intel Delays Launch of Projection TV Chip In another product postponement, semiconductor giant Intel Corp. said it won't be offering a chip for projection TVs by the end of 2004 as it had announced earlier this year.",
+      "gold": {
+        "topic": {
+          "label": "sci_tech"
+        }
+      }
+    },
+    {
+      "id": "ag_news_094",
+      "input": "{\"article\": \"Fund pessimism grows NEW YORK (CNN/Money) - Money managers are growing more pessimistic about the economy, corporate profits and US stock market returns, according to a monthly survey by Merrill Lynch released Tuesday.\"}",
+      "displayText": "Fund pessimism grows NEW YORK (CNN/Money) - Money managers are growing more pessimistic about the economy, corporate profits and US stock market returns, according to a monthly survey by Merrill Lynch released Tuesday.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_095",
+      "input": "{\"article\": \"Kederis proclaims innocence Olympic champion Kostas Kederis today left hospital ahead of his date with IOC inquisitors claiming his innocence and vowing:  quot;After the crucifixion comes the resurrection. quot; ...\"}",
+      "displayText": "Kederis proclaims innocence Olympic champion Kostas Kederis today left hospital ahead of his date with IOC inquisitors claiming his innocence and vowing:  quot;After the crucifixion comes the resurrection. quot; ...",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_096",
+      "input": "{\"article\": \"Eriksson doesn #39;t feel any extra pressure following scandal NEWCASTLE, England (AP) - England coach Sven-Goran Eriksson said Tuesday he isn #39;t under any extra pressure in the aftermath of a scandal that damaged the Football Association #39;s reputation.\"}",
+      "displayText": "Eriksson doesn #39;t feel any extra pressure following scandal NEWCASTLE, England (AP) - England coach Sven-Goran Eriksson said Tuesday he isn #39;t under any extra pressure in the aftermath of a scandal that damaged the Football Association #39;s reputation.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_097",
+      "input": "{\"article\": \"Injured Heskey to miss England friendly NEWCASTLE, England (AP) - Striker Emile Heskey has pulled out of the England squad ahead of Wednesday #39;s friendly against Ukraine because of a tight hamstring, the Football Association said Tuesday.\"}",
+      "displayText": "Injured Heskey to miss England friendly NEWCASTLE, England (AP) - Striker Emile Heskey has pulled out of the England squad ahead of Wednesday #39;s friendly against Ukraine because of a tight hamstring, the Football Association said Tuesday.",
+      "gold": {
+        "topic": {
+          "label": "sports"
+        }
+      }
+    },
+    {
+      "id": "ag_news_098",
+      "input": "{\"article\": \"Staples Profit Up, to Enter China Market  NEW YORK (Reuters) - Staples Inc. &lt;A HREF=\\\"http://www.investor.reuters.com/FullQuote.aspx?ticker=SPLS.O target=/stocks/quickinfo/fullquote\\\"&gt;SPLS.O&lt;/A&gt;, the top U.S.  office products retailer, on Tuesday reported a 39 percent jump  in quarterly profit, raised its full-year forecast and said it  plans to enter the fast-growing Chinese market, sending its  shares higher.\"}",
+      "displayText": "Staples Profit Up, to Enter China Market  NEW YORK (Reuters) - Staples Inc. &lt;A HREF=\"http://www.investor.reuters.com/FullQuote.aspx?ticker=SPLS.O target=/stocks/quickinfo/fullquote\"&gt;SPLS.O&lt;/A&gt;, the top U.S.  office products retailer, on Tuesday reported a 39 percent jump  in quarterly profit, raised its full-year forecast and said it  plans to enter the fast-growing Chinese market, sending its  shares higher.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    },
+    {
+      "id": "ag_news_099",
+      "input": "{\"article\": \"Delegation Is Delayed Before Reaching Najaf AGHDAD, Iraq, Aug. 17  A delegation of Iraqis was delayed for security reasons today but still intended to visit Najaf to try to convince a rebellious Shiite cleric and his militia to evacuate a shrine in the holy city and end ...\"}",
+      "displayText": "Delegation Is Delayed Before Reaching Najaf AGHDAD, Iraq, Aug. 17  A delegation of Iraqis was delayed for security reasons today but still intended to visit Najaf to try to convince a rebellious Shiite cleric and his militia to evacuate a shrine in the holy city and end ...",
+      "gold": {
+        "topic": {
+          "label": "world"
+        }
+      }
+    },
+    {
+      "id": "ag_news_100",
+      "input": "{\"article\": \"Consumer Prices Down, Industry Output Up  WASHINGTON (Reuters) - U.S. consumer prices dropped in July  for the first time in eight months as a sharp run up in energy  costs reversed, the government said in a report that suggested  a slow rate of interest rate hikes is likely.\"}",
+      "displayText": "Consumer Prices Down, Industry Output Up  WASHINGTON (Reuters) - U.S. consumer prices dropped in July  for the first time in eight months as a sharp run up in energy  costs reversed, the government said in a report that suggested  a slow rate of interest rate hikes is likely.",
+      "gold": {
+        "topic": {
+          "label": "business"
+        }
+      }
+    }
+  ]
+}

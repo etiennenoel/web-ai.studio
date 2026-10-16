@@ -8,6 +8,7 @@ export enum ClassifierRuntimeOp {
   DESTROY = 'destroy',
   ABORT = 'abort',
   LIST_MODELS = 'list_models',
+  SET_ACTIVE_MODEL = 'set_active_model',
   DOWNLOAD_MODEL = 'download_model',
   DELETE_MODEL = 'delete_model',
   UNLOAD_MODEL = 'unload_model',

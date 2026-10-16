@@ -1,0 +1,3386 @@
+{
+  "id": "dmb-robustness",
+  "name": "DMB: Spam Gate (S2) & Option-Order Stability (S4)",
+  "shortName": "DMB Robustness",
+  "category": "dmb",
+  "badge": "Order Flip Rate + Gate",
+  "icon": "bi-shield-check",
+  "description": "From nibzard/decision-model-benchmark: evaluates binary SMS spam gating (Suite S2) and Option-Order Permutation Stability (Suite S4, measuring how often predictions flip when option order is permuted).",
+  "sourceUrl": "https://github.com/nibzard/decision-model-benchmark",
+  "datasetUrl": "https://huggingface.co/datasets/ucirvine/sms_spam",
+  "evaluationMode": "robustness",
+  "baselines": [
+    {
+      "id": "gpt-6-luna-dmb",
+      "name": "OpenAI Decisions API (gpt-6-luna)",
+      "provider": "OpenAI (DMB)",
+      "accuracy": 0.96,
+      "ece": 0.041,
+      "flipRate": 0.02,
+      "latencyP50Ms": 295.0,
+      "source": "nibzard/decision-model-benchmark"
+    },
+    {
+      "id": "jev-dmb",
+      "name": "TypeSafe Jev (DMB S2 + S4)",
+      "provider": "TypeSafe AI",
+      "accuracy": 0.93,
+      "ece": 0.246,
+      "flipRate": 0.13,
+      "latencyP50Ms": 268.0,
+      "source": "nibzard/decision-model-benchmark"
+    },
+    {
+      "id": "laya-published-Order",
+      "name": "Laya Encoder (Bidirectional Marker)",
+      "provider": "Laya",
+      "accuracy": 0.955,
+      "ece": 0.035,
+      "flipRate": 0.035,
+      "latencyP50Ms": 24.0,
+      "source": "Laya BENCHMARKS.md"
+    }
+  ],
+  "cases": [
+    {
+      "id": "dmb_s2_spam_01",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Go until jurong point, crazy.. Available only in bugis n great world la e buffet... Cine there got amore wat...\"}",
+      "displayText": "[S2 Spam Gate] Go until jurong point, crazy.. Available only in bugis n great world la e buffet... Cine there got amore wat...",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_02",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Ok lar... Joking wif u oni...\"}",
+      "displayText": "[S2 Spam Gate] Ok lar... Joking wif u oni...",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_03",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C's apply 08452810075over18's\"}",
+      "displayText": "[S2 Spam Gate] Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C's apply 08452810075over18's",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_04",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"U dun say so early hor... U c already then say...\"}",
+      "displayText": "[S2 Spam Gate] U dun say so early hor... U c already then say...",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_05",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Nah I don't think he goes to usf, he lives around here though\"}",
+      "displayText": "[S2 Spam Gate] Nah I don't think he goes to usf, he lives around here though",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_06",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"FreeMsg Hey there darling it's been 3 week's now and no word back! I'd like some fun you up for it still? Tb ok! XxX std chgs to send, \\u00a31.50 to rcv\"}",
+      "displayText": "[S2 Spam Gate] FreeMsg Hey there darling it's been 3 week's now and no word back! I'd like some fun you up for it still? Tb ok! XxX std chgs to send, \u00a31.50 to rcv",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_07",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Even my brother is not like to speak with me. They treat me like aids patent.\"}",
+      "displayText": "[S2 Spam Gate] Even my brother is not like to speak with me. They treat me like aids patent.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_08",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"As per your request 'Melle Melle (Oru Minnaminunginte Nurungu Vettam)' has been set as your callertune for all Callers. Press *9 to copy your friends Callertune\"}",
+      "displayText": "[S2 Spam Gate] As per your request 'Melle Melle (Oru Minnaminunginte Nurungu Vettam)' has been set as your callertune for all Callers. Press *9 to copy your friends Callertune",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_09",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"WINNER!! As a valued network customer you have been selected to receivea \\u00a3900 prize reward! To claim call 09061701461. Claim code KL341. Valid 12 hours only.\"}",
+      "displayText": "[S2 Spam Gate] WINNER!! As a valued network customer you have been selected to receivea \u00a3900 prize reward! To claim call 09061701461. Claim code KL341. Valid 12 hours only.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_10",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Had your mobile 11 months or more? U R entitled to Update to the latest colour mobiles with camera for Free! Call The Mobile Update Co FREE on 08002986030\"}",
+      "displayText": "[S2 Spam Gate] Had your mobile 11 months or more? U R entitled to Update to the latest colour mobiles with camera for Free! Call The Mobile Update Co FREE on 08002986030",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_11",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"I'm gonna be home soon and i don't want to talk about this stuff anymore tonight, k? I've cried enough today.\"}",
+      "displayText": "[S2 Spam Gate] I'm gonna be home soon and i don't want to talk about this stuff anymore tonight, k? I've cried enough today.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_12",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info\"}",
+      "displayText": "[S2 Spam Gate] SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_13",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"URGENT! You have won a 1 week FREE membership in our \\u00a3100,000 Prize Jackpot! Txt the word: CLAIM to No: 81010 T&C www.dbuk.net LCCLTD POBOX 4403LDNW1A7RW18\"}",
+      "displayText": "[S2 Spam Gate] URGENT! You have won a 1 week FREE membership in our \u00a3100,000 Prize Jackpot! Txt the word: CLAIM to No: 81010 T&C www.dbuk.net LCCLTD POBOX 4403LDNW1A7RW18",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_14",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"I've been searching for the right words to thank you for this breather. I promise i wont take your help for granted and will fulfil my promise. You have been wonderful and a blessing at all times.\"}",
+      "displayText": "[S2 Spam Gate] I've been searching for the right words to thank you for this breather. I promise i wont take your help for granted and will fulfil my promise. You have been wonderful and a blessing at all times.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_15",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"I HAVE A DATE ON SUNDAY WITH WILL!!\"}",
+      "displayText": "[S2 Spam Gate] I HAVE A DATE ON SUNDAY WITH WILL!!",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_16",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"XXXMobileMovieClub: To use your credit, click the WAP link in the next txt message or click here>> http://wap. xxxmobilemovieclub.com?n=QJKGIGHJJGCBL\"}",
+      "displayText": "[S2 Spam Gate] XXXMobileMovieClub: To use your credit, click the WAP link in the next txt message or click here>> http://wap. xxxmobilemovieclub.com?n=QJKGIGHJJGCBL",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_17",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Oh k...i'm watching here:)\"}",
+      "displayText": "[S2 Spam Gate] Oh k...i'm watching here:)",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_18",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Eh u remember how 2 spell his name... Yes i did. He v naughty make until i v wet.\"}",
+      "displayText": "[S2 Spam Gate] Eh u remember how 2 spell his name... Yes i did. He v naughty make until i v wet.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_19",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Fine if that\\u0092s the way u feel. That\\u0092s the way its gota b\"}",
+      "displayText": "[S2 Spam Gate] Fine if that\u0092s the way u feel. That\u0092s the way its gota b",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_20",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"England v Macedonia - dont miss the goals/team news. Txt ur national team to 87077 eg ENGLAND to 87077 Try:WALES, SCOTLAND 4txt/\\u00fa1.20 POBOXox36504W45WQ 16+\"}",
+      "displayText": "[S2 Spam Gate] England v Macedonia - dont miss the goals/team news. Txt ur national team to 87077 eg ENGLAND to 87077 Try:WALES, SCOTLAND 4txt/\u00fa1.20 POBOXox36504W45WQ 16+",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "true",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_21",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Is that seriously how you spell his name?\"}",
+      "displayText": "[S2 Spam Gate] Is that seriously how you spell his name?",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_22",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"I\\u2018m going to try for 2 months ha ha only joking\"}",
+      "displayText": "[S2 Spam Gate] I\u2018m going to try for 2 months ha ha only joking",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_23",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"So \\u00fc pay first lar... Then when is da stock comin...\"}",
+      "displayText": "[S2 Spam Gate] So \u00fc pay first lar... Then when is da stock comin...",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_24",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Aft i finish my lunch then i go str down lor. Ard 3 smth lor. U finish ur lunch already?\"}",
+      "displayText": "[S2 Spam Gate] Aft i finish my lunch then i go str down lor. Ard 3 smth lor. U finish ur lunch already?",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_25",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Ffffffffff. Alright no way I can meet up with you sooner?\"}",
+      "displayText": "[S2 Spam Gate] Ffffffffff. Alright no way I can meet up with you sooner?",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_26",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Just forced myself to eat a slice. I'm really not hungry tho. This sucks. Mark is getting worried. He knows I'm sick when I turn down pizza. Lol\"}",
+      "displayText": "[S2 Spam Gate] Just forced myself to eat a slice. I'm really not hungry tho. This sucks. Mark is getting worried. He knows I'm sick when I turn down pizza. Lol",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_27",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Lol your always so convincing.\"}",
+      "displayText": "[S2 Spam Gate] Lol your always so convincing.",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_28",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Did you catch the bus ? Are you frying an egg ? Did you make a tea? Are you eating your mom's left over dinner ? Do you feel my Love ?\"}",
+      "displayText": "[S2 Spam Gate] Did you catch the bus ? Are you frying an egg ? Did you make a tea? Are you eating your mom's left over dinner ? Do you feel my Love ?",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_29",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"I'm back &amp; we're packing the car now, I'll let you know if there's room\"}",
+      "displayText": "[S2 Spam Gate] I'm back &amp; we're packing the car now, I'll let you know if there's room",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s2_spam_30",
+      "workflow": "S2: SMS Spam Gate",
+      "input": "{\"sms\": \"Ahhh. Work. I vaguely remember that! What does it feel like? Lol\"}",
+      "displayText": "[S2 Spam Gate] Ahhh. Work. I vaguely remember that! What does it feel like? Lol",
+      "schema": {
+        "context": "SMS Spam & Smishing Gate (DMB S2).",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this SMS message unsolicited commercial spam, a prize scam, or phishing?",
+            "options": [
+              {
+                "label": "true",
+                "description": "spam, scam, promotional lure, or phishing"
+              },
+              {
+                "label": "false",
+                "description": "legitimate personal or transactional SMS"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_01",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Olympic history for India, UAE An Indian army major shot his way to his country #39;s first ever individual Olympic silver medal on Tuesday, while in the same event an member of Dubai #39;s ruling family became the first ever medallist from the United Arab Emirates.\"}",
+      "displayText": "[S4 Order Permutations] Olympic history for India, UAE An Indian army major shot his way to his country #39;s first ever individual Olympic silver medal on Tuesday, while in the same event an member of Dubai #39;s ruling family became the first ever medallist from the United Arab Emirates.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sports",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_02",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Home Depot Likes High Oil Rising fuel prices, a bugbear for most of the retail sector, are helping Home Depot (HD:NYSE - news - research), the remodeling giant that reported a surge in second-quarter earnings Tuesday and guided the rest of the year higher.\"}",
+      "displayText": "[S4 Order Permutations] Home Depot Likes High Oil Rising fuel prices, a bugbear for most of the retail sector, are helping Home Depot (HD:NYSE - news - research), the remodeling giant that reported a surge in second-quarter earnings Tuesday and guided the rest of the year higher.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "business",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_03",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"China cracks down on  quot;phone sex quot; services BEIJING, Aug. 17 (Xinhuanet) -- China is carrying out a nationwide campaign to crack down on  quot;phone sex quot; services, paralleling another sweeping operation against Internet pornography, Minister of Information Industry Wang Xudong said here Tuesday.\"}",
+      "displayText": "[S4 Order Permutations] China cracks down on  quot;phone sex quot; services BEIJING, Aug. 17 (Xinhuanet) -- China is carrying out a nationwide campaign to crack down on  quot;phone sex quot; services, paralleling another sweeping operation against Internet pornography, Minister of Information Industry Wang Xudong said here Tuesday.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_04",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Surviving Biotech's Downturns Charly Travers offers advice on withstanding the volatility of the biotech sector.\"}",
+      "displayText": "[S4 Order Permutations] Surviving Biotech's Downturns Charly Travers offers advice on withstanding the volatility of the biotech sector.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "business",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_05",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Mr Downer shoots his mouth off Just what Alexander Downer was thinking when he declared on radio last Friday that  quot;they could fire a missile from North Korea to Sydney quot; is unclear. The provocative remark, just days before his arrival yesterday on his second visit to the North Korean ...\"}",
+      "displayText": "[S4 Order Permutations] Mr Downer shoots his mouth off Just what Alexander Downer was thinking when he declared on radio last Friday that  quot;they could fire a missile from North Korea to Sydney quot; is unclear. The provocative remark, just days before his arrival yesterday on his second visit to the North Korean ...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "world",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_06",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Edwards Banned from Games - Source  ATHENS (Reuters) - World 100 meters champion Torri Edwards  will miss the Athens Olympics after her appeal against a  two-year drugs ban was dismissed on Tuesday, a source told  Reuters.\"}",
+      "displayText": "[S4 Order Permutations] Edwards Banned from Games - Source  ATHENS (Reuters) - World 100 meters champion Torri Edwards  will miss the Athens Olympics after her appeal against a  two-year drugs ban was dismissed on Tuesday, a source told  Reuters.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sports",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_07",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Stocks Climb on Drop in Consumer Prices NEW YORK - Stocks rose for a second straight session Tuesday as a drop in consumer prices allowed investors to put aside worries about inflation, at least for the short term.    With gasoline prices falling to eight-month lows, the Consumer Price Index registered a small drop in July, giving consumers a respite from soaring energy prices...\"}",
+      "displayText": "[S4 Order Permutations] Stocks Climb on Drop in Consumer Prices NEW YORK - Stocks rose for a second straight session Tuesday as a drop in consumer prices allowed investors to put aside worries about inflation, at least for the short term.    With gasoline prices falling to eight-month lows, the Consumer Price Index registered a small drop in July, giving consumers a respite from soaring energy prices...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "world",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_08",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Iliadis, Tanimoto win judo golds Ilias Iliadis of Greece thrilled the home crowd Tuesday, beating Roman Gontyuk of Ukraine to win the gold medal in the 81-kilogram class.\"}",
+      "displayText": "[S4 Order Permutations] Iliadis, Tanimoto win judo golds Ilias Iliadis of Greece thrilled the home crowd Tuesday, beating Roman Gontyuk of Ukraine to win the gold medal in the 81-kilogram class.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sports",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_09",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Sudan vows to restore order to Darfur but calls for African peacekeepers (AFP) AFP - Sudan will take the lead in restoring order to its rebellious Darfur region but needs the support of African peacekeepers and humanitarian aid, Foreign Minister Mustafa Osman Ismail said.\"}",
+      "displayText": "[S4 Order Permutations] Sudan vows to restore order to Darfur but calls for African peacekeepers (AFP) AFP - Sudan will take the lead in restoring order to its rebellious Darfur region but needs the support of African peacekeepers and humanitarian aid, Foreign Minister Mustafa Osman Ismail said.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "world",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "world",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_10",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"TGn Sync Proposes New WLAN Standard The battle over home entertainment networking is heating up as a coalition proposes yet another standard for the IEEE #39;s consideration.\"}",
+      "displayText": "[S4 Order Permutations] TGn Sync Proposes New WLAN Standard The battle over home entertainment networking is heating up as a coalition proposes yet another standard for the IEEE #39;s consideration.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_11",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Yahoo! Ups Ante for Small Businesses Web giant Yahoo! is gambling that price cuts on its domain name registration and Web hosting products will make it more competitive with discounters in the space -- which means that small businesses looking to move online get a sweeter deal through ...\"}",
+      "displayText": "[S4 Order Permutations] Yahoo! Ups Ante for Small Businesses Web giant Yahoo! is gambling that price cuts on its domain name registration and Web hosting products will make it more competitive with discounters in the space -- which means that small businesses looking to move online get a sweeter deal through ...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "business",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_12",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"IBM Buys Two Danish Services Firms IBM said Tuesday it has acquired a pair of Danish IT services firms as part of its effort to broaden its presence in Scandinavia. As a result of the moves, IBM will add about 3,700 IT staffers to its global head count. Financial terms of ...\"}",
+      "displayText": "[S4 Order Permutations] IBM Buys Two Danish Services Firms IBM said Tuesday it has acquired a pair of Danish IT services firms as part of its effort to broaden its presence in Scandinavia. As a result of the moves, IBM will add about 3,700 IT staffers to its global head count. Financial terms of ...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_13",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Motorola and HP in Linux tie-up Motorola plans to sell mobile phone network equipment that uses Linux-based code, a step forward in network gear makers #39; efforts to rally around a standard.\"}",
+      "displayText": "[S4 Order Permutations] Motorola and HP in Linux tie-up Motorola plans to sell mobile phone network equipment that uses Linux-based code, a step forward in network gear makers #39; efforts to rally around a standard.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_14",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Microsoft Pushes Off SP2 Release Microsoft will delay the release of its SP2 update for another week to fix software glitches. But not everyone is quite so eager to install the SP2 update for Windows XP. In fact, many companies have demanded the ability to prevent their ...\"}",
+      "displayText": "[S4 Order Permutations] Microsoft Pushes Off SP2 Release Microsoft will delay the release of its SP2 update for another week to fix software glitches. But not everyone is quite so eager to install the SP2 update for Windows XP. In fact, many companies have demanded the ability to prevent their ...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_15",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Cassini Space Probe Spots Two New Saturn Moons (Reuters) Reuters - Two new moons were spotted around\\\\Saturn by the Cassini space probe, raising the total to 33\\\\moons for the ringed planet, NASA said on Monday.\"}",
+      "displayText": "[S4 Order Permutations] Cassini Space Probe Spots Two New Saturn Moons (Reuters) Reuters - Two new moons were spotted around\\Saturn by the Cassini space probe, raising the total to 33\\moons for the ringed planet, NASA said on Monday.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_16",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Buckeyes have lots to replace but are brimming with optimism There are remarkable similarities between the 2004 Ohio State Buckeyes and those that won the national championship just two years ago.\"}",
+      "displayText": "[S4 Order Permutations] Buckeyes have lots to replace but are brimming with optimism There are remarkable similarities between the 2004 Ohio State Buckeyes and those that won the national championship just two years ago.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sports",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_17",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"IBM adds midrange server to eServer lineup The new IBM Power5 eServer i5 550 also features higher performance and new virtualization capabilities that allow it to run multiple operating systems at once on separate partitions.\"}",
+      "displayText": "[S4 Order Permutations] IBM adds midrange server to eServer lineup The new IBM Power5 eServer i5 550 also features higher performance and new virtualization capabilities that allow it to run multiple operating systems at once on separate partitions.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_18",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"iPod Comparison Newsday #146;s Stephen Williams reports on seeing Sony #146;s NW-HD1 audio player in a store:  #147; #145;How #146;s it compare to the iPod? #146; I asked a salesman.  #145;Battery life is a lot longer, up to 30 hours, #146; he said.  #145;The LCD readout is kind of dim, #146; I said.   #146;Battery life is a lot longer, #146; he said.  #145;I understand it can #146;t play MP3 files, #146; I said.  #145;Battery life is a lot longer, #146; he said. #148; Aug 17\"}",
+      "displayText": "[S4 Order Permutations] iPod Comparison Newsday #146;s Stephen Williams reports on seeing Sony #146;s NW-HD1 audio player in a store:  #147; #145;How #146;s it compare to the iPod? #146; I asked a salesman.  #145;Battery life is a lot longer, up to 30 hours, #146; he said.  #145;The LCD readout is kind of dim, #146; I said.   #146;Battery life is a lot longer, #146; he said.  #145;I understand it can #146;t play MP3 files, #146; I said.  #145;Battery life is a lot longer, #146; he said. #148; Aug 17",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sci_tech",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sci_tech",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_19",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Mills Grabs \\\\$1B Portfolio; Taubman Likely to Lose Contracts Mills Corp. agreed to purchase a 50 percent interest in nine malls owned by General Motors Asset Management Corp. for just over \\\\$1 billion, creating a new joint venture between the groups. The deal will extend ...\"}",
+      "displayText": "[S4 Order Permutations] Mills Grabs \\$1B Portfolio; Taubman Likely to Lose Contracts Mills Corp. agreed to purchase a 50 percent interest in nine malls owned by General Motors Asset Management Corp. for just over \\$1 billion, creating a new joint venture between the groups. The deal will extend ...",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "business",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "business",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "dmb_s4_order_20",
+      "workflow": "S4: Option-Order Stability",
+      "input": "{\"article\": \"Women stumble to silver ATHENS -- The mistakes were so minor. Carly Patterson #39;s foot scraping the lower of the uneven bars. Courtney Kupets #39; tumbling pass that ended here instead of there. Mohini Bhardwaj #39;s slight stumble on the beam.\"}",
+      "displayText": "[S4 Order Permutations] Women stumble to silver ATHENS -- The mistakes were so minor. Carly Patterson #39;s foot scraping the lower of the uneven bars. Courtney Kupets #39; tumbling pass that ended here instead of there. Mohini Bhardwaj #39;s slight stumble on the beam.",
+      "schema": {
+        "context": "DMB S4 Option-Order Stability Test.",
+        "expectedInputs": [
+          {
+            "type": "text",
+            "languages": [
+              "en"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "topic_p1",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              }
+            ]
+          },
+          {
+            "id": "topic_p2",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              },
+              {
+                "label": "business",
+                "description": "business and economy"
+              }
+            ]
+          },
+          {
+            "id": "topic_p3",
+            "type": "choice",
+            "prompt": "What is the topic of `article`?",
+            "options": [
+              {
+                "label": "business",
+                "description": "business and economy"
+              },
+              {
+                "label": "sci_tech",
+                "description": "science and technology"
+              },
+              {
+                "label": "sports",
+                "description": "sports"
+              },
+              {
+                "label": "world",
+                "description": "world news and international politics"
+              }
+            ]
+          }
+        ]
+      },
+      "orderStabilityGroup": [
+        "topic_p1",
+        "topic_p2",
+        "topic_p3"
+      ],
+      "gold": {
+        "topic_p1": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p2": {
+          "label": "sports",
+          "type": "choice"
+        },
+        "topic_p3": {
+          "label": "sports",
+          "type": "choice"
+        }
+      }
+    }
+  ]
+}

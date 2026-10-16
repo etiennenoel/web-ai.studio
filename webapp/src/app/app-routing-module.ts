@@ -8,6 +8,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CortexPage} from './pages/cortex/cortex.page';
 import {CortexInsightsPage} from './pages/cortex-insights/cortex-insights.page';
+import {DecisionsBenchmarkPage} from './pages/decisions-benchmark/decisions-benchmark.page';
 import {PrivacyPolicyPage} from './pages/privacy-policy/privacy-policy.page';
 import {TermsOfServicePage} from './pages/terms-of-service/terms-of-service.page';
 import {BugsPage} from './pages/bugs/bugs.page';
@@ -494,6 +495,15 @@ const routes: Routes = [
         component: ConsumerHardwareAnalysisPage,
         data: {
           route: RouteEnum.DashboardsConsumerHardware
+        }
+      },
+      {
+        path: "decisions-benchmark",
+
+        title: "Decisions Benchmark",
+        component: DecisionsBenchmarkPage,
+        data: {
+          route: RouteEnum.DecisionsBenchmark
         }
       },
       {

@@ -19,6 +19,19 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   isDocsExpanded = false;
   isBestPracticesExpanded = false;
   isPlaygroundsExpanded = true;
+  isDecisionsBenchmarkExpanded = false;
+  activeDecisionsSuiteId = 'laya-typed-decisions';
+
+  readonly decisionsBenchmarkSuites: Array<{ id: string; label: string; icon: string }> = [
+    { id: 'laya-typed-decisions', label: 'Typed-Decisions', icon: 'bi-diagram-3' },
+    { id: 'jev-ag-news', label: 'JEV: AG News', icon: 'bi-newspaper' },
+    { id: 'jev-emotion', label: 'JEV: DAIR Emotion', icon: 'bi-emoji-smile' },
+    { id: 'jev-banking', label: 'JEV: Banking77', icon: 'bi-bank' },
+    { id: 'dmb-robustness', label: 'DMB Robustness', icon: 'bi-shield-check' },
+    { id: 'app-guardrails-moderation', label: 'LLM Guardrails', icon: 'bi-shield-exclamation' },
+    { id: 'massive-multilingual', label: 'MASSIVE (6-Lang)', icon: 'bi-translate' },
+    { id: 'litert-parity-gate', label: 'LiteRT Parity Gate', icon: 'bi-cpu-fill' },
+  ];
 
   constructor(@Inject(DOCUMENT) document: Document,
               @Inject(PLATFORM_ID) private platformId: Object,
@@ -36,7 +49,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    this.determineCurrentActiveRoute(window.location.pathname);
+    this.determineCurrentActiveRoute(window.location.pathname, window.location.search);
 
     this.subscriptions.push(
       this.router.events.pipe(
@@ -45,7 +58,11 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         const navEvent = event as NavigationEnd;
         // Extract pathname without query params or hash
         const urlTree = this.router.parseUrl(navEvent.urlAfterRedirects);
-        this.determineCurrentActiveRoute('/' + urlTree.root.children['primary']?.segments.map(s => s.path).join('/') || '/');
+        const suiteParam = urlTree.queryParams?.['suite'];
+        this.determineCurrentActiveRoute(
+          '/' + urlTree.root.children['primary']?.segments.map(s => s.path).join('/') || '/',
+          suiteParam ? `?suite=${suiteParam}` : ''
+        );
       })
     );
   }
@@ -139,7 +156,23 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     this.isPlaygroundsExpanded = !this.isPlaygroundsExpanded;
   }
 
-  determineCurrentActiveRoute(pathname: string) {
+  get isDecisionsBenchmarkActive(): boolean {
+    return this.routeEnum === RouteEnum.DecisionsBenchmark;
+  }
+
+  toggleDecisionsBenchmark(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDecisionsBenchmarkExpanded = !this.isDecisionsBenchmarkExpanded;
+  }
+
+  navigateToDecisionsBenchmark() {
+    this.router.navigate([this.RouteEnum.DecisionsBenchmark], {
+      queryParams: { suite: this.activeDecisionsSuiteId }
+    });
+  }
+
+  determineCurrentActiveRoute(pathname: string, search = '') {
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
       return;
@@ -201,6 +234,17 @@ export class SidebarComponent extends BaseComponent implements OnInit {
         break;
       case "cortex":
         this.routeEnum = RouteEnum.Cortex;
+        break;
+      case "decisions-benchmark":
+        this.routeEnum = RouteEnum.DecisionsBenchmark;
+        this.isDecisionsBenchmarkExpanded = true;
+        if (search) {
+          const params = new URLSearchParams(search);
+          const suite = params.get('suite');
+          if (suite && this.decisionsBenchmarkSuites.some(s => s.id === suite)) {
+            this.activeDecisionsSuiteId = suite;
+          }
+        }
         break;
       case "extension":
         this.routeEnum = RouteEnum.Extension;
