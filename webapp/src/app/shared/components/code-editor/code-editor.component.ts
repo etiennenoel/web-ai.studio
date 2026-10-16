@@ -27,8 +27,10 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   @Input() readOnly: boolean = true;
   @Input() darkTheme: boolean = false;
   @Input() wrap: boolean = false;
+  @Input() foldTemplateLiterals: boolean = false;
   @Output() codeChange = new EventEmitter<string>();
 
+  private ace: any;
   private editor: any;
   private themeObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -49,6 +51,7 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
   async ngAfterViewInit(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
       const ace = (await import('ace-builds')).default;
+      this.ace = ace;
       
       // Dynamically load the modes and themes so they are bundled with webpack 
       // but don't execute in the Node SSR environment
@@ -63,8 +66,10 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
       
       this.updateTheme();
       this.editor.session.setMode(`ace/mode/${this.language}`);
+      this.setupTemplateLiteralFolding();
       this.editor.session.setUseWrapMode(this.wrap);
       this.editor.setValue(this.code, -1);
+      this.applyDefaultTemplateLiteralFolds();
       this.editor.setReadOnly(this.readOnly);
       
       // Customize standard styles to blend with our UI
@@ -110,16 +115,102 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges, OnDestroy 
     this.editor.setTheme(isDark ? 'ace/theme/one_dark' : 'ace/theme/chrome');
   }
 
+  private getTemplateLiteralFoldRange(session: any, row: number): any {
+    if (!this.ace || !session) return null;
+    const line: string = session.getLine(row) || '';
+    if (!/^(?:const|let|var)\s+\w+\s*=\s*`/.test(line)) {
+      return null;
+    }
+    const openBacktickCol = line.indexOf('`');
+    if (openBacktickCol === -1) return null;
+
+    // Check if the template literal closes on the same line
+    const restOfLine = line.slice(openBacktickCol + 1);
+    if (/(?:^|[^\\])`;\s*$/.test(restOfLine)) {
+      return null;
+    }
+
+    const maxRow = session.getLength();
+    for (let r = row + 1; r < maxRow; r++) {
+      const candidate: string = session.getLine(r) || '';
+      if (/(?:^|[^\\])`;\s*$/.test(candidate)) {
+        const closeBacktickCol = candidate.lastIndexOf('`');
+        if (closeBacktickCol !== -1) {
+          return new this.ace.Range(row, openBacktickCol + 1, r, closeBacktickCol);
+        }
+      }
+    }
+    return null;
+  }
+
+  private setupTemplateLiteralFolding(): void {
+    const session = this.editor?.session;
+    if (!session) return;
+
+    const attachHooks = () => {
+      if (!session.getFoldWidget || (session.getFoldWidget as any).__hasTemplateHook) {
+        return;
+      }
+      const baseGetFoldWidget = session.getFoldWidget.bind(session);
+      const baseGetFoldWidgetRange = session.getFoldWidgetRange
+        ? session.getFoldWidgetRange.bind(session)
+        : () => null;
+
+      const wrappedGetFoldWidget = (row: number) => {
+        if (this.getTemplateLiteralFoldRange(session, row)) {
+          return 'start';
+        }
+        return baseGetFoldWidget(row);
+      };
+      (wrappedGetFoldWidget as any).__hasTemplateHook = true;
+
+      session.getFoldWidget = wrappedGetFoldWidget;
+      session.getFoldWidgetRange = (row: number, forceMultiline?: boolean) => {
+        const customRange = this.getTemplateLiteralFoldRange(session, row);
+        if (customRange) {
+          return customRange;
+        }
+        return baseGetFoldWidgetRange(row, forceMultiline);
+      };
+      session.foldWidgets = [];
+    };
+
+    attachHooks();
+    session.on('changeMode', () => {
+      attachHooks();
+      this.applyDefaultTemplateLiteralFolds();
+    });
+  }
+
+  private applyDefaultTemplateLiteralFolds(): void {
+    if (!this.foldTemplateLiterals || !this.editor?.session || !this.ace) {
+      return;
+    }
+    const session = this.editor.session;
+    const maxRow = session.getLength();
+    for (let row = 0; row < maxRow; row++) {
+      const range = this.getTemplateLiteralFoldRange(session, row);
+      if (range) {
+        session.addFold('...', range);
+        row = range.end.row;
+      }
+    }
+    session.foldWidgets = [];
+    this.editor.renderer.updateFull();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (this.editor && changes['code']) {
       if (this.editor.getValue() !== this.code) {
         this.isInternalChange = true;
         this.editor.setValue(this.code, -1);
+        this.applyDefaultTemplateLiteralFolds();
         this.isInternalChange = false;
       }
     }
     if(this.editor && changes['language']) {
       this.editor.session.setMode(`ace/mode/${this.language}`);
+      this.setupTemplateLiteralFolding();
     }
     if(this.editor && changes['readOnly']) {
       this.editor.setReadOnly(this.readOnly);
