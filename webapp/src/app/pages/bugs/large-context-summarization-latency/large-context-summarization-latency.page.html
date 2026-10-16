@@ -186,8 +186,9 @@
       <div [style.height.px]="inspectorHeight" class="w-full relative overflow-hidden">
         @if (activeInspectorTab === 'code') {
           <app-code-editor
-            [code]="getCodeSnippet(selectedRunId, false)"
+            [code]="getCodeSnippet(selectedRunId, true)"
             language="javascript"
+            [wrap]="true"
             [readOnly]="true"
             [darkTheme]="true"
             [height]="inspectorHeight + 'px'">

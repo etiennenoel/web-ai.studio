@@ -263,21 +263,19 @@ export class LargeContextSummarizationLatencyPage
     ];
   }
 
-  getCodeSnippet(patternId: RunPatternId, includeFullStrings = false): string {
-    const sysComment = `${this.systemPromptText.length.toLocaleString()} chars (~${this.estimatedSystemTokens} tokens)`;
-    const docComment = `${this.documentText.length.toLocaleString()} chars (~${this.estimatedDocumentTokens} tokens)`;
+  getCodeSnippet(patternId: RunPatternId, _includeFullStrings = true): string {
+    const toTemplateLiteral = (text: string): string =>
+      `\`${text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\``;
 
-    const sysLiteral = includeFullStrings
-      ? JSON.stringify(this.systemPromptText)
-      : `\`${this.systemPromptText.slice(0, 140).replace(/`/g, '\\`')}... [${sysComment}]\``;
-
-    const docLiteral = includeFullStrings
-      ? JSON.stringify(this.documentText)
-      : `\`${this.documentText.slice(0, 140).replace(/`/g, '\\`')}... [${docComment}]\``;
+    const sysLiteral = toTemplateLiteral(this.systemPromptText);
+    const docLiteral = toTemplateLiteral(this.documentText);
 
     if (patternId === 'prompt-parallel') {
       return `const SYSTEM_PROMPT = ${sysLiteral};
-const extractDocumentText = async () => ${docLiteral};
+
+const DOCUMENT_TEXT = ${docLiteral};
+
+const extractDocumentText = async () => DOCUMENT_TEXT;
 
 async function summarize() {
   const abortController = new AbortController();
