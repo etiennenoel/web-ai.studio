@@ -15,8 +15,6 @@ import { ClassifierLoadedModel } from './classifier-loaded-model.interface';
 
 declare const chrome: any;
 
-const EMBEDDING_ROWS = 256000;
-
 /** Builds a LayaHost for a cached variant: loads LiteRT.js, tokenizer, calibration, and both graphs. */
 export class ClassifierModelLoader {
   private static liteRtReady: Promise<void> | null = null;
@@ -36,14 +34,18 @@ export class ClassifierModelLoader {
     const builder = new LayaSequenceBuilder(tokenizer, variant.window, variant.headMaxLen);
     const initialHeadLengths = initialQuestions?.map((q) => builder.buildHead(q).ids.length);
 
-    const embeddingTable =
-      variant.inputMode === ClassifierModelInputMode.INPUTS_EMBEDS
-        ? new LayaEmbeddingTable(
-            await store.read(variant, ClassifierModelFileRole.EMBEDDING_TABLE),
-            EMBEDDING_ROWS,
-            variant.hidden,
-          )
-        : undefined;
+    let embeddingTable: LayaEmbeddingTable | undefined;
+    if (variant.inputMode === ClassifierModelInputMode.INPUTS_EMBEDS) {
+      const embeddingBuffer = await store.read(variant, ClassifierModelFileRole.EMBEDDING_TABLE);
+      const rowBytes = variant.hidden * 2;
+      if (embeddingBuffer.byteLength % rowBytes !== 0) {
+        throw new Error(
+          `LayaEmbeddingTable: byteLength ${embeddingBuffer.byteLength} is not a multiple of ${rowBytes} (hidden=${variant.hidden} fp16)`,
+        );
+      }
+      const embeddingRows = embeddingBuffer.byteLength / rowBytes;
+      embeddingTable = new LayaEmbeddingTable(embeddingBuffer, embeddingRows, variant.hidden);
+    }
 
     const mainBytes = new Uint8Array(await store.read(variant, ClassifierModelFileRole.MAIN_GRAPH));
     const actBytes = new Uint8Array(await store.read(variant, ClassifierModelFileRole.ACT_HEAD));

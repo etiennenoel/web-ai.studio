@@ -1,0 +1,1122 @@
+{
+  "id": "jev-emotion",
+  "name": "JEV-Bench: DAIR Emotion (6-Way)",
+  "shortName": "DAIR Emotion",
+  "category": "jev-bench",
+  "badge": "JEV-Bench",
+  "icon": "bi-emoji-smile",
+  "description": "Held-out 6-way emotion classification (dair-ai/emotion test split). Known calibration stress-test where uncalibrated models suffer severe overconfidence and NLL spikes.",
+  "sourceUrl": "https://github.com/AbdelStark/jev-benchmarks",
+  "datasetUrl": "https://huggingface.co/datasets/dair-ai/emotion",
+  "evaluationMode": "standard",
+  "sharedSchema": {
+    "context": "Identify the primary emotion expressed in short social media messages.",
+    "expectedInputs": [
+      {
+        "type": "text",
+        "languages": [
+          "en"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "id": "emotion",
+        "type": "choice",
+        "prompt": "Which emotion is most strongly expressed in `text`?",
+        "options": [
+          {
+            "label": "sadness",
+            "description": "sorrow, grief, disappointment, or gloom"
+          },
+          {
+            "label": "joy",
+            "description": "happiness, excitement, pleasure, or optimism"
+          },
+          {
+            "label": "love",
+            "description": "affection, warmth, caring, or devotion"
+          },
+          {
+            "label": "anger",
+            "description": "frustration, rage, irritation, or resentment"
+          },
+          {
+            "label": "fear",
+            "description": "anxiety, worry, terror, or nervousness"
+          },
+          {
+            "label": "surprise",
+            "description": "astonishment, shock, or unexpected discovery"
+          }
+        ]
+      }
+    ]
+  },
+  "baselines": [
+    {
+      "id": "laya-td-published",
+      "name": "Laya Typed-Decisions (Reference)",
+      "provider": "Laya 421M",
+      "accuracy": 0.6,
+      "macroF1": 0.4741,
+      "brierScore": 0.6113,
+      "nll": 1.3242,
+      "ece": 0.2005,
+      "meanConfidence": 0.7928,
+      "latencyP50Ms": 49.7,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-en-published",
+      "name": "Laya English Base (Reference)",
+      "provider": "Laya 421M",
+      "accuracy": 0.595,
+      "macroF1": 0.4752,
+      "brierScore": 0.6963,
+      "nll": 2.0194,
+      "ece": 0.3063,
+      "meanConfidence": 0.9013,
+      "latencyP50Ms": 33.0,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-ml-published",
+      "name": "Laya Multilingual Base (Reference)",
+      "provider": "Laya 322M",
+      "accuracy": 0.53,
+      "macroF1": 0.4441,
+      "brierScore": 0.7659,
+      "nll": 2.2797,
+      "ece": 0.3412,
+      "meanConfidence": 0.8712,
+      "latencyP50Ms": 17.6,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "jev-0.1-published",
+      "name": "TypeSafe Jev v0.1.0 (Cloud API)",
+      "provider": "TypeSafe AI",
+      "accuracy": 0.48,
+      "brierScore": 0.846,
+      "nll": 5.588,
+      "coverageAt5PctRisk": 0.0,
+      "latencyP50Ms": 240.0,
+      "source": "AbdelStark/jev-benchmarks"
+    },
+    {
+      "id": "uniform-random",
+      "name": "Uniform Random Baseline",
+      "provider": "Baseline",
+      "accuracy": 0.1667,
+      "macroF1": 0.1667,
+      "brierScore": 0.8333,
+      "nll": 1.7918,
+      "ece": 0.0,
+      "meanConfidence": 0.1667,
+      "source": "Analytical (K=6)"
+    }
+  ],
+  "cases": [
+    {
+      "id": "emotion_001",
+      "input": "{\"text\": \"im feeling rather rotten so im not very ambitious right now\"}",
+      "displayText": "im feeling rather rotten so im not very ambitious right now",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_002",
+      "input": "{\"text\": \"im updating my blog because i feel shitty\"}",
+      "displayText": "im updating my blog because i feel shitty",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_003",
+      "input": "{\"text\": \"i never make her separate from me because i don t ever want her to feel like i m ashamed with her\"}",
+      "displayText": "i never make her separate from me because i don t ever want her to feel like i m ashamed with her",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_004",
+      "input": "{\"text\": \"i left with my bouquet of red and yellow tulips under my arm feeling slightly more optimistic than when i arrived\"}",
+      "displayText": "i left with my bouquet of red and yellow tulips under my arm feeling slightly more optimistic than when i arrived",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_005",
+      "input": "{\"text\": \"i was feeling a little vain when i did this one\"}",
+      "displayText": "i was feeling a little vain when i did this one",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_006",
+      "input": "{\"text\": \"i cant walk into a shop anywhere where i do not feel uncomfortable\"}",
+      "displayText": "i cant walk into a shop anywhere where i do not feel uncomfortable",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_007",
+      "input": "{\"text\": \"i felt anger when at the end of a telephone call\"}",
+      "displayText": "i felt anger when at the end of a telephone call",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_008",
+      "input": "{\"text\": \"i explain why i clung to a relationship with a boy who was in many ways immature and uncommitted despite the excitement i should have been feeling for getting accepted into the masters program at the university of virginia\"}",
+      "displayText": "i explain why i clung to a relationship with a boy who was in many ways immature and uncommitted despite the excitement i should have been feeling for getting accepted into the masters program at the university of virginia",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_009",
+      "input": "{\"text\": \"i like to have the same breathless feeling as a reader eager to see what will happen next\"}",
+      "displayText": "i like to have the same breathless feeling as a reader eager to see what will happen next",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_010",
+      "input": "{\"text\": \"i jest i feel grumpy tired and pre menstrual which i probably am but then again its only been a week and im about as fit as a walrus on vacation for the summer\"}",
+      "displayText": "i jest i feel grumpy tired and pre menstrual which i probably am but then again its only been a week and im about as fit as a walrus on vacation for the summer",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_011",
+      "input": "{\"text\": \"i don t feel particularly agitated\"}",
+      "displayText": "i don t feel particularly agitated",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_012",
+      "input": "{\"text\": \"i feel beautifully emotional knowing that these women of whom i knew just a handful were holding me and my baba on our journey\"}",
+      "displayText": "i feel beautifully emotional knowing that these women of whom i knew just a handful were holding me and my baba on our journey",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_013",
+      "input": "{\"text\": \"i pay attention it deepens into a feeling of being invaded and helpless\"}",
+      "displayText": "i pay attention it deepens into a feeling of being invaded and helpless",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_014",
+      "input": "{\"text\": \"i just feel extremely comfortable with the group of people that i dont even need to hide myself\"}",
+      "displayText": "i just feel extremely comfortable with the group of people that i dont even need to hide myself",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_015",
+      "input": "{\"text\": \"i find myself in the odd position of feeling supportive of\"}",
+      "displayText": "i find myself in the odd position of feeling supportive of",
+      "gold": {
+        "emotion": {
+          "label": "love"
+        }
+      }
+    },
+    {
+      "id": "emotion_016",
+      "input": "{\"text\": \"i was feeling as heartbroken as im sure katniss was\"}",
+      "displayText": "i was feeling as heartbroken as im sure katniss was",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_017",
+      "input": "{\"text\": \"i feel a little mellow today\"}",
+      "displayText": "i feel a little mellow today",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_018",
+      "input": "{\"text\": \"i feel like my only role now would be to tear your sails with my pessimism and discontent\"}",
+      "displayText": "i feel like my only role now would be to tear your sails with my pessimism and discontent",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_019",
+      "input": "{\"text\": \"i feel just bcoz a fight we get mad to each other n u wanna make a publicity n let the world knows about our fight\"}",
+      "displayText": "i feel just bcoz a fight we get mad to each other n u wanna make a publicity n let the world knows about our fight",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_020",
+      "input": "{\"text\": \"i feel like reds and purples are just so rich and kind of perfect\"}",
+      "displayText": "i feel like reds and purples are just so rich and kind of perfect",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_021",
+      "input": "{\"text\": \"im not sure the feeling of loss will ever go away but it may dull to a sweet feeling of nostalgia at what i shared in this life with my dad and the luck i had to have a dad for years\"}",
+      "displayText": "im not sure the feeling of loss will ever go away but it may dull to a sweet feeling of nostalgia at what i shared in this life with my dad and the luck i had to have a dad for years",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_022",
+      "input": "{\"text\": \"i feel like ive gotten to know many of you through comments and emails and for that im appreciative and glad you are a part of this little space\"}",
+      "displayText": "i feel like ive gotten to know many of you through comments and emails and for that im appreciative and glad you are a part of this little space",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_023",
+      "input": "{\"text\": \"i survey my own posts over the last few years and only feel pleased with vague snippets of a few of them only feel that little bits of them capture what its like to be me or someone like me in dublin in the st century\"}",
+      "displayText": "i survey my own posts over the last few years and only feel pleased with vague snippets of a few of them only feel that little bits of them capture what its like to be me or someone like me in dublin in the st century",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_024",
+      "input": "{\"text\": \"i also tell you in hopes that anyone who is still feeling stigmatized or ashamed of their mental health issues will let go of the stigma let go of the shame\"}",
+      "displayText": "i also tell you in hopes that anyone who is still feeling stigmatized or ashamed of their mental health issues will let go of the stigma let go of the shame",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_025",
+      "input": "{\"text\": \"i don t feel guilty like i m not going to be able to cook for him\"}",
+      "displayText": "i don t feel guilty like i m not going to be able to cook for him",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_026",
+      "input": "{\"text\": \"i hate it when i feel fearful for absolutely no reason\"}",
+      "displayText": "i hate it when i feel fearful for absolutely no reason",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_027",
+      "input": "{\"text\": \"i am feeling outraged it shows everywhere\"}",
+      "displayText": "i am feeling outraged it shows everywhere",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_028",
+      "input": "{\"text\": \"i stole a book from one of my all time favorite authors and now i feel like a rotten person\"}",
+      "displayText": "i stole a book from one of my all time favorite authors and now i feel like a rotten person",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_029",
+      "input": "{\"text\": \"i do feel insecure sometimes but who doesnt\"}",
+      "displayText": "i do feel insecure sometimes but who doesnt",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_030",
+      "input": "{\"text\": \"i highly recommend visiting on a wednesday if youre able because its less crowded so you get to ask the farmers more questions without feeling rude for holding up a line\"}",
+      "displayText": "i highly recommend visiting on a wednesday if youre able because its less crowded so you get to ask the farmers more questions without feeling rude for holding up a line",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_031",
+      "input": "{\"text\": \"ive been missing him and feeling so restless at home thinking of him\"}",
+      "displayText": "ive been missing him and feeling so restless at home thinking of him",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_032",
+      "input": "{\"text\": \"i posted on my facebook page earlier this week ive been feeling a little grumpy and out of sorts the past few days\"}",
+      "displayText": "i posted on my facebook page earlier this week ive been feeling a little grumpy and out of sorts the past few days",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_033",
+      "input": "{\"text\": \"i start to feel emotional\"}",
+      "displayText": "i start to feel emotional",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_034",
+      "input": "{\"text\": \"i feel so cold a href http irish\"}",
+      "displayText": "i feel so cold a href http irish",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_035",
+      "input": "{\"text\": \"i feel like i m defective or something for not having baby fever\"}",
+      "displayText": "i feel like i m defective or something for not having baby fever",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_036",
+      "input": "{\"text\": \"i feel more virtuous than when i eat veggies dipped in hummus\"}",
+      "displayText": "i feel more virtuous than when i eat veggies dipped in hummus",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_037",
+      "input": "{\"text\": \"i feel very honoured to be included in a magzine which prioritises health and clean living so highly im curious do any of you read magazines concerned with health and clean lifestyles such as the green parent\"}",
+      "displayText": "i feel very honoured to be included in a magzine which prioritises health and clean living so highly im curious do any of you read magazines concerned with health and clean lifestyles such as the green parent",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_038",
+      "input": "{\"text\": \"i spent the last two weeks of school feeling miserable\"}",
+      "displayText": "i spent the last two weeks of school feeling miserable",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_039",
+      "input": "{\"text\": \"im feeling very peaceful about our wedding again now after having\"}",
+      "displayText": "im feeling very peaceful about our wedding again now after having",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_040",
+      "input": "{\"text\": \"i had been talking to coach claudia barcomb and coach ali boe for a long time and they both made me feel very welcomed at union\"}",
+      "displayText": "i had been talking to coach claudia barcomb and coach ali boe for a long time and they both made me feel very welcomed at union",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_041",
+      "input": "{\"text\": \"i feel if i completely hated things i d exercise my democratic right speak my mind in what ever ways possible and try to enact a change\"}",
+      "displayText": "i feel if i completely hated things i d exercise my democratic right speak my mind in what ever ways possible and try to enact a change",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_042",
+      "input": "{\"text\": \"i feel humiliated embarrassed or foolish i will remember that others have felt the same way because of the same kinds of things and i will be kind and helpful and accepting\"}",
+      "displayText": "i feel humiliated embarrassed or foolish i will remember that others have felt the same way because of the same kinds of things and i will be kind and helpful and accepting",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_043",
+      "input": "{\"text\": \"i feel reassured that i am dealing with my diet in the right way and that all is good\"}",
+      "displayText": "i feel reassured that i am dealing with my diet in the right way and that all is good",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_044",
+      "input": "{\"text\": \"i feel i have to agree with her even though i can imagine some rather unpleasant possible cases\"}",
+      "displayText": "i feel i have to agree with her even though i can imagine some rather unpleasant possible cases",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_045",
+      "input": "{\"text\": \"im in such a happy mood today i feel almost delighted and i havent done anything different today then i normally have it is wonderful\"}",
+      "displayText": "im in such a happy mood today i feel almost delighted and i havent done anything different today then i normally have it is wonderful",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_046",
+      "input": "{\"text\": \"im feeling really out of place and irritated\"}",
+      "displayText": "im feeling really out of place and irritated",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_047",
+      "input": "{\"text\": \"i also know that i feel nothing than a friendly affection to them too\"}",
+      "displayText": "i also know that i feel nothing than a friendly affection to them too",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_048",
+      "input": "{\"text\": \"i feel like i had a rather productive weekend and i cant always say that no matter how much i get done\"}",
+      "displayText": "i feel like i had a rather productive weekend and i cant always say that no matter how much i get done",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_049",
+      "input": "{\"text\": \"im feeling insecure at the moment\"}",
+      "displayText": "im feeling insecure at the moment",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_050",
+      "input": "{\"text\": \"i was feeling pretty anxious all day but my first day at work was a very good day and that helped a lot\"}",
+      "displayText": "i was feeling pretty anxious all day but my first day at work was a very good day and that helped a lot",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_051",
+      "input": "{\"text\": \"i stood up to you i finally stood up to you and now i feel like im being punished if i could go back and do it again\"}",
+      "displayText": "i stood up to you i finally stood up to you and now i feel like im being punished if i could go back and do it again",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_052",
+      "input": "{\"text\": \"i feel a little nervous i go to the gym\"}",
+      "displayText": "i feel a little nervous i go to the gym",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_053",
+      "input": "{\"text\": \"i feel like i could go into any situation and become successful because i ve been competing all my life explained schaub in an interview with the a href http bleacherreport\"}",
+      "displayText": "i feel like i could go into any situation and become successful because i ve been competing all my life explained schaub in an interview with the a href http bleacherreport",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_054",
+      "input": "{\"text\": \"i can t stop the anxiety i feel when i m alone when i ve got no distractions\"}",
+      "displayText": "i can t stop the anxiety i feel when i m alone when i ve got no distractions",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_055",
+      "input": "{\"text\": \"im trying to feel out my house style now that im living on my own and have creative carte blanche\"}",
+      "displayText": "im trying to feel out my house style now that im living on my own and have creative carte blanche",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_056",
+      "input": "{\"text\": \"i have tried to see what it would be like if i liked one of my girl friends but it has never really worked and i can only ever feel an emotional connection to them because they are my friends\"}",
+      "displayText": "i have tried to see what it would be like if i liked one of my girl friends but it has never really worked and i can only ever feel an emotional connection to them because they are my friends",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_057",
+      "input": "{\"text\": \"i had every intention of doing more gardening this morning while it was still cool but i was just feeling so rotten\"}",
+      "displayText": "i had every intention of doing more gardening this morning while it was still cool but i was just feeling so rotten",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_058",
+      "input": "{\"text\": \"i have a good feeling about this so i am excited\"}",
+      "displayText": "i have a good feeling about this so i am excited",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_059",
+      "input": "{\"text\": \"i feel like i am just starting to understand the blessings that come from being submissive to the will of the father\"}",
+      "displayText": "i feel like i am just starting to understand the blessings that come from being submissive to the will of the father",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_060",
+      "input": "{\"text\": \"i think about the things ive said and the stuff i have done it makes me feel disgusted in myself when i should be making you happy and smile which i was far from doing\"}",
+      "displayText": "i think about the things ive said and the stuff i have done it makes me feel disgusted in myself when i should be making you happy and smile which i was far from doing",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_061",
+      "input": "{\"text\": \"i woke up yesterday monday morning feeling a little depressed\"}",
+      "displayText": "i woke up yesterday monday morning feeling a little depressed",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_062",
+      "input": "{\"text\": \"i feel so embarrassed\"}",
+      "displayText": "i feel so embarrassed",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_063",
+      "input": "{\"text\": \"i spent wandering around still kinda dazed and not feeling particularly sociable but because id been in hiding for a couple for days and it was getting to be a little unhealthy i made myself go down to the cross and hang out with folks\"}",
+      "displayText": "i spent wandering around still kinda dazed and not feeling particularly sociable but because id been in hiding for a couple for days and it was getting to be a little unhealthy i made myself go down to the cross and hang out with folks",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_064",
+      "input": "{\"text\": \"i can honestly say that after each sistahs chat i feel invigorated and blessed\"}",
+      "displayText": "i can honestly say that after each sistahs chat i feel invigorated and blessed",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_065",
+      "input": "{\"text\": \"i still feel stupid to be in that class this is all cause off pbss fault\"}",
+      "displayText": "i still feel stupid to be in that class this is all cause off pbss fault",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_066",
+      "input": "{\"text\": \"i feel a little stunned but can t imagine what the folks who were working in the studio up until this morning are feeling\"}",
+      "displayText": "i feel a little stunned but can t imagine what the folks who were working in the studio up until this morning are feeling",
+      "gold": {
+        "emotion": {
+          "label": "surprise"
+        }
+      }
+    },
+    {
+      "id": "emotion_067",
+      "input": "{\"text\": \"i admit im feeling a little bit unloved at this point\"}",
+      "displayText": "i admit im feeling a little bit unloved at this point",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_068",
+      "input": "{\"text\": \"i feel a bit stressed even though all the things i have going on are fun\"}",
+      "displayText": "i feel a bit stressed even though all the things i have going on are fun",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_069",
+      "input": "{\"text\": \"im feeling pretty anxious\"}",
+      "displayText": "im feeling pretty anxious",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_070",
+      "input": "{\"text\": \"i feel shocked and sad at the fact that there are so many sick people\"}",
+      "displayText": "i feel shocked and sad at the fact that there are so many sick people",
+      "gold": {
+        "emotion": {
+          "label": "surprise"
+        }
+      }
+    },
+    {
+      "id": "emotion_071",
+      "input": "{\"text\": \"i think they have always been proponents of the idea and it is just slightly possible that his feelings for a particularly charming new england girl have brought him around to their way of thinking\"}",
+      "displayText": "i think they have always been proponents of the idea and it is just slightly possible that his feelings for a particularly charming new england girl have brought him around to their way of thinking",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_072",
+      "input": "{\"text\": \"i feel like a naughty school girl because i am falling behind\"}",
+      "displayText": "i feel like a naughty school girl because i am falling behind",
+      "gold": {
+        "emotion": {
+          "label": "love"
+        }
+      }
+    },
+    {
+      "id": "emotion_073",
+      "input": "{\"text\": \"i am right handed however i play billiards left handed naturally so me trying to play right handed feels weird\"}",
+      "displayText": "i am right handed however i play billiards left handed naturally so me trying to play right handed feels weird",
+      "gold": {
+        "emotion": {
+          "label": "surprise"
+        }
+      }
+    },
+    {
+      "id": "emotion_074",
+      "input": "{\"text\": \"i can feel that they are kind friendly and can understand my feelings\"}",
+      "displayText": "i can feel that they are kind friendly and can understand my feelings",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_075",
+      "input": "{\"text\": \"i were to go overseas or cross the border then i become a foreigner and will feel that way but never in my beloved land\"}",
+      "displayText": "i were to go overseas or cross the border then i become a foreigner and will feel that way but never in my beloved land",
+      "gold": {
+        "emotion": {
+          "label": "love"
+        }
+      }
+    },
+    {
+      "id": "emotion_076",
+      "input": "{\"text\": \"i feel disgusted in any man in power who talks about electricity being a problem in his area and says even my own house has similar problems\"}",
+      "displayText": "i feel disgusted in any man in power who talks about electricity being a problem in his area and says even my own house has similar problems",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_077",
+      "input": "{\"text\": \"i feel transcendant and splendid\"}",
+      "displayText": "i feel transcendant and splendid",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_078",
+      "input": "{\"text\": \"i finally arrived home a couple of hours later feeling somewhat exhausted dehydrated and even sun burnt\"}",
+      "displayText": "i finally arrived home a couple of hours later feeling somewhat exhausted dehydrated and even sun burnt",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_079",
+      "input": "{\"text\": \"i am feeling totally relaxed and comfy\"}",
+      "displayText": "i am feeling totally relaxed and comfy",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_080",
+      "input": "{\"text\": \"i want each of you to feel my gentle embrace\"}",
+      "displayText": "i want each of you to feel my gentle embrace",
+      "gold": {
+        "emotion": {
+          "label": "love"
+        }
+      }
+    },
+    {
+      "id": "emotion_081",
+      "input": "{\"text\": \"i feel privileged in my world\"}",
+      "displayText": "i feel privileged in my world",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_082",
+      "input": "{\"text\": \"i am not a people person but for some fuckin reason people feel that they can come bore me with their fuckin petty garbage\"}",
+      "displayText": "i am not a people person but for some fuckin reason people feel that they can come bore me with their fuckin petty garbage",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_083",
+      "input": "{\"text\": \"i realized my mistake and i m really feeling terrible and thinking that i shouldn t do that\"}",
+      "displayText": "i realized my mistake and i m really feeling terrible and thinking that i shouldn t do that",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_084",
+      "input": "{\"text\": \"i suppose i feel too trusting sometimes\"}",
+      "displayText": "i suppose i feel too trusting sometimes",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_085",
+      "input": "{\"text\": \"i came home waiting for the shower read something which made me upset thats why i feel discontent haha\"}",
+      "displayText": "i came home waiting for the shower read something which made me upset thats why i feel discontent haha",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_086",
+      "input": "{\"text\": \"i woke up feeling crappy tired and fighting this feeling all day maybe it is all the pollen the barometric pressure i dont know i know i was off kilter\"}",
+      "displayText": "i woke up feeling crappy tired and fighting this feeling all day maybe it is all the pollen the barometric pressure i dont know i know i was off kilter",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_087",
+      "input": "{\"text\": \"i feel like i am in paradise kissing those sweet lips make me feel like i dive into a magical world of love\"}",
+      "displayText": "i feel like i am in paradise kissing those sweet lips make me feel like i dive into a magical world of love",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_088",
+      "input": "{\"text\": \"i am feeling so happy\"}",
+      "displayText": "i am feeling so happy",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_089",
+      "input": "{\"text\": \"i am running at an approximate minute pace which i feel is quite acceptable\"}",
+      "displayText": "i am running at an approximate minute pace which i feel is quite acceptable",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_090",
+      "input": "{\"text\": \"i feel so disappointed when my ex girlfriend doesn t call me back\"}",
+      "displayText": "i feel so disappointed when my ex girlfriend doesn t call me back",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_091",
+      "input": "{\"text\": \"i have a feeling that people are using it more than they need to and enjoying the feeling as it flies carefree off the tongue but that is alright with me\"}",
+      "displayText": "i have a feeling that people are using it more than they need to and enjoying the feeling as it flies carefree off the tongue but that is alright with me",
+      "gold": {
+        "emotion": {
+          "label": "joy"
+        }
+      }
+    },
+    {
+      "id": "emotion_092",
+      "input": "{\"text\": \"i am feeling uncertain of the merits of posting to this blog with the frequency or earnestness i had been over the previous year\"}",
+      "displayText": "i am feeling uncertain of the merits of posting to this blog with the frequency or earnestness i had been over the previous year",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_093",
+      "input": "{\"text\": \"i just plain feel envious of the self confidence they had\"}",
+      "displayText": "i just plain feel envious of the self confidence they had",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_094",
+      "input": "{\"text\": \"i was feeling weird the other day and it went away about minutes after i took my metformin\"}",
+      "displayText": "i was feeling weird the other day and it went away about minutes after i took my metformin",
+      "gold": {
+        "emotion": {
+          "label": "fear"
+        }
+      }
+    },
+    {
+      "id": "emotion_095",
+      "input": "{\"text\": \"when a friend dropped a frog down my neck\"}",
+      "displayText": "when a friend dropped a frog down my neck",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_096",
+      "input": "{\"text\": \"im feeling angry at someone i do something thoughtful for her and my feelings toward her soften\"}",
+      "displayText": "im feeling angry at someone i do something thoughtful for her and my feelings toward her soften",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_097",
+      "input": "{\"text\": \"i love neglecting this blog but sometimes i feel for my faithful readers\"}",
+      "displayText": "i love neglecting this blog but sometimes i feel for my faithful readers",
+      "gold": {
+        "emotion": {
+          "label": "love"
+        }
+      }
+    },
+    {
+      "id": "emotion_098",
+      "input": "{\"text\": \"i lay in bed feeling as though i were awaiting an unwelcome visitor nevertheless i told myself i was strong and thought of good things until i felt better\"}",
+      "displayText": "i lay in bed feeling as though i were awaiting an unwelcome visitor nevertheless i told myself i was strong and thought of good things until i felt better",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    },
+    {
+      "id": "emotion_099",
+      "input": "{\"text\": \"i feel my heart is tortured by what i have done\"}",
+      "displayText": "i feel my heart is tortured by what i have done",
+      "gold": {
+        "emotion": {
+          "label": "anger"
+        }
+      }
+    },
+    {
+      "id": "emotion_100",
+      "input": "{\"text\": \"i was still feeling weepy and strung out so maggie treated me to ice cream and a movie a href http www\"}",
+      "displayText": "i was still feeling weepy and strung out so maggie treated me to ice cream and a movie a href http www",
+      "gold": {
+        "emotion": {
+          "label": "sadness"
+        }
+      }
+    }
+  ]
+}

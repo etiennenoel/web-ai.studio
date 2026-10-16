@@ -4,6 +4,7 @@ import { ClassifierModelFileRole } from '../enums/classifier-model-file-role.enu
 
 const LAYA_LITERT = 'litert-community/laya-LiteRT';
 const LAYA_ML_LITERT = 'litert-community/Laya-Multilingual-LiteRT';
+const LAYA_EN_LITERT = 'litert-community/Laya-English-LiteRT';
 
 const ML_TOKENIZER_FILES = [
   { role: ClassifierModelFileRole.TOKENIZER, path: 'multilingual/tokenizer.json', bytes: 34363188 },
@@ -23,6 +24,22 @@ const ML_EMBEDS_HOST_FILES = [
   { role: ClassifierModelFileRole.TOKENIZER, path: 'tokenizer.json', bytes: 34363188 },
   { role: ClassifierModelFileRole.TOKENIZER_CONFIG, path: 'tokenizer_config.json', bytes: 524 },
   { role: ClassifierModelFileRole.CALIBRATION, path: 'laya_ml_calibration.json', bytes: 9156 },
+];
+
+const EN_EMBEDS_HOST_FILES = [
+  { role: ClassifierModelFileRole.ACT_HEAD, path: 'laya_en_act_head_fp32.tflite', bytes: 1057960 },
+  { role: ClassifierModelFileRole.EMBEDDING_TABLE, path: 'token_embeddings_en_fp16.bin', bytes: 103153664 },
+  { role: ClassifierModelFileRole.TOKENIZER, path: 'tokenizer.json', bytes: 3583228 },
+  { role: ClassifierModelFileRole.TOKENIZER_CONFIG, path: 'tokenizer_config.json', bytes: 308 },
+  { role: ClassifierModelFileRole.CALIBRATION, path: 'laya_en_config.json', bytes: 745 },
+];
+
+const TD_EMBEDS_HOST_FILES = [
+  { role: ClassifierModelFileRole.ACT_HEAD, path: 'typed-decisions/laya_td_act_head_fp32.tflite', bytes: 1057960 },
+  { role: ClassifierModelFileRole.EMBEDDING_TABLE, path: 'typed-decisions/token_embeddings_td_fp16.bin', bytes: 103153664 },
+  { role: ClassifierModelFileRole.TOKENIZER, path: 'typed-decisions/tokenizer.json', bytes: 3583228 },
+  { role: ClassifierModelFileRole.TOKENIZER_CONFIG, path: 'typed-decisions/tokenizer_config.json', bytes: 337 },
+  { role: ClassifierModelFileRole.CALIBRATION, path: 'typed-decisions/laya_td_config.json', bytes: 847 },
 ];
 
 /**
@@ -62,6 +79,74 @@ export const CLASSIFIER_MODEL_REGISTRY: ClassifierModelVariant[] = [
     files: [
       { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_ml_s512_embeds_wfp16.tflite', bytes: 251806544 },
       ...ML_EMBEDS_HOST_FILES,
+    ],
+  },
+  {
+    id: 'laya-td-s256-embeds-wfp16',
+    family: 'Laya',
+    name: 'Laya Typed-Decisions (English), 256 tokens, fp16 weights (host embeddings)',
+    description: 'ModernBERT-large fine-tuned for typed decisions (choice, boolean, score). 740 MB graph plus 103 MB embedding table. Compiles on GPU.',
+    repository: LAYA_EN_LITERT,
+    window: 256,
+    headMaxLen: 256,
+    hidden: 1024,
+    inputMode: ClassifierModelInputMode.INPUTS_EMBEDS,
+    languages: ['en'],
+    gpuCompiles: true,
+    files: [
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'typed-decisions/laya_td_s256_embeds_wfp16.tflite', bytes: 739765104 },
+      ...TD_EMBEDS_HOST_FILES,
+    ],
+  },
+  {
+    id: 'laya-td-s512-embeds-wfp16',
+    family: 'Laya',
+    name: 'Laya Typed-Decisions (English), 512 tokens, fp16 weights (host embeddings)',
+    description: 'Typed-decisions fine-tune with a 512-token context window. Compiles on GPU.',
+    repository: LAYA_EN_LITERT,
+    window: 512,
+    headMaxLen: 256,
+    hidden: 1024,
+    inputMode: ClassifierModelInputMode.INPUTS_EMBEDS,
+    languages: ['en'],
+    gpuCompiles: true,
+    files: [
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'typed-decisions/laya_td_s512_embeds_wfp16.tflite', bytes: 740813680 },
+      ...TD_EMBEDS_HOST_FILES,
+    ],
+  },
+  {
+    id: 'laya-en-s256-embeds-wfp16',
+    family: 'Laya',
+    name: 'Laya English, 256 tokens, fp16 weights (host embeddings)',
+    description: 'ModernBERT-large decision encoder, English only. 740 MB graph plus 103 MB embedding table. Compiles on GPU.',
+    repository: LAYA_EN_LITERT,
+    window: 256,
+    headMaxLen: 192,
+    hidden: 1024,
+    inputMode: ClassifierModelInputMode.INPUTS_EMBEDS,
+    languages: ['en'],
+    gpuCompiles: true,
+    files: [
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s256_embeds_wfp16.tflite', bytes: 739765104 },
+      ...EN_EMBEDS_HOST_FILES,
+    ],
+  },
+  {
+    id: 'laya-en-s512-embeds-wfp16',
+    family: 'Laya',
+    name: 'Laya English, 512 tokens, fp16 weights (host embeddings)',
+    description: 'ModernBERT-large decision encoder with a 512-token window, fp16 weights (host embeddings). Compiles on GPU.',
+    repository: LAYA_EN_LITERT,
+    window: 512,
+    headMaxLen: 192,
+    hidden: 1024,
+    inputMode: ClassifierModelInputMode.INPUTS_EMBEDS,
+    languages: ['en'],
+    gpuCompiles: true,
+    files: [
+      { role: ClassifierModelFileRole.MAIN_GRAPH, path: 'laya_en_s512_embeds_wfp16.tflite', bytes: 740813680 },
+      ...EN_EMBEDS_HOST_FILES,
     ],
   },
   {

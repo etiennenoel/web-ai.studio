@@ -1,0 +1,945 @@
+<div class="min-h-full bg-slate-50 dark:bg-[#121212] text-slate-900 dark:text-slate-100 pb-20">
+  <!-- TOP HEADER & CONFIGURATION BAR -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-b border-slate-200 dark:border-zinc-800 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-start sm:items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0">
+          <i class="bi bi-ui-checks-grid text-lg"></i>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white m-0">
+              Decisions Benchmark Suite
+            </h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30">
+              JEV-Bench · Laya · DMB
+            </span>
+            @if (isSupported) {
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30">
+                <i class="bi bi-check-circle-fill mr-1"></i>
+                {{ isPolyfilled ? 'Extension Polyfill' : 'Chrome Native' }} · {{ availabilityStatus }}
+              </span>
+            } @else {
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30">
+                <i class="bi bi-exclamation-triangle-fill mr-1"></i> API Unavailable
+              </span>
+            }
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 m-0 mt-0.5">
+            In-browser quality, probability calibration (ECE, Brier, NLL), robustness, and WebGPU latency evaluation for <code>window.DecisionModel</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- ACTION CONTROLS -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        @if (!isRunning) {
+          <button
+            type="button"
+            (click)="runSelectedSuite()"
+            [disabled]="!isSupported || isLoadingPack || isSwitchingModel"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white shadow-sm transition-all cursor-pointer border-none">
+            <i class="bi bi-play-fill text-sm"></i>
+            Run Selected Suite
+          </button>
+
+          <button
+            type="button"
+            (click)="runAllSuites()"
+            [disabled]="!isSupported || isLoadingPack || isSwitchingModel"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 disabled:opacity-50 text-white transition-all cursor-pointer border border-slate-700 dark:border-zinc-700">
+            <i class="bi bi-collection-play text-xs"></i>
+            Run All 8 Suites
+          </button>
+        } @else {
+          <button
+            type="button"
+            (click)="stopBenchmark()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer border-none">
+            <i class="bi bi-stop-fill text-sm"></i>
+            Stop Run
+          </button>
+        }
+
+        @if (currentResult || runHistory.length > 0) {
+          <button
+            type="button"
+            (click)="exportCurrentReport()"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-zinc-700 transition-colors cursor-pointer">
+            <i class="bi bi-download"></i>
+            Export JSON
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 pt-6 space-y-6">
+    <!-- ERROR ALERT -->
+    @if (errorMessage) {
+      <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 flex items-start justify-between gap-3 text-rose-700 dark:text-rose-300 text-xs">
+        <div class="flex items-start gap-2.5">
+          <i class="bi bi-exclamation-octagon-fill text-base mt-0.5"></i>
+          <div>
+            <div class="font-bold">Benchmark Notice</div>
+            <div class="mt-0.5">{{ errorMessage }}</div>
+          </div>
+        </div>
+        <button type="button" (click)="errorMessage = ''" class="text-rose-500 hover:text-rose-700 bg-transparent border-none cursor-pointer">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    }
+
+    <!-- CONFIGURATION PANEL: MODEL SELECTOR + SAMPLE SIZE + SUITE SELECTOR -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <!-- Model & Runtime Config Card -->
+      <div class="lg:col-span-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-4 shadow-sm flex flex-col justify-between gap-4">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <i class="bi bi-box-seam text-indigo-500"></i>
+              Decision Model Checkpoint
+            </label>
+            @if (getExtensionModelStatus(selectedModelId); as extStatus) {
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                [ngClass]="extStatus.state === 'cached' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'">
+                {{ extStatus.state === 'cached' ? (extStatus.loaded ? 'Loaded (' + (extStatus.accelerator || 'GPU') + ')' : 'Cached on Disk') : extStatus.state }}
+              </span>
+            }
+          </div>
+
+          <select
+            [ngModel]="selectedModelId"
+            (ngModelChange)="onModelSelectChange($event)"
+            [disabled]="isRunning || isSwitchingModel"
+            aria-label="Select Decision Model Checkpoint"
+            class="w-full px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            @for (m of modelCatalog; track m.id) {
+              <option [value]="m.id">
+                {{ m.name }} — {{ m.badge }} ({{ m.totalMB }} MB)
+              </option>
+            }
+          </select>
+
+          @if (getSelectedModelCatalogItem(); as modelInfo) {
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+              {{ modelInfo.description }}
+              <span class="font-mono text-[10px] text-slate-400 dark:text-slate-500 ml-1">
+                [window={{ modelInfo.window }}, head={{ modelInfo.headMaxLen }}, dim={{ modelInfo.hidden }}]
+              </span>
+            </p>
+          }
+
+          <!-- Custom Run Label Input -->
+          <div class="mt-3">
+            <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+              Run Label (Optional — rename anytime)
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="customRunLabel"
+              [disabled]="isRunning"
+              placeholder="e.g., Chrome Native Flag #1, Extension WebGPU FP16..."
+              aria-label="Custom Run Label"
+              class="w-full px-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <!-- Sample Size, Persistence & Cold Start Controls -->
+        <div class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Sample:</span>
+            <div class="inline-flex rounded-lg bg-slate-100 dark:bg-zinc-800 p-0.5">
+              @for (opt of sampleSizeOptions; track opt.value) {
+                <button
+                  type="button"
+                  (click)="selectedSampleSize = opt.value; saveSettingsToStorage()"
+                  [disabled]="isRunning"
+                  class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer border-none"
+                  [ngClass]="selectedSampleSize === opt.value ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-300 shadow-sm' : 'bg-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900'">
+                  {{ opt.value === 100 ? 'Full' : opt.value }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none"
+                   title="Keep benchmark results in localStorage across page reloads and Chrome flag changes">
+              <input
+                type="checkbox"
+                [ngModel]="persistRunsLocally"
+                (ngModelChange)="onPersistRunsToggleChange($event)"
+                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <span>Save Runs Locally</span>
+            </label>
+
+            <label class="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                [(ngModel)]="forceColdStart"
+                [disabled]="isRunning"
+                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <span>Cold Start</span>
+            </label>
+          </div>
+
+          @if (getExtensionModelStatus(selectedModelId); as extStatus) {
+            @if (extStatus.state === 'downloadable') {
+              <button
+                type="button"
+                (click)="downloadSelectedModel()"
+                [disabled]="isDownloadingModel || isRunning"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white border-none cursor-pointer">
+                <i class="bi bi-cloud-arrow-down mr-1"></i>
+                {{ isDownloadingModel ? 'Downloading ' + downloadProgress + '%...' : 'Pre-Download Model' }}
+              </button>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Suite Selector Grid (8 Benchmark Suites) -->
+      <div class="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <i class="bi bi-layers text-indigo-500"></i>
+            Select Benchmark Suite (8 Packs Available)
+          </span>
+          @if (activePack) {
+            <a [href]="activePack.datasetUrl" target="_blank" rel="noopener noreferrer"
+               class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+              Dataset Source <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+            </a>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          @for (suite of suiteManifest; track suite.id) {
+            @let isSelected = selectedSuiteId === suite.id;
+            @let hasRun = hasSuiteRun(suite.id);
+            <button
+              type="button"
+              (click)="selectSuite(suite.id)"
+              [disabled]="isRunning"
+              class="text-left p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-1.5"
+              [ngClass]="isSelected
+                ? 'bg-indigo-50/80 dark:bg-indigo-500/15 border-indigo-400 dark:border-indigo-500/60 ring-1 ring-indigo-400/40'
+                : 'bg-slate-50/70 dark:bg-zinc-800/60 border-slate-200/80 dark:border-zinc-700/60 hover:bg-slate-100 dark:hover:bg-zinc-800'">
+              <div class="flex items-center justify-between w-full">
+                <i class="bi {{ suite.icon }} text-sm" [ngClass]="isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'"></i>
+                @if (hasRun) {
+                  <span class="w-2 h-2 rounded-full bg-emerald-500" title="Completed in this session"></span>
+                }
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ suite.shortName }}</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">{{ suite.badge }}</div>
+              </div>
+            </button>
+          }
+        </div>
+
+        @if (activePack) {
+          <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
+            <span class="leading-snug">{{ activePack.description }}</span>
+            <span class="shrink-0 font-mono text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300">
+              {{ activePack.cases.length }} total cases
+            </span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- LIVE EXECUTION PROGRESS BANNER -->
+    @if (isRunning) {
+      <section class="bg-indigo-950 text-white rounded-2xl p-5 border border-indigo-700 shadow-lg space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-arrow-repeat animate-spin text-indigo-400 text-xl"></i>
+            <div>
+              <div class="text-sm font-bold">{{ runStatusText }}</div>
+              <div class="text-xs text-indigo-300">
+                Case {{ progressCompleted }} of {{ progressTotal }} ({{ progressTotal > 0 ? ((progressCompleted / progressTotal) * 100 | number:'1.0-0') : 0 }}%)
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-6 text-xs font-mono">
+            <div>
+              <span class="text-indigo-300 block text-[10px] uppercase">Live Accuracy</span>
+              <span class="text-base font-bold text-emerald-400">{{ liveAccuracy * 100 | number:'1.1-1' }}%</span>
+            </div>
+            <div>
+              <span class="text-indigo-300 block text-[10px] uppercase">p50 Latency</span>
+              <span class="text-base font-bold text-amber-300">{{ liveLatencyP50Ms | number:'1.1-1' }} ms</span>
+            </div>
+            <div>
+              <span class="text-indigo-300 block text-[10px] uppercase">Throughput</span>
+              <span class="text-base font-bold text-cyan-300">{{ liveDecisionsPerSec | number:'1.1-1' }} dec/s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full h-2 bg-indigo-900 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-indigo-400 transition-all duration-200 rounded-full"
+            [style.width.%]="progressTotal > 0 ? (progressCompleted / progressTotal) * 100 : 5"></div>
+        </div>
+      </section>
+    }
+
+    <!-- SAVED RUNS COMPARISON BAR FOR CURRENT SUITE -->
+    @if (getSavedRunsForCurrentSuite().length > 0) {
+      <section class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-3.5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="bi bi-clock-history text-indigo-500 text-sm"></i>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Saved Runs for This Suite ({{ getSavedRunsForCurrentSuite().length }})
+            </span>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500">
+              — Click a run to inspect its charts &amp; decisions, or click <i class="bi bi-pencil"></i> to rename
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="clearSavedRunsForCurrentSuite()"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 bg-transparent border border-rose-200 dark:border-rose-800/50 cursor-pointer transition-colors">
+              <i class="bi bi-trash mr-1"></i>Clear Suite Runs
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          @for (saved of getSavedRunsForCurrentSuite(); track saved.runId) {
+            @let isCurrent = currentResult?.runId === saved.runId;
+            <div
+              (click)="selectSavedRun(saved.runId)"
+              class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all cursor-pointer"
+              [ngClass]="isCurrent
+                ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-400 dark:border-indigo-500 text-indigo-950 dark:text-white ring-1 ring-indigo-400/40'
+                : 'bg-slate-50 dark:bg-zinc-800/70 border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800'">
+              @if (editingRunId === saved.runId) {
+                <input
+                  type="text"
+                  [(ngModel)]="editingRunName"
+                  (click)="$event.stopPropagation()"
+                  (keydown.enter)="commitRenameRun(saved.runId, $event)"
+                  (keydown.escape)="cancelRenameRun($event)"
+                  aria-label="Rename saved run"
+                  class="px-2 py-0.5 rounded bg-white dark:bg-zinc-900 border border-indigo-400 text-xs font-semibold text-slate-900 dark:text-white w-44 focus:outline-none" />
+                <button
+                  type="button"
+                  (click)="commitRenameRun(saved.runId, $event)"
+                  title="Save name"
+                  class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 bg-transparent border-none cursor-pointer p-0.5">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="cancelRenameRun($event)"
+                  title="Cancel"
+                  class="text-slate-400 hover:text-slate-600 bg-transparent border-none cursor-pointer p-0.5">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              } @else {
+                <span class="font-bold">{{ saved.modelName }}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                  {{ saved.accuracy * 100 | number:'1.1-1' }}%
+                </span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1" [title]="saved.timestamp">
+                  <i class="bi bi-clock"></i>
+                  {{ formatRelativeTime(saved.timestamp) }}
+                </span>
+                <button
+                  type="button"
+                  (click)="startRenameRun(saved.runId, saved.modelName, $event)"
+                  title="Rename run"
+                  class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-transparent border-none cursor-pointer p-0.5 opacity-75 group-hover:opacity-100">
+                  <i class="bi bi-pencil text-[11px]"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="deleteSavedRun(saved.runId, $event)"
+                  title="Delete run"
+                  class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 bg-transparent border-none cursor-pointer p-0.5 opacity-75 group-hover:opacity-100">
+                  <i class="bi bi-x-lg text-[11px]"></i>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- RESULTS DASHBOARD -->
+    @if (currentResult; as res) {
+      <!-- 8 KPI SCORECARDS (QUALITY + CALIBRATION + PERFORMANCE) -->
+      <section class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        <!-- 1. Accuracy -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Top-1 Accuracy</div>
+          <div class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
+            {{ res.accuracy * 100 | number:'1.1-1' }}%
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            Macro-F1: {{ res.macroF1 | number:'1.3-3' }}
+          </div>
+        </div>
+
+        <!-- 2. ECE Calibration -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Calibration (ECE)</div>
+          <div class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 tabular-nums">
+            {{ res.ece | number:'1.3-3' }}
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            Mean Conf: {{ res.meanConfidence * 100 | number:'1.1-1' }}%
+          </div>
+        </div>
+
+        <!-- 3. Brier Score & NLL -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Brier Score</div>
+          <div class="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 tabular-nums">
+            {{ res.brierScore | number:'1.3-3' }}
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            NLL: {{ res.nll | number:'1.3-3' }}
+          </div>
+        </div>
+
+        <!-- 4. Selective Automation -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cov @ ≤5% Risk</div>
+          <div class="text-xl font-extrabold text-teal-600 dark:text-teal-400 mt-1 tabular-nums">
+            {{ res.coverageAt5PctRisk * 100 | number:'1.1-1' }}%
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            Acc@50%Cov: {{ res.accAt50PctCoverage * 100 | number:'1.1-1' }}%
+          </div>
+        </div>
+
+        <!-- 5. Suite-Specific Metric (Score MAE / Flip Rate / Parity Diff / Soft Acc) -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          @if (res.scoreMae !== null) {
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score MAE</div>
+            <div class="text-xl font-extrabold text-purple-600 dark:text-purple-400 mt-1 tabular-nums">
+              {{ res.scoreMae | number:'1.3-3' }}
+            </div>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">
+              ±1 lvl: {{ (res.within1ScoreLevel || 0) * 100 | number:'1.0-0' }}%
+            </div>
+          } @else if (res.flipRate !== null) {
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Order Flip Rate</div>
+            <div class="text-xl font-extrabold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
+              {{ res.flipRate * 100 | number:'1.1-1' }}%
+            </div>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">
+              3 option perms
+            </div>
+          } @else if (res.maxAbsProbDiff !== null) {
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Max |Δp| vs FP32</div>
+            <div class="text-xl font-extrabold text-cyan-600 dark:text-cyan-400 mt-1 tabular-nums">
+              {{ res.maxAbsProbDiff | number:'1.4-4' }}
+            </div>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">
+              Mean |Δp|: {{ res.meanAbsProbDiff | number:'1.4-4' }}
+            </div>
+          } @else {
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Zero-Prob Fails</div>
+            <div class="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 tabular-nums">
+              {{ res.zeroProbFailureRate * 100 | number:'1.1-1' }}%
+            </div>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">
+              {{ res.totalDecisions }} decisions
+            </div>
+          }
+        </div>
+
+        <!-- 6. p50 / p95 Latency -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">p50 Latency</div>
+          <div class="text-xl font-extrabold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
+            {{ res.latencyP50Ms | number:'1.1-1' }} <span class="text-xs font-normal">ms</span>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            p95: {{ res.latencyP95Ms | number:'1.1-1' }} ms
+          </div>
+        </div>
+
+        <!-- 7. Throughput -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Throughput</div>
+          <div class="text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1 tabular-nums">
+            {{ res.decisionsPerSec | number:'1.1-1' }} <span class="text-xs font-normal">dec/s</span>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            {{ res.msPerDecision | number:'1.1-1' }} ms/decision
+          </div>
+        </div>
+
+        <!-- 8. Session Compile & Tokens -->
+        <div class="bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Session Create</div>
+          <div class="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 tabular-nums">
+            {{ res.coldCreateMs ?? 0 | number:'1.0-0' }} <span class="text-xs font-normal">ms</span>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono">
+            Head: {{ res.headTokens }}t · State: {{ res.avgStateTokens }}t
+          </div>
+        </div>
+      </section>
+
+      <!-- CALIBRATION RELIABILITY DIAGRAM & SUB-SLICE BREAKDOWN -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- 10-Bin Reliability Diagram -->
+        <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white m-0 flex items-center gap-2">
+                <i class="bi bi-bar-chart-steps text-indigo-500"></i>
+                Probability Calibration (10-Bin Reliability Diagram)
+              </h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mt-0.5">
+                Compares predicted top-1 probability against empirical accuracy in each confidence decile.
+              </p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">
+              ECE = {{ res.ece | number:'1.3-3' }}
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            @for (bin of res.reliabilityBins; track bin.binIndex) {
+              <div class="grid grid-cols-12 items-center gap-2 text-xs">
+                <div class="col-span-2 font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                  {{ bin.lower | number:'1.1-1' }}–{{ bin.upper | number:'1.1-1' }}
+                </div>
+                <div class="col-span-7 relative h-5 bg-slate-100 dark:bg-zinc-800 rounded-md overflow-hidden">
+                  <!-- Empirical Accuracy Bar -->
+                  @if (bin.count > 0) {
+                    <div
+                      class="h-full rounded-md transition-all"
+                      [ngClass]="bin.empiricalAccuracy >= bin.meanConfidence ? 'bg-emerald-500/80' : 'bg-indigo-500/80'"
+                      [style.width.%]="bin.empiricalAccuracy * 100"></div>
+                    <!-- Expected Confidence Marker Line -->
+                    <div
+                      class="absolute top-0 bottom-0 w-0.5 bg-amber-500 z-10"
+                      [style.left.%]="bin.meanConfidence * 100"
+                      title="Mean Confidence: {{ bin.meanConfidence * 100 | number:'1.1-1' }}%"></div>
+                  }
+                </div>
+                <div class="col-span-3 flex items-center justify-end gap-1.5 font-mono text-[10px]">
+                  @if (bin.count > 0) {
+                    <span class="text-slate-700 dark:text-slate-200 font-semibold">
+                      {{ bin.empiricalAccuracy * 100 | number:'1.0-0' }}%
+                    </span>
+                    <span class="text-slate-400">/</span>
+                    <span class="text-amber-600 dark:text-amber-400">
+                      {{ bin.meanConfidence * 100 | number:'1.0-0' }}%
+                    </span>
+                    <span class="text-slate-400">({{ bin.count }})</span>
+                  } @else {
+                    <span class="text-slate-400">empty</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-[10px] text-slate-500">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-indigo-500 inline-block"></span> Empirical Accuracy</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-0.5 bg-amber-500 inline-block"></span> Predicted Confidence</span>
+            </div>
+            <span>Closer bar &amp; marker = better calibrated</span>
+          </div>
+        </div>
+
+        <!-- Breakdown by Question Type & Workflow -->
+        <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 shadow-sm flex flex-col justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white m-0 flex items-center gap-2 mb-1">
+              <i class="bi bi-sliders text-indigo-500"></i>
+              Primitive &amp; Workflow Breakdown
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mb-3">
+              Accuracy, Macro-F1, Brier Score, and ECE segmented by decision type and domain slice.
+            </p>
+
+            <!-- By Question Primitive Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-zinc-800 text-[10px] uppercase text-slate-400">
+                    <th class="py-1.5 px-2">Slice / Primitive</th>
+                    <th class="py-1.5 px-2 text-right">Decisions</th>
+                    <th class="py-1.5 px-2 text-right">Accuracy</th>
+                    <th class="py-1.5 px-2 text-right">Macro-F1</th>
+                    <th class="py-1.5 px-2 text-right">Brier</th>
+                    <th class="py-1.5 px-2 text-right">ECE</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/60 font-mono">
+                  @for (qt of objectKeys(res.byQuestionType); track qt) {
+                    @let s = res.byQuestionType[qt];
+                    <tr>
+                      <td class="py-1.5 px-2 font-sans font-bold uppercase text-[11px] text-indigo-600 dark:text-indigo-400">
+                        {{ qt }}
+                      </td>
+                      <td class="py-1.5 px-2 text-right text-slate-500">{{ s.n }}</td>
+                      <td class="py-1.5 px-2 text-right font-bold text-slate-900 dark:text-white">{{ s.accuracy * 100 | number:'1.1-1' }}%</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ s.macroF1 | number:'1.3-3' }}</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ s.brierScore | number:'1.3-3' }}</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ s.ece | number:'1.3-3' }}</td>
+                    </tr>
+                  }
+                  @for (wf of objectKeys(res.byWorkflow); track wf) {
+                    @let w = res.byWorkflow[wf];
+                    <tr>
+                      <td class="py-1.5 px-2 font-sans font-medium text-slate-700 dark:text-slate-300 truncate max-w-[180px]">
+                        {{ wf }}
+                      </td>
+                      <td class="py-1.5 px-2 text-right text-slate-500">{{ w.n }}</td>
+                      <td class="py-1.5 px-2 text-right font-semibold text-emerald-600 dark:text-emerald-400">{{ w.accuracy * 100 | number:'1.1-1' }}%</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ w.macroF1 | number:'1.3-3' }}</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ w.brierScore | number:'1.3-3' }}</td>
+                      <td class="py-1.5 px-2 text-right text-slate-600 dark:text-slate-300">{{ w.ece | number:'1.3-3' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Selective Risk-Coverage Mini Bar -->
+          <div class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+            <span class="text-slate-500 dark:text-slate-400">
+              Selective Automation Threshold (≤5% Error):
+            </span>
+            <span class="font-mono font-bold text-teal-600 dark:text-teal-400">
+              τ ≥ {{ res.thresholdAt5PctRisk | number:'1.2-2' }} → {{ res.coverageAt5PctRisk * 100 | number:'1.1-1' }}% automated
+            </span>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- LEADERBOARD & PUBLISHED BASELINE COMPARISON TABLE -->
+    @if (activePack) {
+      <section class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+        <div class="px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white m-0 flex items-center gap-2">
+              <i class="bi bi-trophy text-amber-500"></i>
+              Leaderboard &amp; Reference Baselines — {{ activePack.name }}
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mt-0.5">
+              Compares your live in-browser runs against published reference numbers from JEV-Bench, Laya BENCHMARKS.md, and DMB.
+            </p>
+          </div>
+          <a [href]="activePack.sourceUrl" target="_blank" rel="noopener noreferrer"
+             class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+            Benchmark Specification <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+          </a>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-950/40 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <th class="py-2.5 px-4">Model / Configuration</th>
+                <th class="py-2.5 px-3">Runtime / Source</th>
+                <th class="py-2.5 px-3 text-right">Accuracy ↑</th>
+                <th class="py-2.5 px-3 text-right">Macro-F1 ↑</th>
+                <th class="py-2.5 px-3 text-right">Brier ↓</th>
+                <th class="py-2.5 px-3 text-right">NLL ↓</th>
+                <th class="py-2.5 px-3 text-right">ECE ↓</th>
+                <th class="py-2.5 px-3 text-right">Score MAE / Flip</th>
+                <th class="py-2.5 px-4 text-right">p50 Latency ↓</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/60">
+              @for (row of getCombinedLeaderboard(); track row.id) {
+                @let isInspected = row.isLocalRun && currentResult?.runId === row.id;
+                <tr
+                  (click)="row.isLocalRun ? selectSavedRun(row.id) : null"
+                  [ngClass]="isInspected
+                    ? 'bg-indigo-100/70 dark:bg-indigo-500/20 font-semibold cursor-pointer'
+                    : row.isLocalRun
+                      ? 'bg-indigo-50/40 dark:bg-indigo-500/10 font-semibold hover:bg-indigo-50/80 dark:hover:bg-indigo-500/15 cursor-pointer'
+                      : 'hover:bg-slate-50 dark:hover:bg-zinc-800/40'">
+                  <td class="py-2.5 px-4">
+                    <div class="flex items-center gap-2">
+                      @if (row.isLocalRun) {
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase"
+                              [ngClass]="isInspected ? 'bg-indigo-600 text-white' : 'bg-indigo-100 dark:bg-indigo-500/30 text-indigo-700 dark:text-indigo-200'">
+                          {{ isInspected ? 'ACTIVE' : 'SAVED' }}
+                        </span>
+                      }
+                      @if (row.isLocalRun && editingRunId === row.id) {
+                        <div class="inline-flex items-center gap-1.5" (click)="$event.stopPropagation()">
+                          <input
+                            type="text"
+                            [(ngModel)]="editingRunName"
+                            (keydown.enter)="commitRenameRun(row.id, $event)"
+                            (keydown.escape)="cancelRenameRun($event)"
+                            aria-label="Rename run in leaderboard"
+                            class="px-2 py-0.5 rounded bg-white dark:bg-zinc-900 border border-indigo-400 text-xs font-semibold text-slate-900 dark:text-white w-48 focus:outline-none" />
+                          <button
+                            type="button"
+                            (click)="commitRenameRun(row.id, $event)"
+                            title="Save name"
+                            class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 bg-transparent border-none cursor-pointer p-0.5">
+                            <i class="bi bi-check-lg"></i>
+                          </button>
+                          <button
+                            type="button"
+                            (click)="cancelRenameRun($event)"
+                            title="Cancel"
+                            class="text-slate-400 hover:text-slate-600 bg-transparent border-none cursor-pointer p-0.5">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                        </div>
+                      } @else {
+                        <span class="text-slate-900 dark:text-white font-semibold">{{ row.name }}</span>
+                        @if (row.isLocalRun) {
+                          <button
+                            type="button"
+                            (click)="startRenameRun(row.id, row.name, $event)"
+                            title="Rename this run"
+                            class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-transparent border-none cursor-pointer p-0.5">
+                            <i class="bi bi-pencil text-[11px]"></i>
+                          </button>
+                          <button
+                            type="button"
+                            (click)="deleteSavedRun(row.id, $event)"
+                            title="Delete this run"
+                            class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 bg-transparent border-none cursor-pointer p-0.5">
+                            <i class="bi bi-trash text-[11px]"></i>
+                          </button>
+                        }
+                      }
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-3 text-slate-500 dark:text-slate-400">
+                    <span>{{ row.provider }}</span>
+                    <div class="text-[10px] opacity-75 flex items-center gap-1.5">
+                      <span>{{ row.source }}</span>
+                      @if (row.isLocalRun && row.timestamp) {
+                        <span>&bull;</span>
+                        <span class="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium" [title]="row.timestamp">
+                          <i class="bi bi-clock"></i>
+                          {{ formatRelativeTime(row.timestamp) }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    {{ row.accuracy * 100 | number:'1.1-1' }}%
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {{ row.macroF1 != null ? (row.macroF1 | number:'1.3-3') : '—' }}
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {{ row.brierScore != null ? (row.brierScore | number:'1.3-3') : '—' }}
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {{ row.nll != null ? (row.nll | number:'1.3-3') : '—' }}
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {{ row.ece != null ? (row.ece | number:'1.3-3') : '—' }}
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                    @if (row.scoreMae != null) {
+                      <span>MAE {{ row.scoreMae | number:'1.3-3' }}</span>
+                    } @else if (row.flipRate != null) {
+                      <span>Flip {{ row.flipRate * 100 | number:'1.1-1' }}%</span>
+                    } @else if (row.coverageAt5PctRisk != null) {
+                      <span>Cov {{ row.coverageAt5PctRisk * 100 | number:'1.0-0' }}%</span>
+                    } @else {
+                      <span>—</span>
+                    }
+                  </td>
+                  <td class="py-2.5 px-4 text-right font-mono text-amber-600 dark:text-amber-400">
+                    {{ row.latencyP50Ms != null ? (row.latencyP50Ms | number:'1.1-1') + ' ms' : '—' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <!-- PER-DECISION INSPECTOR & PROBABILITY VIEWER -->
+    @if (currentResult; as res) {
+      <section class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+        <div class="px-5 py-4 border-b border-slate-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white m-0 flex items-center gap-2">
+              <i class="bi bi-search text-indigo-500"></i>
+              Per-Decision Inspector ({{ getFilteredQuestions().length }} / {{ res.questionRecords.length }} decisions)
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0 mt-0.5">
+              Click any row to inspect the full calibrated probability distribution across options.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex rounded-lg bg-slate-100 dark:bg-zinc-800 p-0.5 text-xs">
+              <button
+                type="button"
+                (click)="inspectorFilter = 'all'"
+                class="px-2.5 py-1 rounded-md text-[11px] font-semibold border-none cursor-pointer"
+                [ngClass]="inspectorFilter === 'all' ? 'bg-white dark:bg-zinc-700 text-slate-900 dark:text-white shadow-sm' : 'bg-transparent text-slate-500'">
+                All
+              </button>
+              <button
+                type="button"
+                (click)="inspectorFilter = 'errors'"
+                class="px-2.5 py-1 rounded-md text-[11px] font-semibold border-none cursor-pointer"
+                [ngClass]="inspectorFilter === 'errors' ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-rose-400 shadow-sm' : 'bg-transparent text-slate-500'">
+                Errors Only
+              </button>
+              <button
+                type="button"
+                (click)="inspectorFilter = 'high_conf_errors'"
+                class="px-2.5 py-1 rounded-md text-[11px] font-semibold border-none cursor-pointer"
+                [ngClass]="inspectorFilter === 'high_conf_errors' ? 'bg-white dark:bg-zinc-700 text-amber-600 dark:text-amber-400 shadow-sm' : 'bg-transparent text-slate-500'">
+                Overconfident Errors (p≥0.75)
+              </button>
+              @if (res.flipRate !== null) {
+                <button
+                  type="button"
+                  (click)="inspectorFilter = 'flipped'"
+                  class="px-2.5 py-1 rounded-md text-[11px] font-semibold border-none cursor-pointer"
+                  [ngClass]="inspectorFilter === 'flipped' ? 'bg-white dark:bg-zinc-700 text-purple-600 dark:text-purple-400 shadow-sm' : 'bg-transparent text-slate-500'">
+                  Order Flipped
+                </button>
+              }
+            </div>
+
+            <input
+              type="text"
+              [(ngModel)]="inspectorSearch"
+              placeholder="Filter text or label..."
+              aria-label="Filter decisions by text or label"
+              class="px-3 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-zinc-950 border-b border-slate-200 dark:border-zinc-800 text-[10px] font-bold uppercase text-slate-500 z-10">
+              <tr>
+                <th class="py-2 px-3">Case / Question</th>
+                <th class="py-2 px-3">Type</th>
+                <th class="py-2 px-3">Input Snippet</th>
+                <th class="py-2 px-3">Gold</th>
+                <th class="py-2 px-3">Predicted</th>
+                <th class="py-2 px-3 text-right">Top Prob</th>
+                <th class="py-2 px-3 text-right">Brier</th>
+                <th class="py-2 px-3 text-right">Latency</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/60">
+              @for (q of getFilteredQuestions(); track $index) {
+                <tr
+                  (click)="toggleExpandQuestion($index)"
+                  class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors">
+                  <td class="py-2 px-3 font-mono text-[11px] text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                    <span class="font-bold">{{ q.caseId }}</span>
+                    <span class="text-slate-400"> / {{ q.questionId }}</span>
+                  </td>
+                  <td class="py-2 px-3">
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300">
+                      {{ q.type }}
+                    </span>
+                  </td>
+                  <td class="py-2 px-3 text-slate-600 dark:text-slate-400 max-w-md truncate">
+                    {{ q.displayText }}
+                  </td>
+                  <td class="py-2 px-3 font-mono font-semibold text-slate-800 dark:text-slate-200">
+                    {{ q.goldLabel }}
+                  </td>
+                  <td class="py-2 px-3 font-mono font-bold">
+                    <span
+                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px]"
+                      [ngClass]="q.correct ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'">
+                      <i class="bi" [ngClass]="q.correct ? 'bi-check2' : 'bi-x'"></i>
+                      {{ q.predictedLabel }}
+                    </span>
+                  </td>
+                  <td class="py-2 px-3 text-right font-mono tabular-nums text-slate-700 dark:text-slate-300">
+                    {{ q.topProbability * 100 | number:'1.1-1' }}%
+                  </td>
+                  <td class="py-2 px-3 text-right font-mono tabular-nums text-slate-500">
+                    {{ q.brierContribution | number:'1.3-3' }}
+                  </td>
+                  <td class="py-2 px-3 text-right font-mono tabular-nums text-slate-500">
+                    {{ q.latencyMs | number:'1.1-1' }} ms
+                  </td>
+                </tr>
+
+                @if (expandedQuestionIndex === $index) {
+                  <tr class="bg-slate-50/90 dark:bg-zinc-950/80">
+                    <td colspan="8" class="p-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            Prompt: {{ q.prompt }}
+                          </div>
+                          <div class="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
+                            {{ q.displayText }}
+                          </div>
+                          @if (q.expectedScore !== null && q.expectedScore !== undefined) {
+                            <div class="mt-2 text-xs font-mono text-purple-600 dark:text-purple-400">
+                              Expected Score: {{ q.expectedScore | number:'1.2-2' }} (Gold Score: {{ q.goldScore ?? q.goldLabel }} · |Δ| = {{ q.scoreAbsError | number:'1.2-2' }})
+                            </div>
+                          }
+                        </div>
+
+                        <div>
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                            Calibrated Option Probabilities
+                          </div>
+                          <div class="space-y-1.5">
+                            @for (p of q.probabilities; track p.label) {
+                              @let isGold = p.label.toLowerCase() === q.goldLabel.toLowerCase();
+                              <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="w-32 truncate" [ngClass]="isGold ? 'font-bold text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'">
+                                  {{ isGold ? '★ ' : '' }}{{ p.label }}
+                                </span>
+                                <div class="flex-1 h-3 bg-slate-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                  <div
+                                    class="h-full rounded-full"
+                                    [ngClass]="isGold ? 'bg-emerald-500' : 'bg-indigo-500'"
+                                    [style.width.%]="p.probability * 100"></div>
+                                </div>
+                                <span class="w-14 text-right tabular-nums">{{ p.probability * 100 | number:'1.1-1' }}%</span>
+                                @if (q.referenceProbabilities && q.referenceProbabilities[p.label] !== undefined) {
+                                  <span class="text-[10px] text-slate-400 w-20 text-right">
+                                    (ref {{ q.referenceProbabilities[p.label] * 100 | number:'1.1-1' }}%)
+                                  </span>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </div>
+</div>

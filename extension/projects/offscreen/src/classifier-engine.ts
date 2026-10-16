@@ -105,12 +105,11 @@ export class ClassifierEngine {
       session.questions.map((q) => q.laya),
     );
     const stateIds = model.host.encodeState(state);
-    const stateTokens = stateIds.length;
 
     for (const q of session.questions) {
-      if (stateTokens > q.stateRoom) {
+      if (q.stateRoom <= 0) {
         throw new DOMException(
-          `Input uses ${stateTokens} tokens but question "${q.id}" leaves room for ${q.stateRoom} (context window ${session.contextWindow}).`,
+          `Question "${q.id}" leaves no room for input tokens (context window ${session.contextWindow}).`,
           'QuotaExceededError',
         );
       }
@@ -166,6 +165,15 @@ export class ClassifierEngine {
       });
     }
     return { activeVariantId: active.id, models };
+  }
+
+  async setActiveModel(variantId: string): Promise<{ activeVariantId: string; models: ClassifierModelStatus[] }> {
+    const variant = this.variant(variantId);
+    await ClassifierEngine.writeSetting(ClassifierSettingsKey.MODEL_VARIANT, variant.id);
+    if (this.loaded && this.loaded.variant.id !== variant.id) {
+      this.unloadModel();
+    }
+    return this.listModels();
   }
 
   async downloadModel(variantId: string, onProgress: (loaded: number) => void, signal?: AbortSignal): Promise<void> {
@@ -331,6 +339,19 @@ export class ClassifierEngine {
         });
       } catch {
         resolve(defaultValue);
+      }
+    });
+  }
+
+  private static writeSetting(key: string, value: unknown): Promise<void> {
+    return new Promise((resolve) => {
+      try {
+        chrome.runtime.sendMessage({ action: 'set_setting', key, value }, () => {
+          void chrome.runtime.lastError;
+          resolve();
+        });
+      } catch {
+        resolve();
       }
     });
   }

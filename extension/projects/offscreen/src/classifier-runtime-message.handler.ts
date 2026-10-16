@@ -63,6 +63,9 @@ export class ClassifierRuntimeMessageHandler {
       case ClassifierRuntimeOp.LIST_MODELS:
         return this.engine.listModels();
 
+      case ClassifierRuntimeOp.SET_ACTIVE_MODEL:
+        return this.engine.setActiveModel(payload['variantId']);
+
       case ClassifierRuntimeOp.DOWNLOAD_MODEL:
         return this.abortable(request, (signal) => {
           const emitter = new ClassifierProgressEmitter(request.requestId, request.clientTabId, payload['variantId']);

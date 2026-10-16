@@ -45,6 +45,20 @@ export interface NormalizedClassifierResult {
   raw: any;
 }
 
+export interface ExtensionClassifierModelStatus {
+  variantId: string;
+  state: 'downloadable' | 'downloading' | 'cached' | 'error';
+  cachedBytes: number;
+  totalBytes: number;
+  loaded: boolean;
+  accelerator?: 'webgpu' | 'wasm';
+}
+
+export interface ExtensionClassifierModelList {
+  activeVariantId: string;
+  models: ExtensionClassifierModelStatus[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -136,6 +150,98 @@ export class ClassifierService {
     options: { signal?: AbortSignal; onDownloadProgress?: (loaded: number) => void } = {}
   ): Promise<NormalizedClassifierResult> {
     return this.decide(schema, input, options);
+  }
+
+  /** Destroys all cached DecisionModel sessions. */
+  clearSessions(): void {
+    for (const session of this.sessions.values()) {
+      try {
+        session?.destroy?.();
+      } catch {}
+    }
+    this.sessions.clear();
+  }
+
+  /** Queries the WebAI Extension offscreen runtime for available Laya model variants. */
+  async listExtensionModels(): Promise<ExtensionClassifierModelList | null> {
+    if (!this.isBrowser) return null;
+    try {
+      return await this.sendExtensionRequest<ExtensionClassifierModelList>('list_models', {}, { timeoutMs: 3500 });
+    } catch {
+      return null;
+    }
+  }
+
+  /** Switches the active Laya model variant in the WebAI Extension offscreen runtime. */
+  async setActiveExtensionModel(variantId: string): Promise<ExtensionClassifierModelList | null> {
+    if (!this.isBrowser) return null;
+    this.clearSessions();
+    return await this.sendExtensionRequest<ExtensionClassifierModelList>('set_active_model', { variantId }, { timeoutMs: 8000 });
+  }
+
+  /** Downloads a Laya model variant into the WebAI Extension OPFS cache. */
+  async downloadExtensionModel(
+    variantId: string,
+    onProgress?: (loaded: number) => void
+  ): Promise<void> {
+    if (!this.isBrowser) return;
+    await this.sendExtensionRequest<void>('download_model', { variantId }, {
+      timeoutMs: 30 * 60 * 1000,
+      onProgress,
+    });
+  }
+
+  /** Unloads the currently loaded Laya model from WebGPU/WASM memory (for cold-start benchmarking). */
+  async unloadExtensionModel(): Promise<void> {
+    if (!this.isBrowser) return;
+    this.clearSessions();
+    try {
+      await this.sendExtensionRequest<void>('unload_model', {}, { timeoutMs: 5000 });
+    } catch {}
+  }
+
+  private sendExtensionRequest<T>(
+    op: string,
+    payload: unknown,
+    options: { onProgress?: (loaded: number) => void; timeoutMs?: number } = {}
+  ): Promise<T> {
+    const requestId = crypto.randomUUID();
+    const messageId = `webai-classifier-${requestId}`;
+    const timeoutMs = options.timeoutMs ?? 15000;
+
+    return new Promise<T>((resolve, reject) => {
+      let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+      const cleanup = () => {
+        window.removeEventListener('message', listener);
+        if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
+      };
+
+      const listener = (event: MessageEvent) => {
+        if (event.source !== window || !event.data) return;
+        const data = event.data;
+        if (data.type === 'WEBAI_CLASSIFIER_PROGRESS' && data.requestId === requestId) {
+          options.onProgress?.(Number(data.loaded));
+          return;
+        }
+        if (data.type !== 'WEBAI_CLASSIFIER_RESPONSE' || data.messageId !== messageId) return;
+        cleanup();
+        const response = data.data;
+        if (response?.ok) resolve(response.value as T);
+        else reject(new Error(response?.error?.message ?? 'Extension runtime request failed.'));
+      };
+
+      window.addEventListener('message', listener);
+      window.postMessage(
+        { type: 'WEBAI_CLASSIFIER_REQUEST', messageId, op, requestId, payload },
+        '*'
+      );
+
+      timeoutHandle = setTimeout(() => {
+        cleanup();
+        reject(new Error(`Extension runtime timed out (${op}).`));
+      }, timeoutMs);
+    });
   }
 
   private normalizeModality(type: ClassifierQuestionModality): 'boolean' | 'choice' | 'score' {

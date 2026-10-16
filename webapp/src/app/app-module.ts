@@ -25,6 +25,7 @@ import { WritingAssistanceCodeModal } from './components/writing-assistance-code
 import {AutoScrollDirective} from './directives/auto-scroll.directive';
 import { CortexPage } from './pages/cortex/cortex.page';
 import { CortexInsightsPage } from './pages/cortex-insights/cortex-insights.page';
+import { DecisionsBenchmarkPage } from './pages/decisions-benchmark/decisions-benchmark.page';
 import { CortexFilterDropdownComponent } from './pages/cortex/components/filter-dropdown/filter-dropdown.component';
 import { CortexShareModalComponent } from './pages/cortex/components/share-modal/share-modal.component';
 import { CortexExtensionModalComponent } from './pages/cortex/components/extension-modal/extension-modal.component';
@@ -329,6 +330,7 @@ import { InstantFormAutofillDemoComponent } from './pages/demos/features/instant
     AutoScrollDirective,
     CortexPage,
     CortexInsightsPage,
+    DecisionsBenchmarkPage,
     CortexFilterDropdownComponent,
     CortexShareModalComponent,
     CortexExtensionModalComponent,

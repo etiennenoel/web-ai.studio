@@ -1,0 +1,2746 @@
+{
+  "id": "litert-parity-gate",
+  "name": "LiteRT Browser Numerical Parity Gate (FP32 vs WebGPU/WASM)",
+  "shortName": "LiteRT Parity Gate",
+  "category": "parity",
+  "badge": "Golden Reference Gate",
+  "icon": "bi-cpu-fill",
+  "description": "Verifies in-browser LiteRT.js (WebGPU / WASM fp16) numerical fidelity against the official PyTorch FP32 golden reference fixtures (gate_rows_s256 & gate_rows_td_s256), measuring argmax parity % and max |\u0394p|.",
+  "sourceUrl": "https://huggingface.co/litert-community/Laya-English-LiteRT",
+  "datasetUrl": "https://huggingface.co/litert-community/Laya-Multilingual-LiteRT",
+  "evaluationMode": "parity",
+  "baselines": [
+    {
+      "id": "pytorch-fp32-golden",
+      "name": "PyTorch FP32 Reference Host",
+      "provider": "Golden Reference",
+      "accuracy": 1.0,
+      "macroF1": 1.0,
+      "brierScore": 0.0,
+      "ece": 0.0,
+      "source": "HOST_CONTRACT.md"
+    }
+  ],
+  "cases": [
+    {
+      "id": "laya-ml-s256:ML_A01/department",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A01/department] {\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "billing",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.9999998807907104,
+            "technical": 5.818159820591973e-08,
+            "sales": 2.4648846519426115e-08,
+            "other": 6.190021650809285e-08
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A01/urgency",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A01/urgency] {\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.025542890653014183,
+            "1": 0.23200185596942902,
+            "2": 0.7424553036689758
+          },
+          "goldScore": 1.7169
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A01/churn_risk",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A01/churn_risk] {\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.0041094026528298855,
+            "false": 0.9958906173706055
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A01/refund_requested",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A01/refund_requested] {\"from\": \"Draft desk\", \"subject\": \"Extra charge\", \"body\": \"Please return the duplicate payment.\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "true",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.8500984907150269,
+            "false": 0.14990149438381195
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A02/department",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel the plan. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A02/department] {\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel th",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "technical",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.0044455742463469505,
+            "technical": 0.9122844934463501,
+            "sales": 0.01113373227417469,
+            "other": 0.07213611900806427
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A02/urgency",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel the plan. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A02/urgency] {\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel th",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.008238467387855053,
+            "1": 0.15517078340053558,
+            "2": 0.8365907073020935
+          },
+          "goldScore": 1.8284
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A02/churn_risk",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel the plan. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A02/churn_risk] {\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel th",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.016403818503022194,
+            "false": 0.9835962057113647
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A02/refund_requested",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel the plan. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A02/refund_requested] {\"from\": \"Draft desk\", \"subject\": \"Upload blocked\", \"body\": \"The upload fails every time. Our workshop is blocked today. If this is not fixed, we will cancel th",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.0008723080973140895,
+            "false": 0.9991276860237122
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A03/department",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and how to arrange a demonstration next week. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps. The team uses three work tables and a notice board. Materials for the next review have been placed in a separate tray so that the current record remains easy to follow. We have kept the earlier copy and added a short note beside each change. The record is ordered by the time of the event, with the most recent observation at the end. Before the next meeting, the person handling this item will read the opening request and the attached notes together. Please use the opening request as the main point of this message. There is no additional customer information in this note. The draft contains only the workshop schedule and a list of tasks, and the review can use a copy without changing the original. The notes were collected in one place to prevent different versions from being confused. After the review, we plan to add the result and keep the earlier notes for reference. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A03/department] {\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and h",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "sales",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.0018838427495211363,
+            "technical": 0.007903624325990677,
+            "sales": 0.980435848236084,
+            "other": 0.009776654653251171
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A03/urgency",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and how to arrange a demonstration next week. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps. The team uses three work tables and a notice board. Materials for the next review have been placed in a separate tray so that the current record remains easy to follow. We have kept the earlier copy and added a short note beside each change. The record is ordered by the time of the event, with the most recent observation at the end. Before the next meeting, the person handling this item will read the opening request and the attached notes together. Please use the opening request as the main point of this message. There is no additional customer information in this note. The draft contains only the workshop schedule and a list of tasks, and the review can use a copy without changing the original. The notes were collected in one place to prevent different versions from being confused. After the review, we plan to add the result and keep the earlier notes for reference. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A03/urgency] {\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and h",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.004166151862591505,
+            "1": 0.2091919183731079,
+            "2": 0.7866419553756714
+          },
+          "goldScore": 1.7825
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A03/churn_risk",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and how to arrange a demonstration next week. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps. The team uses three work tables and a notice board. Materials for the next review have been placed in a separate tray so that the current record remains easy to follow. We have kept the earlier copy and added a short note beside each change. The record is ordered by the time of the event, with the most recent observation at the end. Before the next meeting, the person handling this item will read the opening request and the attached notes together. Please use the opening request as the main point of this message. There is no additional customer information in this note. The draft contains only the workshop schedule and a list of tasks, and the review can use a copy without changing the original. The notes were collected in one place to prevent different versions from being confused. After the review, we plan to add the result and keep the earlier notes for reference. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A03/churn_risk] {\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and h",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.00027469941414892673,
+            "false": 0.9997252821922302
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A03/refund_requested",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and how to arrange a demonstration next week. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps. The team uses three work tables and a notice board. Materials for the next review have been placed in a separate tray so that the current record remains easy to follow. We have kept the earlier copy and added a short note beside each change. The record is ordered by the time of the event, with the most recent observation at the end. Before the next meeting, the person handling this item will read the opening request and the attached notes together. Please use the opening request as the main point of this message. There is no additional customer information in this note. The draft contains only the workshop schedule and a list of tasks, and the review can use a copy without changing the original. The notes were collected in one place to prevent different versions from being confused. After the review, we plan to add the result and keep the earlier notes for reference. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared.\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A03/refund_requested] {\"from\": \"Draft desk\", \"subject\": \"Plan details\", \"body\": \"We are considering a new contract for our workshop. Please explain the price for a larger group and h",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.0018380879191681743,
+            "false": 0.9981619715690613
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A04/department",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A04/department] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "billing",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.9992189407348633,
+            "technical": 5.210045401327079e-06,
+            "sales": 0.0007621371187269688,
+            "other": 1.3717257388634607e-05
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A04/urgency",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A04/urgency] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.010628378950059414,
+            "1": 0.15766942501068115,
+            "2": 0.8317021727561951
+          },
+          "goldScore": 1.8211
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A04/churn_risk",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A04/churn_risk] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.012829991988837719,
+            "false": 0.9871699810028076
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A04/refund_requested",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A04/refund_requested] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4e8c\u91cd\u8acb\u6c42\", \"body\": \"\u6599\u91d1\u304c\u4e8c\u91cd\u306b\u5f15\u304d\u843d\u3068\u3055\u308c\u3066\u3044\u307e\u3059\u3002\u5dee\u984d\u3092\u8fd4\u91d1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "true",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.9898260831832886,
+            "false": 0.010173930786550045
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A05/department",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A05/department] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "technical",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.03208402916789055,
+            "technical": 0.44801387190818787,
+            "sales": 0.0884794071316719,
+            "other": 0.43142274022102356
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A05/urgency",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A05/urgency] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.004046465270221233,
+            "1": 0.17571629583835602,
+            "2": 0.8202372193336487
+          },
+          "goldScore": 1.8162
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A05/churn_risk",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A05/churn_risk] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.0021024872548878193,
+            "false": 0.9978975057601929
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A05/refund_requested",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A05/refund_requested] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\", \"body\": \"\u8cc7\u6599\u3092\u4fdd\u5b58\u3057\u3088\u3046\u3068\u3059\u308b\u3068\u753b\u9762\u304c\u6b62\u307e\u308a\u307e\u3059\u3002\u672c\u65e5\u306e\u4f5c\u696d\u304c\u9032\u3081\u3089\u308c\u307e\u305b\u3093\u3002\u76f4\u3089\u306a\u3044\u5834\u5408\u306f\u89e3\u7d04\u3092\u691c\u8a0e\u3057\u307e\u3059\u3002\u65e9\u3081\u306b\u5bfe\u5fdc\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.00035368380486033857,
+            "false": 0.9996463060379028
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A06/department",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\u524d\u56de\u306e\u8a18\u9332\u3068\u4eca\u56de\u306e\u5185\u5bb9\u3092\u4e26\u3079\u3066\u78ba\u8a8d\u3067\u304d\u308b\u3088\u3046\u3001\u5909\u66f4\u3057\u305f\u7b87\u6240\u306b\u306f\u77ed\u3044\u8aac\u660e\u3092\u6dfb\u3048\u307e\u3057\u305f\u3002\u78ba\u8a8d\u3057\u305f\u65e5\u6642\u306e\u9806\u306b\u6574\u7406\u3057\u3066\u3044\u308b\u305f\u3081\u3001\u5f8c\u304b\u3089\u898b\u76f4\u3059\u5834\u5408\u3082\u7d4c\u7def\u3092\u305f\u3069\u308c\u307e\u3059\u3002\u6b21\u306e\u6253\u3061\u5408\u308f\u305b\u3067\u306f\u3001\u6700\u521d\u306e\u4f9d\u983c\u3068\u88dc\u8db3\u8cc7\u6599\u3092\u4e00\u7dd2\u306b\u78ba\u8a8d\u3059\u308b\u4e88\u5b9a\u3067\u3059\u3002\u62c5\u5f53\u304c\u4ea4\u4ee3\u3057\u3066\u3082\u5185\u5bb9\u304c\u4f1d\u308f\u308b\u3088\u3046\u3001\u78ba\u8a8d\u6e08\u307f\u306e\u9805\u76ee\u306b\u306f\u5370\u3092\u4ed8\u3051\u3066\u3044\u307e\u3059\u3002\u65b0\u305f\u306a\u4f9d\u983c\u3092\u8ffd\u52a0\u3059\u308b\u3082\u306e\u3067\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u5171\u6709\u306e\u9023\u7d61\u5e33\u306b\u306f\u4f5c\u696d\u306e\u9806\u756a\u3068\u62c5\u5f53\u306e\u5f79\u5272\u3060\u3051\u3092\u8a18\u8f09\u3057\u3066\u3044\u307e\u3059\u3002\u500b\u4eba\u306e\u8a73\u3057\u3044\u60c5\u5831\u306f\u542b\u3081\u3066\u3044\u307e\u305b\u3093\u3002\u5fc5\u8981\u306a\u5834\u5408\u306f\u63a7\u3048\u3092\u4f7f\u3063\u3066\u78ba\u8a8d\u3057\u3001\u539f\u672c\u306f\u305d\u306e\u307e\u307e\u4fdd\u7ba1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u8cc7\u6599\u306e\u7248\u3092\u53d6\u308a\u9055\u3048\u306a\u3044\u3088\u3046\u3001\u8868\u7d19\u306b\u306f\u78ba\u8a8d\u65e5\u3092\u8a18\u5165\u3057\u307e\u3057\u305f\u3002\u4f5c\u696d\u304c\u7d42\u308f\u3063\u305f\u3089\u7d50\u679c\u3092\u8ffd\u8a18\u3057\u3001\u4ee5\u524d\u306e\u8a18\u9332\u3082\u53c2\u8003\u3068\u3057\u3066\u6b8b\u3059\u4e88\u5b9a\u3067\u3059\u3002\u3054\u78ba\u8a8d\u306e\u969b\u306f\u5192\u982d\u306e\u5185\u5bb9\u3092\u512a\u5148\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A06/department] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "department",
+            "type": "choice",
+            "prompt": "Which department should handle this request?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, system errors"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, new contracts"
+              },
+              {
+                "label": "other",
+                "description": "everything else"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "department": {
+          "label": "other",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.06967029720544815,
+            "technical": 0.15413546562194824,
+            "sales": 0.10963791608810425,
+            "other": 0.6665562987327576
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A06/urgency",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\u524d\u56de\u306e\u8a18\u9332\u3068\u4eca\u56de\u306e\u5185\u5bb9\u3092\u4e26\u3079\u3066\u78ba\u8a8d\u3067\u304d\u308b\u3088\u3046\u3001\u5909\u66f4\u3057\u305f\u7b87\u6240\u306b\u306f\u77ed\u3044\u8aac\u660e\u3092\u6dfb\u3048\u307e\u3057\u305f\u3002\u78ba\u8a8d\u3057\u305f\u65e5\u6642\u306e\u9806\u306b\u6574\u7406\u3057\u3066\u3044\u308b\u305f\u3081\u3001\u5f8c\u304b\u3089\u898b\u76f4\u3059\u5834\u5408\u3082\u7d4c\u7def\u3092\u305f\u3069\u308c\u307e\u3059\u3002\u6b21\u306e\u6253\u3061\u5408\u308f\u305b\u3067\u306f\u3001\u6700\u521d\u306e\u4f9d\u983c\u3068\u88dc\u8db3\u8cc7\u6599\u3092\u4e00\u7dd2\u306b\u78ba\u8a8d\u3059\u308b\u4e88\u5b9a\u3067\u3059\u3002\u62c5\u5f53\u304c\u4ea4\u4ee3\u3057\u3066\u3082\u5185\u5bb9\u304c\u4f1d\u308f\u308b\u3088\u3046\u3001\u78ba\u8a8d\u6e08\u307f\u306e\u9805\u76ee\u306b\u306f\u5370\u3092\u4ed8\u3051\u3066\u3044\u307e\u3059\u3002\u65b0\u305f\u306a\u4f9d\u983c\u3092\u8ffd\u52a0\u3059\u308b\u3082\u306e\u3067\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u5171\u6709\u306e\u9023\u7d61\u5e33\u306b\u306f\u4f5c\u696d\u306e\u9806\u756a\u3068\u62c5\u5f53\u306e\u5f79\u5272\u3060\u3051\u3092\u8a18\u8f09\u3057\u3066\u3044\u307e\u3059\u3002\u500b\u4eba\u306e\u8a73\u3057\u3044\u60c5\u5831\u306f\u542b\u3081\u3066\u3044\u307e\u305b\u3093\u3002\u5fc5\u8981\u306a\u5834\u5408\u306f\u63a7\u3048\u3092\u4f7f\u3063\u3066\u78ba\u8a8d\u3057\u3001\u539f\u672c\u306f\u305d\u306e\u307e\u307e\u4fdd\u7ba1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u8cc7\u6599\u306e\u7248\u3092\u53d6\u308a\u9055\u3048\u306a\u3044\u3088\u3046\u3001\u8868\u7d19\u306b\u306f\u78ba\u8a8d\u65e5\u3092\u8a18\u5165\u3057\u307e\u3057\u305f\u3002\u4f5c\u696d\u304c\u7d42\u308f\u3063\u305f\u3089\u7d50\u679c\u3092\u8ffd\u8a18\u3057\u3001\u4ee5\u524d\u306e\u8a18\u9332\u3082\u53c2\u8003\u3068\u3057\u3066\u6b8b\u3059\u4e88\u5b9a\u3067\u3059\u3002\u3054\u78ba\u8a8d\u306e\u969b\u306f\u5192\u982d\u306e\u5185\u5bb9\u3092\u512a\u5148\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A06/urgency] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is this request?",
+            "options": [
+              {
+                "label": "0",
+                "description": "not urgent"
+              },
+              {
+                "label": "1",
+                "description": "soon"
+              },
+              {
+                "label": "2",
+                "description": "critical deadline or blocking issue"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.019749503582715988,
+            "1": 0.3695833384990692,
+            "2": 0.6106671094894409
+          },
+          "goldScore": 1.5909
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A06/churn_risk",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\u524d\u56de\u306e\u8a18\u9332\u3068\u4eca\u56de\u306e\u5185\u5bb9\u3092\u4e26\u3079\u3066\u78ba\u8a8d\u3067\u304d\u308b\u3088\u3046\u3001\u5909\u66f4\u3057\u305f\u7b87\u6240\u306b\u306f\u77ed\u3044\u8aac\u660e\u3092\u6dfb\u3048\u307e\u3057\u305f\u3002\u78ba\u8a8d\u3057\u305f\u65e5\u6642\u306e\u9806\u306b\u6574\u7406\u3057\u3066\u3044\u308b\u305f\u3081\u3001\u5f8c\u304b\u3089\u898b\u76f4\u3059\u5834\u5408\u3082\u7d4c\u7def\u3092\u305f\u3069\u308c\u307e\u3059\u3002\u6b21\u306e\u6253\u3061\u5408\u308f\u305b\u3067\u306f\u3001\u6700\u521d\u306e\u4f9d\u983c\u3068\u88dc\u8db3\u8cc7\u6599\u3092\u4e00\u7dd2\u306b\u78ba\u8a8d\u3059\u308b\u4e88\u5b9a\u3067\u3059\u3002\u62c5\u5f53\u304c\u4ea4\u4ee3\u3057\u3066\u3082\u5185\u5bb9\u304c\u4f1d\u308f\u308b\u3088\u3046\u3001\u78ba\u8a8d\u6e08\u307f\u306e\u9805\u76ee\u306b\u306f\u5370\u3092\u4ed8\u3051\u3066\u3044\u307e\u3059\u3002\u65b0\u305f\u306a\u4f9d\u983c\u3092\u8ffd\u52a0\u3059\u308b\u3082\u306e\u3067\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u5171\u6709\u306e\u9023\u7d61\u5e33\u306b\u306f\u4f5c\u696d\u306e\u9806\u756a\u3068\u62c5\u5f53\u306e\u5f79\u5272\u3060\u3051\u3092\u8a18\u8f09\u3057\u3066\u3044\u307e\u3059\u3002\u500b\u4eba\u306e\u8a73\u3057\u3044\u60c5\u5831\u306f\u542b\u3081\u3066\u3044\u307e\u305b\u3093\u3002\u5fc5\u8981\u306a\u5834\u5408\u306f\u63a7\u3048\u3092\u4f7f\u3063\u3066\u78ba\u8a8d\u3057\u3001\u539f\u672c\u306f\u305d\u306e\u307e\u307e\u4fdd\u7ba1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u8cc7\u6599\u306e\u7248\u3092\u53d6\u308a\u9055\u3048\u306a\u3044\u3088\u3046\u3001\u8868\u7d19\u306b\u306f\u78ba\u8a8d\u65e5\u3092\u8a18\u5165\u3057\u307e\u3057\u305f\u3002\u4f5c\u696d\u304c\u7d42\u308f\u3063\u305f\u3089\u7d50\u679c\u3092\u8ffd\u8a18\u3057\u3001\u4ee5\u524d\u306e\u8a18\u9332\u3082\u53c2\u8003\u3068\u3057\u3066\u6b8b\u3059\u4e88\u5b9a\u3067\u3059\u3002\u3054\u78ba\u8a8d\u306e\u969b\u306f\u5192\u982d\u306e\u5185\u5bb9\u3092\u512a\u5148\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A06/churn_risk] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the user threaten to cancel or leave?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 7.986622563294077e-08,
+            "false": 0.9999998807907104
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_A06/refund_requested",
+      "workflow": "laya-ml-s256 (JA)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e\u306b\u5225\u306e\u62c5\u5f53\u8005\u304c\u540c\u3058\u624b\u9806\u3067\u898b\u76f4\u3057\u307e\u3057\u305f\u3002\u4eca\u56de\u306e\u304a\u9858\u3044\u306f\u5192\u982d\u306b\u8a18\u8f09\u3057\u305f\u3068\u304a\u308a\u3067\u3059\u3002\u4f5c\u696d\u5ba4\u3067\u306f\u3001\u6848\u4ef6\u3054\u3068\u306b\u8cc7\u6599\u3092\u5206\u3051\u3066\u4fdd\u7ba1\u3057\u3066\u3044\u307e\u3059\u3002\u4eca\u56de\u306e\u8cc7\u6599\u3082\u5c02\u7528\u306e\u7bb1\u306b\u307e\u3068\u3081\u3001\u6b21\u306e\u78ba\u8a8d\u3067\u4f7f\u3046\u63a7\u3048\u306f\u5225\u306e\u5834\u6240\u306b\u7f6e\u304d\u307e\u3057\u305f\u3002\u5143\u306e\u8a18\u9332\u306f\u5909\u66f4\u305b\u305a\u306b\u6b8b\u3057\u3066\u3044\u307e\u3059\u3002\u524d\u56de\u306e\u8a18\u9332\u3068\u4eca\u56de\u306e\u5185\u5bb9\u3092\u4e26\u3079\u3066\u78ba\u8a8d\u3067\u304d\u308b\u3088\u3046\u3001\u5909\u66f4\u3057\u305f\u7b87\u6240\u306b\u306f\u77ed\u3044\u8aac\u660e\u3092\u6dfb\u3048\u307e\u3057\u305f\u3002\u78ba\u8a8d\u3057\u305f\u65e5\u6642\u306e\u9806\u306b\u6574\u7406\u3057\u3066\u3044\u308b\u305f\u3081\u3001\u5f8c\u304b\u3089\u898b\u76f4\u3059\u5834\u5408\u3082\u7d4c\u7def\u3092\u305f\u3069\u308c\u307e\u3059\u3002\u6b21\u306e\u6253\u3061\u5408\u308f\u305b\u3067\u306f\u3001\u6700\u521d\u306e\u4f9d\u983c\u3068\u88dc\u8db3\u8cc7\u6599\u3092\u4e00\u7dd2\u306b\u78ba\u8a8d\u3059\u308b\u4e88\u5b9a\u3067\u3059\u3002\u62c5\u5f53\u304c\u4ea4\u4ee3\u3057\u3066\u3082\u5185\u5bb9\u304c\u4f1d\u308f\u308b\u3088\u3046\u3001\u78ba\u8a8d\u6e08\u307f\u306e\u9805\u76ee\u306b\u306f\u5370\u3092\u4ed8\u3051\u3066\u3044\u307e\u3059\u3002\u65b0\u305f\u306a\u4f9d\u983c\u3092\u8ffd\u52a0\u3059\u308b\u3082\u306e\u3067\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u5171\u6709\u306e\u9023\u7d61\u5e33\u306b\u306f\u4f5c\u696d\u306e\u9806\u756a\u3068\u62c5\u5f53\u306e\u5f79\u5272\u3060\u3051\u3092\u8a18\u8f09\u3057\u3066\u3044\u307e\u3059\u3002\u500b\u4eba\u306e\u8a73\u3057\u3044\u60c5\u5831\u306f\u542b\u3081\u3066\u3044\u307e\u305b\u3093\u3002\u5fc5\u8981\u306a\u5834\u5408\u306f\u63a7\u3048\u3092\u4f7f\u3063\u3066\u78ba\u8a8d\u3057\u3001\u539f\u672c\u306f\u305d\u306e\u307e\u307e\u4fdd\u7ba1\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u8cc7\u6599\u306e\u7248\u3092\u53d6\u308a\u9055\u3048\u306a\u3044\u3088\u3046\u3001\u8868\u7d19\u306b\u306f\u78ba\u8a8d\u65e5\u3092\u8a18\u5165\u3057\u307e\u3057\u305f\u3002\u4f5c\u696d\u304c\u7d42\u308f\u3063\u305f\u3089\u7d50\u679c\u3092\u8ffd\u8a18\u3057\u3001\u4ee5\u524d\u306e\u8a18\u9332\u3082\u53c2\u8003\u3068\u3057\u3066\u6b8b\u3059\u4e88\u5b9a\u3067\u3059\u3002\u3054\u78ba\u8a8d\u306e\u969b\u306f\u5192\u982d\u306e\u5185\u5bb9\u3092\u512a\u5148\u3057\u3066\u304f\u3060\u3055\u3044\u3002\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_A06/refund_requested] {\"from\": \"\u9023\u7d61\u4fc2\", \"subject\": \"\u304a\u793c\u306e\u3054\u9023\u7d61\", \"body\": \"\u5148\u65e5\u306f\u4f5c\u696d\u5ba4\u306e\u898b\u5b66\u306b\u3054\u5354\u529b\u3044\u305f\u3060\u304d\u3001\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3057\u305f\u3002\u8aac\u660e\u304c\u5206\u304b\u308a\u3084\u3059\u304f\u3001\u53c2\u52a0\u8005\u306b\u3082\u597d\u8a55\u3067\u3057\u305f\u3002\u4eca\u56de\u306f\u304a\u793c\u306e\u307f\u306e\u3054\u9023\u7d61\u3067\u3059\u3002\u8fd4\u4fe1\u306f\u4e0d\u8981\u3067\u3059\u3002\u88dc\u8db3\u3068\u3057\u3066\u3001\u3053\u308c\u307e\u3067\u306e\u78ba\u8a8d\u5185\u5bb9\u3092\u304a\u4f1d\u3048\u3057\u307e\u3059\u3002\u62c5\u5f53\u8005\u306f\u5348\u524d\u4e2d\u306b\u8a18\u9332\u3092\u78ba\u8a8d\u3057\u3001\u663c\u904e\u304e",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "refund_requested",
+            "type": "boolean",
+            "prompt": "Does the user explicitly request a refund?"
+          }
+        ]
+      },
+      "gold": {
+        "refund_requested": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 5.9388254157966e-05,
+            "false": 0.9999406337738037
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B01/category",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B01/category] {\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "category",
+            "type": "choice",
+            "prompt": "Which team should handle the email in `body`?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, integrations"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, demos, new purchases"
+              },
+              {
+                "label": "security",
+                "description": "phishing, scams, account compromise"
+              },
+              {
+                "label": "hr",
+                "description": "hiring, leave, payroll"
+              },
+              {
+                "label": "other",
+                "description": "none of the above"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "category": {
+          "label": "billing",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.9999996423721313,
+            "technical": 7.615844310748798e-08,
+            "sales": 6.101717531237227e-08,
+            "security": 5.7436555067624795e-08,
+            "hr": 5.730524321734265e-08,
+            "other": 1.5779764339640678e-07
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B01/is_spam",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B01/is_spam] {\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_spam",
+            "type": "boolean",
+            "prompt": "Is this email unsolicited spam or bulk marketing?"
+          }
+        ]
+      },
+      "gold": {
+        "is_spam": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 5.043886631028727e-05,
+            "false": 0.99994957447052
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B01/is_phishing",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B01/is_phishing] {\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "is_phishing",
+            "type": "boolean",
+            "prompt": "Is this email a phishing or scam attempt to steal money, credentials, or personal data?",
+            "options": [
+              {
+                "label": "true",
+                "description": "phishing, scam, or fraud"
+              },
+              {
+                "label": "false",
+                "description": "a legitimate email"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "is_phishing": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 1.8181413906859234e-05,
+            "false": 0.9999817609786987
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B01/urgency",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B01/urgency] {\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How urgent is the request in `body`?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "needs attention soon"
+              },
+              {
+                "label": "2",
+                "description": "blocking issue or hard deadline"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.0042721182107925415,
+            "1": 0.20295366644859314,
+            "2": 0.7927742004394531
+          },
+          "goldScore": 1.7885
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B01/needs_reply",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B01/needs_reply] {\"subject\": \"Invoice copy\", \"body\": \"Please send a copy of our paid invoice.\", \"from\": \"Note desk\"}",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_reply",
+            "type": "boolean",
+            "prompt": "Does the sender expect a reply?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_reply": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.07394052296876907,
+            "false": 0.9260594844818115
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-ml-s256:ML_B02/category",
+      "workflow": "laya-ml-s256 (EN)",
+      "referenceModel": "laya-ml-s256",
+      "input": "{\"subject\": \"Import stopped\", \"body\": \"The import stopped this morning. We need to recover the draft before tomorrow. Please reply with the next steps. For context, the workshop keeps a small folder for each request. The opening message states what we need; these notes explain how the record was prepared. A colleague checked the draft in the morning and recorded the result on the shared sheet. Another colleague compared the same draft after lunch, using the same steps.\", \"from\": \"Note desk\"}",
+      "displayText": "[laya-ml-s256 \u00b7 ML_B02/category] {\"subject\": \"Import stopped\", \"body\": \"The import stopped this morning. We need to recover the draft before tomorrow. Please reply with the next steps. For cont",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "category",
+            "type": "choice",
+            "prompt": "Which team should handle the email in `body`?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "invoices, payments, refunds"
+              },
+              {
+                "label": "technical",
+                "description": "bugs, outages, integrations"
+              },
+              {
+                "label": "sales",
+                "description": "pricing, demos, new purchases"
+              },
+              {
+                "label": "security",
+                "description": "phishing, scams, account compromise"
+              },
+              {
+                "label": "hr",
+                "description": "hiring, leave, payroll"
+              },
+              {
+                "label": "other",
+                "description": "none of the above"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "category": {
+          "label": "other",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.00534707959741354,
+            "technical": 0.03833889588713646,
+            "sales": 0.016684329137206078,
+            "security": 0.0024674036540091038,
+            "hr": 0.020952537655830383,
+            "other": 0.9162098169326782
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_01/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, returned a count of seven, and a separate checker confirmed seven. No files were changed.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_01/action] {\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, return",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What should happen next after this agent trace?",
+            "options": [
+              {
+                "label": "close",
+                "description": "finish because the task is complete"
+              },
+              {
+                "label": "continue",
+                "description": "continue the permitted task"
+              },
+              {
+                "label": "retry",
+                "description": "retry a recoverable failed step"
+              },
+              {
+                "label": "escalate",
+                "description": "ask a human reviewer to decide"
+              },
+              {
+                "label": "stop",
+                "description": "stop an unsafe or unauthorized operation"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "continue",
+          "type": "choice",
+          "referenceProbabilities": {
+            "close": 0.17004378139972687,
+            "continue": 0.2955693006515503,
+            "retry": 0.25621068477630615,
+            "escalate": 0.18005657196044922,
+            "stop": 0.09811966866254807
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_01/needs_review",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, returned a count of seven, and a separate checker confirmed seven. No files were changed.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_01/needs_review] {\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, return",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_review",
+            "type": "boolean",
+            "prompt": "Does this trace require human review?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_review": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.44168058037757874,
+            "false": 0.5583193898200989
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_01/outcome",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, returned a count of seven, and a separate checker confirmed seven. No files were changed.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_01/outcome] {\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, return",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "outcome",
+            "type": "choice",
+            "prompt": "What outcome is supported by the trace?",
+            "options": [
+              {
+                "label": "successful",
+                "description": "the requested task completed and was verified"
+              },
+              {
+                "label": "partial",
+                "description": "only part of the requested task completed"
+              },
+              {
+                "label": "failed",
+                "description": "the requested task did not complete"
+              },
+              {
+                "label": "uncertain",
+                "description": "the available evidence does not establish the outcome"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "outcome": {
+          "label": "successful",
+          "type": "choice",
+          "referenceProbabilities": {
+            "successful": 0.4732168912887573,
+            "partial": 0.22981809079647064,
+            "failed": 0.13864465057849884,
+            "uncertain": 0.1583203673362732
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_01/risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, returned a count of seven, and a separate checker confirmed seven. No files were changed.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_01/risk] {\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, return",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "risk",
+            "type": "score",
+            "prompt": "How serious is the risk shown in this trace?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no material risk"
+              },
+              {
+                "label": "1",
+                "description": "minor reversible problem"
+              },
+              {
+                "label": "2",
+                "description": "substantial operational or data risk"
+              },
+              {
+                "label": "3",
+                "description": "critical unauthorized or irreversible harm"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "risk": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.3226436674594879,
+            "1": 0.5522603392601013,
+            "2": 0.0911361426115036,
+            "3": 0.03395984694361687
+          },
+          "goldScore": 0.8364
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_01/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, returned a count of seven, and a separate checker confirmed seven. No files were changed.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_01/urgency] {\"case_id\": \"TD1_01\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent was asked to count red blocks in a local test file. It read the file, return",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.3341362476348877,
+            "1": 0.3760867714881897,
+            "2": 0.21952544152736664,
+            "3": 0.07025153189897537
+          },
+          "goldScore": 1.0259
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_02/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and no data changed. The trace records a temporary connection error and allows one retry. The task is due tomorrow.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_02/action] {\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and n",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What should happen next after this agent trace?",
+            "options": [
+              {
+                "label": "close",
+                "description": "finish because the task is complete"
+              },
+              {
+                "label": "continue",
+                "description": "continue the permitted task"
+              },
+              {
+                "label": "retry",
+                "description": "retry a recoverable failed step"
+              },
+              {
+                "label": "escalate",
+                "description": "ask a human reviewer to decide"
+              },
+              {
+                "label": "stop",
+                "description": "stop an unsafe or unauthorized operation"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "retry",
+          "type": "choice",
+          "referenceProbabilities": {
+            "close": 0.09056303650140762,
+            "continue": 0.2858797013759613,
+            "retry": 0.3879516124725342,
+            "escalate": 0.14489392936229706,
+            "stop": 0.09071164578199387
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_02/needs_review",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and no data changed. The trace records a temporary connection error and allows one retry. The task is due tomorrow.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_02/needs_review] {\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and n",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_review",
+            "type": "boolean",
+            "prompt": "Does this trace require human review?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_review": {
+          "label": "true",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.5517571568489075,
+            "false": 0.4482428729534149
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_02/outcome",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and no data changed. The trace records a temporary connection error and allows one retry. The task is due tomorrow.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_02/outcome] {\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and n",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "outcome",
+            "type": "choice",
+            "prompt": "What outcome is supported by the trace?",
+            "options": [
+              {
+                "label": "successful",
+                "description": "the requested task completed and was verified"
+              },
+              {
+                "label": "partial",
+                "description": "only part of the requested task completed"
+              },
+              {
+                "label": "failed",
+                "description": "the requested task did not complete"
+              },
+              {
+                "label": "uncertain",
+                "description": "the available evidence does not establish the outcome"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "outcome": {
+          "label": "partial",
+          "type": "choice",
+          "referenceProbabilities": {
+            "successful": 0.24700979888439178,
+            "partial": 0.3867761790752411,
+            "failed": 0.1847265511751175,
+            "uncertain": 0.1814875304698944
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_02/risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and no data changed. The trace records a temporary connection error and allows one retry. The task is due tomorrow.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_02/risk] {\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and n",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "risk",
+            "type": "score",
+            "prompt": "How serious is the risk shown in this trace?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no material risk"
+              },
+              {
+                "label": "1",
+                "description": "minor reversible problem"
+              },
+              {
+                "label": "2",
+                "description": "substantial operational or data risk"
+              },
+              {
+                "label": "3",
+                "description": "critical unauthorized or irreversible harm"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "risk": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.30618372559547424,
+            "1": 0.5378031730651855,
+            "2": 0.1128317266702652,
+            "3": 0.04318126663565636
+          },
+          "goldScore": 0.893
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_02/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and no data changed. The trace records a temporary connection error and allows one retry. The task is due tomorrow.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_02/urgency] {\"case_id\": \"TD1_02\", \"workflow\": \"agent_trace_observability\", \"record\": \"A permitted read of a synthetic inventory timed out once. No output was produced and n",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.12844565510749817,
+            "1": 0.2758731544017792,
+            "2": 0.4104056656360626,
+            "3": 0.18527553975582123
+          },
+          "goldScore": 1.6525
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_03/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and verified. Two folders were locked. The agent accurately reported the two unfinished items and is waiting for access.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information. A reviewer kept the earlier note in order and recorded the time of the next check. The case description above remains the source of the decision; these background notes add no new outcome.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_03/action] {\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and ver",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What should happen next after this agent trace?",
+            "options": [
+              {
+                "label": "close",
+                "description": "finish because the task is complete"
+              },
+              {
+                "label": "continue",
+                "description": "continue the permitted task"
+              },
+              {
+                "label": "retry",
+                "description": "retry a recoverable failed step"
+              },
+              {
+                "label": "escalate",
+                "description": "ask a human reviewer to decide"
+              },
+              {
+                "label": "stop",
+                "description": "stop an unsafe or unauthorized operation"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "continue",
+          "type": "choice",
+          "referenceProbabilities": {
+            "close": 0.16659915447235107,
+            "continue": 0.2777162790298462,
+            "retry": 0.1955644190311432,
+            "escalate": 0.2653084099292755,
+            "stop": 0.09481169283390045
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_03/needs_review",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and verified. Two folders were locked. The agent accurately reported the two unfinished items and is waiting for access.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information. A reviewer kept the earlier note in order and recorded the time of the next check. The case description above remains the source of the decision; these background notes add no new outcome.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_03/needs_review] {\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and ver",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_review",
+            "type": "boolean",
+            "prompt": "Does this trace require human review?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_review": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.44395166635513306,
+            "false": 0.5560483336448669
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_03/outcome",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and verified. Two folders were locked. The agent accurately reported the two unfinished items and is waiting for access.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information. A reviewer kept the earlier note in order and recorded the time of the next check. The case description above remains the source of the decision; these background notes add no new outcome.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_03/outcome] {\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and ver",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "outcome",
+            "type": "choice",
+            "prompt": "What outcome is supported by the trace?",
+            "options": [
+              {
+                "label": "successful",
+                "description": "the requested task completed and was verified"
+              },
+              {
+                "label": "partial",
+                "description": "only part of the requested task completed"
+              },
+              {
+                "label": "failed",
+                "description": "the requested task did not complete"
+              },
+              {
+                "label": "uncertain",
+                "description": "the available evidence does not establish the outcome"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "outcome": {
+          "label": "successful",
+          "type": "choice",
+          "referenceProbabilities": {
+            "successful": 0.37365829944610596,
+            "partial": 0.29387539625167847,
+            "failed": 0.15187236666679382,
+            "uncertain": 0.18059396743774414
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_03/risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and verified. Two folders were locked. The agent accurately reported the two unfinished items and is waiting for access.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information. A reviewer kept the earlier note in order and recorded the time of the next check. The case description above remains the source of the decision; these background notes add no new outcome.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_03/risk] {\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and ver",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "risk",
+            "type": "score",
+            "prompt": "How serious is the risk shown in this trace?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no material risk"
+              },
+              {
+                "label": "1",
+                "description": "minor reversible problem"
+              },
+              {
+                "label": "2",
+                "description": "substantial operational or data risk"
+              },
+              {
+                "label": "3",
+                "description": "critical unauthorized or irreversible harm"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "risk": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.3150150775909424,
+            "1": 0.5022223591804504,
+            "2": 0.13079744577407837,
+            "3": 0.05196505784988403
+          },
+          "goldScore": 0.9197
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_03/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and verified. Two folders were locked. The agent accurately reported the two unfinished items and is waiting for access.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information. A reviewer kept the earlier note in order and recorded the time of the next check. The case description above remains the source of the decision; these background notes add no new outcome.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_03/urgency] {\"case_id\": \"TD1_03\", \"workflow\": \"agent_trace_observability\", \"record\": \"The request was to label eight fictional sample folders. Six labels were saved and ver",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.2530294954776764,
+            "1": 0.36660394072532654,
+            "2": 0.2897070348262787,
+            "3": 0.09065951406955719
+          },
+          "goldScore": 1.218
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_07/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the copy. A permitted formatting step remains. The original file is intact and the user asked the agent to continue.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_07/action] {\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the co",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What should happen next after this agent trace?",
+            "options": [
+              {
+                "label": "close",
+                "description": "finish because the task is complete"
+              },
+              {
+                "label": "continue",
+                "description": "continue the permitted task"
+              },
+              {
+                "label": "retry",
+                "description": "retry a recoverable failed step"
+              },
+              {
+                "label": "escalate",
+                "description": "ask a human reviewer to decide"
+              },
+              {
+                "label": "stop",
+                "description": "stop an unsafe or unauthorized operation"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "continue",
+          "type": "choice",
+          "referenceProbabilities": {
+            "close": 0.10036048293113708,
+            "continue": 0.5352607369422913,
+            "retry": 0.15232665836811066,
+            "escalate": 0.14630047976970673,
+            "stop": 0.0657515674829483
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_07/needs_review",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the copy. A permitted formatting step remains. The original file is intact and the user asked the agent to continue.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_07/needs_review] {\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the co",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_review",
+            "type": "boolean",
+            "prompt": "Does this trace require human review?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_review": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.36391153931617737,
+            "false": 0.636088490486145
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_07/outcome",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the copy. A permitted formatting step remains. The original file is intact and the user asked the agent to continue.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_07/outcome] {\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the co",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "outcome",
+            "type": "choice",
+            "prompt": "What outcome is supported by the trace?",
+            "options": [
+              {
+                "label": "successful",
+                "description": "the requested task completed and was verified"
+              },
+              {
+                "label": "partial",
+                "description": "only part of the requested task completed"
+              },
+              {
+                "label": "failed",
+                "description": "the requested task did not complete"
+              },
+              {
+                "label": "uncertain",
+                "description": "the available evidence does not establish the outcome"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "outcome": {
+          "label": "successful",
+          "type": "choice",
+          "referenceProbabilities": {
+            "successful": 0.4068254828453064,
+            "partial": 0.2892698645591736,
+            "failed": 0.11556459218263626,
+            "uncertain": 0.18834005296230316
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_07/risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the copy. A permitted formatting step remains. The original file is intact and the user asked the agent to continue.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_07/risk] {\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the co",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "risk",
+            "type": "score",
+            "prompt": "How serious is the risk shown in this trace?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no material risk"
+              },
+              {
+                "label": "1",
+                "description": "minor reversible problem"
+              },
+              {
+                "label": "2",
+                "description": "substantial operational or data risk"
+              },
+              {
+                "label": "3",
+                "description": "critical unauthorized or irreversible harm"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "risk": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.30662286281585693,
+            "1": 0.5741595029830933,
+            "2": 0.0863145962357521,
+            "3": 0.032903049141168594
+          },
+          "goldScore": 0.8455
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_07/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the copy. A permitted formatting step remains. The original file is intact and the user asked the agent to continue.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_07/urgency] {\"case_id\": \"TD1_07\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent copied a fictional draft into its assigned scratch folder and checked the co",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.23427559435367584,
+            "1": 0.43490010499954224,
+            "2": 0.2749468684196472,
+            "3": 0.05587739869952202
+          },
+          "goldScore": 1.1524
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_08/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applying the edit requires a reviewer decision under this fictional task policy. The trace correctly stops before applying it.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_08/action] {\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applyin",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What should happen next after this agent trace?",
+            "options": [
+              {
+                "label": "close",
+                "description": "finish because the task is complete"
+              },
+              {
+                "label": "continue",
+                "description": "continue the permitted task"
+              },
+              {
+                "label": "retry",
+                "description": "retry a recoverable failed step"
+              },
+              {
+                "label": "escalate",
+                "description": "ask a human reviewer to decide"
+              },
+              {
+                "label": "stop",
+                "description": "stop an unsafe or unauthorized operation"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "escalate",
+          "type": "choice",
+          "referenceProbabilities": {
+            "close": 0.1691373884677887,
+            "continue": 0.18529319763183594,
+            "retry": 0.14218181371688843,
+            "escalate": 0.2998999059200287,
+            "stop": 0.20348764955997467
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_08/needs_review",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applying the edit requires a reviewer decision under this fictional task policy. The trace correctly stops before applying it.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_08/needs_review] {\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applyin",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_review",
+            "type": "boolean",
+            "prompt": "Does this trace require human review?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_review": {
+          "label": "true",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.5444563627243042,
+            "false": 0.4555436670780182
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_08/outcome",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applying the edit requires a reviewer decision under this fictional task policy. The trace correctly stops before applying it.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_08/outcome] {\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applyin",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "outcome",
+            "type": "choice",
+            "prompt": "What outcome is supported by the trace?",
+            "options": [
+              {
+                "label": "successful",
+                "description": "the requested task completed and was verified"
+              },
+              {
+                "label": "partial",
+                "description": "only part of the requested task completed"
+              },
+              {
+                "label": "failed",
+                "description": "the requested task did not complete"
+              },
+              {
+                "label": "uncertain",
+                "description": "the available evidence does not establish the outcome"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "outcome": {
+          "label": "successful",
+          "type": "choice",
+          "referenceProbabilities": {
+            "successful": 0.30510324239730835,
+            "partial": 0.2979791462421417,
+            "failed": 0.17994509637355804,
+            "uncertain": 0.21697252988815308
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_08/risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applying the edit requires a reviewer decision under this fictional task policy. The trace correctly stops before applying it.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_08/risk] {\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applyin",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "risk",
+            "type": "score",
+            "prompt": "How serious is the risk shown in this trace?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no material risk"
+              },
+              {
+                "label": "1",
+                "description": "minor reversible problem"
+              },
+              {
+                "label": "2",
+                "description": "substantial operational or data risk"
+              },
+              {
+                "label": "3",
+                "description": "critical unauthorized or irreversible harm"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "risk": {
+          "label": "1",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.25385212898254395,
+            "1": 0.544496476650238,
+            "2": 0.12916067242622375,
+            "3": 0.07249071449041367
+          },
+          "goldScore": 1.0203
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD1_08/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applying the edit requires a reviewer decision under this fictional task policy. The trace correctly stops before applying it.\", \"background\": \"This is an invented case in a small offline practice workspace. The objects, records and events are synthetic and contain no real personal or business information.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD1_08/urgency] {\"case_id\": \"TD1_08\", \"workflow\": \"agent_trace_observability\", \"record\": \"The agent prepared a reversible draft edit and displayed the proposed content. Applyin",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "2",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.18911932408809662,
+            "1": 0.28993818163871765,
+            "2": 0.3684437870979309,
+            "3": 0.1524987369775772
+          },
+          "goldScore": 1.4843
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD2_01/action",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is broken, there is no deadline, and they say they are happy with the service.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD2_01/action] {\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is brok",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "action",
+            "type": "choice",
+            "prompt": "What is the best next service action for this case?",
+            "options": [
+              {
+                "label": "answer",
+                "description": "provide the requested information"
+              },
+              {
+                "label": "troubleshoot",
+                "description": "diagnose and resolve a technical problem"
+              },
+              {
+                "label": "refund",
+                "description": "review and return an incorrect payment"
+              },
+              {
+                "label": "cancel",
+                "description": "process an explicit cancellation request"
+              },
+              {
+                "label": "escalate",
+                "description": "send the case to a human specialist"
+              },
+              {
+                "label": "clarify",
+                "description": "ask for information needed to proceed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "action": {
+          "label": "clarify",
+          "type": "choice",
+          "referenceProbabilities": {
+            "answer": 0.3174004554748535,
+            "troubleshoot": 0.018451830372214317,
+            "refund": 0.011007202789187431,
+            "cancel": 0.019567547366023064,
+            "escalate": 0.031245913356542587,
+            "clarify": 0.6023270487785339
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD2_01/category",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is broken, there is no deadline, and they say they are happy with the service.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD2_01/category] {\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is brok",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "category",
+            "type": "choice",
+            "prompt": "Which category best describes this service case?",
+            "options": [
+              {
+                "label": "billing",
+                "description": "charges, invoices or refunds"
+              },
+              {
+                "label": "technical",
+                "description": "a failure or problem using the service"
+              },
+              {
+                "label": "cancellation",
+                "description": "ending or reducing the service"
+              },
+              {
+                "label": "information",
+                "description": "general questions or instructions"
+              },
+              {
+                "label": "account",
+                "description": "account access or identity verification"
+              },
+              {
+                "label": "other",
+                "description": "none of the other categories fits"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "category": {
+          "label": "information",
+          "type": "choice",
+          "referenceProbabilities": {
+            "billing": 0.00645101023837924,
+            "technical": 0.022596927359700203,
+            "cancellation": 0.015000241808593273,
+            "information": 0.5980488061904907,
+            "account": 0.016293708235025406,
+            "other": 0.34160932898521423
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD2_01/churn_risk",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is broken, there is no deadline, and they say they are happy with the service.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD2_01/churn_risk] {\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is brok",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "churn_risk",
+            "type": "boolean",
+            "prompt": "Does the customer indicate they may leave or cancel?"
+          }
+        ]
+      },
+      "gold": {
+        "churn_risk": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.13786907494068146,
+            "false": 0.8621309399604797
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD2_01/needs_human",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is broken, there is no deadline, and they say they are happy with the service.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD2_01/needs_human] {\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is brok",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "needs_human",
+            "type": "boolean",
+            "prompt": "Does resolving this case require a human specialist?"
+          }
+        ]
+      },
+      "gold": {
+        "needs_human": {
+          "label": "false",
+          "type": "boolean",
+          "referenceProbabilities": {
+            "true": 0.1425788253545761,
+            "false": 0.8574211597442627
+          },
+          "goldScore": null
+        }
+      }
+    },
+    {
+      "id": "laya-td-s256:TD2_01/urgency",
+      "workflow": "laya-td-s256 (EN)",
+      "referenceModel": "laya-td-s256",
+      "input": "{\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is broken, there is no deadline, and they say they are happy with the service.\"}",
+      "displayText": "[laya-td-s256 \u00b7 TD2_01/urgency] {\"case_id\": \"TD2_01\", \"workflow\": \"customer_service\", \"record\": \"The customer asks where to find instructions for exporting a practice notebook. Nothing is brok",
+      "schema": {
+        "expectedInputs": [
+          {
+            "type": "text"
+          }
+        ],
+        "questions": [
+          {
+            "id": "urgency",
+            "type": "score",
+            "prompt": "How quickly does this case need attention?",
+            "options": [
+              {
+                "label": "0",
+                "description": "no time pressure"
+              },
+              {
+                "label": "1",
+                "description": "routine attention soon"
+              },
+              {
+                "label": "2",
+                "description": "prompt attention before a stated deadline"
+              },
+              {
+                "label": "3",
+                "description": "immediate response is needed"
+              }
+            ]
+          }
+        ]
+      },
+      "gold": {
+        "urgency": {
+          "label": "0",
+          "type": "score",
+          "referenceProbabilities": {
+            "0": 0.4256911277770996,
+            "1": 0.3291376829147339,
+            "2": 0.19580791890621185,
+            "3": 0.04936327040195465
+          },
+          "goldScore": 0.8688
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1124 @@
+{
+  "id": "jev-banking",
+  "name": "JEV-Bench & DMB: Banking77 Intent (16-Way)",
+  "shortName": "Banking Intent",
+  "category": "jev-bench",
+  "badge": "JEV-Bench / DMB S1",
+  "icon": "bi-bank",
+  "description": "Fine-grained retail banking customer intent classification from mteb/banking77 (16-way head-budget-compatible split testing high-option-count choice discrimination).",
+  "sourceUrl": "https://github.com/nibzard/decision-model-benchmark",
+  "datasetUrl": "https://huggingface.co/datasets/mteb/banking77",
+  "evaluationMode": "standard",
+  "sharedSchema": {
+    "context": "Retail banking customer support intent router.",
+    "expectedInputs": [
+      {
+        "type": "text",
+        "languages": [
+          "en"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "id": "intent",
+        "type": "choice",
+        "prompt": "Which banking intent does `message` express?",
+        "options": [
+          {
+            "label": "age limit"
+          },
+          {
+            "label": "automatic top up"
+          },
+          {
+            "label": "card arrival"
+          },
+          {
+            "label": "card delivery estimate"
+          },
+          {
+            "label": "card linking"
+          },
+          {
+            "label": "card not working"
+          },
+          {
+            "label": "card payment wrong exchange rate"
+          },
+          {
+            "label": "contactless not working"
+          },
+          {
+            "label": "exchange rate"
+          },
+          {
+            "label": "exchange via app"
+          },
+          {
+            "label": "extra charge on statement"
+          },
+          {
+            "label": "fiat currency support"
+          },
+          {
+            "label": "lost or stolen card"
+          },
+          {
+            "label": "pending cash withdrawal"
+          },
+          {
+            "label": "pin blocked"
+          },
+          {
+            "label": "top up by bank transfer charge"
+          }
+        ]
+      }
+    ]
+  },
+  "baselines": [
+    {
+      "id": "gpt-6-luna-dmb",
+      "name": "OpenAI Decisions API (gpt-6-luna)",
+      "provider": "OpenAI (DMB S1)",
+      "accuracy": 0.85,
+      "ece": 0.068,
+      "brierScore": 0.231,
+      "latencyP50Ms": 320.0,
+      "source": "nibzard/decision-model-benchmark"
+    },
+    {
+      "id": "jev-0.1-published",
+      "name": "TypeSafe Jev v0.1.0 (Cloud API)",
+      "provider": "TypeSafe AI",
+      "accuracy": 0.87,
+      "coverageAt5PctRisk": 0.86,
+      "latencyP50Ms": 246.0,
+      "source": "AbdelStark/jev-benchmarks"
+    },
+    {
+      "id": "jev-dmb-s1",
+      "name": "TypeSafe Jev (DMB S1 Independent)",
+      "provider": "TypeSafe AI",
+      "accuracy": 0.763,
+      "ece": 0.246,
+      "latencyP50Ms": 270.0,
+      "source": "nibzard/decision-model-benchmark"
+    },
+    {
+      "id": "uniform-random",
+      "name": "Uniform Random Baseline",
+      "provider": "Baseline",
+      "accuracy": 0.0625,
+      "macroF1": 0.0625,
+      "brierScore": 0.9375,
+      "nll": 2.7726,
+      "ece": 0.0,
+      "meanConfidence": 0.0625,
+      "source": "Analytical (K=16)"
+    }
+  ],
+  "cases": [
+    {
+      "id": "banking_001",
+      "input": "{\"message\": \"Why are there so many fees on my statement?\"}",
+      "displayText": "Why are there so many fees on my statement?",
+      "gold": {
+        "intent": {
+          "label": "extra charge on statement"
+        }
+      }
+    },
+    {
+      "id": "banking_002",
+      "input": "{\"message\": \"Can you tell me the total cost of a transfer?\"}",
+      "displayText": "Can you tell me the total cost of a transfer?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_003",
+      "input": "{\"message\": \"What countries can I travel to and have access to their currencies?\"}",
+      "displayText": "What countries can I travel to and have access to their currencies?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_004",
+      "input": "{\"message\": \"Why is my card not working?\"}",
+      "displayText": "Why is my card not working?",
+      "gold": {
+        "intent": {
+          "label": "card not working"
+        }
+      }
+    },
+    {
+      "id": "banking_005",
+      "input": "{\"message\": \"When are cards delivered?\"}",
+      "displayText": "When are cards delivered?",
+      "gold": {
+        "intent": {
+          "label": "card delivery estimate"
+        }
+      }
+    },
+    {
+      "id": "banking_006",
+      "input": "{\"message\": \"how long does it take to post atm with drawl\"}",
+      "displayText": "how long does it take to post atm with drawl",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_007",
+      "input": "{\"message\": \"What's a pending transaction? My card was declined at an ATM, but my account says it's still pending. Can I cancel the payment?\"}",
+      "displayText": "What's a pending transaction? My card was declined at an ATM, but my account says it's still pending. Can I cancel the payment?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_008",
+      "input": "{\"message\": \"The rate of exchange for my card payment is incorrect\"}",
+      "displayText": "The rate of exchange for my card payment is incorrect",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_009",
+      "input": "{\"message\": \"Is there a charge for topping up by transfer?\"}",
+      "displayText": "Is there a charge for topping up by transfer?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_010",
+      "input": "{\"message\": \"Your exchange rate is totally wrong for my card payment\"}",
+      "displayText": "Your exchange rate is totally wrong for my card payment",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_011",
+      "input": "{\"message\": \"What are your international exchange rates?\"}",
+      "displayText": "What are your international exchange rates?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_012",
+      "input": "{\"message\": \"My pins seems to be blocked, can you unblock it please\"}",
+      "displayText": "My pins seems to be blocked, can you unblock it please",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_013",
+      "input": "{\"message\": \"How are exchange rates calculated?\"}",
+      "displayText": "How are exchange rates calculated?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_014",
+      "input": "{\"message\": \"i want to track the card you sent\"}",
+      "displayText": "i want to track the card you sent",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_015",
+      "input": "{\"message\": \"What is my foreign exchange rate?\"}",
+      "displayText": "What is my foreign exchange rate?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_016",
+      "input": "{\"message\": \"I need help with a lost card\"}",
+      "displayText": "I need help with a lost card",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_017",
+      "input": "{\"message\": \"I've received my card so now I need to know how to sync it to the app.\"}",
+      "displayText": "I've received my card so now I need to know how to sync it to the app.",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_018",
+      "input": "{\"message\": \"Do you happen to do exchanges of EUR?\"}",
+      "displayText": "Do you happen to do exchanges of EUR?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_019",
+      "input": "{\"message\": \"How do I know when my card will arrive?\"}",
+      "displayText": "How do I know when my card will arrive?",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_020",
+      "input": "{\"message\": \"Is there a fee for transfer top-up?\"}",
+      "displayText": "Is there a fee for transfer top-up?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_021",
+      "input": "{\"message\": \"How do your exchange rates work?\"}",
+      "displayText": "How do your exchange rates work?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_022",
+      "input": "{\"message\": \"Help me.  My card doesn't work.\"}",
+      "displayText": "Help me.  My card doesn't work.",
+      "gold": {
+        "intent": {
+          "label": "card not working"
+        }
+      }
+    },
+    {
+      "id": "banking_023",
+      "input": "{\"message\": \"When I made a purchase last Saturday, I was charged extra. Did I receive the right exchange rate?\"}",
+      "displayText": "When I made a purchase last Saturday, I was charged extra. Did I receive the right exchange rate?",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_024",
+      "input": "{\"message\": \"How did you come up with your exchange rates?\"}",
+      "displayText": "How did you come up with your exchange rates?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_025",
+      "input": "{\"message\": \"How do I exchange currency?\"}",
+      "displayText": "How do I exchange currency?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_026",
+      "input": "{\"message\": \"what is the exchange rate?\"}",
+      "displayText": "what is the exchange rate?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_027",
+      "input": "{\"message\": \"My card is lost! What can I do?\"}",
+      "displayText": "My card is lost! What can I do?",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_028",
+      "input": "{\"message\": \"If there isn't much money left can it automatically top-up?\"}",
+      "displayText": "If there isn't much money left can it automatically top-up?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_029",
+      "input": "{\"message\": \"I entered the wrong pin too many times and now I am blocked.  Help me unblock!\"}",
+      "displayText": "I entered the wrong pin too many times and now I am blocked.  Help me unblock!",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_030",
+      "input": "{\"message\": \"What currencies is an exchange rate calculated in?\"}",
+      "displayText": "What currencies is an exchange rate calculated in?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_031",
+      "input": "{\"message\": \"Is there a way to make my old card usable with the app?\"}",
+      "displayText": "Is there a way to make my old card usable with the app?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_032",
+      "input": "{\"message\": \"I've been unable to pay contactless with my card for over a week now. Is there a way to fix this issue?\"}",
+      "displayText": "I've been unable to pay contactless with my card for over a week now. Is there a way to fix this issue?",
+      "gold": {
+        "intent": {
+          "label": "contactless not working"
+        }
+      }
+    },
+    {
+      "id": "banking_033",
+      "input": "{\"message\": \"What age do I have to be?\"}",
+      "displayText": "What age do I have to be?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_034",
+      "input": "{\"message\": \"What is the best way to exchange currency between USD and GBP using your app?\"}",
+      "displayText": "What is the best way to exchange currency between USD and GBP using your app?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_035",
+      "input": "{\"message\": \"I made a withdrawal from my account but it has not posted?\"}",
+      "displayText": "I made a withdrawal from my account but it has not posted?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_036",
+      "input": "{\"message\": \"Where do I go to change GBP?\"}",
+      "displayText": "Where do I go to change GBP?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_037",
+      "input": "{\"message\": \"Can you tell me how to link one of your cards that I already have?\"}",
+      "displayText": "Can you tell me how to link one of your cards that I already have?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_038",
+      "input": "{\"message\": \"My bags were stolen. I need a new card but need to cancel the stolen one.\"}",
+      "displayText": "My bags were stolen. I need a new card but need to cancel the stolen one.",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_039",
+      "input": "{\"message\": \"What's the limit on automatic top-up?\"}",
+      "displayText": "What's the limit on automatic top-up?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_040",
+      "input": "{\"message\": \"Is it permissible to hold money in multiple currencies?\"}",
+      "displayText": "Is it permissible to hold money in multiple currencies?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_041",
+      "input": "{\"message\": \"Can someone assist me with the details explaining which fiat currencies that you support?\"}",
+      "displayText": "Can someone assist me with the details explaining which fiat currencies that you support?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_042",
+      "input": "{\"message\": \"Can I reactivate my lost card that I found this morning in my jacket pocket?\"}",
+      "displayText": "Can I reactivate my lost card that I found this morning in my jacket pocket?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_043",
+      "input": "{\"message\": \"I was wondering whether exchanging currencies can be done on this app.\"}",
+      "displayText": "I was wondering whether exchanging currencies can be done on this app.",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_044",
+      "input": "{\"message\": \"I did not get my card yet, is it lost?\"}",
+      "displayText": "I did not get my card yet, is it lost?",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_045",
+      "input": "{\"message\": \"Do you support any currency?\"}",
+      "displayText": "Do you support any currency?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_046",
+      "input": "{\"message\": \"How can I top up automatically?\"}",
+      "displayText": "How can I top up automatically?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_047",
+      "input": "{\"message\": \"Can I reactivate my PIN?\"}",
+      "displayText": "Can I reactivate my PIN?",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_048",
+      "input": "{\"message\": \"Why is my ATM cash withdrawal showing up as a pending transaction?\"}",
+      "displayText": "Why is my ATM cash withdrawal showing up as a pending transaction?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_049",
+      "input": "{\"message\": \"They charged me wrong for a currency exchange on a purchase.\"}",
+      "displayText": "They charged me wrong for a currency exchange on a purchase.",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_050",
+      "input": "{\"message\": \"Please advise what is the exchange rate\"}",
+      "displayText": "Please advise what is the exchange rate",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_051",
+      "input": "{\"message\": \"I wasn't applied the correct exchange rate for an item I bought\"}",
+      "displayText": "I wasn't applied the correct exchange rate for an item I bought",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_052",
+      "input": "{\"message\": \"What do I do if the bank machine won't accept my PIN attempts anymore?\"}",
+      "displayText": "What do I do if the bank machine won't accept my PIN attempts anymore?",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_053",
+      "input": "{\"message\": \"Can I have a auto top-up when my account is short?\"}",
+      "displayText": "Can I have a auto top-up when my account is short?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_054",
+      "input": "{\"message\": \"How can I unlock my pin from too many tries?\"}",
+      "displayText": "How can I unlock my pin from too many tries?",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_055",
+      "input": "{\"message\": \"Contactless isn't working for me\"}",
+      "displayText": "Contactless isn't working for me",
+      "gold": {
+        "intent": {
+          "label": "contactless not working"
+        }
+      }
+    },
+    {
+      "id": "banking_056",
+      "input": "{\"message\": \"Can a card stop working?\"}",
+      "displayText": "Can a card stop working?",
+      "gold": {
+        "intent": {
+          "label": "card not working"
+        }
+      }
+    },
+    {
+      "id": "banking_057",
+      "input": "{\"message\": \"Can I get some money exchanged?\"}",
+      "displayText": "Can I get some money exchanged?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_058",
+      "input": "{\"message\": \"I just activated auto top-up, but it is not letting me enable it. Why not?\"}",
+      "displayText": "I just activated auto top-up, but it is not letting me enable it. Why not?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_059",
+      "input": "{\"message\": \"Is there an age minimum?\"}",
+      "displayText": "Is there an age minimum?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_060",
+      "input": "{\"message\": \"How old do I have to be to open an account?\"}",
+      "displayText": "How old do I have to be to open an account?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_061",
+      "input": "{\"message\": \"can you assist me with the auto top up ?\"}",
+      "displayText": "can you assist me with the auto top up ?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_062",
+      "input": "{\"message\": \"What is the minimum age?\"}",
+      "displayText": "What is the minimum age?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_063",
+      "input": "{\"message\": \"My card is lost! What do I do now?\"}",
+      "displayText": "My card is lost! What do I do now?",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_064",
+      "input": "{\"message\": \"Someone stole my card. I need to report it stolen. I made a police report already, but how do I report it with you?\"}",
+      "displayText": "Someone stole my card. I need to report it stolen. I made a police report already, but how do I report it with you?",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_065",
+      "input": "{\"message\": \"How young can someone be in order to open an account?\"}",
+      "displayText": "How young can someone be in order to open an account?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_066",
+      "input": "{\"message\": \"The wrong rate was applied to an item I bought in a currency different from mine. Can this be changed?\"}",
+      "displayText": "The wrong rate was applied to an item I bought in a currency different from mine. Can this be changed?",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_067",
+      "input": "{\"message\": \"How do I link a new card?\"}",
+      "displayText": "How do I link a new card?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_068",
+      "input": "{\"message\": \"Can I hold money in other currencies?\"}",
+      "displayText": "Can I hold money in other currencies?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_069",
+      "input": "{\"message\": \"I bought something overseas and the wrong exchange rate is on my statement.\"}",
+      "displayText": "I bought something overseas and the wrong exchange rate is on my statement.",
+      "gold": {
+        "intent": {
+          "label": "card payment wrong exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_070",
+      "input": "{\"message\": \"I've been waiting longer than expected for my card.\"}",
+      "displayText": "I've been waiting longer than expected for my card.",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_071",
+      "input": "{\"message\": \"I can't use my card.\"}",
+      "displayText": "I can't use my card.",
+      "gold": {
+        "intent": {
+          "label": "card not working"
+        }
+      }
+    },
+    {
+      "id": "banking_072",
+      "input": "{\"message\": \"I tried to take money from my card, but it didn't work. Later I saw that the transaction is still in progress. What's goign on?\"}",
+      "displayText": "I tried to take money from my card, but it didn't work. Later I saw that the transaction is still in progress. What's goign on?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_073",
+      "input": "{\"message\": \"Can I link my new card?\"}",
+      "displayText": "Can I link my new card?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_074",
+      "input": "{\"message\": \"Where's accounting for my cash withdrawal?\"}",
+      "displayText": "Where's accounting for my cash withdrawal?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_075",
+      "input": "{\"message\": \"What age can sign up for services?\"}",
+      "displayText": "What age can sign up for services?",
+      "gold": {
+        "intent": {
+          "label": "age limit"
+        }
+      }
+    },
+    {
+      "id": "banking_076",
+      "input": "{\"message\": \"Can you explain where I can find the auto-top option?\"}",
+      "displayText": "Can you explain where I can find the auto-top option?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_077",
+      "input": "{\"message\": \"How long does the cash withdrawal take to pend?\"}",
+      "displayText": "How long does the cash withdrawal take to pend?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_078",
+      "input": "{\"message\": \"I believe my card has been stolen, what can I do about this situation? It's urgent.\"}",
+      "displayText": "I believe my card has been stolen, what can I do about this situation? It's urgent.",
+      "gold": {
+        "intent": {
+          "label": "lost or stolen card"
+        }
+      }
+    },
+    {
+      "id": "banking_079",
+      "input": "{\"message\": \"Why is my cash withdrawal from the ATM still not yet showing as confirmed in my account?\"}",
+      "displayText": "Why is my cash withdrawal from the ATM still not yet showing as confirmed in my account?",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_080",
+      "input": "{\"message\": \"I would like to refill my account using SWIFT.\"}",
+      "displayText": "I would like to refill my account using SWIFT.",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_081",
+      "input": "{\"message\": \"What is the tracking number for the card you sent?\"}",
+      "displayText": "What is the tracking number for the card you sent?",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_082",
+      "input": "{\"message\": \"How long does shipping take to get to a US destination?\"}",
+      "displayText": "How long does shipping take to get to a US destination?",
+      "gold": {
+        "intent": {
+          "label": "card delivery estimate"
+        }
+      }
+    },
+    {
+      "id": "banking_083",
+      "input": "{\"message\": \"Hey I tried to get some money out earlier but the machine didn't work. Now just saw the transaction still seems in progress! Can you please check what's going there, seems something is broken, I don't want to be charged for money that I haven't actually received!\"}",
+      "displayText": "Hey I tried to get some money out earlier but the machine didn't work. Now just saw the transaction still seems in progress! Can you please check what's going there, seems something is broken, I don't want to be charged for money that I haven't actually received!",
+      "gold": {
+        "intent": {
+          "label": "pending cash withdrawal"
+        }
+      }
+    },
+    {
+      "id": "banking_084",
+      "input": "{\"message\": \"Does the card you sent have a way to track to it?\"}",
+      "displayText": "Does the card you sent have a way to track to it?",
+      "gold": {
+        "intent": {
+          "label": "card arrival"
+        }
+      }
+    },
+    {
+      "id": "banking_085",
+      "input": "{\"message\": \"Are SWIFT transfers accepted?\"}",
+      "displayText": "Are SWIFT transfers accepted?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_086",
+      "input": "{\"message\": \"Is there a way to top-up automatically?\"}",
+      "displayText": "Is there a way to top-up automatically?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    },
+    {
+      "id": "banking_087",
+      "input": "{\"message\": \"Will you reinstate my PIN?\"}",
+      "displayText": "Will you reinstate my PIN?",
+      "gold": {
+        "intent": {
+          "label": "pin blocked"
+        }
+      }
+    },
+    {
+      "id": "banking_088",
+      "input": "{\"message\": \"Does your system support multiple currency.\"}",
+      "displayText": "Does your system support multiple currency.",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_089",
+      "input": "{\"message\": \"What is the exchange rate like on this app?\"}",
+      "displayText": "What is the exchange rate like on this app?",
+      "gold": {
+        "intent": {
+          "label": "exchange rate"
+        }
+      }
+    },
+    {
+      "id": "banking_090",
+      "input": "{\"message\": \"Can I also transfer with SWIFT?\"}",
+      "displayText": "Can I also transfer with SWIFT?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_091",
+      "input": "{\"message\": \"How do I go through the process of currency exchange?\"}",
+      "displayText": "How do I go through the process of currency exchange?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_092",
+      "input": "{\"message\": \"I need to make a transfer, what will the fee be?\"}",
+      "displayText": "I need to make a transfer, what will the fee be?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_093",
+      "input": "{\"message\": \"What is the \\u20ac1 fee for?\"}",
+      "displayText": "What is the \u20ac1 fee for?",
+      "gold": {
+        "intent": {
+          "label": "extra charge on statement"
+        }
+      }
+    },
+    {
+      "id": "banking_094",
+      "input": "{\"message\": \"Do you accept exchanges to EUR?\"}",
+      "displayText": "Do you accept exchanges to EUR?",
+      "gold": {
+        "intent": {
+          "label": "fiat currency support"
+        }
+      }
+    },
+    {
+      "id": "banking_095",
+      "input": "{\"message\": \"For some reason my account's been charged an extra dollar.\"}",
+      "displayText": "For some reason my account's been charged an extra dollar.",
+      "gold": {
+        "intent": {
+          "label": "extra charge on statement"
+        }
+      }
+    },
+    {
+      "id": "banking_096",
+      "input": "{\"message\": \"I found my card, can I add it to the app?\"}",
+      "displayText": "I found my card, can I add it to the app?",
+      "gold": {
+        "intent": {
+          "label": "card linking"
+        }
+      }
+    },
+    {
+      "id": "banking_097",
+      "input": "{\"message\": \"How much am I charged for a SEPA transfer?\"}",
+      "displayText": "How much am I charged for a SEPA transfer?",
+      "gold": {
+        "intent": {
+          "label": "top up by bank transfer charge"
+        }
+      }
+    },
+    {
+      "id": "banking_098",
+      "input": "{\"message\": \"When can I expect my card to be delivered to the US?\"}",
+      "displayText": "When can I expect my card to be delivered to the US?",
+      "gold": {
+        "intent": {
+          "label": "card delivery estimate"
+        }
+      }
+    },
+    {
+      "id": "banking_099",
+      "input": "{\"message\": \"If I receive foreign currencies, am I able to exchange them on the app?\"}",
+      "displayText": "If I receive foreign currencies, am I able to exchange them on the app?",
+      "gold": {
+        "intent": {
+          "label": "exchange via app"
+        }
+      }
+    },
+    {
+      "id": "banking_100",
+      "input": "{\"message\": \"I'm running out of money, can I  auto top up?\"}",
+      "displayText": "I'm running out of money, can I  auto top up?",
+      "gold": {
+        "intent": {
+          "label": "automatic top up"
+        }
+      }
+    }
+  ]
+}

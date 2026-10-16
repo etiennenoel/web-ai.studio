@@ -1,0 +1,1219 @@
+{
+  "id": "massive-multilingual",
+  "name": "MASSIVE Multilingual Intent (6 Languages, 16-Way)",
+  "shortName": "MASSIVE Multilingual",
+  "category": "multilingual",
+  "badge": "EN \u00b7 FR \u00b7 ES \u00b7 DE \u00b7 JA \u00b7 HI",
+  "icon": "bi-translate",
+  "description": "Cross-lingual zero-shot intent classification across English, French, Spanish, German, Japanese, and Hindi from Amazon MASSIVE using a single English schema.",
+  "sourceUrl": "https://github.com/NandhaKishorM/laya/blob/main/BENCHMARKS.md",
+  "datasetUrl": "https://huggingface.co/datasets/mteb/amazon_massive_intent",
+  "evaluationMode": "standard",
+  "sharedSchema": {
+    "context": "Multilingual assistant intent classifier (MASSIVE).",
+    "expectedInputs": [
+      {
+        "type": "text",
+        "languages": [
+          "en",
+          "fr",
+          "es",
+          "de",
+          "ja",
+          "hi"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "id": "intent",
+        "type": "choice",
+        "prompt": "What is the user asking for in `utterance`?",
+        "options": [
+          {
+            "label": "alarm_query",
+            "description": "alarm query"
+          },
+          {
+            "label": "alarm_remove",
+            "description": "alarm remove"
+          },
+          {
+            "label": "alarm_set",
+            "description": "alarm set"
+          },
+          {
+            "label": "audio_volume_mute",
+            "description": "audio volume mute"
+          },
+          {
+            "label": "datetime_convert",
+            "description": "datetime convert"
+          },
+          {
+            "label": "datetime_query",
+            "description": "datetime query"
+          },
+          {
+            "label": "general_greet",
+            "description": "general greet"
+          },
+          {
+            "label": "general_quirky",
+            "description": "general quirky"
+          },
+          {
+            "label": "iot_cleaning",
+            "description": "iot cleaning"
+          },
+          {
+            "label": "iot_hue_lightchange",
+            "description": "iot hue lightchange"
+          },
+          {
+            "label": "iot_hue_lightoff",
+            "description": "iot hue lightoff"
+          },
+          {
+            "label": "iot_hue_lighton",
+            "description": "iot hue lighton"
+          },
+          {
+            "label": "iot_hue_lightup",
+            "description": "iot hue lightup"
+          },
+          {
+            "label": "music_likeness",
+            "description": "music likeness"
+          },
+          {
+            "label": "takeaway_order",
+            "description": "takeaway order"
+          },
+          {
+            "label": "weather_query",
+            "description": "weather query"
+          }
+        ]
+      }
+    ]
+  },
+  "baselines": [
+    {
+      "id": "gemini-3.8-flash-lite",
+      "name": "Gemini 3.8 Flash Lite (Cloud LLM)",
+      "provider": "Google Cloud",
+      "accuracy": 0.86,
+      "latencyP50Ms": 420.0,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-ml-published",
+      "name": "Laya Multilingual (laya-ml-s256)",
+      "provider": "Laya 322M",
+      "accuracy": 0.7773,
+      "macroF1": 0.754,
+      "ece": 0.0886,
+      "brierScore": 0.342,
+      "latencyP50Ms": 22.0,
+      "source": "Laya 51-Language Sweep"
+    },
+    {
+      "id": "qwen-2.5-7b",
+      "name": "Qwen 2.5 7B Instruct",
+      "provider": "Qwen",
+      "accuracy": 0.703,
+      "source": "Laya BENCHMARKS.md"
+    },
+    {
+      "id": "laya-en-monolingual",
+      "name": "Laya English Only (Cross-Lingual Floor)",
+      "provider": "Laya 421M EN",
+      "accuracy": 0.335,
+      "ece": 0.312,
+      "source": "Laya 51-Language Sweep"
+    }
+  ],
+  "cases": [
+    {
+      "id": "massive_en_01",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"wake me up at five am this week\"}",
+      "displayText": "[EN] wake me up at five am this week",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_02",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"quiet\"}",
+      "displayText": "[EN] quiet",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_03",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"pink is all we need\"}",
+      "displayText": "[EN] pink is all we need",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_04",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"and the darkness has fallen\"}",
+      "displayText": "[EN] and the darkness has fallen",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_05",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"olly turn the lights off in the bedroom\"}",
+      "displayText": "[EN] olly turn the lights off in the bedroom",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_06",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"it's dirty here make some noise\"}",
+      "displayText": "[EN] it's dirty here make some noise",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_07",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"hoover the hallway\"}",
+      "displayText": "[EN] hoover the hallway",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_08",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"i want the status on my screen brightness\"}",
+      "displayText": "[EN] i want the status on my screen brightness",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_09",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"what's up olly\"}",
+      "displayText": "[EN] what's up olly",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_10",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"what's the time in australia\"}",
+      "displayText": "[EN] what's the time in australia",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_11",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"olly tell me the time in g. m. t. plus five\"}",
+      "displayText": "[EN] olly tell me the time in g. m. t. plus five",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_12",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"cancel my seven am alarm\"}",
+      "displayText": "[EN] cancel my seven am alarm",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_13",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"what alarms i have set\"}",
+      "displayText": "[EN] what alarms i have set",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_14",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"tell me about my alarms\"}",
+      "displayText": "[EN] tell me about my alarms",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_en_15",
+      "workflow": "Lang: EN",
+      "input": "{\"utterance\": \"i like senatra songs\"}",
+      "displayText": "[EN] i like senatra songs",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_01",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"r\\u00e9veille-moi \\u00e0 cinq heures du matin cette semaine\"}",
+      "displayText": "[FR] r\u00e9veille-moi \u00e0 cinq heures du matin cette semaine",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_02",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"silence\"}",
+      "displayText": "[FR] silence",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_03",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"le rose est tout ce dont nous avons besoin\"}",
+      "displayText": "[FR] le rose est tout ce dont nous avons besoin",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_04",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"et l'obscurit\\u00e9 est tomb\\u00e9e\"}",
+      "displayText": "[FR] et l'obscurit\u00e9 est tomb\u00e9e",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_05",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"olly \\u00e9teindre les lumi\\u00e8res dans la chambre\"}",
+      "displayText": "[FR] olly \u00e9teindre les lumi\u00e8res dans la chambre",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_06",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"c'est sale ici fais du bruit\"}",
+      "displayText": "[FR] c'est sale ici fais du bruit",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_07",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"passer l'aspirateur dans le couloir\"}",
+      "displayText": "[FR] passer l'aspirateur dans le couloir",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_08",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"je veux le statut sur la luminosit\\u00e9 de mon \\u00e9cran\"}",
+      "displayText": "[FR] je veux le statut sur la luminosit\u00e9 de mon \u00e9cran",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_09",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"quoi de neuf olly\"}",
+      "displayText": "[FR] quoi de neuf olly",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_10",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"quelle heure est-il en australie\"}",
+      "displayText": "[FR] quelle heure est-il en australie",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_11",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"olly donne-moi l'heure en g. m. t. plus cinq\"}",
+      "displayText": "[FR] olly donne-moi l'heure en g. m. t. plus cinq",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_12",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"annuler mon alarme de sept heures du matin\"}",
+      "displayText": "[FR] annuler mon alarme de sept heures du matin",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_13",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"quelles alarmes j'ai r\\u00e9gl\\u00e9es\"}",
+      "displayText": "[FR] quelles alarmes j'ai r\u00e9gl\u00e9es",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_14",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"dis moi pour mes alarmes\"}",
+      "displayText": "[FR] dis moi pour mes alarmes",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_fr_15",
+      "workflow": "Lang: FR",
+      "input": "{\"utterance\": \"j' aime les chansons de jacques brel\"}",
+      "displayText": "[FR] j' aime les chansons de jacques brel",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_01",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"despi\\u00e9rtame a las cinco de la ma\\u00f1ana esta semana\"}",
+      "displayText": "[ES] despi\u00e9rtame a las cinco de la ma\u00f1ana esta semana",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_02",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"silencio\"}",
+      "displayText": "[ES] silencio",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_03",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"el rosa es todo lo que necesitamos\"}",
+      "displayText": "[ES] el rosa es todo lo que necesitamos",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_04",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"y la oscuridad ha ca\\u00eddo\"}",
+      "displayText": "[ES] y la oscuridad ha ca\u00eddo",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_05",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"olly apaga las luces en la habitaci\\u00f3n\"}",
+      "displayText": "[ES] olly apaga las luces en la habitaci\u00f3n",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_06",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"est\\u00e1 sucio aqu\\u00ed haz algo de ruido\"}",
+      "displayText": "[ES] est\u00e1 sucio aqu\u00ed haz algo de ruido",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_07",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"aspira el pasillo\"}",
+      "displayText": "[ES] aspira el pasillo",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_08",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"quiero el estado del brillo de mi pantalla\"}",
+      "displayText": "[ES] quiero el estado del brillo de mi pantalla",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_09",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"que pasa\"}",
+      "displayText": "[ES] que pasa",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_10",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"que hora es en australia\"}",
+      "displayText": "[ES] que hora es en australia",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_11",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"siri dime la hora en g. m. t. m\\u00e1s cinco\"}",
+      "displayText": "[ES] siri dime la hora en g. m. t. m\u00e1s cinco",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_12",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"cancela mi alarma de las siete de la ma\\u00f1ana\"}",
+      "displayText": "[ES] cancela mi alarma de las siete de la ma\u00f1ana",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_13",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"qu\\u00e9 alarmas tengo yo puestas\"}",
+      "displayText": "[ES] qu\u00e9 alarmas tengo yo puestas",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_14",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"dime mis alarmas\"}",
+      "displayText": "[ES] dime mis alarmas",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_es_15",
+      "workflow": "Lang: ES",
+      "input": "{\"utterance\": \"me gustan las canciones del barrio\"}",
+      "displayText": "[ES] me gustan las canciones del barrio",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_01",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"wecke mich in dieser woche um f\\u00fcnf uhr auf\"}",
+      "displayText": "[DE] wecke mich in dieser woche um f\u00fcnf uhr auf",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_02",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"leise\"}",
+      "displayText": "[DE] leise",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_03",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"wir brauchen rosa\"}",
+      "displayText": "[DE] wir brauchen rosa",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_04",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"und die dunkelkeit f\\u00e4llt\"}",
+      "displayText": "[DE] und die dunkelkeit f\u00e4llt",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_05",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"olly mache die lichter im schlafzimmer aus\"}",
+      "displayText": "[DE] olly mache die lichter im schlafzimmer aus",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_06",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"es ist dreckig hier mach etwas l\\u00e4rm\"}",
+      "displayText": "[DE] es ist dreckig hier mach etwas l\u00e4rm",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_07",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"staubsauge den flur\"}",
+      "displayText": "[DE] staubsauge den flur",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_08",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"wie ist die einstellung f\\u00fcr die helligkeit an meinem bildschirm\"}",
+      "displayText": "[DE] wie ist die einstellung f\u00fcr die helligkeit an meinem bildschirm",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_09",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"was geht olly\"}",
+      "displayText": "[DE] was geht olly",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_10",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"wie sp\\u00e4t ist es in schweden\"}",
+      "displayText": "[DE] wie sp\u00e4t ist es in schweden",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_11",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"olly sage mir die zeit in g. m. t. plus f\\u00fcnf\"}",
+      "displayText": "[DE] olly sage mir die zeit in g. m. t. plus f\u00fcnf",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_12",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"l\\u00f6sche meinen wecker f\\u00fcr sieben uhr\"}",
+      "displayText": "[DE] l\u00f6sche meinen wecker f\u00fcr sieben uhr",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_13",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"welche wecker habe ich gestellt\"}",
+      "displayText": "[DE] welche wecker habe ich gestellt",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_14",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"erz\\u00e4hl mir von meinen weckern\"}",
+      "displayText": "[DE] erz\u00e4hl mir von meinen weckern",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_de_15",
+      "workflow": "Lang: DE",
+      "input": "{\"utterance\": \"ich mag lindenberg lieder\"}",
+      "displayText": "[DE] ich mag lindenberg lieder",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_01",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u4eca\\u9031\\u306f\\u5348\\u524d\\u4e94\\u6642\\u306b\\u8d77\\u3053\\u3057\\u3066\"}",
+      "displayText": "[JA] \u4eca\u9031\u306f\u5348\u524d\u4e94\u6642\u306b\u8d77\u3053\u3057\u3066",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_02",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u97f3\\u3092\\u6d88\\u3057\\u3066\"}",
+      "displayText": "[JA] \u97f3\u3092\u6d88\u3057\u3066",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_03",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u30d4\\u30f3\\u30af\\u304c\\u3044\\u3044\"}",
+      "displayText": "[JA] \u30d4\u30f3\u30af\u304c\u3044\u3044",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_04",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u6697\\u304f\\u3057\\u3066\"}",
+      "displayText": "[JA] \u6697\u304f\u3057\u3066",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_05",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"olly \\u30d9\\u30c3\\u30c9\\u30eb\\u30fc\\u30e0\\u306e\\u30e9\\u30a4\\u30c8\\u3092\\u6d88\\u3057\\u3066\"}",
+      "displayText": "[JA] olly \u30d9\u30c3\u30c9\u30eb\u30fc\u30e0\u306e\u30e9\u30a4\u30c8\u3092\u6d88\u3057\u3066",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_06",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u3053\\u3053\\u306f\\u6c5a\\u308c\\u3066\\u3044\\u308b\\u304b\\u3089\\u304b\\u3051\\u3066\"}",
+      "displayText": "[JA] \u3053\u3053\u306f\u6c5a\u308c\u3066\u3044\u308b\u304b\u3089\u304b\u3051\u3066",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_07",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u5eca\\u4e0b\\u306b\\u6383\\u9664\\u6a5f\\u3092\\u304b\\u3051\\u3066\"}",
+      "displayText": "[JA] \u5eca\u4e0b\u306b\u6383\u9664\u6a5f\u3092\u304b\u3051\u3066",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_08",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u50d5\\u306e\\u30b9\\u30af\\u30ea\\u30fc\\u30f3\\u306e\\u660e\\u308b\\u3055\\u3092\\u8868\\u793a\\u3057\\u305f\\u307e\\u3048\"}",
+      "displayText": "[JA] \u50d5\u306e\u30b9\u30af\u30ea\u30fc\u30f3\u306e\u660e\u308b\u3055\u3092\u8868\u793a\u3057\u305f\u307e\u3048",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_09",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u4f55\\u3067\\u3059\\u304b\\u3001\\u30aa\\u30ea\\u2015\\u3055\\u3093\"}",
+      "displayText": "[JA] \u4f55\u3067\u3059\u304b\u3001\u30aa\u30ea\u2015\u3055\u3093",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_10",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u30aa\\u30fc\\u30b9\\u30c8\\u30e9\\u30ea\\u30a2\\u306e\\u6642\\u9593\\u306f\"}",
+      "displayText": "[JA] \u30aa\u30fc\u30b9\u30c8\u30e9\u30ea\u30a2\u306e\u6642\u9593\u306f",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_11",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"g. m. t. \\u30d7\\u30e9\\u30b9\\u4e94\\u306e\\u6642\\u9593\\u3092\\u6559\\u3048\\u3066\"}",
+      "displayText": "[JA] g. m. t. \u30d7\u30e9\u30b9\u4e94\u306e\u6642\u9593\u3092\u6559\u3048\u3066",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_12",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u5348\\u524d\\u4e03\\u6642\\u306e\\u30a2\\u30e9\\u30fc\\u30e0\\u3092\\u30ad\\u30e3\\u30f3\\u30bb\\u30eb\"}",
+      "displayText": "[JA] \u5348\u524d\u4e03\u6642\u306e\u30a2\u30e9\u30fc\u30e0\u3092\u30ad\u30e3\u30f3\u30bb\u30eb",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_13",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u3069\\u3093\\u306a\\u30a2\\u30e9\\u30fc\\u30e0\\u3092\\u8a2d\\u5b9a\\u3057\\u305f\\u304b\"}",
+      "displayText": "[JA] \u3069\u3093\u306a\u30a2\u30e9\u30fc\u30e0\u3092\u8a2d\u5b9a\u3057\u305f\u304b",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_14",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u30a2\\u30e9\\u30fc\\u30e0\\u306e\\u5185\\u5bb9\\u3092\\u6559\\u3048\\u3066\"}",
+      "displayText": "[JA] \u30a2\u30e9\u30fc\u30e0\u306e\u5185\u5bb9\u3092\u6559\u3048\u3066",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_ja_15",
+      "workflow": "Lang: JA",
+      "input": "{\"utterance\": \"\\u79c1\\u306f\\u798f\\u5c71\\u96c5\\u6cbb\\u306e\\u6b4c\\u304c\\u597d\\u304d\\u3060\"}",
+      "displayText": "[JA] \u79c1\u306f\u798f\u5c71\u96c5\u6cbb\u306e\u6b4c\u304c\u597d\u304d\u3060",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_01",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0941\\u091d\\u0947 \\u0907\\u0938 \\u0938\\u092a\\u094d\\u0924\\u093e\\u0939 \\u0938\\u0941\\u092c\\u0939 \\u092a\\u093e\\u0902\\u091a \\u092c\\u091c\\u0947 \\u091c\\u0917\\u093e \\u0926\\u094b\"}",
+      "displayText": "[HI] \u092e\u0941\u091d\u0947 \u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0938\u0941\u092c\u0939 \u092a\u093e\u0902\u091a \u092c\u091c\u0947 \u091c\u0917\u093e \u0926\u094b",
+      "gold": {
+        "intent": {
+          "label": "alarm_set",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_02",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092c\\u0902\\u0926 \\u0915\\u0930\\u094b\"}",
+      "displayText": "[HI] \u092c\u0902\u0926 \u0915\u0930\u094b",
+      "gold": {
+        "intent": {
+          "label": "audio_volume_mute",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_03",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u0939\\u092e\\u0915\\u094b \\u0917\\u0941\\u0932\\u093e\\u092c\\u0940 \\u0939\\u0940 \\u091a\\u093e\\u0939\\u093f\\u090f\"}",
+      "displayText": "[HI] \u0939\u092e\u0915\u094b \u0917\u0941\u0932\u093e\u092c\u0940 \u0939\u0940 \u091a\u093e\u0939\u093f\u090f",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightchange",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_04",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u0914\\u0930 \\u0905\\u0901\\u0927\\u0947\\u0930\\u093e \\u091b\\u093e \\u0917\\u092f\\u093e\"}",
+      "displayText": "[HI] \u0914\u0930 \u0905\u0901\u0927\u0947\u0930\u093e \u091b\u093e \u0917\u092f\u093e",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lighton",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_05",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u0913\\u0932\\u0940 \\u0936\\u092f\\u0928\\u0915\\u0915\\u094d\\u0937 \\u092e\\u0947\\u0902 \\u092c\\u0924\\u094d\\u0924\\u093f\\u092f\\u093e\\u0901 \\u092c\\u0902\\u0926 \\u0915\\u0930 \\u0926\\u0947\\u0902\"}",
+      "displayText": "[HI] \u0913\u0932\u0940 \u0936\u092f\u0928\u0915\u0915\u094d\u0937 \u092e\u0947\u0902 \u092c\u0924\u094d\u0924\u093f\u092f\u093e\u0901 \u092c\u0902\u0926 \u0915\u0930 \u0926\u0947\u0902",
+      "gold": {
+        "intent": {
+          "label": "iot_hue_lightoff",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_06",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092f\\u0939 \\u0917\\u0902\\u0926\\u093e \\u0939\\u0948 \\u092f\\u0939\\u093e\\u0901 \\u0915\\u0941\\u091b \\u0906\\u0935\\u093e\\u091c\\u093c \\u0909\\u0920\\u093e\\u0913\"}",
+      "displayText": "[HI] \u092f\u0939 \u0917\u0902\u0926\u093e \u0939\u0948 \u092f\u0939\u093e\u0901 \u0915\u0941\u091b \u0906\u0935\u093e\u091c\u093c \u0909\u0920\u093e\u0913",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_07",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u0939\\u0941\\u0935\\u0930 \\u0915\\u094b \\u0939\\u0949\\u0932 \\u092e\\u0947\\u0902 \\u091a\\u093e\\u0932\\u093e\\u0913\"}",
+      "displayText": "[HI] \u0939\u0941\u0935\u0930 \u0915\u094b \u0939\u0949\u0932 \u092e\u0947\u0902 \u091a\u093e\u0932\u093e\u0913",
+      "gold": {
+        "intent": {
+          "label": "iot_cleaning",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_08",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0941\\u091d\\u0947 \\u0905\\u092a\\u0928\\u0940 \\u0938\\u094d\\u0915\\u094d\\u0930\\u0940\\u0928 \\u0915\\u0940 \\u091a\\u092e\\u0915 \\u0915\\u0940 \\u0938\\u094d\\u0925\\u093f\\u0924\\u093f \\u091a\\u093e\\u0939\\u093f\\u090f\"}",
+      "displayText": "[HI] \u092e\u0941\u091d\u0947 \u0905\u092a\u0928\u0940 \u0938\u094d\u0915\u094d\u0930\u0940\u0928 \u0915\u0940 \u091a\u092e\u0915 \u0915\u0940 \u0938\u094d\u0925\u093f\u0924\u093f \u091a\u093e\u0939\u093f\u090f",
+      "gold": {
+        "intent": {
+          "label": "general_quirky",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_09",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u0915\\u094d\\u092f\\u093e \\u091a\\u0932 \\u0930\\u0939\\u093e \\u0939\\u0948 \\u0913\\u0932\\u0940\"}",
+      "displayText": "[HI] \u0915\u094d\u092f\u093e \u091a\u0932 \u0930\u0939\u093e \u0939\u0948 \u0913\u0932\u0940",
+      "gold": {
+        "intent": {
+          "label": "general_greet",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_10",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092d\\u093e\\u0930\\u0924 \\u092e\\u0947\\u0902 \\u0938\\u092e\\u092f \\u0915\\u094d\\u092f\\u093e \\u0939\\u0948\"}",
+      "displayText": "[HI] \u092d\u093e\u0930\u0924 \u092e\u0947\u0902 \u0938\u092e\u092f \u0915\u094d\u092f\u093e \u0939\u0948",
+      "gold": {
+        "intent": {
+          "label": "datetime_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_11",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"olly \\u092e\\u0941\\u091d\\u0947 \\u091c\\u0940. \\u090f\\u092e. \\u091f\\u0940. \\u092e\\u0947\\u0902 \\u0938\\u092e\\u092f \\u092c\\u0924\\u093e\\u0913\"}",
+      "displayText": "[HI] olly \u092e\u0941\u091d\u0947 \u091c\u0940. \u090f\u092e. \u091f\u0940. \u092e\u0947\u0902 \u0938\u092e\u092f \u092c\u0924\u093e\u0913",
+      "gold": {
+        "intent": {
+          "label": "datetime_convert",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_12",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0947\\u0930\\u093e \\u0938\\u0941\\u092c\\u0939 \\u0938\\u093e\\u0924 \\u092c\\u091c\\u0947 \\u0915\\u093e \\u0905\\u0932\\u093e\\u0930\\u094d\\u092e \\u0930\\u0926\\u094d\\u0926 \\u0915\\u0930\\u094b\"}",
+      "displayText": "[HI] \u092e\u0947\u0930\u093e \u0938\u0941\u092c\u0939 \u0938\u093e\u0924 \u092c\u091c\u0947 \u0915\u093e \u0905\u0932\u093e\u0930\u094d\u092e \u0930\u0926\u094d\u0926 \u0915\u0930\u094b",
+      "gold": {
+        "intent": {
+          "label": "alarm_remove",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_13",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0948\\u0902\\u0928\\u0947 \\u0915\\u094c\\u0928 \\u0938\\u0947 \\u0905\\u0932\\u093e\\u0930\\u094d\\u092e \\u0938\\u0947\\u091f \\u0915\\u093f\\u090f \\u0939\\u0948\\u0902\"}",
+      "displayText": "[HI] \u092e\u0948\u0902\u0928\u0947 \u0915\u094c\u0928 \u0938\u0947 \u0905\u0932\u093e\u0930\u094d\u092e \u0938\u0947\u091f \u0915\u093f\u090f \u0939\u0948\u0902",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_14",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0941\\u091d\\u0947 \\u092e\\u0947\\u0930\\u0947 \\u0905\\u0932\\u093e\\u0930\\u094d\\u092e \\u0915\\u0947 \\u092c\\u093e\\u0930\\u0947 \\u092e\\u0947\\u0902 \\u092c\\u0924\\u093e\\u0913\"}",
+      "displayText": "[HI] \u092e\u0941\u091d\u0947 \u092e\u0947\u0930\u0947 \u0905\u0932\u093e\u0930\u094d\u092e \u0915\u0947 \u092c\u093e\u0930\u0947 \u092e\u0947\u0902 \u092c\u0924\u093e\u0913",
+      "gold": {
+        "intent": {
+          "label": "alarm_query",
+          "type": "choice"
+        }
+      }
+    },
+    {
+      "id": "massive_hi_15",
+      "workflow": "Lang: HI",
+      "input": "{\"utterance\": \"\\u092e\\u0941\\u091d\\u0947 \\u0905\\u0930\\u093f\\u091c\\u0940\\u0924 \\u0938\\u093f\\u0902\\u0939 \\u0915\\u0947 \\u0917\\u093e\\u0928\\u0947 \\u092a\\u0938\\u0902\\u0926 \\u0939\\u0948\"}",
+      "displayText": "[HI] \u092e\u0941\u091d\u0947 \u0905\u0930\u093f\u091c\u0940\u0924 \u0938\u093f\u0902\u0939 \u0915\u0947 \u0917\u093e\u0928\u0947 \u092a\u0938\u0902\u0926 \u0939\u0948",
+      "gold": {
+        "intent": {
+          "label": "music_likeness",
+          "type": "choice"
+        }
+      }
+    }
+  ]
+}
