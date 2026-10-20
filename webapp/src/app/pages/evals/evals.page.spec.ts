@@ -528,9 +528,24 @@ describe('EvalsPage', () => {
     });
 
     it('should give Prompt everything', () => {
-      for (const field of ['context', 'input', 'images', 'audio', 'schema']) {
+      for (const field of ['context', 'input', 'images', 'audio', 'schema', 'samplingMode']) {
         expect(component.usesField(ApiEnum.Prompt, field)).toBeTrue();
       }
+    });
+  });
+
+  describe('sampling mode', () => {
+    it('should match the Sampling Mode sheet header', () => {
+      expect(component.matchColumn('Sampling Mode')).toBe('samplingMode');
+      expect(component.matchColumn('Sampling Mode (Optional)')).toBe('samplingMode');
+    });
+
+    it('should normalise valid samplingMode values and reject unknown ones', () => {
+      expect(component.normalizeSamplingMode('Most Predictable')).toBe('most-predictable');
+      expect(component.normalizeSamplingMode('most-predictable')).toBe('most-predictable');
+      expect(component.normalizeSamplingMode('slightly_creative')).toBe('slightly-creative');
+      expect(component.normalizeSamplingMode('  ')).toBe('');
+      expect(component.normalizeSamplingMode('random-mode')).toBeNull();
     });
   });
 
