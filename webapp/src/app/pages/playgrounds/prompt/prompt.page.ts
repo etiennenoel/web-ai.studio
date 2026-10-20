@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { PROMPT_SAMPLING_MODES } from '../../../core/models/prompt-run.options';
 
 declare const window: any;
 
@@ -153,9 +154,12 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     { value: 'text', label: 'Text' }
   ];
 
+  samplingModes = PROMPT_SAMPLING_MODES;
+
   initForm() {
     this.playgroundForm = this.fb.group({
       // Create Options
+      samplingMode: ['balanced'],
       temperature: [null],
       topK: [null],
       
@@ -275,15 +279,16 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
   }
 
   getLanguageModel() {
-    return (window as any).ai?.languageModel || (window as any).LanguageModel;
+    return (window as any).LanguageModel;
   }
 
   getCreateOptions() {
     const val = this.playgroundForm.value;
     const options: any = {};
     
-    if (val.temperature !== null) options.temperature = parseFloat(val.temperature);
-    if (val.topK !== null) options.topK = parseInt(val.topK, 10);
+    if (val.samplingMode) options.samplingMode = val.samplingMode;
+    if (val.temperature !== null && val.temperature !== '') options.temperature = parseFloat(val.temperature);
+    if (val.topK !== null && val.topK !== '') options.topK = parseInt(val.topK, 10);
     
     if (val.initialPrompts.length > 0) {
       options.initialPrompts = val.initialPrompts.map((p: any) => ({
@@ -715,8 +720,9 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     
     let optionsCode = `const options = {\n`;
     
-    if (val.temperature !== null) optionsCode += `  temperature: ${val.temperature},\n`;
-    if (val.topK !== null) optionsCode += `  topK: ${val.topK},\n`;
+    if (val.samplingMode) optionsCode += `  samplingMode: "${val.samplingMode}",\n`;
+    if (val.temperature !== null && val.temperature !== '') optionsCode += `  temperature: ${val.temperature}, // Deprecated\n`;
+    if (val.topK !== null && val.topK !== '') optionsCode += `  topK: ${val.topK}, // Deprecated\n`;
     
     if (val.initialPrompts.length > 0) {
       optionsCode += `  initialPrompts: [\n`;

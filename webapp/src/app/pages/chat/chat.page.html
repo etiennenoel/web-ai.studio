@@ -164,29 +164,44 @@
       </div>
 
       <div class="mb-6">
-        <div class="flex justify-between mb-2">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Temperature</label>
-        </div>
-        <div class="flex items-center gap-4">
-          <input type="range" class="form-range flex-grow" [(ngModel)]="options.temperature" [min]="0"
-            [max]="maxTemperature" [step]="0.1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            [(ngModel)]="options.temperature" [min]="0" [max]="maxTemperature" [step]="0.1"
-            (change)="onOptionsChange(options)">
-        </div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" for="samplingModeSelect">Sampling Mode</label>
+        <select id="samplingModeSelect"
+          class="form-select form-select-sm w-full bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          [(ngModel)]="options.samplingMode" (change)="onOptionsChange(options)">
+          <option *ngFor="let mode of samplingModes" [value]="mode.value">{{mode.label}}</option>
+        </select>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 mb-0">
+          Use <code class="font-mono">"most-predictable"</code> for strict reproducibility and speculative decoding.
+        </p>
       </div>
 
-      <div class="mb-6">
-        <div class="flex justify-between mb-2">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">TopK</label>
+      <details class="rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 p-3">
+        <summary class="text-xs font-semibold text-slate-600 dark:text-slate-400 cursor-pointer flex items-center justify-between">
+          <span>Deprecated Parameters</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300">Deprecated</span>
+        </summary>
+        <div class="mt-3 pt-3 border-t border-slate-200 dark:border-zinc-800 space-y-4">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-0">
+            <code class="font-mono">temperature</code> and <code class="font-mono">topK</code> are deprecated on web pages; <code class="font-mono">samplingMode</code> takes precedence.
+          </p>
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="text-xs font-medium text-slate-700 dark:text-slate-300">Temperature <span class="text-[10px] text-amber-600 dark:text-amber-400">(Deprecated)</span></label>
+            </div>
+            <input type="number" placeholder="Unset" class="form-control form-control-sm w-full bg-white dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              [(ngModel)]="options.temperature" [min]="0" [max]="maxTemperature" [step]="0.1"
+              (change)="onOptionsChange(options)">
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="text-xs font-medium text-slate-700 dark:text-slate-300">TopK <span class="text-[10px] text-amber-600 dark:text-amber-400">(Deprecated)</span></label>
+            </div>
+            <input type="number" placeholder="Unset" class="form-control form-control-sm w-full bg-white dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
+                   [(ngModel)]="options.topK" [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
+          </div>
         </div>
-        <div class="flex items-center gap-4">
-          <input type="range" class="form-range flex-grow" [(ngModel)]="options.topK" [min]="1" [max]="maxTopK"
-            [step]="1" (change)="onOptionsChange(options)">
-          <input type="number" class="form-control form-control-sm w-20 text-center bg-slate-50 dark:bg-[#161616] border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
-                 [(ngModel)]="options.topK" [min]="1" [max]="maxTopK" [step]="1" (change)="onOptionsChange(options)">
-        </div>
-      </div>
+      </details>
     </div>
 
     <div class="h-px w-full bg-slate-200 dark:bg-zinc-800 my-6"></div>

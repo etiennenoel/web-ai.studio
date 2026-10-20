@@ -18,17 +18,28 @@ export class PromptManager {
   }
 
   getCode(options: PromptRunOptions, isStream: boolean, language: "typescript" | "javascript"): string {
-    // Basic implementation for demonstration
-    const declaration = language === 'typescript' ? 'const session = await LanguageModel.create({' : 'const session = await LanguageModel.create({';
-    return `
-// Check availability
-const availability = await LanguageModel.availability();
+    const optionLines: string[] = [];
+    if (options.samplingMode) {
+      optionLines.push(`    samplingMode: "${options.samplingMode}",`);
+    }
+    if (options.systemPrompt) {
+      optionLines.push(`    initialPrompts: [{ role: "system", content: ${JSON.stringify(options.systemPrompt)} }],`);
+    }
+    if (options.temperature !== null && options.temperature !== undefined) {
+      optionLines.push(`    temperature: ${options.temperature}, // Deprecated`);
+    }
+    if (options.topK !== null && options.topK !== undefined) {
+      optionLines.push(`    topK: ${options.topK}, // Deprecated`);
+    }
 
-if (availability !== "no") {
-  ${declaration}
-    systemPrompt: "${options.systemPrompt}",
-    temperature: ${options.temperature},
-    topK: ${options.topK}
+    return `// Check availability
+const availability = await LanguageModel.availability({
+  samplingMode: "${options.samplingMode || 'balanced'}"
+});
+
+if (availability !== "unavailable") {
+  const session = await LanguageModel.create({
+${optionLines.join('\n')}
   });
 
   const stream = session.promptStreaming("Your prompt here");

@@ -33,15 +33,19 @@
         </div>
         <div class="p-6 space-y-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Temperature</label>
-            <input type="number" step="0.1" formControlName="temperature" placeholder="Default" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow shadow-sm">
+        <div class="flex flex-col gap-1.5">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Sampling Mode</label>
+          <div class="relative">
+            <select formControlName="samplingMode" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow shadow-sm cursor-pointer appearance-none">
+              <option *ngFor="let mode of samplingModes" [value]="mode.value">{{mode.label}} — {{mode.description}}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
+              <i class="bi bi-chevron-down text-xs"></i>
+            </div>
           </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 pl-1">Top K</label>
-            <input type="number" formControlName="topK" placeholder="Default" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow shadow-sm">
-          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 pl-1">
+            Select <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-mono text-[11px]">"most-predictable"</code> for strict reproducibility and speculative decoding.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -123,16 +127,41 @@
         
         <details class="group bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden mt-3">
           <summary class="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer list-none transition-colors [&::-webkit-details-marker]:hidden">
-<div class="flex items-center justify-between w-full">
-  <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced Session Configuration</span>
-  <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
-</div>
-</summary>
-          <div class="p-3 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-3">
-            
-            <div class="flex items-center gap-3 mt-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
+            <div class="flex items-center justify-between w-full">
+              <span class="flex items-center gap-2"><i class="bi bi-gear text-slate-400"></i> Advanced &amp; Deprecated Session Configuration</span>
+              <i class="bi bi-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+            </div>
+          </summary>
+          <div class="p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
+            <div class="flex items-center gap-3 bg-white dark:bg-zinc-800 p-3 rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm">
               <input type="checkbox" formControlName="useAbortSignal" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-900 dark:border-zinc-600 cursor-pointer">
               <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Use Abort Signal for Cancellations</span>
+            </div>
+
+            <div class="p-4 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Deprecated Hyperparameters
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-200/80 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300">Deprecated</span>
+              </div>
+              <p class="text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed mb-0">
+                <code class="font-mono">temperature</code> and <code class="font-mono">topK</code> are deprecated and restricted to web extension contexts. In standard web pages they are ignored and <code class="font-mono">samplingMode</code> takes precedence.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                <div class="flex flex-col gap-1.5">
+                  <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">
+                    Temperature <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 normal-case">(Deprecated)</span>
+                  </label>
+                  <input type="number" step="0.1" formControlName="temperature" placeholder="Unset (use samplingMode)" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow shadow-sm">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-1">
+                    Top K <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 normal-case">(Deprecated)</span>
+                  </label>
+                  <input type="number" formControlName="topK" placeholder="Unset (use samplingMode)" class="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow shadow-sm">
+                </div>
+              </div>
             </div>
           </div>
         </details>
@@ -201,7 +230,9 @@
 
           <div *ngIf="session" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
              <div class="rounded-lg px-5 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-100 dark:border-emerald-500/20 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
-                <i class="bi bi-check-circle-fill"></i> Session Active <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
+                <i class="bi bi-check-circle-fill"></i> Session Active
+                <span *ngIf="session.samplingMode" class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/20 text-xs font-mono">{{session.samplingMode}}</span>
+                <span *ngIf="sessionCreationTimeMs !== null" class="text-xs font-mono ml-1">{{sessionCreationTimeMs}}ms</span>
              </div>
              <button type="button" (click)="destroySession()" [disabled]="isPrompting" class="rounded-md px-3 py-2 bg-white dark:bg-zinc-800 text-red-500 dark:text-red-400 font-bold text-sm border border-slate-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center disabled:opacity-50 hover:border-red-200 dark:hover:border-red-900/50 shadow-sm"  title="Destroy Session">
               <i class="bi bi-trash3 text-lg"></i>
