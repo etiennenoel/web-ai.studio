@@ -51,10 +51,12 @@ describe('PromptComponent', () => {
   });
 
   it('should reset settings', () => {
+    component.samplingMode = 'most-predictable';
     component.temperature = 2;
     component.topK = 50;
     component.resetSettings();
-    expect(component.temperature).toBe(1);
-    expect(component.topK).toBe(3);
+    expect(component.samplingMode).toBe('balanced');
+    expect(component.temperature).toBeNull();
+    expect(component.topK).toBeNull();
   });
 });
