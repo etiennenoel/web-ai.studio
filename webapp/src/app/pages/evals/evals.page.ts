@@ -13,6 +13,7 @@ import {SpeechQuality, WebSpeechService} from '../../core/services/web-speech.se
 import {MediaSourceUtils} from '../../core/utils/media-source.utils';
 import {ApiStatusPill} from '../demos/components/api-status/api-status.component';
 import {SummarizerOption} from './summarizer-option.interface';
+import {PROMPT_SAMPLING_MODES} from '../../core/models/prompt-run.options';
 
 type MediaKind = 'image' | 'audio';
 
@@ -58,8 +59,8 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    */
   private static readonly headerVocabulary = new Set([
     'api', 'audio', 'clip', 'clips', 'constraint', 'context', 'expected', 'file', 'files',
-    'image', 'images', 'input', 'length', 'optional', 'output', 'preference', 'prompt',
-    'response', 'schema', 'sound', 'speed', 'structured', 'summariser', 'summarizer',
+    'image', 'images', 'input', 'length', 'mode', 'optional', 'output', 'preference', 'prompt',
+    'response', 'sampling', 'schema', 'sound', 'speed', 'structured', 'summariser', 'summarizer',
     'system', 'text', 'type',
   ]);
 
@@ -71,6 +72,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     [/image/, 'images'],
     [/audio|sound|clip/, 'audio'],
     [/schema|constraint|structured/, 'schema'],
+    [/sampling|mode/, 'samplingMode'],
     [/length/, 'summarizerLength'],
     [/type/, 'summarizerType'],
     [/preference|speed/, 'summarizerPreference'],
@@ -84,7 +86,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   /** Which cells each API actually reads. Everything else is dimmed out on that row. */
   private static readonly apiFields: Record<string, readonly string[]> = {
-    [ApiEnum.Prompt]: ['context', 'input', 'images', 'audio', 'schema'],
+    [ApiEnum.Prompt]: ['context', 'input', 'images', 'audio', 'schema', 'samplingMode'],
     [ApiEnum.Summarizer]: ['context', 'input', 'summarizer'],
     [ApiEnum.WebSpeech]: ['audio'],
   };
@@ -118,10 +120,13 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   readonly apiOptions: ApiEnum[] = Object.values(ApiEnum);
 
-  readonly optionalColumns: {field: 'images' | 'audio' | 'schema' | 'summarizer', label: string, icon: string}[] = [
+  readonly samplingModes = PROMPT_SAMPLING_MODES;
+
+  readonly optionalColumns: {field: 'images' | 'audio' | 'schema' | 'samplingMode' | 'summarizer', label: string, icon: string}[] = [
     {field: 'images', label: 'Images', icon: 'bi-image'},
     {field: 'audio', label: 'Audio', icon: 'bi-file-earmark-music'},
     {field: 'schema', label: 'Schema', icon: 'bi-braces'},
+    {field: 'samplingMode', label: 'Sampling mode', icon: 'bi-sliders2'},
     {field: 'summarizer', label: 'Summarizer', icon: 'bi-sliders'},
   ];
 
@@ -161,6 +166,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       settings: this.fb.group({
         speechLang: ['en-US'],
         speechQuality: ['dictation'],
+        samplingMode: [''],
         omitResponseConstraintInput: [false],
         audioPaths: [''],
       }),
@@ -207,6 +213,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   get speechPills(): ApiStatusPill[] {
     return [{name: 'Web Speech (on-device)', status: this.speechStatus}];
+  }
+
+  get usesPrompt(): boolean {
+    return this.rows.controls.some(control => control.value.api === ApiEnum.Prompt);
   }
 
   get usesSummarizer(): boolean {
@@ -270,6 +280,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       images: [data?.images || []],
       audio: [data?.audio || []],
       schema: [data?.schema || ''],
+      samplingMode: [data?.samplingMode || ''],
       summarizerLength: [data?.summarizerLength || ''],
       summarizerType: [data?.summarizerType || ''],
       summarizerPreference: [data?.summarizerPreference || ''],
@@ -413,7 +424,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async runSummarizer(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {
-    const {context, input, images, audio, schema} = formRow.value;
+    const {context, input, images, audio, schema, samplingMode} = formRow.value;
 
     if (images?.length || audio?.length) {
       this.addWarning(formRow, 'The Summarizer API reads text only — the attached media was ignored.');
@@ -421,6 +432,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
     if (schema?.trim()) {
       this.addWarning(formRow, 'The Summarizer API has no structured output — the schema was ignored.');
+    }
+
+    if (samplingMode?.trim()) {
+      this.addWarning(formRow, 'The Sampling mode option applies to Prompt rows only — it was ignored.');
     }
 
     const createOptions = this.buildSummarizerOptions(formRow.value);
@@ -475,7 +490,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async runPrompt(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {
-    const {context, input, images, audio, schema} = formRow.value;
+    const {context, input, images, audio, schema, samplingMode} = formRow.value;
 
     if (this.hasSummarizerOptions(formRow.value)) {
       this.addWarning(formRow, 'The Summarizer options apply to Summarizer rows only — they were ignored.');
@@ -483,13 +498,23 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
     const expectedInputs = this.buildExpectedInputs(images, audio);
     const responseConstraint = this.buildResponseConstraint(schema);
+    const effectiveSamplingMode = (samplingMode || this.settings.value.samplingMode || '').trim();
     const signal = this.abortController?.signal;
 
-    if (await LanguageModel.availability({expectedInputs} as any) === 'unavailable') {
+    const availabilityOptions: any = {expectedInputs};
+    if (effectiveSamplingMode) {
+      availabilityOptions.samplingMode = effectiveSamplingMode;
+    }
+
+    if (await LanguageModel.availability(availabilityOptions) === 'unavailable') {
       throw new Error(`The Prompt API is unavailable for ${this.describeInputs(images, audio)} on this device.`);
     }
 
     const sessionCreationOptions: any = {expectedInputs, signal};
+
+    if (effectiveSamplingMode) {
+      sessionCreationOptions.samplingMode = effectiveSamplingMode;
+    }
 
     if (context) {
       sessionCreationOptions.initialPrompts = [{role: 'system', content: context}];
@@ -529,7 +554,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async runWebSpeech(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {
-    const {audio, images, schema} = formRow.value;
+    const {audio, images, schema, samplingMode} = formRow.value;
 
     if (images?.length) {
       this.addWarning(formRow, 'Web Speech transcribes audio only — the attached images were ignored.');
@@ -537,6 +562,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
     if (schema?.trim()) {
       this.addWarning(formRow, 'Web Speech has no structured output — the schema was ignored.');
+    }
+
+    if (samplingMode?.trim()) {
+      this.addWarning(formRow, 'The Sampling mode option applies to Prompt rows only — it was ignored.');
     }
 
     if (this.hasSummarizerOptions(formRow.value)) {
@@ -1055,6 +1084,20 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           data.api = this.normalizeApi(cell.textContent ?? '');
           break;
 
+        case 'samplingMode': {
+          const written = (cell.textContent ?? '').trim();
+          const value = this.normalizeSamplingMode(written);
+
+          if (value === null) {
+            const choices = this.samplingModes.map(mode => mode.value).join(', ');
+            warnings.push(`The Sampling mode "${written}" is not a value the API takes — it was ignored. Use ${choices}.`);
+          } else {
+            data.samplingMode = value;
+          }
+
+          break;
+        }
+
         case 'summarizerLength':
         case 'summarizerType':
         case 'summarizerPreference': {
@@ -1097,6 +1140,22 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     const key = cleaned.replace(/[^a-z]/g, '');
 
     return option.choices.find(choice => choice.replace(/[^a-z]/g, '') === key) ?? null;
+  }
+
+  /**
+   * Matches a cell such as "Most Predictable" or "most-predictable" to the LanguageModelSamplingMode value.
+   * Returns an empty string for an empty cell, and null for an unrecognized value.
+   */
+  normalizeSamplingMode(written: string): string | null {
+    const cleaned = written.trim().toLowerCase();
+
+    if (!cleaned) {
+      return '';
+    }
+
+    const key = cleaned.replace(/[^a-z]/g, '');
+
+    return this.samplingModes.find(mode => mode.value.replace(/[^a-z]/g, '') === key)?.value ?? null;
   }
 
   private async readMediaCell(cell: Element, kind: MediaKind, warnings: string[]): Promise<string[]> {

@@ -15,6 +15,9 @@ export class EvalsRow {
   /** Structured output constraint: a JSON Schema document or a /regex/flags literal. */
   schema: string = "";
 
+  /** Prompt API sampling mode. A blank one falls back to the global setting or model default. */
+  samplingMode: string = "";
+
   /** Summarizer create options. A blank one leaves the choice to the model. */
   summarizerLength: string = "";
 
