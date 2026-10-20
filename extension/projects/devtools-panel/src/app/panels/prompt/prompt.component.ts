@@ -23,8 +23,21 @@ export class PromptComponent implements OnInit {
   // Inputs
   systemPrompt = '';
   promptText = '';
-  temperature: number = 1;
-  topK: number = 3;
+  samplingMode: string = 'balanced';
+  /** @deprecated Use samplingMode instead */
+  temperature: number | null = null;
+  /** @deprecated Use samplingMode instead */
+  topK: number | null = null;
+
+  samplingModes = [
+    { value: 'most-predictable', label: 'most-predictable' },
+    { value: 'predictable', label: 'predictable' },
+    { value: 'slightly-predictable', label: 'slightly-predictable' },
+    { value: 'balanced', label: 'balanced (default)' },
+    { value: 'slightly-creative', label: 'slightly-creative' },
+    { value: 'creative', label: 'creative' },
+    { value: 'most-creative', label: 'most-creative' },
+  ];
 
   defaultTemperature: number = 1;
   defaultTopK: number = 3;
@@ -32,8 +45,9 @@ export class PromptComponent implements OnInit {
   maxTopK: number = 128;
 
   get isNonDefaultParams(): boolean {
-    return Number(this.temperature) !== Number(this.defaultTemperature) || 
-           Number(this.topK) !== Number(this.defaultTopK);
+    return this.samplingMode !== 'balanced' ||
+           this.temperature !== null ||
+           this.topK !== null;
   }
 
   // Output
@@ -86,13 +100,15 @@ export class PromptComponent implements OnInit {
       console.warn("Could not load LanguageModel params", e);
     }
 
-    this.temperature = this.defaultTemperature;
-    this.topK = this.defaultTopK;
+    this.samplingMode = 'balanced';
+    this.temperature = null;
+    this.topK = null;
   }
 
   resetSettings() {
-    this.temperature = this.defaultTemperature;
-    this.topK = this.defaultTopK;
+    this.samplingMode = 'balanced';
+    this.temperature = null;
+    this.topK = null;
     this.updateGeneratedCode();
   }
 
@@ -146,8 +162,9 @@ export class PromptComponent implements OnInit {
             { role: 'system', content: this.systemPrompt }
         ];
       }
-      if (this.temperature !== null) options.temperature = Number(this.temperature);
-      if (this.topK !== null) options.topK = Number(this.topK);
+      if (this.samplingMode) options.samplingMode = this.samplingMode;
+      if (this.temperature !== null && String(this.temperature) !== '') options.temperature = Number(this.temperature);
+      if (this.topK !== null && String(this.topK) !== '') options.topK = Number(this.topK);
 
       const session = await this.promptManager.createSession(options);
 
@@ -211,11 +228,14 @@ export class PromptComponent implements OnInit {
 
   updateGeneratedCode() {
     const optionsObj: any = {};
+    if (this.samplingMode) {
+      optionsObj.samplingMode = this.samplingMode;
+    }
     if (this.systemPrompt.trim()) {
        optionsObj.initialPrompts = [{ role: 'system', content: this.systemPrompt }];
     }
-    if (this.temperature !== null) optionsObj.temperature = this.temperature;
-    if (this.topK !== null) optionsObj.topK = this.topK;
+    if (this.temperature !== null && String(this.temperature) !== '') optionsObj.temperature = this.temperature;
+    if (this.topK !== null && String(this.topK) !== '') optionsObj.topK = this.topK;
 
     this.generatedCode = this.promptManager.getCodeSnippet(optionsObj, this.promptText);
   }

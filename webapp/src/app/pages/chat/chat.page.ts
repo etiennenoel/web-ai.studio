@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {isPlatformServer} from '@angular/common';
 import {Title} from '@angular/platform-browser';
 import {ConversationManager} from '../../core/services/conversation.manager';
-import {PromptRunOptions} from '../../core/models/prompt-run.options';
+import {PromptRunOptions, PROMPT_SAMPLING_MODES} from '../../core/models/prompt-run.options';
 import {InferenceStateEnum} from '../../core/enums/inference-state.enum';
 import {PromptInputStateEnum} from '../../core/enums/prompt-input-state.enum';
 import {BasePage} from '../base-page';
@@ -46,6 +46,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   maxTopK = 128;
   defaultTopK = 3;
 
+  samplingModes = PROMPT_SAMPLING_MODES;
   options: PromptRunOptions = new PromptRunOptions();
 
   suggestions = [
@@ -73,8 +74,9 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
 
   get settingsActive() {
     return this.options.structuredOutputEnabled === true ||
-      Number(this.options.temperature) !== Number(this.defaultTemperature) ||
-      Number(this.options.topK) !== Number(this.defaultTopK) ||
+      this.options.samplingMode !== 'balanced' ||
+      (this.options.temperature !== null && this.options.temperature !== undefined) ||
+      (this.options.topK !== null && this.options.topK !== undefined) ||
       this.options.stream !== true;
   }
 
@@ -119,26 +121,14 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      if ('LanguageModel' in window) {
-        const params = await LanguageModel.params();
-        if (params) {
-          this.defaultTemperature = params.defaultTemperature || 1;
-          this.maxTemperature = params.maxTemperature || 2;
-          this.defaultTopK = params.defaultTopK || 3;
-          this.maxTopK = params.maxTopK || 128;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not load LanguageModel params", e);
-    }
-
-    this.options.temperature = this.defaultTemperature;
-    this.options.topK = this.defaultTopK;
+    this.options.samplingMode = 'balanced';
+    this.options.temperature = null;
+    this.options.topK = null;
     this.options.stream = true;
 
     this.lastOptionsRunStr = JSON.stringify({
       stream: this.options.stream,
+      samplingMode: this.options.samplingMode,
       temperature: this.options.temperature,
       topK: this.options.topK,
       structuredOutputEnabled: this.options.structuredOutputEnabled,
@@ -148,8 +138,9 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   }
 
   resetSettings() {
-    this.options.temperature = this.defaultTemperature;
-    this.options.topK = this.defaultTopK;
+    this.options.samplingMode = 'balanced';
+    this.options.temperature = null;
+    this.options.topK = null;
     this.options.stream = true;
     this.options.structuredOutputEnabled = false;
     this.onOptionsChange(this.options);
@@ -161,6 +152,7 @@ export class ChatPage extends BasePage implements OnInit, OnDestroy {
   onOptionsChange(options: PromptRunOptions) {
     const currentSettings = JSON.stringify({
       stream: options.stream,
+      samplingMode: options.samplingMode,
       temperature: options.temperature,
       topK: options.topK,
       structuredOutputEnabled: options.structuredOutputEnabled,

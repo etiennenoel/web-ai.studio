@@ -36,12 +36,22 @@ export class ConversationManager {
 
     try {
       if ('LanguageModel' in self) {
-        this.session = await LanguageModel.create({
-          systemPrompt: options.systemPrompt,
-          temperature: Number(options.temperature),
-          topK: Number(options.topK),
+        const createOptions: any = {
           expectedInputs: options.expectedInputs,
-        });
+        };
+        if (options.systemPrompt) {
+          createOptions.initialPrompts = [{ role: 'system', content: options.systemPrompt }];
+        }
+        if (options.samplingMode) {
+          createOptions.samplingMode = options.samplingMode;
+        }
+        if (options.temperature !== null && options.temperature !== undefined) {
+          createOptions.temperature = Number(options.temperature);
+        }
+        if (options.topK !== null && options.topK !== undefined) {
+          createOptions.topK = Number(options.topK);
+        }
+        this.session = await LanguageModel.create(createOptions);
       }
     } catch (e) {
       console.error('Failed to create session', e);

@@ -68,12 +68,22 @@ export abstract class BaseDemoComponent extends BasePage {
     let firstTokenTime: number | null = null;
     
     try {
-      const session = await LanguageModel.create({
-        systemPrompt: systemPrompt,
-        temperature: options.temperature,
-        topK: options.topK,
+      const createOptions: any = {
         expectedInputs: expectedInputs
-      });
+      };
+      if (systemPrompt) {
+        createOptions.initialPrompts = [{ role: 'system', content: systemPrompt }];
+      }
+      if (options.samplingMode) {
+        createOptions.samplingMode = options.samplingMode;
+      }
+      if (options.temperature !== null && options.temperature !== undefined) {
+        createOptions.temperature = options.temperature;
+      }
+      if (options.topK !== null && options.topK !== undefined) {
+        createOptions.topK = options.topK;
+      }
+      const session = await LanguageModel.create(createOptions);
 
       let promptInput: any = options.prompt;
       

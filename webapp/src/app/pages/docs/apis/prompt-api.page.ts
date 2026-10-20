@@ -49,8 +49,8 @@ import { Component } from '@angular/core';
           <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-xl text-blue-800 dark:text-blue-300 text-sm leading-relaxed max-w-4xl flex gap-3">
             <i class="bi bi-info-circle-fill text-lg mt-0.5"></i>
             <div>
-              <strong>Experimental:</strong> The Prompt API is stable for Chrome Extensions (Chrome 138+), while the version for web pages is still in development. An origin trial covering sampling parameters (<code>temperature</code> / <code>topK</code>) is running as of Chrome 148 — register your domain to use them without flags.
-              <a href="https://developer.chrome.com/docs/web-platform/origin-trials" target="_blank" class="ml-1 text-blue-600 dark:text-blue-400 underline font-semibold hover:text-blue-700 dark:hover:text-blue-300">Register Here <i class="bi bi-box-arrow-up-right text-[10px]"></i></a>
+              <strong>Sampling Modes:</strong> Raw hyperparameters (<code>temperature</code> / <code>topK</code> / <code>LanguageModel.params()</code>) are deprecated for web pages. Use the semantic <code>samplingMode</code> option (e.g. <code>"most-predictable"</code> for strict reproducibility and speculative decoding, or <code>"balanced"</code> by default) when creating a session.
+              <a href="https://github.com/webmachinelearning/prompt-api#configuration-of-sampling-modes" target="_blank" class="ml-1 text-blue-600 dark:text-blue-400 underline font-semibold hover:text-blue-700 dark:hover:text-blue-300">Read Explainer <i class="bi bi-box-arrow-up-right text-[10px]"></i></a>
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ import { Component } from '@angular/core';
                 <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30">
                   <td class="px-4 py-3 font-mono text-xs">samplingMode</td>
                   <td class="px-4 py-3 font-mono text-xs">LanguageModelSamplingMode</td>
-                  <td class="px-4 py-3">High-level control over output variety: <code>"most-predictable" | "predictable" | "balanced" | "creative" | "most-creative"</code>. Defaults to <code>"balanced"</code>. This is the web-page replacement for the deprecated <code>temperature</code>/<code>topK</code> parameters (see Deprecations below).</td>
+                  <td class="px-4 py-3">High-level control over output predictability vs. creativity: <code>"most-predictable" | "predictable" | "slightly-predictable" | "balanced" | "slightly-creative" | "creative" | "most-creative"</code>. Defaults to <code>"balanced"</code>. Replaces the deprecated <code>temperature</code> and <code>topK</code> parameters.</td>
                 </tr>
               </tbody>
             </table>
@@ -147,10 +147,32 @@ if (availability !== &quot;unavailable&quot;) &#123;
           </div>
         
           <app-code-snippet code="const session = await LanguageModel.create(&#123;
+  samplingMode: &quot;most-predictable&quot;,
   initialPrompts: [&#123; role: &quot;system&quot;, content: &quot;You are a helpful assistant.&quot; &#125;],
   expectedInputs: [&#123; type: &quot;text&quot; &#125;]
 &#125;);
-console.log(&quot;Session created:&quot;, session);"></app-code-snippet>
+console.log(&quot;Session created with samplingMode:&quot;, session.samplingMode);"></app-code-snippet>
+
+          <h3 class="text-sm font-bold text-slate-900 dark:text-slate-300 mt-8 mb-3 tracking-wider">Sampling Modes (LanguageModelSamplingMode)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+            Rather than exposing raw model-dependent parameters like <code>topK</code> and <code>temperature</code>, the API provides seven semantic presets and exposes the active mode on <code>session.samplingMode</code>:
+          </p>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+            <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+              <thead class="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white">
+                <tr><th class="px-4 py-2.5 font-semibold">Mode</th><th class="px-4 py-2.5 font-semibold">Use Case</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-zinc-800/80 text-xs">
+                <tr><td class="px-4 py-2.5 font-mono">"most-predictable"</td><td class="px-4 py-2.5">Strict consistency, reproducibility, code generation, content extraction, and speculative decoding.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"predictable"</td><td class="px-4 py-2.5">Focused outputs with minimal variation.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"slightly-predictable"</td><td class="px-4 py-2.5">Focused outputs with a bit more variation than <code>"predictable"</code>.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"balanced"</td><td class="px-4 py-2.5"><strong>Default.</strong> Standard preset suitable for most conversational interactions.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"slightly-creative"</td><td class="px-4 py-2.5">Creative outputs slightly more focused than <code>"creative"</code>.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"creative"</td><td class="px-4 py-2.5">Variety and creativity preferred over strict reproducibility.</td></tr>
+                <tr><td class="px-4 py-2.5 font-mono">"most-creative"</td><td class="px-4 py-2.5">Maximum diversity of output and creative brainstorming.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <!-- session.prompt() -->
@@ -324,8 +346,8 @@ console.log(&quot;Session destroyed.&quot;);"></app-code-snippet>
 
           <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
             <li class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20">
-              <strong class="text-slate-900 dark:text-slate-200 block mb-1">Hyperparameters</strong>
-              <code>temperature</code> and <code>topK</code> inside <code>create()</code> options, as well as accessing <code>session.temperature</code>, will be ignored in standard web contexts. Use the <code>samplingMode</code> create option instead to control output variety on web pages. In extension contexts, passing both <code>samplingMode</code> and a raw parameter rejects <code>create()</code> with a <code>TypeError</code>.
+              <strong class="text-slate-900 dark:text-slate-200 block mb-1">Hyperparameters (topK &amp; temperature)</strong>
+              <code>temperature</code> and <code>topK</code> inside <code>create()</code> options, as well as accessing <code>session.temperature</code> and <code>session.topK</code>, are deprecated and ignored in standard web page contexts. Use the <code>samplingMode</code> option instead. If both <code>samplingMode</code> and raw parameters are provided, <code>samplingMode</code> takes precedence and the raw parameters are ignored.
             </li>
             <li class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20">
               <strong class="text-slate-900 dark:text-slate-200 block mb-1">LanguageModel.params()</strong>
