@@ -672,7 +672,10 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
     }
     
     try {
-      this.tokensMeasured = await this.session.measureContextUsage(promptInput);
+      const measureFn = this.session.measureContextUsage ?? this.session.measureInputUsage;
+      if (typeof measureFn === 'function') {
+        this.tokensMeasured = await measureFn.call(this.session, promptInput);
+      }
     } catch (e: any) {
       this.errorMessage = e.message || 'Error during measureUsage';
     } finally {
@@ -699,8 +702,8 @@ export class PromptPlaygroundPage implements OnInit, OnDestroy {
 
   updateMetrics() {
     if (this.session) {
-      this.contextUsage = this.session.contextUsage || this.session.inputUsage || 0;
-      this.contextWindow = this.session.contextWindow || this.session.inputQuota || 0;
+      this.contextUsage = this.session.contextUsage ?? this.session.inputUsage ?? 0;
+      this.contextWindow = this.session.contextWindow ?? this.session.inputQuota ?? 0;
     }
   }
   sharePlayground() {

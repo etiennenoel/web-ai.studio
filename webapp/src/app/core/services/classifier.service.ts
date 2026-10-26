@@ -273,6 +273,11 @@ export class ClassifierService {
             description: p.description,
             probability: Number(p.probability ?? 0)
           }))
+        : entry.probabilities && typeof entry.probabilities === 'object'
+        ? Object.entries(entry.probabilities).map(([label, prob]) => ({
+            label,
+            probability: Number(prob ?? 0)
+          }))
         : [];
 
       let rawLabel = entry.label ?? entry.choice ?? entry.value;
@@ -304,6 +309,8 @@ export class ClassifierService {
           : entry.score;
 
       const topProb = probs.length > 0 ? Math.max(...probs.map((p) => p.probability)) : 0;
+      const inferredBooleanProb =
+        modality === 'boolean' ? probs.find((p) => p.label === 'true')?.probability ?? null : null;
 
       const nd: NormalizedDecision = {
         id: q.id,
@@ -311,7 +318,10 @@ export class ClassifierService {
         prompt: q.prompt,
         label: String(rawLabel ?? ''),
         confidence: entry.confidence !== undefined && entry.confidence !== null ? Number(entry.confidence) : topProb,
-        probability: entry.probability !== undefined && entry.probability !== null ? Number(entry.probability) : null,
+        probability:
+          entry.probability !== undefined && entry.probability !== null
+            ? Number(entry.probability)
+            : inferredBooleanProb,
         expectedScore: scoreVal !== undefined && scoreVal !== null ? Number(scoreVal) : null,
         probabilities: probs
       };

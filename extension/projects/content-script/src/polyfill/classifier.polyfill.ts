@@ -11,6 +11,24 @@ const CLASSIFY_TIMEOUT_MS = 30 * 60 * 1000;
 
 const CONSTRUCTOR_TOKEN = Symbol('DecisionModel.create');
 
+class DecisionCreateMonitor extends EventTarget {
+  #ondownloadprogress: ((this: EventTarget, ev: ProgressEvent) => unknown) | null = null;
+
+  get ondownloadprogress(): ((this: EventTarget, ev: ProgressEvent) => unknown) | null {
+    return this.#ondownloadprogress;
+  }
+
+  set ondownloadprogress(handler: ((this: EventTarget, ev: ProgressEvent) => unknown) | null) {
+    if (this.#ondownloadprogress) {
+      this.removeEventListener('downloadprogress', this.#ondownloadprogress as EventListener);
+    }
+    this.#ondownloadprogress = typeof handler === 'function' ? handler : null;
+    if (this.#ondownloadprogress) {
+      this.addEventListener('downloadprogress', this.#ondownloadprogress as EventListener);
+    }
+  }
+}
+
 /**
  * `window.DecisionModel` (and `window.Classifier` alias) polyfill following the Decisions API explainer:
  *
@@ -21,13 +39,14 @@ const CONSTRUCTOR_TOKEN = Symbol('DecisionModel.create');
  *
  * Inference runs in the extension's offscreen document (LiteRT.js + Laya).
  */
-export class DecisionModel {
+export class DecisionModel extends EventTarget {
   private sessionId: string;
   private readonly contextWindowValue: number;
   private readonly contextUsageValue: number;
   private destroyed = false;
 
   constructor(token?: symbol, info?: ClassifierSessionInfo) {
+    super();
     if (token !== CONSTRUCTOR_TOKEN || !info) {
       throw new TypeError('Illegal constructor');
     }
@@ -65,7 +84,7 @@ export class DecisionModel {
     signal?.throwIfAborted();
     const schema = DecisionModel.toSchema(options);
 
-    const monitorTarget = new EventTarget();
+    const monitorTarget = new DecisionCreateMonitor();
     if (monitor) (monitor as (m: EventTarget) => void)(monitorTarget);
 
     const requestId = crypto.randomUUID();
@@ -79,10 +98,13 @@ export class DecisionModel {
           {
             requestId,
             timeoutMs: CREATE_TIMEOUT_MS,
-            onProgress: (loaded) =>
-              monitorTarget.dispatchEvent(
-                new ProgressEvent('downloadprogress', { lengthComputable: true, loaded, total: 1 }),
-              ),
+            onProgress: (loaded) => {
+              const ev = new ProgressEvent('downloadprogress', { lengthComputable: true, loaded, total: 1 });
+              if (ev.loaded !== loaded) {
+                Object.defineProperty(ev, 'loaded', { value: loaded });
+              }
+              monitorTarget.dispatchEvent(ev);
+            },
           },
         ),
         DecisionModel.rejectOnAbort(signal),

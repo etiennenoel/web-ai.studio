@@ -292,10 +292,13 @@ console.log(response);"></app-code-snippet>
           <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-400">
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly contextUsage: double</code> - The current number of tokens stored in the session history.</li>
             <li><code class="font-mono text-indigo-600 dark:text-indigo-400">readonly contextWindow: double</code> - The absolute maximum token limit for this model instance.</li>
-            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">oncontextoverflow</code> - Event fired when a prompt causes the session history to overflow and evict older messages.</li>
+            <li><code class="font-mono text-indigo-600 dark:text-indigo-400">oncontextoverflow</code> - Event fired when a prompt causes the session history to overflow and evict older messages (listening via <code class="font-mono">session.addEventListener("contextoverflow", handler, &#123; signal &#125;)</code> is recommended).</li>
           </ul>
         
           <app-code-snippet code="const session = await LanguageModel.create();
+session.addEventListener(&quot;contextoverflow&quot;, () =&gt; &#123;
+  console.warn(&quot;Context window overflowed; older messages were evicted.&quot;);
+&#125;);
 const tokenCount = await session.measureContextUsage(&quot;This is a test prompt.&quot;);
 console.log(&quot;This prompt will cost &quot; + tokenCount + &quot; tokens.&quot;);
 console.log(&quot;Total usage: &quot; + session.contextUsage + &quot; / &quot; + session.contextWindow);"></app-code-snippet>

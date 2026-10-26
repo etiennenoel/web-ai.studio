@@ -120,18 +120,19 @@ export async function fitDocumentToInputQuota(
     '\n\n' +
     LARGE_TECHNICAL_DOCUMENT_MAX_CONTEXT;
 
+  const rawQuota = instance?.contextWindow ?? instance?.inputQuota;
   const quota: number | undefined =
-    typeof instance?.inputQuota === 'number' &&
-    Number.isFinite(instance.inputQuota) &&
-    instance.inputQuota > 0
-      ? instance.inputQuota
+    typeof rawQuota === 'number' &&
+    Number.isFinite(rawQuota) &&
+    rawQuota > 0
+      ? rawQuota
       : undefined;
 
   const measureFn =
-    typeof instance?.measureInputUsage === 'function'
-      ? (txt: string) => instance.measureInputUsage(txt)
-      : typeof instance?.measureContextUsage === 'function'
+    typeof instance?.measureContextUsage === 'function'
       ? (txt: string) => instance.measureContextUsage(txt)
+      : typeof instance?.measureInputUsage === 'function'
+      ? (txt: string) => instance.measureInputUsage(txt)
       : null;
 
   if (!quota || !measureFn) {

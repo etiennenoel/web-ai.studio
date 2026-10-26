@@ -162,7 +162,10 @@ export class PromptComponent implements OnInit {
             { role: 'system', content: this.systemPrompt }
         ];
       }
-      if (this.samplingMode) options.samplingMode = this.samplingMode;
+      const hasLegacyParams =
+        (this.temperature !== null && String(this.temperature) !== '') ||
+        (this.topK !== null && String(this.topK) !== '');
+      if (this.samplingMode && !hasLegacyParams) options.samplingMode = this.samplingMode;
       if (this.temperature !== null && String(this.temperature) !== '') options.temperature = Number(this.temperature);
       if (this.topK !== null && String(this.topK) !== '') options.topK = Number(this.topK);
 
@@ -170,8 +173,9 @@ export class PromptComponent implements OnInit {
 
       let inputTokens: number | undefined = undefined;
       try {
-        if (typeof session.measureInputUsage === 'function') {
-          inputTokens = await session.measureInputUsage(this.promptText);
+        const measureFn = session.measureContextUsage ?? session.measureInputUsage;
+        if (typeof measureFn === 'function') {
+          inputTokens = await measureFn.call(session, this.promptText);
         }
       } catch(e) {}
 
@@ -228,7 +232,10 @@ export class PromptComponent implements OnInit {
 
   updateGeneratedCode() {
     const optionsObj: any = {};
-    if (this.samplingMode) {
+    const hasLegacyParams =
+      (this.temperature !== null && String(this.temperature) !== '') ||
+      (this.topK !== null && String(this.topK) !== '');
+    if (this.samplingMode && !hasLegacyParams) {
       optionsObj.samplingMode = this.samplingMode;
     }
     if (this.systemPrompt.trim()) {

@@ -573,9 +573,10 @@ await summarizeWithSummarizerApi(DOCUMENT_TEXT);`;
     measuredTokens: number | null;
     quota: number | null;
   }> {
+    const rawQuota = instance?.contextWindow ?? instance?.inputQuota;
     const quota: number | null =
-      typeof instance?.inputQuota === 'number' && instance.inputQuota > 0
-        ? instance.inputQuota
+      typeof rawQuota === 'number' && Number.isFinite(rawQuota) && rawQuota > 0
+        ? rawQuota
         : null;
 
     if (this.documentPreset === 'max-quota') {
@@ -599,11 +600,11 @@ await summarizeWithSummarizerApi(DOCUMENT_TEXT);`;
     text: string
   ): Promise<number | null> {
     try {
-      if (typeof instance?.measureInputUsage === 'function') {
-        return Number(await instance.measureInputUsage(text));
-      }
       if (typeof instance?.measureContextUsage === 'function') {
         return Number(await instance.measureContextUsage(text));
+      }
+      if (typeof instance?.measureInputUsage === 'function') {
+        return Number(await instance.measureInputUsage(text));
       }
     } catch {
       // Ignore measurement errors
