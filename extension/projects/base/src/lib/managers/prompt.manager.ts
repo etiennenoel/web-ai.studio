@@ -19,12 +19,24 @@ export class PromptManager {
   }
 
   async createSession(options?: any): Promise<any> {
+    if (
+      options &&
+      typeof options === 'object' &&
+      options.samplingMode !== undefined &&
+      ('temperature' in options || 'topK' in options)
+    ) {
+      const sanitizedOptions = { ...options };
+      delete sanitizedOptions.temperature;
+      delete sanitizedOptions.topK;
+      // @ts-ignore
+      return await window.LanguageModel.create(sanitizedOptions);
+    }
     // @ts-ignore
     return await window.LanguageModel.create(options);
   }
 
   async getParams(): Promise<any> {
-    if (!('LanguageModel' in window)) {
+    if (!('LanguageModel' in window) || typeof (window as any).LanguageModel?.params !== 'function') {
       return null;
     }
     // @ts-ignore

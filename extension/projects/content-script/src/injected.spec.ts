@@ -238,4 +238,141 @@ describe('injected script', () => {
     expect(createMsg.payload.api).toBe('LanguageModel');
     expect(createMsg.payload.method).toBe('create');
   });
+
+  it('should forward underlying target in Proxy set trap for brand-checked WebIDL setters like oncontextoverflow', async () => {
+    vi.resetModules();
+
+    let storedHandler: ((ev: Event) => void) | null = null;
+    const nativeSession: any = {
+      prompt: vi.fn().mockResolvedValue('Hello'),
+      measureContextUsage: vi.fn().mockResolvedValue(7),
+    };
+
+    Object.defineProperty(nativeSession, 'oncontextoverflow', {
+      get() {
+        if (this !== nativeSession) {
+          throw new TypeError('Illegal invocation');
+        }
+        return storedHandler;
+      },
+      set(val) {
+        if (this !== nativeSession) {
+          throw new TypeError('Illegal invocation');
+        }
+        storedHandler = typeof val === 'function' ? val : null;
+      },
+      configurable: true,
+    });
+
+    const clonedNativeSession: any = {
+      prompt: vi.fn().mockResolvedValue('Cloned hello'),
+      measureContextUsage: vi.fn().mockResolvedValue(4),
+    };
+    let clonedStoredHandler: ((ev: Event) => void) | null = null;
+    Object.defineProperty(clonedNativeSession, 'oncontextoverflow', {
+      get() {
+        if (this !== clonedNativeSession) {
+          throw new TypeError('Illegal invocation');
+        }
+        return clonedStoredHandler;
+      },
+      set(val) {
+        if (this !== clonedNativeSession) {
+          throw new TypeError('Illegal invocation');
+        }
+        clonedStoredHandler = typeof val === 'function' ? val : null;
+      },
+      configurable: true,
+    });
+    nativeSession.clone = vi.fn().mockResolvedValue(clonedNativeSession);
+
+    const createSpy = vi.fn().mockResolvedValue(nativeSession);
+    (window as any).LanguageModel = { create: createSpy };
+
+    const postedMessages: any[] = [];
+    vi.spyOn(window, 'postMessage').mockImplementation((msg: any) => {
+      postedMessages.push(msg);
+      if (msg.type === 'WEBAI_ROUTING_REQUEST') {
+        window.dispatchEvent(new MessageEvent('message', {
+          source: window,
+          data: {
+            type: 'WEBAI_ROUTING_RESPONSE',
+            messageId: msg.messageId,
+            data: { modelRouting: 'chrome' },
+          },
+        }));
+      }
+    });
+
+    await import('./injected');
+
+    const session = await (window as any).LanguageModel.create({
+      samplingMode: 'most-predictable',
+      temperature: 0,
+      topK: 1,
+    });
+
+    // Should strip temperature and topK when samplingMode is present
+    expect(createSpy).toHaveBeenCalledWith({ samplingMode: 'most-predictable' });
+
+    const handler = vi.fn();
+    // Chained assignment testing both legacy expando property and native WebIDL setter
+    expect(() => {
+      session.onquotaoverflow = session.oncontextoverflow = handler;
+    }).not.toThrow();
+
+    expect(storedHandler).toBe(handler);
+    expect(session.oncontextoverflow).toBe(handler);
+
+    // Calling prompt should measure token usage via measureContextUsage
+    await session.prompt('test prompt');
+    expect(nativeSession.measureContextUsage).toHaveBeenCalledWith('test prompt');
+
+    // Cloned session should also be wrapped in a Proxy with working set trap and telemetry
+    const cloned = await session.clone();
+    const clonedHandler = vi.fn();
+    expect(() => {
+      cloned.oncontextoverflow = clonedHandler;
+    }).not.toThrow();
+    expect(clonedStoredHandler).toBe(clonedHandler);
+
+    await cloned.prompt('cloned prompt');
+    expect(clonedNativeSession.measureContextUsage).toHaveBeenCalledWith('cloned prompt');
+  });
+
+  it('should not overwrite native window.DecisionModel when already defined', async () => {
+    const { ClassifierPolyfillInstaller } = await import('./polyfill/classifier-polyfill.installer');
+    ClassifierPolyfillInstaller.uninstall();
+    const nativeDecisionModel = { create: vi.fn(), availability: vi.fn() };
+    (window as any).DecisionModel = nativeDecisionModel;
+    delete (window as any).Classifier;
+
+    const installed = ClassifierPolyfillInstaller.install();
+    expect(installed).toBe(false);
+    expect((window as any).DecisionModel).toBe(nativeDecisionModel);
+  });
+
+  it('should support monitor.ondownloadprogress property handler and EventTarget inheritance on DecisionModel polyfill', async () => {
+    const { DecisionModel } = await import('./polyfill/classifier.polyfill');
+    const { ClassifierPageBridge } = await import('./polyfill/classifier-page-bridge');
+
+    vi.spyOn(ClassifierPageBridge, 'request').mockImplementation(async (_op, _payload, options) => {
+      options?.onProgress?.(0.5);
+      options?.onProgress?.(1.0);
+      return { sessionId: 's1', contextWindow: 256, contextUsage: 12 } as any;
+    });
+
+    const progressEvents: number[] = [];
+    const session = await DecisionModel.create({
+      questions: [{ id: 'q1', type: 'boolean', prompt: 'Is urgent?' }],
+      monitor(m: any) {
+        m.ondownloadprogress = (ev: ProgressEvent) => {
+          progressEvents.push(ev.loaded);
+        };
+      },
+    });
+
+    expect(progressEvents).toEqual([0.5, 1.0]);
+    expect(session).toBeInstanceOf(EventTarget);
+  });
 });

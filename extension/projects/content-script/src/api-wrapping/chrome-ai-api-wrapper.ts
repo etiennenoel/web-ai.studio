@@ -98,7 +98,20 @@ export class ChromeAiApiWrapper {
         }
 
         // Chrome on-device path: call the real .create() and wrap the result
-        const originalInstance = await originalCreate.call(this, options);
+        let forwardedOptions = options;
+        if (
+          wrapper.apiName === 'LanguageModel' &&
+          options &&
+          typeof options === 'object' &&
+          (options as Record<string, unknown>)['samplingMode'] !== undefined &&
+          ('temperature' in (options as object) || 'topK' in (options as object))
+        ) {
+          const clonedOptions = { ...(options as Record<string, unknown>) };
+          delete clonedOptions['temperature'];
+          delete clonedOptions['topK'];
+          forwardedOptions = clonedOptions;
+        }
+        const originalInstance = await originalCreate.call(this, forwardedOptions);
         wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.COMPLETED);
         return wrapper.createTrackedProxy(originalInstance, callId);
       } catch (err: unknown) {
@@ -130,9 +143,31 @@ export class ChromeAiApiWrapper {
    */
   private createMockInstance(sessionCallId: string): Record<string, unknown> {
     const wrapper = this;
+    const eventTarget = new EventTarget();
+    let oncontextoverflowHandler: ((this: EventTarget, ev: Event) => unknown) | null = null;
+
     const mockInstance: Record<string, unknown> = {
       clone: async function () { return this; },
       destroy: function () {},
+      addEventListener: eventTarget.addEventListener.bind(eventTarget),
+      removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+      dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
+      contextUsage: 0,
+      contextWindow: 0,
+      measureContextUsage: async () => 0,
+      measureInputUsage: async () => 0,
+      get oncontextoverflow() {
+        return oncontextoverflowHandler;
+      },
+      set oncontextoverflow(handler: ((this: EventTarget, ev: Event) => unknown) | null) {
+        if (oncontextoverflowHandler) {
+          eventTarget.removeEventListener('contextoverflow', oncontextoverflowHandler as EventListener);
+        }
+        oncontextoverflowHandler = typeof handler === 'function' ? handler : null;
+        if (oncontextoverflowHandler) {
+          eventTarget.addEventListener('contextoverflow', oncontextoverflowHandler as EventListener);
+        }
+      },
     };
 
     for (const methodName of MOCK_INSTANCE_METHODS) {
@@ -252,8 +287,14 @@ export class ChromeAiApiWrapper {
 
         if (typeof value !== 'function') return value;
         if (prop === 'constructor') return value;
+        if (typeof prop === 'string' && prop.startsWith('on')) {
+          return value;
+        }
+        if (typeof prop === 'symbol') {
+          return value.bind(target);
+        }
 
-        const methodName = prop.toString();
+        const methodName = prop;
         const shouldWrap = (WRAPPED_INSTANCE_METHODS as readonly string[]).includes(methodName);
 
         if (!shouldWrap) {
@@ -263,6 +304,9 @@ export class ChromeAiApiWrapper {
         return function (...args: unknown[]) {
           return wrapper.invokeTrackedMethod(target, value, methodName, sessionCallId, args);
         };
+      },
+      set(target, prop, value) {
+        return Reflect.set(target, prop, value, target);
       },
     });
   }
@@ -307,17 +351,28 @@ export class ChromeAiApiWrapper {
     });
 
     // Attempt to measure token usage asynchronously if the API supports it
-    if (typeof (target as any).measureInputUsage === 'function') {
-      try {
-        (target as any).measureInputUsage(...args)
-          .then((usage: number) => {
-            this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.INPUT_USAGE, {
-              inputTokenCount: usage,
-            });
-          })
-          .catch(() => {});
-      } catch {
-        // measureInputUsage is best-effort
+    const nonMeasuredMethods = ['measureContextUsage', 'measureInputUsage', 'clone', 'destroy'];
+    if (!nonMeasuredMethods.includes(methodName)) {
+      const measureFn =
+        typeof (target as any).measureContextUsage === 'function'
+          ? (target as any).measureContextUsage
+          : typeof (target as any).measureInputUsage === 'function'
+            ? (target as any).measureInputUsage
+            : null;
+
+      if (measureFn) {
+        try {
+          measureFn
+            .apply(target, args)
+            .then((usage: number) => {
+              this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.INPUT_USAGE, {
+                inputTokenCount: usage,
+              });
+            })
+            .catch(() => {});
+        } catch {
+          // Token usage measurement is best-effort
+        }
       }
     }
 
@@ -335,6 +390,9 @@ export class ChromeAiApiWrapper {
           this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
             response: sanitizedRes as any,
           });
+          if (methodName === 'clone' && res && typeof res === 'object') {
+            return this.createTrackedProxy(res, sessionCallId);
+          }
           return res;
         }).catch((err: unknown) => {
           const errorMessage = err instanceof Error ? err.message : String(err);

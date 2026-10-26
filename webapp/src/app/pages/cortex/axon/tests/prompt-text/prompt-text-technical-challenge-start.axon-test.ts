@@ -84,7 +84,7 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
       const start = performance.now()
 
       const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal })
-      this.results.inputContextSize = session.inputQuota;
+      this.results.inputContextSize = (session as any).contextWindow ?? session.inputQuota;
 
       iterationResult.creationTime = performance.now() - start;
 
@@ -107,10 +107,10 @@ export class PromptTextTechnicalChallengeStartAxonTest implements AxonTestInterf
       iterationResult.totalResponseTime = performance.now() - start;
       let inputTokens = this.results.input.length;
       try {
-        if (typeof (session as any).measureInputUsage === 'function') {
-          inputTokens = await (session as any).measureInputUsage(this.results.input);
-        } else if (typeof (session as any).measureContextUsage === 'function') {
+        if (typeof (session as any).measureContextUsage === 'function') {
           inputTokens = await (session as any).measureContextUsage(this.results.input);
+        } else if (typeof (session as any).measureInputUsage === 'function') {
+          inputTokens = await (session as any).measureInputUsage(this.results.input);
         }
       } catch (e) {
         console.warn('Could not measure input usage', e);

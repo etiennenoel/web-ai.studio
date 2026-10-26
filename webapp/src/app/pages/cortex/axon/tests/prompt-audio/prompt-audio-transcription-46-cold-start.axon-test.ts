@@ -67,7 +67,7 @@ export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInte
 
       const start = performance.now();
       const session = await LanguageModel.create({ ...this.creationOptions, signal: this.abortSignal });
-      this.results.inputContextSize = session.inputQuota;
+      this.results.inputContextSize = (session as any).contextWindow ?? session.inputQuota;
       iterationResult.creationTime = performance.now() - start;
 
       const promptInput = [{
@@ -97,10 +97,10 @@ export class PromptAudioTranscription46ColdStartAxonTest implements AxonTestInte
         iterationResult.totalResponseTime = performance.now() - start;
         let inputTokens = JSON.stringify(promptInput).length;
         try {
-          if (typeof (session as any).measureInputUsage === 'function') {
-            inputTokens = await (session as any).measureInputUsage(promptInput);
-          } else if (typeof (session as any).measureContextUsage === 'function') {
+          if (typeof (session as any).measureContextUsage === 'function') {
             inputTokens = await (session as any).measureContextUsage(promptInput);
+          } else if (typeof (session as any).measureInputUsage === 'function') {
+            inputTokens = await (session as any).measureInputUsage(promptInput);
           }
         } catch (e) {
           console.warn('Could not measure input usage', e);

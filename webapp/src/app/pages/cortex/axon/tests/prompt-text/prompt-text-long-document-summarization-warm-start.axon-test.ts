@@ -81,7 +81,7 @@ export class PromptTextLongDocumentSummarizationWarmStartAxonTest implements Axo
       ...this.creationOptions,
       signal: this.abortSignal,
     });
-    this.results.inputContextSize = baseSession.inputQuota;
+    this.results.inputContextSize = (baseSession as any).contextWindow ?? baseSession.inputQuota;
     const creationTime = performance.now() - start;
 
     try {
@@ -116,10 +116,10 @@ export class PromptTextLongDocumentSummarizationWarmStartAxonTest implements Axo
 
           let inputTokens = this.results.input.length;
           try {
-            if (typeof (iterSession as any).measureInputUsage === 'function') {
-              inputTokens = await (iterSession as any).measureInputUsage(this.results.input);
-            } else if (typeof (iterSession as any).measureContextUsage === 'function') {
+            if (typeof (iterSession as any).measureContextUsage === 'function') {
               inputTokens = await (iterSession as any).measureContextUsage(this.results.input);
+            } else if (typeof (iterSession as any).measureInputUsage === 'function') {
+              inputTokens = await (iterSession as any).measureInputUsage(this.results.input);
             }
           } catch (e) {
             console.warn('Could not measure input usage', e);
