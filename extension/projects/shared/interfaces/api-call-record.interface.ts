@@ -24,6 +24,9 @@ export interface ApiCallRecord {
   /** Base timestamp for indexing (from the first stage received). */
   timestamp: number;
 
+  /** Latest resolved lifecycle stage for this call. */
+  stage?: ApiCallStage;
+
   /** Map of stage name -> timestamp, recording when each stage occurred. */
   timestamps: Partial<Record<ApiCallStage, number>>;
 

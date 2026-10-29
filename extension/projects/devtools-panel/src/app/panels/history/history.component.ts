@@ -93,6 +93,15 @@ export class HistoryComponent implements OnInit {
 
   showClearConfirm: boolean = false;
   expandedSessions: Set<string> = new Set<string>();
+  private readonly staticMethods = new Set(['availability', 'params']);
+
+  isStaticOnlyGroup(group: SessionGroup): boolean {
+    return (
+      !group.createItem &&
+      group.methodItems.length > 0 &&
+      group.methodItems.every((item) => this.staticMethods.has(item.method))
+    );
+  }
 
   timeFilterCounts = { all: 0, '24h': 0, '1h': 0, '5m': 0 };
   apiFilterCounts: Record<string, number> = {};
@@ -712,6 +721,10 @@ export class HistoryComponent implements OnInit {
     }
 
     if (group.methodItems.length === 0) {
+      if (group.createItem?.timestamps?.completed) {
+        group.computedStatus = 'completed';
+        return 'completed';
+      }
       group.computedStatus = 'running';
       return 'running';
     }

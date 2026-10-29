@@ -21,13 +21,28 @@
     </div>
 
     <div *ngFor="let origin of origins" class="mb-4 last:mb-0 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-      <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="font-medium truncate text-sm" [title]="origin">{{ origin }}</h3>
-        <button (click)="clearHistory(origin)" class="text-xs text-red-500 hover:text-red-700 p-1" title="Clear all sessions for this site">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+      <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700 gap-2">
+        <h3 class="font-medium truncate text-sm min-w-0" [title]="origin">{{ origin }}</h3>
+        <div class="shrink-0">
+          <button *ngIf="confirmingOrigin !== origin"
+                  type="button"
+                  (click)="promptClearHistory(origin)"
+                  class="text-xs text-red-500 hover:text-red-700 p-1"
+                  title="Clear all sessions for this site">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <div *ngIf="confirmingOrigin === origin" class="inline-flex items-center gap-2 text-xs">
+            <span class="text-gray-600 dark:text-gray-300">Clear?</span>
+            <button type="button" (click)="confirmClearHistory(origin)" class="font-semibold text-red-600 hover:text-red-700 dark:text-red-400">
+              Yes
+            </button>
+            <button type="button" (click)="cancelClearHistory()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">
+              No
+            </button>
+          </div>
+        </div>
       </div>
-      
+
       <div class="p-2 space-y-2 bg-white dark:bg-gray-900">
         <div *ngFor="let session of sessionsByOrigin[origin]" class="p-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded">
           <div class="flex justify-between items-start mb-1">
@@ -38,39 +53,45 @@
               {{ session.latestTimestamp | date:'shortTime' }}
             </span>
           </div>
-          <div class="text-[10px] text-gray-600 dark:text-gray-300 flex justify-between">
-            <span class="font-mono truncate" style="max-width: 150px;">{{ session.sessionId }}</span>
-            <span>{{ session.calls.length }} call(s)</span>
+          <div class="text-[10px] text-gray-600 dark:text-gray-300 flex justify-between items-center">
+            <span *ngIf="session.isStaticCall" class="text-gray-500 dark:text-gray-400 italic">Static call</span>
+            <span *ngIf="!session.isStaticCall" class="font-mono truncate" style="max-width: 180px;" [title]="session.sessionId">
+              Session {{ session.sessionId | slice:0:8 }}...
+            </span>
+            <span>{{ session.calls.length }} {{ session.calls.length === 1 ? 'call' : 'calls' }}</span>
           </div>
-          
+
           <!-- Detailed Calls List -->
           <div class="mt-2 space-y-1">
             <div *ngFor="let call of session.calls" class="border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-900">
-              <div class="flex justify-between items-center p-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" (click)="toggleDetails(call.id)">
-                <div class="flex items-center gap-2 text-[10px]">
-                  <span class="font-semibold text-gray-700 dark:text-gray-300">{{ call.method }}</span>
-                  <span class="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">{{ call.stage }}</span>
+              <div class="flex justify-between items-center p-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors gap-2" (click)="toggleDetails(call.id)">
+                <div class="flex flex-wrap items-center gap-1.5 text-[10px] min-w-0">
+                  <span class="font-mono font-semibold text-gray-800 dark:text-gray-200">{{ call.method }}()</span>
+                  <span class="px-1.5 py-0.5 rounded border text-[9px] font-medium"
+                        [ngClass]="call.stage === 'completed' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800/50' : (call.stage === 'error' ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800/50' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700')">
+                    {{ call.stage }}
+                  </span>
                   <span *ngIf="call.durationMs !== null" class="text-gray-500 dark:text-gray-400">{{ call.durationMs }}ms</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 shrink-0">
                   <span class="text-[9px] text-red-500 font-semibold" *ngIf="call.errorMessage">Error</span>
                   <i class="fas fa-chevron-down text-gray-400 text-[10px] transition-transform duration-200" [class.rotate-180]="expandedCalls.has(call.id)"></i>
                 </div>
               </div>
-              
+
               <div *ngIf="expandedCalls.has(call.id)" class="p-2 border-t border-gray-200 dark:border-gray-700 text-[10px] space-y-2 bg-gray-50 dark:bg-gray-800/30 overflow-x-auto">
                 <div *ngIf="call.errorMessage" class="text-red-600 dark:text-red-400 font-mono break-words whitespace-pre-wrap mb-1">
                   Error: {{ call.errorMessage }}
                 </div>
-                <div *ngIf="call.options">
+                <div *ngIf="hasPayload(call.options)">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Options</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.options | json }}</code></pre>
                 </div>
-                <div *ngIf="call.args">
+                <div *ngIf="hasPayload(call.args)">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Arguments</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.args | json }}</code></pre>
                 </div>
-                <div *ngIf="call.response">
+                <div *ngIf="call.response !== undefined">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Response</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.response | json }}</code></pre>
                 </div>

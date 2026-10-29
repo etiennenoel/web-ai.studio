@@ -66,6 +66,13 @@ chrome.runtime.onMessage.addListener((request: any, _sender: any, sendResponse: 
     return false;
   }
 
+  // Clear current page sessions from memory
+  if (request.action === RuntimeMessageAction.CLEAR_PAGE_SESSIONS) {
+    ApiCallForwardHandler.clearCurrentPageCalls();
+    sendResponse({ success: true });
+    return false;
+  }
+
   // Classifier download progress relayed by the service worker is consumed by
   // ClassifierRuntimeClient's own listener; nothing to do here.
   if (request.action === RuntimeMessageAction.CLASSIFIER_PROGRESS) {

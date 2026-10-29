@@ -1,5 +1,25 @@
+import { ApiCallStage } from '../../shared/enums/api-call-stage.enum';
 import { ApiCallPayload } from '../../shared/interfaces/api-call-payload.interface';
 import { ApiCallRecord, SettingRecord } from '../../shared/interfaces/api-call-record.interface';
+
+function resolveRecordStage(record: ApiCallRecord, incomingStage?: ApiCallStage): ApiCallStage | undefined {
+  if (record.timestamps[ApiCallStage.ERROR] !== undefined || record.errorMessage) {
+    return ApiCallStage.ERROR;
+  }
+  if (record.timestamps[ApiCallStage.COMPLETED] !== undefined) {
+    return ApiCallStage.COMPLETED;
+  }
+  if (record.timestamps[ApiCallStage.FIRST_TOKEN] !== undefined) {
+    return ApiCallStage.FIRST_TOKEN;
+  }
+  if (record.timestamps[ApiCallStage.EXECUTE] !== undefined) {
+    return ApiCallStage.EXECUTE;
+  }
+  if (record.timestamps[ApiCallStage.CREATE] !== undefined) {
+    return ApiCallStage.CREATE;
+  }
+  return incomingStage;
+}
 
 /**
  * Manages IndexedDB storage for the Web AI extension.
@@ -89,6 +109,8 @@ export class WebAIDatabase {
         if (data.response !== undefined) record.response = data.response;
         if (data.inputTokenCount !== undefined) record.inputTokenCount = data.inputTokenCount;
         if (data.inputLength !== undefined) record.inputLength = data.inputLength;
+
+        record.stage = resolveRecordStage(record, data.stage);
 
         const putReq = store.put(record);
         putReq.onsuccess = () => resolve();

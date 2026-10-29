@@ -239,6 +239,59 @@ describe('injected script', () => {
     expect(createMsg.payload.method).toBe('create');
   });
 
+  it('should wrap static availability() and emit execute + completed stages, and restore on unwrap', async () => {
+    vi.resetModules();
+
+    const availabilitySpy = vi.fn().mockResolvedValue('available');
+    const createSpy = vi.fn().mockResolvedValue({});
+    (window as any).LanguageModel = {
+      availability: availabilitySpy,
+      create: createSpy,
+    };
+
+    const postedMessages: any[] = [];
+    vi.spyOn(window, 'postMessage').mockImplementation((msg: any) => {
+      postedMessages.push(msg);
+    });
+
+    await import('./injected');
+
+    expect((window as any).LanguageModel.availability).not.toBe(availabilitySpy);
+
+    const status = await (window as any).LanguageModel.availability({
+      expectedInputs: [{ type: 'text', languages: ['en'] }],
+    });
+    expect(status).toBe('available');
+    expect(availabilitySpy).toHaveBeenCalledWith({
+      expectedInputs: [{ type: 'text', languages: ['en'] }],
+    });
+
+    const executeMsg = postedMessages.find(
+      (m) => m.type === 'WEBAI_API_CALL' && m.payload?.method === 'availability' && m.payload?.stage === 'execute',
+    );
+    const completedMsg = postedMessages.find(
+      (m) => m.type === 'WEBAI_API_CALL' && m.payload?.method === 'availability' && m.payload?.stage === 'completed',
+    );
+    expect(executeMsg).toBeDefined();
+    expect(executeMsg.payload.api).toBe('LanguageModel');
+    expect(completedMsg).toBeDefined();
+    expect(completedMsg.payload.response).toBe('available');
+
+    // Pushing wrapApi: false should restore both create and availability
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        source: window,
+        data: {
+          type: 'WEBAI_SETTINGS_PUSH',
+          data: { wrapApi: false, classifierPolyfill: true },
+        },
+      }),
+    );
+
+    expect((window as any).LanguageModel.availability).toBe(availabilitySpy);
+    expect((window as any).LanguageModel.create).toBe(createSpy);
+  });
+
   it('should forward underlying target in Proxy set trap for brand-checked WebIDL setters like oncontextoverflow', async () => {
     vi.resetModules();
 

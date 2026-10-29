@@ -1,29 +1,32 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 
 declare const chrome: any;
-declare const window: any;
 
 @Component({
   selector: 'app-sessions',
   templateUrl: './sessions.html',
   styleUrls: [],
-  standalone: false
+  standalone: false,
 })
 export class SessionsComponent implements OnInit {
   sessionsByOrigin: { [origin: string]: any[] } = {};
   origins: string[] = [];
   loading = true;
   expandedCalls = new Set<string>();
+  confirmingOrigin: string | null = null;
 
-  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+  ) {}
 
   ngOnInit(): void {
     this.fetchActiveSessions();
 
     // Listen for updates from the background script or content script
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
-      chrome.runtime.onMessage.addListener((request: any, sender: any, sendResponse: any) => {
-        if (request.action === 'api_call_logged' || request.action === 'log_api_call') {
+      chrome.runtime.onMessage.addListener((request: any) => {
+        if (request?.action === 'api_call_logged' || request?.action === 'log_api_call') {
           this.ngZone.run(() => {
             setTimeout(() => this.fetchActiveSessions(), 100);
           });
@@ -32,7 +35,7 @@ export class SessionsComponent implements OnInit {
     }
   }
 
-  toggleDetails(callId: string) {
+  toggleDetails(callId: string): void {
     if (this.expandedCalls.has(callId)) {
       this.expandedCalls.delete(callId);
     } else {
@@ -40,19 +43,51 @@ export class SessionsComponent implements OnInit {
     }
   }
 
-  fetchActiveSessions() {
+  hasPayload(value: unknown): boolean {
+    if (value === null || value === undefined) return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value as object).length > 0;
+    return true;
+  }
+
+  private resolveStage(call: any): string {
+    if (call?.timestamps?.error !== undefined || call?.errorMessage) {
+      return 'error';
+    }
+    if (call?.timestamps?.completed !== undefined) {
+      return 'completed';
+    }
+    if (call?.timestamps?.first_token !== undefined) {
+      return 'first_token';
+    }
+    if (call?.timestamps?.execute !== undefined) {
+      return 'execute';
+    }
+    if (call?.timestamps?.create !== undefined) {
+      return 'create';
+    }
+    return call?.stage || 'pending';
+  }
+
+  fetchActiveSessions(): void {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ action: 'get_all_history' }, (response: any) => {
         if (response && response.data) {
           this.ngZone.run(() => {
             this.processHistory(response.data);
           });
+        } else {
+          this.ngZone.run(() => {
+            this.processHistory([]);
+          });
         }
       });
+    } else {
+      this.processHistory([]);
     }
   }
 
-  processHistory(history: any[]) {
+  processHistory(history: any[]): void {
     // Group by origin
     const grouped: { [origin: string]: any[] } = {};
     for (const item of history) {
@@ -75,55 +110,68 @@ export class SessionsComponent implements OnInit {
         }
         sessionsMap[sid].push(item);
       }
-      
-      const sessions = Object.keys(sessionsMap).map(sid => {
-        const calls = sessionsMap[sid].map(call => {
-          let durationMs = null;
+
+      const sessions = Object.keys(sessionsMap).map((sid) => {
+        const calls = sessionsMap[sid].map((call) => {
+          let durationMs: number | null = null;
           if (call.timestamps) {
-            const start = call.timestamps.execute || call.timestamps.create;
-            const end = call.timestamps.completed || call.timestamps.error;
-            if (start && end) {
-              durationMs = end - start;
+            const start = call.timestamps.execute ?? call.timestamps.create;
+            const end = call.timestamps.completed ?? call.timestamps.error;
+            if (start !== undefined && end !== undefined) {
+              durationMs = Math.max(0, Math.round(end - start));
             }
           }
-          return { ...call, durationMs };
+          return {
+            ...call,
+            stage: this.resolveStage(call),
+            durationMs,
+          };
         });
-        // sort calls by timestamp
-        calls.sort((a, b) => b.timestamp - a.timestamp);
-        const latestCall = calls[0];
-        const apiName = latestCall.api || 'Unknown API';
-        
+        calls.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        const latestTimestamp = calls.reduce((max, c) => Math.max(max, c.timestamp || 0), 0);
+        const apiName = calls[calls.length - 1]?.api || 'Unknown API';
+        const isStaticCall =
+          calls.length === 1 && (calls[0].method === 'availability' || calls[0].method === 'params');
+
         return {
           sessionId: sid,
-          apiName: apiName,
-          calls: calls,
-          latestTimestamp: latestCall.timestamp
+          apiName,
+          calls,
+          latestTimestamp,
+          isStaticCall,
         };
       });
-      
+
       // sort sessions by latest timestamp
       sessions.sort((a, b) => b.latestTimestamp - a.latestTimestamp);
-      
+
       if (sessions.length > 0) {
         sessionsByOrigin[origin] = sessions;
       }
     }
-    
+
     this.sessionsByOrigin = sessionsByOrigin;
     this.origins = Object.keys(sessionsByOrigin).sort();
     this.loading = false;
     this.cdr.detectChanges();
   }
 
-  clearHistory(origin: string) {
-    if (window.confirm(`Are you sure you want to clear all history for ${origin}?`)) {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-        chrome.runtime.sendMessage({ action: 'clear_api_history', payload: { origin } }, (response: any) => {
-          this.ngZone.run(() => {
-            this.fetchActiveSessions();
-          });
+  promptClearHistory(origin: string): void {
+    this.confirmingOrigin = origin;
+  }
+
+  cancelClearHistory(): void {
+    this.confirmingOrigin = null;
+  }
+
+  confirmClearHistory(origin: string): void {
+    this.confirmingOrigin = null;
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: 'clear_api_history', payload: { origin } }, () => {
+        this.ngZone.run(() => {
+          this.fetchActiveSessions();
         });
-      }
+      });
     }
   }
 }

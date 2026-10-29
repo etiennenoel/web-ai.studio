@@ -5,9 +5,9 @@
         <i class="fa-solid fa-arrow-left text-lg"></i>
       </button>
       <div>
-        <h2 class="text-xl font-semibold">Diagnosis & Debugging</h2>
+        <h2 class="text-xl font-semibold">Browser Diagnosis &amp; Readiness</h2>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Troubleshoot why Built-In AI APIs might not be working on the current page.
+          Check which Built-In AI globals Chrome exposes on <code>window</code> for this page and verify local model readiness.
         </p>
       </div>
     </div>
@@ -108,9 +108,9 @@
       <div class="w-16 h-16 bg-green-100 dark:bg-green-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fa-solid fa-check text-2xl text-green-600 dark:text-green-400"></i>
       </div>
-      <h3 class="text-xl font-bold text-green-800 dark:text-green-400 mb-2">Everything is working perfectly!</h3>
+      <h3 class="text-xl font-bold text-green-800 dark:text-green-400 mb-2">All Built-in AI Globals Exposed in Browser!</h3>
       <p class="text-green-700 dark:text-green-500 max-w-lg mx-auto">
-        All tested APIs are injected into the page and available to use. If you are still experiencing issues, check the <span class="font-semibold">History</span> panel to verify if the model throws errors like <code>QuotaExceeded</code> during execution.
+        All Built-in AI globals are exposed on <code>window</code> by Chrome for this page. (Whether the website itself invokes them is tracked separately under <strong>Used by This Site</strong>.) If a site call fails at runtime, check the <span class="font-semibold">History</span> panel for execution errors.
       </p>
     </div>
 
@@ -210,7 +210,7 @@
 
     <!-- Working APIs (Collapsed or minimal) -->
     <div *ngIf="workingApis.length > 0" class="mt-8">
-      <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Available APIs</h3>
+      <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Globals Exposed on window by Browser</h3>
       <div class="flex flex-wrap gap-2">
         <div *ngFor="let api of workingApis" class="bg-gray-100 dark:bg-[#35363a] px-3 py-1.5 rounded-full text-xs font-mono text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3c4043] flex items-center gap-2">
           <i class="fa-solid fa-check text-green-500"></i> {{ api.globalName }}
