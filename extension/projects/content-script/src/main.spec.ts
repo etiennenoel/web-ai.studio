@@ -260,4 +260,66 @@ describe('content-script main', () => {
     );
     expect(logCalls.length).toBe(0);
   });
+
+  it('should resolve latest call stage in get_page_sessions and support clear_page_sessions', async () => {
+    mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
+      if (req.action === 'get_setting') cb({ value: false });
+      if (req.action === 'log_api_call' && cb) cb({ success: true });
+    });
+
+    await import('./main');
+
+    const windowListenerArgs = (window.addEventListener as any).mock.calls.find(
+      (args: any) => args[0] === 'message',
+    );
+    const windowMessageListener = windowListenerArgs[1];
+    const runtimeMessageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
+    // Clear any calls from earlier tests in the same module cache
+    runtimeMessageListener({ action: 'clear_page_sessions' }, {}, vi.fn());
+
+    // Emit execute -> completed -> late input_usage
+    await windowMessageListener({
+      source: window,
+      data: {
+        type: 'WEBAI_API_CALL',
+        payload: { id: 'call-stage-1', sessionId: 's-1', api: 'LanguageModel', method: 'prompt', stage: 'execute', timestamp: 100 },
+      },
+    });
+    await windowMessageListener({
+      source: window,
+      data: {
+        type: 'WEBAI_API_CALL',
+        payload: { id: 'call-stage-1', sessionId: 's-1', api: 'LanguageModel', method: 'prompt', stage: 'completed', timestamp: 150, response: 'Hi' },
+      },
+    });
+    await windowMessageListener({
+      source: window,
+      data: {
+        type: 'WEBAI_API_CALL',
+        payload: { id: 'call-stage-1', sessionId: 's-1', api: 'LanguageModel', method: 'prompt', stage: 'input_usage', timestamp: 160, inputTokenCount: 3 },
+      },
+    });
+
+    const getResp = vi.fn();
+    runtimeMessageListener({ action: 'get_page_sessions' }, {}, getResp);
+    expect(getResp).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          id: 'call-stage-1',
+          stage: 'completed',
+          inputTokenCount: 3,
+          response: 'Hi',
+        }),
+      ],
+    });
+
+    const clearResp = vi.fn();
+    runtimeMessageListener({ action: 'clear_page_sessions' }, {}, clearResp);
+    expect(clearResp).toHaveBeenCalledWith({ success: true });
+
+    const afterClearResp = vi.fn();
+    runtimeMessageListener({ action: 'get_page_sessions' }, {}, afterClearResp);
+    expect(afterClearResp).toHaveBeenCalledWith({ data: [] });
+  });
 });

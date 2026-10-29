@@ -7,6 +7,12 @@ import { ApiStageEmitter } from './api-stage-emitter';
 import { TrackedStreamHandler } from './tracked-stream-handler';
 
 /**
+ * Static methods (besides .create()) on Chrome AI API constructors that we
+ * intercept for telemetry so page-level availability/feature probes are visible.
+ */
+const WRAPPED_STATIC_METHODS = ['availability', 'params'] as const;
+
+/**
  * Methods on Chrome AI API instances that we explicitly intercept for telemetry.
  * All other methods are passed through to the original instance unchanged.
  */
@@ -58,6 +64,7 @@ export class ChromeAiApiWrapper {
   private readonly emitter: ApiStageEmitter;
   private readonly streamHandler: TrackedStreamHandler;
   private originalCreate: Function | null = null;
+  private readonly originalStaticMethods = new Map<string, Function>();
 
   constructor(private readonly apiName: string) {
     this.emitter = new ApiStageEmitter(apiName);
@@ -65,16 +72,24 @@ export class ChromeAiApiWrapper {
   }
 
   /**
-   * Replaces the .create() static method on the global API object
-   * (e.g., window.LanguageModel.create) with an instrumented version.
+   * Replaces static methods (.create(), .availability(), .params()) on the global
+   * API object (e.g., window.LanguageModel) with instrumented versions.
    *
-   * Does nothing if the API doesn't exist on window or lacks a .create() method.
+   * Does nothing if the API doesn't exist on window.
    */
   wrap(): void {
     if (typeof window === 'undefined' || !(this.apiName in window)) return;
 
     const apiObj = (window as any)[this.apiName];
-    if (!apiObj || typeof apiObj.create !== 'function') return;
+    if (!apiObj || (typeof apiObj !== 'object' && typeof apiObj !== 'function')) return;
+
+    for (const staticMethod of WRAPPED_STATIC_METHODS) {
+      if (typeof apiObj[staticMethod] === 'function') {
+        this.wrapStaticMethod(apiObj, staticMethod);
+      }
+    }
+
+    if (typeof apiObj.create !== 'function') return;
 
     const originalCreate = apiObj.create;
     const wrapper = this;
@@ -123,13 +138,56 @@ export class ChromeAiApiWrapper {
   }
 
   /**
-   * Restores the original .create() (used when API wrapping is disabled in settings).
+   * Restores the original static methods (used when API wrapping is disabled in settings).
    */
   unwrap(): void {
-    if (!this.originalCreate || typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return;
     const apiObj = (window as any)[this.apiName];
-    if (apiObj) apiObj.create = this.originalCreate;
+    if (apiObj) {
+      if (this.originalCreate) {
+        apiObj.create = this.originalCreate;
+      }
+      for (const [methodName, originalFn] of this.originalStaticMethods.entries()) {
+        apiObj[methodName] = originalFn;
+      }
+    }
     this.originalCreate = null;
+    this.originalStaticMethods.clear();
+  }
+
+  /**
+   * Wraps a static method (such as availability() or params()) to emit
+   * execute/completed/error telemetry stages without altering its behavior.
+   */
+  private wrapStaticMethod(apiObj: Record<string, any>, methodName: string): void {
+    const originalFn = apiObj[methodName] as Function;
+    const wrapper = this;
+    this.originalStaticMethods.set(methodName, originalFn);
+
+    apiObj[methodName] = async function (...args: unknown[]) {
+      const callId = crypto.randomUUID();
+      if (args.length > 0) {
+        const sanitizedArgs = await PostMessageSanitizer.sanitize(args);
+        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.EXECUTE, {
+          args: sanitizedArgs as any,
+        });
+      } else {
+        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.EXECUTE);
+      }
+
+      try {
+        const res = await originalFn.apply(this, args);
+        const sanitizedRes = await PostMessageSanitizer.sanitize(res);
+        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.COMPLETED, {
+          response: sanitizedRes as any,
+        });
+        return res;
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.ERROR, { errorMessage });
+        throw err;
+      }
+    };
   }
 
   /**

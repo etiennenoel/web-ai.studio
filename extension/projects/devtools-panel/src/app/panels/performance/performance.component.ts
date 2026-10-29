@@ -299,10 +299,23 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private readonly staticMethods = new Set(['availability', 'params']);
+  private readonly nonInferenceMethods = new Set([
+    'availability',
+    'params',
+    'measureContextUsage',
+    'measureInputUsage',
+    'clone',
+    'destroy',
+  ]);
+
   groupSessions() {
     const groupsMap = new Map<string, SessionGroup>();
     
     for (const item of this.rawItems) {
+      if (this.staticMethods.has(item.method)) {
+        continue;
+      }
       const sid = item.sessionId || item.id;
       if (!groupsMap.has(sid)) {
         groupsMap.set(sid, {
@@ -561,6 +574,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGroupTtft(group: SessionGroup): number | null {
     for (const item of group.methodItems) {
+      if (this.nonInferenceMethods.has(item.method)) continue;
       const ttft = this.getTtft(item);
       if (ttft !== null) return ttft;
     }
@@ -569,6 +583,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGroupInferenceTime(group: SessionGroup): number | null {
     for (const item of group.methodItems) {
+      if (this.nonInferenceMethods.has(item.method)) continue;
       const duration = this.getDuration(item);
       if (duration !== null) return duration;
     }
@@ -577,6 +592,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGroupTokensPerSecond(group: SessionGroup): number | null {
     for (const item of group.methodItems) {
+      if (this.nonInferenceMethods.has(item.method)) continue;
       if (item.chunkCount !== undefined && item.chunkCount !== null) {
         const duration = this.getDuration(item);
         if (duration && duration > 0) {
@@ -590,6 +606,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGroupCharsPerSecond(group: SessionGroup): number | null {
     for (const item of group.methodItems) {
+      if (this.nonInferenceMethods.has(item.method)) continue;
       if (item.response && typeof item.response === 'string') {
         const duration = this.getDuration(item);
         if (duration && duration > 0) {

@@ -9,7 +9,7 @@
       <a routerLink="/diagnosis" class="relative text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Diagnosis & APIs">
         <i class="fas fa-stethoscope text-xl"></i>
         <span *ngIf="(errorCount$ | async) as errorCount" class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center justify-center min-w-[1.1rem]">
-            {{ errorCount }}
+          {{ errorCount }}
         </span>
       </a>
       <a routerLink="/settings" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Settings">
@@ -18,37 +18,174 @@
     </div>
   </div>
 
-  <!-- Snapshot Status -->
+  <!-- Current Page Overview: Explicit Site Usage vs Browser Exposure -->
   <div class="mb-6">
     <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Current Page</h2>
-    <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <i class="fas fa-globe text-gray-400"></i>
-          <span class="text-sm font-medium truncate" [title]="currentOrigin || 'Loading...'">
-            {{ currentOrigin || 'No active page detected' }}
+    <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3">
+      <!-- Origin Row -->
+      <div class="flex items-center gap-2 min-w-0">
+        <i class="fas fa-globe text-gray-400 shrink-0"></i>
+        <span class="text-sm font-medium truncate" [title]="currentOrigin || 'No active web page'">
+          {{ currentOrigin || 'No active web page detected' }}
+        </span>
+      </div>
+
+      <!-- 1. USED BY THIS SITE (Runtime calls made by the page) -->
+      <div class="p-2.5 rounded-md border bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+            Used by This Site
+          </span>
+          <button *ngIf="selectedApiFilter"
+                  type="button"
+                  (click)="clearApiFilter()"
+                  class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">
+            Show all calls
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div *ngIf="loading" class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <span>Checking site AI calls...</span>
+          </div>
+
+          <div *ngIf="!loading && !wrapApiEnabled && usedApis.length === 0" class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Call Tracking Disabled in Settings</span>
+          </div>
+
+          <div *ngIf="!loading && (wrapApiEnabled || usedApis.length > 0)"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
+               [ngClass]="apiDetected ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700'">
+            <i class="fas" [ngClass]="apiDetected ? 'fa-check-circle' : 'fa-minus-circle'"></i>
+            <span>
+              {{ apiDetected ? (usedApis.length + ' AI ' + (usedApis.length === 1 ? 'API' : 'APIs') + ' Called by This Site') : 'No AI APIs Called by This Site' }}
+            </span>
+          </div>
+
+          <span *ngIf="!loading && totalCallsCount > 0" class="text-xs text-gray-500 dark:text-gray-400">
+            {{ totalCallsCount }} {{ totalCallsCount === 1 ? 'call' : 'calls' }}
           </span>
         </div>
-        <div class="flex items-center gap-2 mt-1">
-          <div class="text-xs px-2 py-1 rounded-full font-medium" 
-               [ngClass]="apiDetected ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'">
-            <i class="fas" [ngClass]="apiDetected ? 'fa-check-circle' : 'fa-minus-circle'"></i>
-            {{ apiDetected ? 'AI APIs Detected' : 'No AI APIs Detected' }}
+
+        <p *ngIf="!loading && wrapApiEnabled && !apiDetected && currentOrigin" class="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+          This website has not invoked any Built-in AI API methods on this page yet.
+        </p>
+
+        <!-- Breakdown of Used APIs and Their Method Calls -->
+        <div *ngIf="!loading && usedApis.length > 0" class="mt-2.5 space-y-2">
+          <div *ngFor="let usage of usedApis"
+               (click)="toggleApiFilter(usage.apiName)"
+               class="p-2 rounded-md border cursor-pointer transition-colors bg-gray-50 dark:bg-gray-800/60"
+               [ngClass]="selectedApiFilter === usage.apiName ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'"
+               [title]="'Filter call log by ' + usage.apiName">
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">
+                {{ usage.apiName }}
+              </span>
+              <span class="text-[11px] text-gray-500 dark:text-gray-400">
+                {{ usage.totalCalls }} {{ usage.totalCalls === 1 ? 'call' : 'calls' }}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              <span *ngFor="let m of usage.methods"
+                    class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border"
+                    [ngClass]="m.hasError ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800/50' : 'bg-white text-gray-700 border-gray-200 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700'">
+                <span>{{ m.method }}()</span>
+                <span class="font-sans font-semibold opacity-75">&times;{{ m.count }}</span>
+              </span>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- 2. EXPOSED BY BROWSER (Globals available on window in Chrome for this page) -->
+      <div class="p-2.5 rounded-md border bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+            Exposed by Browser (window)
+          </span>
+          <a routerLink="/diagnosis" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline shrink-0">
+            Diagnose &rarr;
+          </a>
+        </div>
+
+        <p *ngIf="!currentOrigin" class="text-[11px] text-gray-500 dark:text-gray-400">
+          Open an http(s) web page to inspect which Built-in AI globals Chrome exposes on <code>window</code>.
+        </p>
+
+        <div *ngIf="currentOrigin && isCheckingBrowserApis" class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+          <i class="fas fa-circle-notch fa-spin text-[10px]"></i>
+          <span>Checking <code>window</code> globals in browser...</span>
+        </div>
+
+        <ng-container *ngIf="currentOrigin && !isCheckingBrowserApis">
+          <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5">
+            {{ exposedBrowserApis.length }} of {{ browserApis.length }} Built-in AI globals available in this browser for this page:
+          </p>
+
+          <div *ngIf="exposedBrowserApis.length > 0" class="flex flex-wrap gap-1">
+            <span *ngFor="let api of exposedBrowserApis"
+                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border"
+                  [ngClass]="isBrowserApiUsedBySite(api.globalName) ? 'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800/50' : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700'"
+                  [title]="isBrowserApiUsedBySite(api.globalName) ? ('window.' + api.globalName + ' is exposed by the browser and actively called by this site') : ('window.' + api.globalName + ' is exposed by the browser (not called by this site yet)')">
+              <span class="w-1.5 h-1.5 rounded-full" [ngClass]="isBrowserApiUsedBySite(api.globalName) ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'"></span>
+              <span>window.{{ api.globalName }}</span>
+            </span>
+
+            <a *ngIf="missingBrowserApis.length > 0"
+               routerLink="/diagnosis"
+               class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/50 hover:underline"
+               title="View missing APIs and flag/Origin Trial instructions">
+              +{{ missingBrowserApis.length }} not exposed
+            </a>
+          </div>
+
+          <div *ngIf="exposedBrowserApis.length === 0 && browserApis.length > 0" class="text-[11px] text-amber-700 dark:text-amber-400">
+            No Built-in AI globals are currently exposed on <code>window</code>. Open <a routerLink="/diagnosis" class="underline font-medium">Diagnosis</a> to check Chrome flags or Origin Trials.
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
 
-  <!-- Active Sessions -->
+  <!-- Site Call Log -->
   <div class="mb-6">
-    <div class="flex justify-between items-center mb-2">
-      <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Current Page Calls</h2>
-      <button *ngIf="currentOrigin && sessions.length > 0" (click)="clearHistory()" class="text-xs text-red-500 hover:text-red-700" title="Clear history for this site">
-        <i class="fas fa-trash-alt"></i> Clear
-      </button>
+    <div class="flex justify-between items-center mb-2 gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Site Call Log</h2>
+        <button *ngIf="selectedApiFilter"
+                type="button"
+                (click)="clearApiFilter()"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors"
+                title="Clear API filter">
+          <span>{{ selectedApiFilter }}</span>
+          <i class="fas fa-times text-[9px]"></i>
+        </button>
+      </div>
+
+      <div *ngIf="currentOrigin && sessions.length > 0" class="shrink-0">
+        <button *ngIf="!confirmingClear"
+                type="button"
+                (click)="promptClearHistory()"
+                class="text-xs text-red-500 hover:text-red-700"
+                title="Clear history for this site">
+          <i class="fas fa-trash-alt"></i> Clear
+        </button>
+        <div *ngIf="confirmingClear" class="inline-flex items-center gap-2 text-xs">
+          <span class="text-gray-600 dark:text-gray-300">Clear?</span>
+          <button type="button" (click)="confirmClearHistory()" class="font-semibold text-red-600 hover:text-red-700 dark:text-red-400">
+            Yes
+          </button>
+          <button type="button" (click)="cancelClearHistory()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">
+            No
+          </button>
+        </div>
+      </div>
     </div>
-    
+
     <!-- DevTools Info Banner -->
     <div *ngIf="showDevtoolsInfo" class="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-lg p-3 flex items-start gap-3">
       <i class="fas fa-lightbulb text-yellow-500 dark:text-yellow-400 mt-0.5"></i>
@@ -57,24 +194,24 @@
           <strong>Did You Know?</strong> Look for the <strong>WebAI</strong> panel in Chrome DevTools (F12) to view more details.
         </p>
       </div>
-      <button (click)="dismissDevtoolsInfo()" class="text-yellow-500 hover:text-yellow-700 dark:text-yellow-600 dark:hover:text-yellow-400 transition-colors">
+      <button type="button" (click)="dismissDevtoolsInfo()" class="text-yellow-500 hover:text-yellow-700 dark:text-yellow-600 dark:hover:text-yellow-400 transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
     <div *ngIf="loading" class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg">
       <i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i>
-      <p class="text-sm">Loading sessions...</p>
+      <p class="text-sm">Loading site calls...</p>
     </div>
 
     <ng-container *ngIf="!loading">
-      <div *ngIf="!currentOrigin || sessions.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/20">
+      <div *ngIf="!currentOrigin || filteredSessions.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/20">
         <i class="fas fa-ghost text-2xl mb-2"></i>
-        <p class="text-sm">No API calls logged for this page.</p>
+        <p class="text-sm">No AI API calls made by this page.</p>
       </div>
 
-      <div *ngIf="currentOrigin && sessions.length > 0" class="space-y-4">
-        <div *ngFor="let session of sessions" class="p-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div *ngIf="currentOrigin && filteredSessions.length > 0" class="space-y-3">
+        <div *ngFor="let session of filteredSessions" class="p-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex justify-between items-start mb-1">
             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
               {{ session.apiName }}
@@ -83,41 +220,50 @@
               {{ session.latestTimestamp | date:'shortTime' }}
             </span>
           </div>
-          <div class="text-[10px] text-gray-600 dark:text-gray-300 flex justify-between">
-            <span class="font-mono truncate" style="max-width: 150px;">{{ session.sessionId }}</span>
-            <span>{{ session.calls.length }} call(s)</span>
+          <div class="text-[10px] text-gray-600 dark:text-gray-300 flex justify-between items-center">
+            <span *ngIf="session.isStaticCall" class="text-gray-500 dark:text-gray-400 italic">Static call</span>
+            <span *ngIf="!session.isStaticCall" class="font-mono truncate" style="max-width: 180px;" [title]="session.sessionId">
+              Session {{ session.sessionId | slice:0:8 }}...
+            </span>
+            <span>{{ session.calls.length }} {{ session.calls.length === 1 ? 'call' : 'calls' }}</span>
           </div>
-          
+
           <!-- Detailed Calls List -->
           <div class="mt-2 space-y-1">
             <div *ngFor="let call of session.calls" class="border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-900">
               <!-- Compact summary header -->
-              <div class="flex justify-between items-center p-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" (click)="toggleDetails(call.id)">
-                <div class="flex items-center gap-2 text-[10px]">
-                  <span class="font-semibold text-gray-700 dark:text-gray-300">{{ call.method }}</span>
-                  <span class="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">{{ call.stage }}</span>
+              <div class="flex justify-between items-center p-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors gap-2" (click)="toggleDetails(call.id)">
+                <div class="flex flex-wrap items-center gap-1.5 text-[10px] min-w-0">
+                  <span class="font-mono font-semibold text-gray-800 dark:text-gray-200">{{ call.method }}()</span>
+                  <span class="px-1.5 py-0.5 rounded border text-[9px] font-medium"
+                        [ngClass]="call.stage === 'completed' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800/50' : (call.stage === 'error' ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800/50' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700')">
+                    {{ call.stage }}
+                  </span>
+                  <span *ngIf="getInlineResponsePreview(call) as preview" class="px-1.5 py-0.5 rounded font-mono text-[9px] bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50">
+                    &rarr; {{ preview }}
+                  </span>
                   <span *ngIf="call.durationMs !== null" class="text-gray-500 dark:text-gray-400">{{ call.durationMs }}ms</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 shrink-0">
                   <span class="text-[9px] text-red-500 font-semibold" *ngIf="call.errorMessage">Error</span>
                   <i class="fas fa-chevron-down text-gray-400 text-[10px] transition-transform duration-200" [class.rotate-180]="expandedCalls.has(call.id)"></i>
                 </div>
               </div>
-              
+
               <!-- Expanded Details -->
               <div *ngIf="expandedCalls.has(call.id)" class="p-2 border-t border-gray-200 dark:border-gray-700 text-[10px] space-y-2 bg-gray-50 dark:bg-gray-800/30 overflow-x-auto">
                 <div *ngIf="call.errorMessage" class="text-red-600 dark:text-red-400 font-mono break-words whitespace-pre-wrap mb-1">
                   Error: {{ call.errorMessage }}
                 </div>
-                <div *ngIf="call.options">
+                <div *ngIf="hasPayload(call.options)">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Options</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.options | json }}</code></pre>
                 </div>
-                <div *ngIf="call.args">
+                <div *ngIf="hasPayload(call.args)">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Arguments</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.args | json }}</code></pre>
                 </div>
-                <div *ngIf="call.response">
+                <div *ngIf="call.response !== undefined">
                   <div class="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">Response</div>
                   <pre class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono text-[9px]"><code>{{ call.response | json }}</code></pre>
                 </div>
@@ -128,7 +274,7 @@
       </div>
     </ng-container>
   </div>
-  
+
   <div class="mt-4 pb-4">
     <a routerLink="/sessions" class="w-full block text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-200 dark:border-gray-700">
       View All Sessions

@@ -42,6 +42,9 @@ export enum RuntimeMessageAction {
   /** Retrieve the list of API calls for the current page session (content script memory). */
   GET_PAGE_SESSIONS = 'get_page_sessions',
 
+  /** Clear the in-memory list of API calls for the current page session (content script memory). */
+  CLEAR_PAGE_SESSIONS = 'clear_page_sessions',
+
   /** Create the offscreen document that hosts the Classifier polyfill runtime. */
   ENSURE_OFFSCREEN = 'ensure_offscreen',
 
