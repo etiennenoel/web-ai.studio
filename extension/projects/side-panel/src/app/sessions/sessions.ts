@@ -1,6 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 
 declare const chrome: any;
+
+const STATIC_PROBE_METHODS = new Set(['availability', 'params', 'capabilities']);
+const REFRESH_DEBOUNCE_MS = 80;
 
 @Component({
   selector: 'app-sessions',
@@ -8,12 +11,15 @@ declare const chrome: any;
   styleUrls: [],
   standalone: false,
 })
-export class SessionsComponent implements OnInit {
+export class SessionsComponent implements OnInit, OnDestroy {
   sessionsByOrigin: { [origin: string]: any[] } = {};
   origins: string[] = [];
   loading = true;
   expandedCalls = new Set<string>();
   confirmingOrigin: string | null = null;
+
+  private runtimeMessageListener: ((request: any) => void) | null = null;
+  private refreshDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -23,16 +29,44 @@ export class SessionsComponent implements OnInit {
   ngOnInit(): void {
     this.fetchActiveSessions();
 
-    // Listen for updates from the background script or content script
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
-      chrome.runtime.onMessage.addListener((request: any) => {
-        if (request?.action === 'api_call_logged' || request?.action === 'log_api_call') {
-          this.ngZone.run(() => {
-            setTimeout(() => this.fetchActiveSessions(), 100);
-          });
+      this.runtimeMessageListener = (request: any) => {
+        const action = request?.action;
+        if (
+          action === 'api_call_logged' ||
+          action === 'log_api_call' ||
+          action === 'clear_api_history' ||
+          action === 'clear_all_history'
+        ) {
+          this.scheduleRefresh();
         }
-      });
+      };
+      chrome.runtime.onMessage.addListener(this.runtimeMessageListener);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshDebounceTimer !== null) {
+      clearTimeout(this.refreshDebounceTimer);
+      this.refreshDebounceTimer = null;
+    }
+    if (
+      typeof chrome !== 'undefined' &&
+      this.runtimeMessageListener &&
+      chrome.runtime?.onMessage?.removeListener
+    ) {
+      chrome.runtime.onMessage.removeListener(this.runtimeMessageListener);
+    }
+  }
+
+  private scheduleRefresh(): void {
+    if (this.refreshDebounceTimer !== null) return;
+    this.refreshDebounceTimer = setTimeout(() => {
+      this.refreshDebounceTimer = null;
+      this.ngZone.run(() => {
+        this.fetchActiveSessions();
+      });
+    }, REFRESH_DEBOUNCE_MS);
   }
 
   toggleDetails(callId: string): void {
@@ -88,7 +122,6 @@ export class SessionsComponent implements OnInit {
   }
 
   processHistory(history: any[]): void {
-    // Group by origin
     const grouped: { [origin: string]: any[] } = {};
     for (const item of history) {
       const origin = item.origin || 'Unknown Origin';
@@ -98,7 +131,6 @@ export class SessionsComponent implements OnInit {
       grouped[origin].push(item);
     }
 
-    // Now, group by session ID per origin
     const sessionsByOrigin: { [origin: string]: any[] } = {};
     for (const origin of Object.keys(grouped)) {
       const items = grouped[origin];
@@ -130,8 +162,7 @@ export class SessionsComponent implements OnInit {
         calls.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         const latestTimestamp = calls.reduce((max, c) => Math.max(max, c.timestamp || 0), 0);
         const apiName = calls[calls.length - 1]?.api || 'Unknown API';
-        const isStaticCall =
-          calls.length === 1 && (calls[0].method === 'availability' || calls[0].method === 'params');
+        const isStaticCall = calls.length === 1 && STATIC_PROBE_METHODS.has(calls[0].method);
 
         return {
           sessionId: sid,
@@ -142,7 +173,6 @@ export class SessionsComponent implements OnInit {
         };
       });
 
-      // sort sessions by latest timestamp
       sessions.sort((a, b) => b.latestTimestamp - a.latestTimestamp);
 
       if (sessions.length > 0) {

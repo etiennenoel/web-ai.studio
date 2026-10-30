@@ -45,6 +45,21 @@ export enum RuntimeMessageAction {
   /** Clear the in-memory list of API calls for the current page session (content script memory). */
   CLEAR_PAGE_SESSIONS = 'clear_page_sessions',
 
+  /** Retrieve aggregated active API calls across all frames of a specific browser tab (service worker memory). */
+  GET_TAB_SESSIONS = 'get_tab_sessions',
+
+  /** Notify the service worker that a top-level frame started a new document navigation. */
+  PAGE_NAVIGATION_START = 'page_navigation_start',
+
+  /** Push existing in-memory frame records into the service worker tab session store (e.g. after SW wake-up). */
+  SYNC_TAB_SESSIONS = 'sync_tab_sessions',
+
+  /** Ask all frames in a tab to push their in-memory call records to the service worker. */
+  SYNC_FRAME_SESSIONS = 'sync_frame_sessions',
+
+  /** Broadcast sent when extension settings (wrapping, polyfill, routing provider) change. */
+  SETTINGS_UPDATED = 'settings_updated',
+
   /** Create the offscreen document that hosts the Classifier polyfill runtime. */
   ENSURE_OFFSCREEN = 'ensure_offscreen',
 

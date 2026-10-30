@@ -30,10 +30,10 @@ class DecisionCreateMonitor extends EventTarget {
 }
 
 /**
- * `window.DecisionModel` (and `window.Classifier` alias) polyfill following the Decisions API explainer:
+ * `window.DecisionModel` polyfill following the Decisions API explainer:
  *
  * - `DecisionModel.availability(options)` / `DecisionModel.create(options)`
- * - `classify(input, options)` / `decide(input, options)` resolves to a record keyed by question id
+ * - `decide(input, options)` resolves to a record keyed by question id
  * - `contextWindow`, `contextUsage`, `measureContextUsage(input, options)`
  * - `destroy()`
  *
@@ -151,11 +151,6 @@ export class DecisionModel extends EventTarget {
     }
   }
 
-  /** Backward-compatible alias for `decide`. */
-  async classify(input: unknown, options: unknown = {}): Promise<ClassifierResult> {
-    return this.decide(input, options);
-  }
-
   async measureContextUsage(input: unknown, options: unknown = {}): Promise<number> {
     this.assertAlive('measureContextUsage');
     const { signal, classifyOptions } = DecisionModel.toDecideOptions(options, 'measureContextUsage');
@@ -209,13 +204,6 @@ export class DecisionModel extends EventTarget {
     return { signal: signal as AbortSignal | undefined, classifyOptions };
   }
 
-  private static toClassifyOptions(options: unknown): {
-    signal: AbortSignal | undefined;
-    classifyOptions: ClassifierClassifyOptions;
-  } {
-    return this.toDecideOptions(options, 'classify');
-  }
-
   /** WebIDL DOMString conversion. */
   private static toDomString(value: unknown): string {
     if (typeof value === 'symbol') throw new TypeError('Cannot convert a Symbol value to a string');
@@ -232,6 +220,3 @@ export class DecisionModel extends EventTarget {
     });
   }
 }
-
-export const Classifier = DecisionModel;
-export type Classifier = DecisionModel;

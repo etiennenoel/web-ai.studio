@@ -35,7 +35,8 @@ describe('content-script main', () => {
 
   it('should not inject a script tag (injected.js is a MAIN-world content script) and push settings', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
-      if (req.action === 'get_setting') cb({ value: true });
+      if (req.action === 'get_setting' && req.key === 'activeProviderId') cb({ value: 'chrome' });
+      else if (req.action === 'get_setting') cb({ value: true });
     });
     const postMessage = vi.spyOn(window, 'postMessage');
 
@@ -44,7 +45,10 @@ describe('content-script main', () => {
 
     expect(document.head.getElementsByTagName('script').length).toBe(0);
     expect(postMessage).toHaveBeenCalledWith(
-      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: true, classifierPolyfill: true } },
+      {
+        type: 'WEBAI_SETTINGS_PUSH',
+        data: { wrapApi: true, classifierPolyfill: true, activeProviderId: 'chrome' },
+      },
       '*',
     );
   });
@@ -52,6 +56,7 @@ describe('content-script main', () => {
   it('should push wrapApi=false when the setting is off', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
       if (req.action === 'get_setting' && req.key === 'wrap_api') cb({ value: false });
+      else if (req.action === 'get_setting' && req.key === 'activeProviderId') cb({ value: 'gemini' });
       else if (req.action === 'get_setting') cb({ value: true });
     });
     const postMessage = vi.spyOn(window, 'postMessage');
@@ -60,12 +65,15 @@ describe('content-script main', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(postMessage).toHaveBeenCalledWith(
-      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: false, classifierPolyfill: true } },
+      {
+        type: 'WEBAI_SETTINGS_PUSH',
+        data: { wrapApi: false, classifierPolyfill: true, activeProviderId: 'gemini' },
+      },
       '*',
     );
   });
 
-  it('should default both settings to true when the response has no value', async () => {
+  it('should default settings when the response has no value and register capture-phase message listener', async () => {
     mockChrome.runtime.sendMessage.mockImplementation((req: any, cb: Function) => {
       if (req.action === 'get_setting') cb({});
     });
@@ -75,9 +83,17 @@ describe('content-script main', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(postMessage).toHaveBeenCalledWith(
-      { type: 'WEBAI_SETTINGS_PUSH', data: { wrapApi: true, classifierPolyfill: true } },
+      {
+        type: 'WEBAI_SETTINGS_PUSH',
+        data: { wrapApi: true, classifierPolyfill: true, activeProviderId: 'chrome' },
+      },
       '*',
     );
+
+    const listenerArgs = (window.addEventListener as any).mock.calls.find(
+      (args: any) => args[0] === 'message',
+    );
+    expect(listenerArgs[2]).toBe(true);
   });
 
   // -------------------------------------------------------------------------
@@ -321,5 +337,38 @@ describe('content-script main', () => {
     const afterClearResp = vi.fn();
     runtimeMessageListener({ action: 'get_page_sessions' }, {}, afterClearResp);
     expect(afterClearResp).toHaveBeenCalledWith({ data: [] });
+
+    // Emit multimodal payload containing heavy base64 dataUrl and ensure dataUrl is stripped in memory
+    await windowMessageListener({
+      source: window,
+      data: {
+        type: 'WEBAI_API_CALL',
+        payload: {
+          id: 'call-media-1',
+          sessionId: 's-media',
+          api: 'LanguageModel',
+          method: 'prompt',
+          stage: 'execute',
+          timestamp: 200,
+          args: [
+            {
+              __type: 'Blob',
+              type: 'image/png',
+              size: 1024000,
+              dataUrl: 'data:image/png;base64,AAAA_HUGE_BASE64_PAYLOAD',
+            },
+          ],
+        },
+      },
+    });
+
+    const mediaResp = vi.fn();
+    runtimeMessageListener({ action: 'get_page_sessions', includeMeta: true }, {}, mediaResp);
+    const returnedRecord = mediaResp.mock.calls[0][0].data[0];
+    expect(returnedRecord.hasMedia).toBe(true);
+    expect(returnedRecord.hasImage).toBe(true);
+    expect(returnedRecord.args[0].dataUrl).toBeUndefined();
+    expect(returnedRecord.args[0].hasMedia).toBe(true);
+    expect(mediaResp.mock.calls[0][0].meta).toBeDefined();
   });
 });

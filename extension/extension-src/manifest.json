@@ -31,19 +31,23 @@
         "<all_urls>"
       ],
       "js": [
-        "injected.js"
+        "content-script.js"
       ],
       "run_at": "document_start",
-      "world": "MAIN"
+      "all_frames": true,
+      "match_origin_as_fallback": true
     },
     {
       "matches": [
         "<all_urls>"
       ],
       "js": [
-        "content-script.js"
+        "injected.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true,
+      "match_origin_as_fallback": true
     }
   ],
   "web_accessible_resources": [

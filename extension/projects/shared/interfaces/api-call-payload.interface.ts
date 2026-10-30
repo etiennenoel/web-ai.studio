@@ -48,4 +48,10 @@ export interface ApiCallPayload {
 
   /** Token count from measureInputUsage() (only present on INPUT_USAGE stage). */
   inputTokenCount?: number;
+
+  /** Chrome frameId of the frame that emitted the call (0 for top frame, >0 for subframes). */
+  frameId?: number;
+
+  /** True when the API call originated inside an embedded subframe (`<iframe>`). */
+  isSubframe?: boolean;
 }

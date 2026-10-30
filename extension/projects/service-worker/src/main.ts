@@ -1,14 +1,19 @@
 import { db } from './db';
+import { tabSessionsStore } from './tab-sessions.store';
 import { RuntimeMessageDispatcher } from './runtime-message-dispatcher';
 import { RuntimeMessage } from '../../shared/interfaces/runtime-messages.interface';
 import { RuntimeMessageAction } from '../../shared/enums/runtime-message-action.enum';
 
 declare const chrome: any;
 
-const dispatcher = new RuntimeMessageDispatcher(db);
+const dispatcher = new RuntimeMessageDispatcher(db, tabSessionsStore);
 
 chrome.action.onClicked.addListener((tab: any) => {
   chrome.sidePanel.open({ windowId: tab.windowId });
+});
+
+chrome.tabs?.onRemoved?.addListener((tabId: number) => {
+  tabSessionsStore.clearTab(tabId);
 });
 
 chrome.runtime.onInstalled.addListener((details: any) => {

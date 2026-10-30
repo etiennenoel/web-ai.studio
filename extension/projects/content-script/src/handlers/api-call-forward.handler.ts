@@ -1,37 +1,28 @@
 import { WindowMessageType } from '../../../shared/enums/window-message-type.enum';
 import { RuntimeMessageAction } from '../../../shared/enums/runtime-message-action.enum';
-import { ApiCallStage } from '../../../shared/enums/api-call-stage.enum';
 import { ApiCallWindowMessage } from '../../../shared/interfaces/window-messages.interface';
 import { WindowMessageHandler } from './window-message-handler.interface';
 import { ApiCallRecord } from '../../../shared/interfaces/api-call-record.interface';
+import { mergePayloadIntoMemoryRecord } from '../../../shared/utils/api-call-record.utils';
 
 declare const chrome: any;
 
-function resolveRecordStage(record: ApiCallRecord, incomingStage?: ApiCallStage): ApiCallStage | undefined {
-  if (record.timestamps[ApiCallStage.ERROR] !== undefined || record.errorMessage) {
-    return ApiCallStage.ERROR;
+const MAX_IN_MEMORY_PAGE_CALLS = 500;
+
+function detectIsSubframe(): boolean {
+  try {
+    return typeof window !== 'undefined' && window.self !== window.top;
+  } catch {
+    return true;
   }
-  if (record.timestamps[ApiCallStage.COMPLETED] !== undefined) {
-    return ApiCallStage.COMPLETED;
-  }
-  if (record.timestamps[ApiCallStage.FIRST_TOKEN] !== undefined) {
-    return ApiCallStage.FIRST_TOKEN;
-  }
-  if (record.timestamps[ApiCallStage.EXECUTE] !== undefined) {
-    return ApiCallStage.EXECUTE;
-  }
-  if (record.timestamps[ApiCallStage.CREATE] !== undefined) {
-    return ApiCallStage.CREATE;
-  }
-  return incomingStage;
 }
 
 /**
  * Handles WEBAI_API_CALL messages by forwarding the API call payload
  * to the service worker for persistence in IndexedDB.
- * 
- * It also maintains an in-memory cache of the current page's calls
- * for the side panel's active session view.
+ *
+ * It also maintains a bounded, `dataUrl`-stripped in-memory cache of the
+ * current frame's calls for the side panel's active session view.
  */
 export class ApiCallForwardHandler implements WindowMessageHandler {
   readonly handledType = WindowMessageType.API_CALL;
@@ -39,16 +30,15 @@ export class ApiCallForwardHandler implements WindowMessageHandler {
   private static currentPageCalls = new Map<string, ApiCallRecord>();
 
   /**
-   * Returns all API calls captured in the current page session.
+   * Returns all API calls captured in the current frame session, sorted newest-first.
    */
   public static getCurrentPageCalls(): ApiCallRecord[] {
     const records = Array.from(this.currentPageCalls.values());
-    // Sort by timestamp descending
     return records.sort((a, b) => b.timestamp - a.timestamp);
   }
 
   /**
-   * Clears the in-memory API calls captured for the current page session.
+   * Clears the in-memory API calls captured for the current frame session.
    */
   public static clearCurrentPageCalls(): void {
     this.currentPageCalls.clear();
@@ -56,43 +46,35 @@ export class ApiCallForwardHandler implements WindowMessageHandler {
 
   handle(message: ApiCallWindowMessage): void {
     const data = message.payload;
-    
-    // Update in-memory record for the current page session
-    let record = ApiCallForwardHandler.currentPageCalls.get(data.id);
-    if (!record) {
-      record = {
-        id: data.id,
-        sessionId: data.sessionId || data.id,
-        api: data.api,
-        method: data.method,
-        origin: data.origin,
-        timestamp: data.timestamp,
-        timestamps: {},
-      };
-      ApiCallForwardHandler.currentPageCalls.set(data.id, record);
-    }
+    const isSubframe = detectIsSubframe();
 
-    if (data.stage) {
-      record.timestamps[data.stage] = data.timestamp;
-    }
-
-    if (data.errorMessage !== undefined) record.errorMessage = data.errorMessage;
-    if (data.options !== undefined) record.options = data.options;
-    if (data.args !== undefined) record.args = data.args;
-    if (data.response !== undefined) record.response = data.response;
-    if (data.inputTokenCount !== undefined) record.inputTokenCount = data.inputTokenCount;
-    if (data.inputLength !== undefined) record.inputLength = data.inputLength;
-
-    record.stage = resolveRecordStage(record, data.stage);
-
-    // Forward to service worker for persistence
-    chrome.runtime.sendMessage(
-      { action: RuntimeMessageAction.LOG_API_CALL, payload: message.payload },
-      () => {
-        if (chrome.runtime.lastError) {
-          // Intentionally ignored
-        }
-      },
+    const existing = ApiCallForwardHandler.currentPageCalls.get(data.id);
+    const updated = mergePayloadIntoMemoryRecord(
+      existing,
+      data,
+      isSubframe ? { isSubframe: true } : undefined,
     );
+
+    if (!existing && ApiCallForwardHandler.currentPageCalls.size >= MAX_IN_MEMORY_PAGE_CALLS) {
+      const oldestKey = ApiCallForwardHandler.currentPageCalls.keys().next().value;
+      if (oldestKey !== undefined) {
+        ApiCallForwardHandler.currentPageCalls.delete(oldestKey);
+      }
+    }
+    ApiCallForwardHandler.currentPageCalls.set(data.id, updated);
+
+    // Forward full payload to service worker for IndexedDB persistence & tab aggregation
+    try {
+      chrome.runtime.sendMessage(
+        { action: RuntimeMessageAction.LOG_API_CALL, payload: message.payload },
+        () => {
+          if (chrome.runtime?.lastError) {
+            // Intentionally ignored
+          }
+        },
+      );
+    } catch {
+      // Extension context may have been invalidated after an update
+    }
   }
 }

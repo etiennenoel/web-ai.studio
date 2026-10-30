@@ -1,15 +1,16 @@
 import { RuntimeMessageAction } from '../../../shared/enums/runtime-message-action.enum';
 import {
   RuntimeMessage,
-  GetAllHistoryMessage,
   GetHistoryItemMessage,
   GetApiHistoryMessage,
   ClearApiHistoryMessage,
-  ClearAllHistoryMessage,
   DeleteApiSessionMessage,
 } from '../../../shared/interfaces/runtime-messages.interface';
 import { WebAIDatabase } from '../db';
+import { TabSessionsStore } from '../tab-sessions.store';
 import { RuntimeMessageHandler } from './runtime-message-handler.interface';
+
+declare const chrome: any;
 
 /**
  * Handles all history-related chrome.runtime messages.
@@ -27,7 +28,10 @@ export class HistoryHandler implements RuntimeMessageHandler {
     RuntimeMessageAction.DELETE_API_SESSION,
   ];
 
-  constructor(private readonly database: WebAIDatabase) {}
+  constructor(
+    private readonly database: WebAIDatabase,
+    private readonly tabSessions?: TabSessionsStore,
+  ) {}
 
   async handle(request: RuntimeMessage, sender: any): Promise<unknown> {
     switch (request.action) {
@@ -58,11 +62,15 @@ export class HistoryHandler implements RuntimeMessageHandler {
         if (!origin) return { error: 'Missing origin' };
 
         await this.database.clearHistory(origin);
+        this.tabSessions?.clearOrigin(origin);
+        this.clearMatchingOpenTabs(origin);
         return { success: true };
       }
 
       case RuntimeMessageAction.CLEAR_ALL_HISTORY: {
         await this.database.clearAllHistory();
+        this.tabSessions?.clearAll();
+        this.clearMatchingOpenTabs(null);
         return { success: true };
       }
 
@@ -73,11 +81,63 @@ export class HistoryHandler implements RuntimeMessageHandler {
         if (!origin || !sessionId) return { error: 'Missing origin or sessionId' };
 
         await this.database.deleteSession(origin, sessionId);
+        this.tabSessions?.deleteSession(origin, sessionId);
         return { success: true };
       }
 
       default:
         return { error: `HistoryHandler: Unhandled action ${request.action}` };
+    }
+  }
+
+  /**
+   * Clears live content-script memory and resets toolbar icons on open tabs
+   * matching `targetOrigin` (or all tabs when `targetOrigin` is `null`).
+   */
+  private clearMatchingOpenTabs(targetOrigin: string | null): void {
+    if (typeof chrome === 'undefined' || !chrome.tabs?.query) return;
+
+    try {
+      chrome.tabs.query({}, (tabs: any[]) => {
+        if (chrome.runtime?.lastError || !Array.isArray(tabs)) return;
+
+        for (const tab of tabs) {
+          if (typeof tab?.id !== 'number') continue;
+
+          if (targetOrigin !== null) {
+            if (!tab.url) continue;
+            try {
+              const tabUrl = new URL(tab.url);
+              const tabOrigin =
+                tabUrl.origin !== 'null' ? tabUrl.origin : `${tabUrl.protocol}//`;
+              if (tabOrigin !== targetOrigin) continue;
+            } catch {
+              continue;
+            }
+          }
+
+          if (chrome.tabs?.sendMessage) {
+            chrome.tabs.sendMessage(
+              tab.id,
+              { action: RuntimeMessageAction.CLEAR_PAGE_SESSIONS },
+              () => {
+                void chrome.runtime?.lastError;
+              },
+            );
+          }
+
+          if (chrome.action?.setIcon) {
+            chrome.action.setIcon(
+              { path: 'assets/images/icon.png', tabId: tab.id },
+              () => {
+                void chrome.runtime?.lastError;
+              },
+            );
+          }
+        }
+      });
+    } catch {
+      // Ignore if tabs API is unavailable
     }
   }
 
