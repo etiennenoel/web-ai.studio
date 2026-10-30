@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "WebAI Extension",
   "description": "Unlock Chrome’s Built-In AI. Monitor local model readiness, inspect APIs, and debug your on-device AI natively in DevTools.",
-  "version": "0.12.10",
+  "version": "0.12.11",
   "action": {
     "default_icon": "assets/images/icon.png"
   },
@@ -31,19 +31,23 @@
         "<all_urls>"
       ],
       "js": [
-        "injected.js"
+        "content-script.js"
       ],
       "run_at": "document_start",
-      "world": "MAIN"
+      "all_frames": true,
+      "match_origin_as_fallback": true
     },
     {
       "matches": [
         "<all_urls>"
       ],
       "js": [
-        "content-script.js"
+        "injected.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true,
+      "match_origin_as_fallback": true
     }
   ],
   "web_accessible_resources": [

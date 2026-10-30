@@ -88,12 +88,11 @@ export class HistoryComponent implements OnInit {
     Rewriter: '#f48fb1',
     Proofreader: '#80cbc4',
     DecisionModel: '#a5b4fc',
-    Classifier: '#a5b4fc',
   };
 
   showClearConfirm: boolean = false;
   expandedSessions: Set<string> = new Set<string>();
-  private readonly staticMethods = new Set(['availability', 'params']);
+  private readonly staticMethods = new Set(['availability', 'params', 'capabilities']);
 
   isStaticOnlyGroup(group: SessionGroup): boolean {
     return (

@@ -4,6 +4,11 @@ import { ApiDiagnostic, DiagnosisService } from 'base';
 
 declare const chrome: any;
 
+const STATIC_PROBE_METHODS = new Set(['availability', 'params', 'capabilities']);
+const REFRESH_DEBOUNCE_MS = 80;
+
+export type TabInstrumentationStatus = 'active' | 'needs_reload' | 'unsupported';
+
 export interface UsedApiMethodSummary {
   method: string;
   count: number;
@@ -15,6 +20,8 @@ export interface UsedApiSummary {
   totalCalls: number;
   methods: UsedApiMethodSummary[];
   latestTimestamp: number;
+  probeOnly: boolean;
+  hasSubframeCalls: boolean;
 }
 
 @Component({
@@ -26,6 +33,9 @@ export interface UsedApiSummary {
 export class OverviewComponent implements OnInit, OnDestroy {
   currentOrigin: string | null = null;
   activeTabId: number | null = null;
+  instrumentationStatus: TabInstrumentationStatus = 'active';
+  pageHasWebWorkers = false;
+
   sessions: any[] = [];
   usedApis: UsedApiSummary[] = [];
   totalCallsCount = 0;
@@ -46,8 +56,12 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
   private runtimeMessageListener: ((request: any, sender: any) => void) | null = null;
-  private tabActivatedListener: (() => void) | null = null;
-  private tabUpdatedListener: ((tabId: number, changeInfo: any) => void) | null = null;
+  private tabActivatedListener: ((activeInfo: any) => void) | null = null;
+  private tabUpdatedListener: ((tabId: number, changeInfo: any, tab?: any) => void) | null = null;
+  private currentWindowId: number | null = null;
+  private contextSeq = 0;
+  private fetchSeq = 0;
+  private refreshDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -58,10 +72,25 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * True only when the current website has actually invoked at least one Built-in AI API.
+   * True when the current website (or one of its subframes) invoked at least one Built-in AI API method.
    */
   get apiDetected(): boolean {
     return this.usedApis.length > 0;
+  }
+
+  /**
+   * True when at least one Built-in AI API had `.create()` or an instance method invoked.
+   */
+  get hasActiveSessionUsage(): boolean {
+    return this.usedApis.some((u) => !u.probeOnly);
+  }
+
+  /**
+   * True when the site only probed static methods (`availability()`, `params()`, `capabilities()`)
+   * without creating any AI sessions yet.
+   */
+  get isProbeOnlyUsage(): boolean {
+    return this.usedApis.length > 0 && this.usedApis.every((u) => u.probeOnly);
   }
 
   get filteredSessions(): any[] {
@@ -93,32 +122,86 @@ export class OverviewComponent implements OnInit, OnDestroy {
       this.isCheckingBrowserApis = false;
     }
 
-    this.refreshActiveTabContext();
+    if (this.diagnosisService.hasWebWorkers$) {
+      this.subscriptions.push(
+        this.diagnosisService.hasWebWorkers$.subscribe((hasWorkers: boolean) => {
+          this.pageHasWebWorkers = hasWorkers;
+          this.cdr.detectChanges();
+        }),
+      );
+    }
+
+    if (typeof chrome !== 'undefined' && chrome.windows?.getCurrent) {
+      try {
+        chrome.windows.getCurrent((win: any) => {
+          if (!chrome.runtime?.lastError && typeof win?.id === 'number') {
+            this.currentWindowId = win.id;
+          }
+          this.ngZone.run(() => this.refreshActiveTabContext());
+        });
+      } catch {
+        this.refreshActiveTabContext();
+      }
+    } else {
+      this.refreshActiveTabContext();
+    }
 
     // Listen for updates from the background script or content script
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
       this.runtimeMessageListener = (request: any, sender: any) => {
-        if (request?.action === 'api_call_logged' || request?.action === 'log_api_call') {
+        const action = request?.action;
+        if (action === 'api_call_logged' || action === 'log_api_call') {
           if (!sender?.tab?.id || sender.tab.id === this.activeTabId) {
-            this.ngZone.run(() => {
-              this.fetchActiveSessionsForTab();
-            });
+            this.scheduleSessionsRefresh();
           }
+        } else if (action === 'settings_updated') {
+          this.ngZone.run(() => this.refreshActiveTabContext());
+        } else if (action === 'clear_api_history' || action === 'clear_all_history') {
+          this.ngZone.run(() => this.fetchActiveSessionsForTab());
         }
       };
       chrome.runtime.onMessage.addListener(this.runtimeMessageListener);
     }
 
-    // Listen for tab changes
+    // Listen for tab changes scoped to this Side Panel's browser window
     if (typeof chrome !== 'undefined' && chrome.tabs) {
       if (chrome.tabs.onActivated) {
-        this.tabActivatedListener = () => {
+        this.tabActivatedListener = (activeInfo: any) => {
+          if (
+            this.currentWindowId !== null &&
+            activeInfo?.windowId !== undefined &&
+            activeInfo.windowId !== this.currentWindowId
+          ) {
+            return;
+          }
           this.ngZone.run(() => this.refreshActiveTabContext());
         };
         chrome.tabs.onActivated.addListener(this.tabActivatedListener);
       }
+
       if (chrome.tabs.onUpdated) {
-        this.tabUpdatedListener = (tabId: number, changeInfo: any) => {
+        this.tabUpdatedListener = (tabId: number, changeInfo: any, tab?: any) => {
+          if (
+            this.currentWindowId !== null &&
+            tab?.windowId !== undefined &&
+            tab.windowId !== this.currentWindowId
+          ) {
+            return;
+          }
+
+          if (this.activeTabId && tabId === this.activeTabId && changeInfo.status === 'loading') {
+            this.ngZone.run(() => {
+              this.loading = true;
+              this.sessions = [];
+              this.usedApis = [];
+              this.totalCallsCount = 0;
+              this.selectedApiFilter = null;
+              this.confirmingClear = false;
+              this.cdr.detectChanges();
+            });
+            return;
+          }
+
           if (
             (!this.activeTabId || tabId === this.activeTabId) &&
             (changeInfo.status === 'complete' || changeInfo.url)
@@ -132,6 +215,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.refreshDebounceTimer !== null) {
+      clearTimeout(this.refreshDebounceTimer);
+      this.refreshDebounceTimer = null;
+    }
     this.subscriptions.forEach((s) => s.unsubscribe());
     if (typeof chrome !== 'undefined') {
       if (this.runtimeMessageListener && chrome.runtime?.onMessage?.removeListener) {
@@ -146,8 +233,26 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
   }
 
+  private scheduleSessionsRefresh(): void {
+    if (this.refreshDebounceTimer !== null) return;
+    this.refreshDebounceTimer = setTimeout(() => {
+      this.refreshDebounceTimer = null;
+      this.ngZone.run(() => {
+        this.fetchActiveSessionsForTab();
+      });
+    }, REFRESH_DEBOUNCE_MS);
+  }
+
   isBrowserApiUsedBySite(globalName: string): boolean {
     return this.usedApis.some((u) => u.apiName === globalName);
+  }
+
+  reloadActiveTab(): void {
+    if (this.activeTabId && typeof chrome !== 'undefined' && chrome.tabs?.reload) {
+      this.loading = true;
+      this.cdr.detectChanges();
+      chrome.tabs.reload(this.activeTabId);
+    }
   }
 
   toggleDetails(callId: string): void {
@@ -180,42 +285,82 @@ export class OverviewComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  private isRestrictedWebStoreUrl(url: URL): boolean {
+    return (
+      url.hostname === 'chromewebstore.google.com' ||
+      (url.hostname === 'chrome.google.com' && url.pathname.startsWith('/webstore'))
+    );
+  }
+
+  private sendMessageToTopFrame(
+    tabId: number,
+    message: unknown,
+    callback: (response: any) => void,
+  ): void {
+    if (chrome.tabs.sendMessage.length === 3) {
+      chrome.tabs.sendMessage(tabId, message, callback);
+    } else {
+      chrome.tabs.sendMessage(tabId, message, { frameId: 0 }, callback);
+    }
+  }
+
   refreshActiveTabContext(): void {
+    const seq = ++this.contextSeq;
     this.loading = true;
     this.confirmingClear = false;
+    this.pageHasWebWorkers = false;
     this.checkWrapApiSetting();
 
     if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      const queryInfo =
+        this.currentWindowId !== null
+          ? { active: true, windowId: this.currentWindowId }
+          : { active: true, currentWindow: true };
+
+      chrome.tabs.query(queryInfo, (tabs: any) => {
+        if (seq !== this.contextSeq) return;
+
         if (tabs && tabs.length > 0 && tabs[0].url) {
           try {
             const url = new URL(tabs[0].url);
-            const isWebOrigin = url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'file:';
-            this.currentOrigin = isWebOrigin ? (url.origin !== 'null' ? url.origin : url.protocol + '//') : null;
-            this.activeTabId = isWebOrigin ? tabs[0].id : null;
+            const isWebOrigin =
+              url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'file:';
+            const isRestricted = isWebOrigin && this.isRestrictedWebStoreUrl(url);
 
-            // Trigger browser/window exposure check for the active tab
-            this.diagnosisService.runChecks();
+            if (isWebOrigin && !isRestricted && typeof tabs[0].id === 'number') {
+              this.currentOrigin =
+                url.origin !== 'null' ? url.origin : `${url.protocol}//`;
+              this.activeTabId = tabs[0].id;
+              this.instrumentationStatus = 'active';
 
-            if (this.activeTabId) {
+              this.diagnosisService.runChecks(this.activeTabId ?? undefined);
               this.fetchActiveSessionsForTab();
             } else {
+              this.currentOrigin = isRestricted ? url.origin : null;
+              this.activeTabId = null;
+              this.instrumentationStatus = 'unsupported';
+              this.diagnosisService.runChecks(null);
               this.resetUsageState();
             }
           } catch {
             this.currentOrigin = null;
             this.activeTabId = null;
+            this.instrumentationStatus = 'unsupported';
+            this.diagnosisService.runChecks(null);
             this.resetUsageState();
           }
         } else {
           this.currentOrigin = null;
           this.activeTabId = null;
+          this.instrumentationStatus = 'unsupported';
+          this.diagnosisService.runChecks(null);
           this.resetUsageState();
         }
       });
     } else {
       this.currentOrigin = null;
       this.activeTabId = null;
+      this.instrumentationStatus = 'unsupported';
       this.resetUsageState();
     }
   }
@@ -245,22 +390,108 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  private mergeCallRecords(topFrameCalls: any[], swTabCalls: any[]): any[] {
+    const merged = new Map<string, any>();
+
+    for (const call of topFrameCalls) {
+      if (call && typeof call.id === 'string') {
+        merged.set(call.id, call);
+      }
+    }
+
+    for (const call of swTabCalls) {
+      if (!call || typeof call.id !== 'string') continue;
+      const existing = merged.get(call.id);
+      if (!existing) {
+        merged.set(call.id, call);
+      } else {
+        const existingTsCount = existing.timestamps ? Object.keys(existing.timestamps).length : 0;
+        const incomingTsCount = call.timestamps ? Object.keys(call.timestamps).length : 0;
+        if (incomingTsCount > existingTsCount) {
+          merged.set(call.id, { ...existing, ...call });
+        } else if (call.isSubframe) {
+          existing.isSubframe = true;
+        }
+      }
+    }
+
+    return Array.from(merged.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }
+
   fetchActiveSessionsForTab(): void {
     if (!this.activeTabId) return;
 
-    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
-      chrome.tabs.sendMessage(this.activeTabId, { action: 'get_page_sessions' }, (response: any) => {
-        if (chrome.runtime?.lastError || !response || !response.data) {
-          this.ngZone.run(() => {
-            this.resetUsageState();
-          });
+    const seq = ++this.fetchSeq;
+    const requestedTabId = this.activeTabId;
+
+    if (typeof chrome === 'undefined' || !chrome.tabs?.sendMessage) {
+      return;
+    }
+
+    const hasRuntimeMessaging = Boolean(chrome.runtime?.sendMessage);
+    let pending = hasRuntimeMessaging ? 2 : 1;
+    let topFrameFailed = false;
+    let topFrameCalls: any[] = [];
+    let swTabCalls: any[] = [];
+    let topFrameMeta: any = null;
+
+    const finalize = () => {
+      pending--;
+      if (pending > 0) return;
+      if (seq !== this.fetchSeq || requestedTabId !== this.activeTabId) return;
+
+      this.ngZone.run(() => {
+        if (seq !== this.fetchSeq || requestedTabId !== this.activeTabId) return;
+
+        if (topFrameFailed) {
+          this.instrumentationStatus = 'needs_reload';
+          this.resetUsageState();
           return;
         }
 
-        this.ngZone.run(() => {
-          this.processHistory(response.data);
-        });
+        this.instrumentationStatus = 'active';
+        if (topFrameMeta) {
+          if (typeof topFrameMeta.hasWebWorkers === 'boolean' && topFrameMeta.hasWebWorkers) {
+            this.pageHasWebWorkers = true;
+          }
+          if (typeof topFrameMeta.wrappingActive === 'boolean') {
+            this.wrapApiEnabled = topFrameMeta.wrappingActive;
+          }
+        }
+
+        const mergedCalls = this.mergeCallRecords(topFrameCalls, swTabCalls);
+        this.processHistory(mergedCalls);
       });
+    };
+
+    this.sendMessageToTopFrame(
+      requestedTabId,
+      { action: 'get_page_sessions', includeMeta: true },
+      (response: any) => {
+        if (chrome.runtime?.lastError || !response || !Array.isArray(response.data)) {
+          topFrameFailed = true;
+        } else {
+          topFrameCalls = response.data;
+          topFrameMeta = response.meta ?? null;
+        }
+        finalize();
+      },
+    );
+
+    if (hasRuntimeMessaging) {
+      try {
+        chrome.runtime.sendMessage(
+          { action: 'get_tab_sessions', tabId: requestedTabId },
+          (response: any) => {
+            if (!chrome.runtime?.lastError && Array.isArray(response?.data)) {
+              swTabCalls = response.data;
+            }
+            finalize();
+          },
+        );
+      } catch {
+        finalize();
+      }
     }
   }
 
@@ -288,6 +519,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       case 'availability':
         return 0;
       case 'params':
+      case 'capabilities':
         return 1;
       case 'create':
         return 2;
@@ -306,7 +538,12 @@ export class OverviewComponent implements OnInit, OnDestroy {
         apiName: string;
         totalCalls: number;
         latestTimestamp: number;
-        methodsMap: Map<string, { method: string; count: number; hasError: boolean; earliestTimestamp: number }>;
+        hasNonProbeCall: boolean;
+        hasSubframeCalls: boolean;
+        methodsMap: Map<
+          string,
+          { method: string; count: number; hasError: boolean; earliestTimestamp: number }
+        >;
       }
     >();
 
@@ -317,17 +554,26 @@ export class OverviewComponent implements OnInit, OnDestroy {
       const methodName = item.method || 'unknown';
       const ts = typeof item.timestamp === 'number' ? item.timestamp : 0;
       const hasError = Boolean(item.errorMessage || item.timestamps?.error !== undefined);
+      const isStaticProbe = STATIC_PROBE_METHODS.has(methodName);
 
       if (!apiUsageMap.has(apiName)) {
         apiUsageMap.set(apiName, {
           apiName,
           totalCalls: 0,
           latestTimestamp: ts,
+          hasNonProbeCall: false,
+          hasSubframeCalls: false,
           methodsMap: new Map(),
         });
       }
       const apiEntry = apiUsageMap.get(apiName)!;
       apiEntry.totalCalls++;
+      if (!isStaticProbe) {
+        apiEntry.hasNonProbeCall = true;
+      }
+      if (item.isSubframe) {
+        apiEntry.hasSubframeCalls = true;
+      }
       if (ts > apiEntry.latestTimestamp) {
         apiEntry.latestTimestamp = ts;
       }
@@ -358,7 +604,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .map((entry) => {
         const methods = Array.from(entry.methodsMap.values())
           .sort((a, b) => {
-            const priorityDiff = this.getMethodOrderPriority(a.method) - this.getMethodOrderPriority(b.method);
+            const priorityDiff =
+              this.getMethodOrderPriority(a.method) - this.getMethodOrderPriority(b.method);
             if (priorityDiff !== 0) return priorityDiff;
             return a.earliestTimestamp - b.earliestTimestamp;
           })
@@ -369,6 +616,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
           totalCalls: entry.totalCalls,
           methods,
           latestTimestamp: entry.latestTimestamp,
+          probeOnly: !entry.hasNonProbeCall,
+          hasSubframeCalls: entry.hasSubframeCalls,
         };
       })
       .sort((a, b) => b.latestTimestamp - a.latestTimestamp);
@@ -391,7 +640,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
         };
       });
 
-      // Order calls within a session chronologically (create before instance calls)
       calls.sort((a, b) => {
         const pDiff = this.getMethodOrderPriority(a.method) - this.getMethodOrderPriority(b.method);
         if (a.timestamp === b.timestamp && pDiff !== 0) return pDiff;
@@ -400,8 +648,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
       const latestTimestamp = calls.reduce((max, c) => Math.max(max, c.timestamp || 0), 0);
       const apiName = calls[calls.length - 1]?.api || 'Unknown API';
-      const isStaticCall =
-        calls.length === 1 && (calls[0].method === 'availability' || calls[0].method === 'params');
+      const isStaticCall = calls.length === 1 && STATIC_PROBE_METHODS.has(calls[0].method);
+      const isSubframe = calls.some((c) => Boolean(c.isSubframe));
+      const frameOrigin = isSubframe ? calls[0]?.origin || null : null;
 
       return {
         sessionId: sid,
@@ -409,6 +658,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
         calls,
         latestTimestamp,
         isStaticCall,
+        isSubframe,
+        frameOrigin,
       };
     });
 

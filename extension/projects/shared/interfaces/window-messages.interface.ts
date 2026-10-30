@@ -44,6 +44,13 @@ export interface HwInfoResponseMessage extends CorrelatedMessage {
 /** Result of checking which Chrome AI APIs exist on window. */
 export type DiagnosisEvalResult = Record<ChromeAiApiName, boolean>;
 
+/** Supplemental page-context metadata returned alongside DiagnosisEvalResult. */
+export interface DiagnosisEvalMeta {
+  polyfilledApis: string[];
+  hasWebWorkers: boolean;
+  wrappingActive: boolean;
+}
+
 export interface DiagnosisEvalRequestMessage extends CorrelatedMessage {
   type: WindowMessageType.DIAGNOSIS_EVAL_REQUEST;
 }
@@ -51,6 +58,7 @@ export interface DiagnosisEvalRequestMessage extends CorrelatedMessage {
 export interface DiagnosisEvalResponseMessage extends CorrelatedMessage {
   type: WindowMessageType.DIAGNOSIS_EVAL_RESPONSE;
   data: DiagnosisEvalResult;
+  meta?: DiagnosisEvalMeta;
 }
 
 // ---------------------------------------------------------------------------
@@ -141,6 +149,7 @@ export interface ClassifierProgressWindowMessage {
 export interface SettingsPushData {
   wrapApi: boolean;
   classifierPolyfill: boolean;
+  activeProviderId?: string;
 }
 
 export interface SettingsPushMessage {

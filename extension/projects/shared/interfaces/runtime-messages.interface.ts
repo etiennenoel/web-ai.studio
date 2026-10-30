@@ -83,6 +83,24 @@ export interface DiagnoseApisMessage extends RuntimeMessageBase {
 }
 
 // ---------------------------------------------------------------------------
+// Active Tab Session Tracking (Multi-frame)
+// ---------------------------------------------------------------------------
+
+export interface GetTabSessionsMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.GET_TAB_SESSIONS;
+  tabId: number;
+}
+
+export interface PageNavigationStartMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.PAGE_NAVIGATION_START;
+}
+
+export interface SyncTabSessionsMessage extends RuntimeMessageBase {
+  action: RuntimeMessageAction.SYNC_TAB_SESSIONS;
+  records: unknown[];
+}
+
+// ---------------------------------------------------------------------------
 // Classifier polyfill runtime
 // ---------------------------------------------------------------------------
 
@@ -126,6 +144,9 @@ export type RuntimeMessage =
   | GetSettingMessage
   | SetSettingMessage
   | DiagnoseApisMessage
+  | GetTabSessionsMessage
+  | PageNavigationStartMessage
+  | SyncTabSessionsMessage
   | EnsureOffscreenMessage
   | ClassifierRequestRuntimeMessage
   | ClassifierProgressRuntimeMessage;

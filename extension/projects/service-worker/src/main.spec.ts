@@ -313,4 +313,79 @@ describe('service-worker main', () => {
     const result = handler({ action: 'unknown_action' }, {}, sendResponse);
     expect(result).toBe(false);
   });
+
+  it('should aggregate multi-frame calls per tab, strip dataUrls, and reset on top-frame navigation', async () => {
+    const handler = await getMessageHandler();
+
+    // Top-frame call (frameId: 0)
+    const resp1 = vi.fn();
+    handler(
+      {
+        action: 'log_api_call',
+        payload: {
+          id: 'top-call',
+          sessionId: 'top-call',
+          api: 'LanguageModel',
+          method: 'create',
+          stage: 'create',
+          origin: 'https://news.example',
+          timestamp: 1000,
+        },
+      },
+      { tab: { id: 77, url: 'https://news.example/article' }, frameId: 0 },
+      resp1,
+    );
+    await vi.waitFor(() => expect(resp1).toHaveBeenCalledWith({ success: true }));
+
+    // Subframe (iframe) call (frameId: 4) with embedded Blob dataUrl
+    const resp2 = vi.fn();
+    handler(
+      {
+        action: 'log_api_call',
+        payload: {
+          id: 'iframe-call',
+          sessionId: 'iframe-sess',
+          api: 'Summarizer',
+          method: 'summarize',
+          stage: 'completed',
+          origin: 'https://widget.example',
+          timestamp: 1100,
+          args: [{ __type: 'Blob', type: 'audio/wav', dataUrl: 'data:audio/wav;base64,ZZZZ' }],
+        },
+      },
+      { tab: { id: 77, url: 'https://news.example/article' }, frameId: 4 },
+      resp2,
+    );
+    await vi.waitFor(() => expect(resp2).toHaveBeenCalledWith({ success: true }));
+
+    const getTabResp = vi.fn();
+    handler({ action: 'get_tab_sessions', tabId: 77 }, {}, getTabResp);
+    await vi.waitFor(() => expect(getTabResp).toHaveBeenCalled());
+
+    const tabRecords = getTabResp.mock.calls[0][0].data;
+    expect(tabRecords.length).toBe(2);
+    const iframeRec = tabRecords.find((r: any) => r.id === 'iframe-call');
+    expect(iframeRec.isSubframe).toBe(true);
+    expect(iframeRec.hasAudio).toBe(true);
+    expect(iframeRec.args[0].dataUrl).toBeUndefined();
+
+    // Subframe reload (frameId: 4) clears only subframe calls
+    const subNavResp = vi.fn();
+    handler({ action: 'page_navigation_start' }, { tab: { id: 77 }, frameId: 4 }, subNavResp);
+    await vi.waitFor(() => expect(subNavResp).toHaveBeenCalledWith({ success: true }));
+
+    const afterSubNavResp = vi.fn();
+    handler({ action: 'get_tab_sessions', tabId: 77 }, {}, afterSubNavResp);
+    await vi.waitFor(() => expect(afterSubNavResp).toHaveBeenCalled());
+    expect(afterSubNavResp.mock.calls[0][0].data.map((r: any) => r.id)).toEqual(['top-call']);
+
+    // Top-frame navigation (frameId: 0) clears entire tab
+    const topNavResp = vi.fn();
+    handler({ action: 'page_navigation_start' }, { tab: { id: 77 }, frameId: 0 }, topNavResp);
+    await vi.waitFor(() => expect(topNavResp).toHaveBeenCalledWith({ success: true }));
+
+    const afterTopNavResp = vi.fn();
+    handler({ action: 'get_tab_sessions', tabId: 77 }, {}, afterTopNavResp);
+    await vi.waitFor(() => expect(afterTopNavResp).toHaveBeenCalledWith({ data: [] }));
+  });
 });

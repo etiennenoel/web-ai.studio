@@ -30,7 +30,7 @@
         </span>
       </div>
 
-      <!-- 1. USED BY THIS SITE (Runtime calls made by the page) -->
+      <!-- 1. USED BY THIS SITE (Runtime calls made by the page or its iframes) -->
       <div class="p-2.5 rounded-md border bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between gap-2 mb-1.5">
           <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
@@ -45,32 +45,85 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+          <!-- Loading -->
           <div *ngIf="loading" class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
             <i class="fas fa-circle-notch fa-spin"></i>
             <span>Checking site AI calls...</span>
           </div>
 
-          <div *ngIf="!loading && !wrapApiEnabled && usedApis.length === 0" class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+          <!-- Uninstrumented Tab (opened before extension loaded / reloaded) -->
+          <ng-container *ngIf="!loading && instrumentationStatus === 'needs_reload'">
+            <div class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-300">
+              <i class="fas fa-sync-alt"></i>
+              <span>Reload Tab to Monitor AI Calls</span>
+            </div>
+            <button type="button"
+                    (click)="reloadActiveTab()"
+                    class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-md font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+              <i class="fas fa-redo text-[10px]"></i>
+              <span>Reload Tab</span>
+            </button>
+          </ng-container>
+
+          <!-- Unsupported / Restricted Page (chrome://, New Tab, Chrome Web Store) -->
+          <div *ngIf="!loading && instrumentationStatus === 'unsupported'"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+            <i class="fas fa-ban"></i>
+            <span>Monitoring Unavailable on Browser/Restricted Page</span>
+          </div>
+
+          <!-- Active Instrumentation: Call Tracking Disabled in Settings -->
+          <div *ngIf="!loading && instrumentationStatus === 'active' && !wrapApiEnabled && usedApis.length === 0"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
             <i class="fas fa-exclamation-triangle"></i>
             <span>Call Tracking Disabled in Settings</span>
           </div>
 
-          <div *ngIf="!loading && (wrapApiEnabled || usedApis.length > 0)"
-               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
-               [ngClass]="apiDetected ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700'">
-            <i class="fas" [ngClass]="apiDetected ? 'fa-check-circle' : 'fa-minus-circle'"></i>
+          <!-- Active Instrumentation: Actively Used (create / inference calls) -->
+          <div *ngIf="!loading && instrumentationStatus === 'active' && hasActiveSessionUsage"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+            <i class="fas fa-check-circle"></i>
             <span>
-              {{ apiDetected ? (usedApis.length + ' AI ' + (usedApis.length === 1 ? 'API' : 'APIs') + ' Called by This Site') : 'No AI APIs Called by This Site' }}
+              {{ usedApis.length }} AI {{ usedApis.length === 1 ? 'API' : 'APIs' }} Called by This Site
             </span>
           </div>
 
-          <span *ngIf="!loading && totalCallsCount > 0" class="text-xs text-gray-500 dark:text-gray-400">
+          <!-- Active Instrumentation: Probed Only (only static availability/params/capabilities calls) -->
+          <div *ngIf="!loading && instrumentationStatus === 'active' && isProbeOnlyUsage"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            <i class="fas fa-search"></i>
+            <span>
+              {{ usedApis.length }} AI {{ usedApis.length === 1 ? 'API' : 'APIs' }} Probed by This Site
+            </span>
+          </div>
+
+          <!-- Active Instrumentation: 0 Calls -->
+          <div *ngIf="!loading && instrumentationStatus === 'active' && wrapApiEnabled && !apiDetected"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+            <i class="fas fa-minus-circle"></i>
+            <span>No AI APIs Called by This Site</span>
+          </div>
+
+          <span *ngIf="!loading && instrumentationStatus === 'active' && totalCallsCount > 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ totalCallsCount }} {{ totalCallsCount === 1 ? 'call' : 'calls' }}
           </span>
         </div>
 
-        <p *ngIf="!loading && wrapApiEnabled && !apiDetected && currentOrigin" class="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+        <p *ngIf="!loading && instrumentationStatus === 'needs_reload'" class="mt-1.5 text-[11px] text-amber-800 dark:text-amber-300">
+          This tab was already open before the extension loaded. Reload it so WebAI can wrap Built-in AI APIs from page start.
+        </p>
+
+        <p *ngIf="!loading && instrumentationStatus === 'active' && isProbeOnlyUsage" class="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+          This site checked static API availability/parameters, but has not created an AI session or run inference yet.
+        </p>
+
+        <p *ngIf="!loading && instrumentationStatus === 'active' && wrapApiEnabled && !apiDetected && currentOrigin" class="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
           This website has not invoked any Built-in AI API methods on this page yet.
+        </p>
+
+        <p *ngIf="!loading && instrumentationStatus === 'active' && wrapApiEnabled && !apiDetected && currentOrigin && pageHasWebWorkers"
+           class="mt-1 text-[10px] text-gray-500 dark:text-gray-400 italic">
+          Note: Active Web Workers were detected on this page. Calls executed inside a Worker global scope (<code>self</code>) cannot be intercepted by content scripts.
         </p>
 
         <!-- Breakdown of Used APIs and Their Method Calls -->
@@ -81,10 +134,21 @@
                [ngClass]="selectedApiFilter === usage.apiName ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'"
                [title]="'Filter call log by ' + usage.apiName">
             <div class="flex items-center justify-between gap-2 mb-1.5">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">
-                {{ usage.apiName }}
-              </span>
-              <span class="text-[11px] text-gray-500 dark:text-gray-400">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">
+                  {{ usage.apiName }}
+                </span>
+                <span *ngIf="usage.probeOnly"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                  probed only
+                </span>
+                <span *ngIf="usage.hasSubframeCalls"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300"
+                      title="Includes calls from an embedded iframe on this page">
+                  iframe
+                </span>
+              </div>
+              <span class="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
                 {{ usage.totalCalls }} {{ usage.totalCalls === 1 ? 'call' : 'calls' }}
               </span>
             </div>
@@ -112,16 +176,20 @@
           </a>
         </div>
 
-        <p *ngIf="!currentOrigin" class="text-[11px] text-gray-500 dark:text-gray-400">
+        <p *ngIf="!currentOrigin || instrumentationStatus === 'unsupported'" class="text-[11px] text-gray-500 dark:text-gray-400">
           Open an http(s) web page to inspect which Built-in AI globals Chrome exposes on <code>window</code>.
         </p>
 
-        <div *ngIf="currentOrigin && isCheckingBrowserApis" class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+        <p *ngIf="currentOrigin && instrumentationStatus === 'needs_reload'" class="text-[11px] text-amber-800 dark:text-amber-300">
+          Reload this tab to inspect <code>window</code> globals in the page context.
+        </p>
+
+        <div *ngIf="currentOrigin && instrumentationStatus === 'active' && isCheckingBrowserApis" class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
           <i class="fas fa-circle-notch fa-spin text-[10px]"></i>
           <span>Checking <code>window</code> globals in browser...</span>
         </div>
 
-        <ng-container *ngIf="currentOrigin && !isCheckingBrowserApis">
+        <ng-container *ngIf="currentOrigin && instrumentationStatus === 'active' && !isCheckingBrowserApis">
           <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5">
             {{ exposedBrowserApis.length }} of {{ browserApis.length }} Built-in AI globals available in this browser for this page:
           </p>
@@ -130,9 +198,10 @@
             <span *ngFor="let api of exposedBrowserApis"
                   class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border"
                   [ngClass]="isBrowserApiUsedBySite(api.globalName) ? 'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800/50' : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700'"
-                  [title]="isBrowserApiUsedBySite(api.globalName) ? ('window.' + api.globalName + ' is exposed by the browser and actively called by this site') : ('window.' + api.globalName + ' is exposed by the browser (not called by this site yet)')">
+                  [title]="api.isPolyfilled ? ('window.' + api.globalName + ' is injected by the WebAI Extension polyfill') : (isBrowserApiUsedBySite(api.globalName) ? ('window.' + api.globalName + ' is exposed by the browser and called by this site') : ('window.' + api.globalName + ' is exposed by the browser (not called by this site yet)'))">
               <span class="w-1.5 h-1.5 rounded-full" [ngClass]="isBrowserApiUsedBySite(api.globalName) ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'"></span>
               <span>window.{{ api.globalName }}</span>
+              <span *ngIf="api.isPolyfilled" class="font-sans text-[9px] opacity-75">(polyfill)</span>
             </span>
 
             <a *ngIf="missingBrowserApis.length > 0"
@@ -205,18 +274,36 @@
     </div>
 
     <ng-container *ngIf="!loading">
-      <div *ngIf="!currentOrigin || filteredSessions.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/20">
+      <div *ngIf="instrumentationStatus === 'needs_reload'" class="text-center text-amber-800 dark:text-amber-300 py-6 px-4 border border-amber-200 dark:border-amber-800/50 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+        <i class="fas fa-sync-alt text-xl mb-2"></i>
+        <p class="text-xs mb-3">Reload this tab to begin capturing Built-in AI calls.</p>
+        <button type="button"
+                (click)="reloadActiveTab()"
+                class="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+          <i class="fas fa-redo text-[10px]"></i>
+          <span>Reload Tab</span>
+        </button>
+      </div>
+
+      <div *ngIf="instrumentationStatus !== 'needs_reload' && (!currentOrigin || filteredSessions.length === 0)" class="text-center text-gray-500 dark:text-gray-400 py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/20">
         <i class="fas fa-ghost text-2xl mb-2"></i>
         <p class="text-sm">No AI API calls made by this page.</p>
       </div>
 
-      <div *ngIf="currentOrigin && filteredSessions.length > 0" class="space-y-3">
+      <div *ngIf="instrumentationStatus === 'active' && currentOrigin && filteredSessions.length > 0" class="space-y-3">
         <div *ngFor="let session of filteredSessions" class="p-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex justify-between items-start mb-1">
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-              {{ session.apiName }}
-            </span>
-            <span class="text-[10px] text-gray-500 dark:text-gray-400" [title]="session.latestTimestamp | date:'medium'">
+          <div class="flex justify-between items-start mb-1 gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                {{ session.apiName }}
+              </span>
+              <span *ngIf="session.isSubframe"
+                    class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300"
+                    [title]="session.frameOrigin ? ('Iframe origin: ' + session.frameOrigin) : 'Called from embedded iframe'">
+                iframe
+              </span>
+            </div>
+            <span class="text-[10px] text-gray-500 dark:text-gray-400 shrink-0" [title]="session.latestTimestamp | date:'medium'">
               {{ session.latestTimestamp | date:'shortTime' }}
             </span>
           </div>
@@ -241,6 +328,12 @@
                   </span>
                   <span *ngIf="getInlineResponsePreview(call) as preview" class="px-1.5 py-0.5 rounded font-mono text-[9px] bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50">
                     &rarr; {{ preview }}
+                  </span>
+                  <span *ngIf="call.hasImage" class="px-1.5 py-0.5 rounded text-[9px] bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800/50">
+                    image
+                  </span>
+                  <span *ngIf="call.hasAudio" class="px-1.5 py-0.5 rounded text-[9px] bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800/50">
+                    audio
                   </span>
                   <span *ngIf="call.durationMs !== null" class="text-gray-500 dark:text-gray-400">{{ call.durationMs }}ms</span>
                 </div>

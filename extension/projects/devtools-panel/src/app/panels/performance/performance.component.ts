@@ -299,10 +299,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private readonly staticMethods = new Set(['availability', 'params']);
+  private readonly staticMethods = new Set(['availability', 'params', 'capabilities']);
   private readonly nonInferenceMethods = new Set([
     'availability',
     'params',
+    'capabilities',
     'measureContextUsage',
     'measureInputUsage',
     'clone',

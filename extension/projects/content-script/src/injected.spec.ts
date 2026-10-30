@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('injected script', () => {
+  const initialWorker = (window as any).Worker;
+
   beforeEach(() => {
     // Reset window state
     (window as any).webai = undefined;
+    (window as any).Worker = initialWorker;
     (window as any).LanguageModel = {
       create: vi.fn().mockResolvedValue({
         prompt: vi.fn().mockResolvedValue('Hello'),
@@ -67,13 +70,18 @@ describe('injected script', () => {
     expect((window as any).Summarizer.create).not.toBe(originalCreate);
   });
 
-  it('should not wrap APIs that do not exist on window', async () => {
-    // Writer is not defined
+  it('should not wrap APIs that do not exist on window and should not define legacy window.Classifier', async () => {
     delete (window as any).Writer;
+    delete (window as any).Classifier;
+    delete (window as any).DecisionModel;
     vi.resetModules();
     await import('./injected');
 
     expect((window as any).Writer).toBeUndefined();
+    expect((window as any).Classifier).toBeUndefined();
+    expect((window as any).DecisionModel).toBeDefined();
+    expect(window.webai.classifier).toBeUndefined();
+    expect(window.webai.decisions.isPolyfilled).toBe(true);
   });
 
   // -------------------------------------------------------------------------
@@ -239,15 +247,25 @@ describe('injected script', () => {
     expect(createMsg.payload.method).toBe('create');
   });
 
-  it('should wrap static availability() and emit execute + completed stages, and restore on unwrap', async () => {
+  it('should wrap static availability(), support destructured unbound calls, and re-wrap idempotently on settings toggle', async () => {
     vi.resetModules();
 
-    const availabilitySpy = vi.fn().mockResolvedValue('available');
-    const createSpy = vi.fn().mockResolvedValue({});
-    (window as any).LanguageModel = {
-      availability: availabilitySpy,
-      create: createSpy,
-    };
+    const languageModelObj: any = {};
+    const availabilitySpy = vi.fn(function (this: unknown) {
+      if (this !== languageModelObj) {
+        throw new TypeError('Illegal invocation');
+      }
+      return Promise.resolve('available');
+    });
+    const createSpy = vi.fn(function (this: unknown) {
+      if (this !== languageModelObj) {
+        throw new TypeError('Illegal invocation');
+      }
+      return Promise.resolve({});
+    });
+    languageModelObj.availability = availabilitySpy;
+    languageModelObj.create = createSpy;
+    (window as any).LanguageModel = languageModelObj;
 
     const postedMessages: any[] = [];
     vi.spyOn(window, 'postMessage').mockImplementation((msg: any) => {
@@ -258,13 +276,13 @@ describe('injected script', () => {
 
     expect((window as any).LanguageModel.availability).not.toBe(availabilitySpy);
 
-    const status = await (window as any).LanguageModel.availability({
+    // Destructured unbound call (`this === undefined`) should still bind `LanguageModel`
+    const { availability, create } = (window as any).LanguageModel;
+    const status = await availability({
       expectedInputs: [{ type: 'text', languages: ['en'] }],
     });
     expect(status).toBe('available');
-    expect(availabilitySpy).toHaveBeenCalledWith({
-      expectedInputs: [{ type: 'text', languages: ['en'] }],
-    });
+    await create();
 
     const executeMsg = postedMessages.find(
       (m) => m.type === 'WEBAI_API_CALL' && m.payload?.method === 'availability' && m.payload?.stage === 'execute',
@@ -283,13 +301,137 @@ describe('injected script', () => {
         source: window,
         data: {
           type: 'WEBAI_SETTINGS_PUSH',
-          data: { wrapApi: false, classifierPolyfill: true },
+          data: { wrapApi: false, classifierPolyfill: false, activeProviderId: 'chrome' },
         },
       }),
     );
 
     expect((window as any).LanguageModel.availability).toBe(availabilitySpy);
     expect((window as any).LanguageModel.create).toBe(createSpy);
+    expect((window as any).DecisionModel).toBeUndefined();
+
+    // Re-enabling wrapApi: true live should re-wrap existing APIs
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        source: window,
+        data: {
+          type: 'WEBAI_SETTINGS_PUSH',
+          data: { wrapApi: true, classifierPolyfill: false, activeProviderId: 'chrome' },
+        },
+      }),
+    );
+
+    expect((window as any).LanguageModel.availability).not.toBe(availabilitySpy);
+    expect((window as any).LanguageModel.create).not.toBe(createSpy);
+  });
+
+  it('should wrap measureInputUsage and handle stream cancellation cleanly without throwing', async () => {
+    vi.resetModules();
+
+    let underlyingCancelledReason: unknown = null;
+    const rawStream = new ReadableStream({
+      pull(controller) {
+        controller.enqueue('chunk-1');
+      },
+      cancel(reason) {
+        underlyingCancelledReason = reason;
+      },
+    });
+
+    (window as any).Summarizer = {
+      create: vi.fn().mockResolvedValue({
+        measureInputUsage: vi.fn().mockResolvedValue(42),
+        summarizeStreaming: vi.fn().mockReturnValue(rawStream),
+      }),
+    };
+
+    const postedMessages: any[] = [];
+    vi.spyOn(window, 'postMessage').mockImplementation((msg: any) => {
+      postedMessages.push(msg);
+    });
+
+    await import('./injected');
+
+    const summarizer = await (window as any).Summarizer.create();
+    const usage = await summarizer.measureInputUsage('hello world');
+    expect(usage).toBe(42);
+
+    const trackedStream: ReadableStream = summarizer.summarizeStreaming('hello world');
+    const reader = trackedStream.getReader();
+    const first = await reader.read();
+    expect(first.value).toBe('chunk-1');
+
+    // Cancelling early (as in breaking out of `for await`) must not throw on locked stream
+    await expect(reader.cancel('user-aborted')).resolves.toBeUndefined();
+    expect(underlyingCancelledReason).toBe('user-aborted');
+
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(
+      postedMessages.some(
+        (m) =>
+          m.type === 'WEBAI_API_CALL' &&
+          m.payload?.api === 'Summarizer' &&
+          m.payload?.method === 'measureInputUsage' &&
+          m.payload?.stage === 'completed',
+      ),
+    ).toBe(true);
+
+    const streamCompleted = postedMessages.find(
+      (m) =>
+        m.type === 'WEBAI_API_CALL' &&
+        m.payload?.api === 'Summarizer' &&
+        m.payload?.method === 'summarizeStreaming' &&
+        m.payload?.stage === 'completed',
+    );
+    expect(streamCompleted).toBeDefined();
+    expect(streamCompleted.payload.response).toBe('chunk-1');
+  });
+
+  it('should observe Worker construction non-invasively and report polyfilledApis + hasWebWorkers in diagnosis meta', async () => {
+    vi.resetModules();
+    delete (window as any).DecisionModel;
+
+    const workerCalls: any[][] = [];
+    class FakeWorker {
+      url: string;
+      constructor(url: string, opts?: unknown) {
+        this.url = url;
+        workerCalls.push([url, opts]);
+      }
+    }
+    (window as any).Worker = FakeWorker;
+
+    const postedMessages: any[] = [];
+    vi.spyOn(window, 'postMessage').mockImplementation((msg: any) => {
+      postedMessages.push(msg);
+    });
+
+    await import('./injected');
+
+    const w = new (window as any).Worker('/ai-worker.js', { type: 'module' });
+    expect(w).toBeInstanceOf(FakeWorker);
+    expect(workerCalls).toEqual([['/ai-worker.js', { type: 'module' }]]);
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        source: window,
+        data: {
+          type: 'WEBAI_DIAGNOSIS_EVAL_REQUEST',
+          messageId: 'diag-meta-1',
+        },
+      }),
+    );
+
+    const diagResp = postedMessages.find(
+      (m) => m.type === 'WEBAI_DIAGNOSIS_EVAL_RESPONSE' && m.messageId === 'diag-meta-1',
+    );
+    expect(diagResp).toBeDefined();
+    expect(diagResp.meta).toEqual({
+      polyfilledApis: ['DecisionModel'],
+      hasWebWorkers: true,
+      wrappingActive: true,
+    });
   });
 
   it('should forward underlying target in Proxy set trap for brand-checked WebIDL setters like oncontextoverflow', async () => {
