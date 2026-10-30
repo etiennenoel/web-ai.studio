@@ -1,6 +1,5 @@
 import { WindowMessageType } from '../../../shared/enums/window-message-type.enum';
 import { ApiCallStage } from '../../../shared/enums/api-call-stage.enum';
-import { RoutingResponseData } from '../../../shared/interfaces/window-messages.interface';
 import { WindowMessageBridge } from '../../../shared/messaging/window-message-bridge';
 import { PostMessageSanitizer } from '../../../shared/sanitization/post-message-sanitizer';
 import { ApiStageEmitter } from './api-stage-emitter';
@@ -10,7 +9,7 @@ import { TrackedStreamHandler } from './tracked-stream-handler';
  * Static methods (besides .create()) on Chrome AI API constructors that we
  * intercept for telemetry so page-level availability/feature probes are visible.
  */
-const WRAPPED_STATIC_METHODS = ['availability', 'params'] as const;
+const WRAPPED_STATIC_METHODS = ['availability', 'params', 'capabilities'] as const;
 
 /**
  * Methods on Chrome AI API instances that we explicitly intercept for telemetry.
@@ -23,7 +22,7 @@ const WRAPPED_INSTANCE_METHODS = [
   'detect', 'write', 'writeStreaming',
   'rewrite', 'rewriteStreaming',
   'proofread', 'proofreadStreaming',
-  'classify', 'decide', 'measureContextUsage',
+  'decide', 'measureContextUsage', 'measureInputUsage',
   'clone', 'destroy',
 ] as const;
 
@@ -32,7 +31,7 @@ const WRAPPED_INSTANCE_METHODS = [
  * served by the extension's own on-device polyfill, so the routing setting
  * (Gemini/OpenAI) does not apply to it.
  */
-const LOCAL_ONLY_APIS: readonly string[] = ['DecisionModel', 'Classifier'];
+const LOCAL_ONLY_APIS: readonly string[] = ['DecisionModel'];
 
 /**
  * Methods available on mock instances returned when routing to an external provider.
@@ -47,41 +46,56 @@ const MOCK_INSTANCE_METHODS = [
   'proofread', 'proofreadStreaming',
 ] as const;
 
+const CHROME_EXT_ORIGIN_RE = /chrome-extension:\/\/[a-z]{32}/g;
+const PAGE_SCRIPT_SCHEME_RE = /(?:https?|file|blob):\/\//i;
+
 /**
- * Wraps a Chrome AI API (e.g., LanguageModel, Summarizer) to intercept
- * create() calls and proxy instance method invocations for telemetry and routing.
- *
- * Two code paths exist depending on the active provider setting:
- *
- * 1. **Chrome (on-device)**: The original .create() is called. The returned instance
- *    is wrapped in a Proxy that emits lifecycle stages for each method call.
- *
- * 2. **External provider (Gemini/OpenAI)**: A mock instance is returned that routes
- *    all method calls through the content script to the external API. The original
- *    Chrome AI API is never called.
+ * Wraps an existing Chrome AI API global (e.g., `window.LanguageModel`, `window.Summarizer`)
+ * to intercept static probes (`.availability()`, `.params()`, `.capabilities()`), `.create()`,
+ * and instance method invocations for telemetry and optional provider routing.
  */
 export class ChromeAiApiWrapper {
   private readonly emitter: ApiStageEmitter;
   private readonly streamHandler: TrackedStreamHandler;
+  private wrappedTarget: Record<string, any> | null = null;
   private originalCreate: Function | null = null;
   private readonly originalStaticMethods = new Map<string, Function>();
+  private wrapped = false;
 
-  constructor(private readonly apiName: string) {
+  constructor(
+    private readonly apiName: string,
+    private readonly getActiveProviderId: () => string = () => 'chrome',
+    private readonly ownExtensionOrigin: string | null = null,
+  ) {
     this.emitter = new ApiStageEmitter(apiName);
     this.streamHandler = new TrackedStreamHandler(this.emitter);
   }
 
   /**
-   * Replaces static methods (.create(), .availability(), .params()) on the global
-   * API object (e.g., window.LanguageModel) with instrumented versions.
+   * Returns true only when the given Built-in AI global actually exists on `window`.
+   */
+  static isApiPresent(apiName: string): boolean {
+    if (typeof window === 'undefined' || !(apiName in window)) return false;
+    const apiObj = (window as any)[apiName];
+    return Boolean(apiObj && (typeof apiObj === 'object' || typeof apiObj === 'function'));
+  }
+
+  get isWrapped(): boolean {
+    return this.wrapped;
+  }
+
+  /**
+   * Replaces static methods (`.create()`, `.availability()`, `.params()`, `.capabilities()`)
+   * on the global API object with instrumented versions.
    *
-   * Does nothing if the API doesn't exist on window.
+   * Idempotent and does nothing if the API does not exist on `window`.
    */
   wrap(): void {
-    if (typeof window === 'undefined' || !(this.apiName in window)) return;
+    if (this.wrapped) return;
+    if (!ChromeAiApiWrapper.isApiPresent(this.apiName)) return;
 
-    const apiObj = (window as any)[this.apiName];
-    if (!apiObj || (typeof apiObj !== 'object' && typeof apiObj !== 'function')) return;
+    const apiObj = (window as any)[this.apiName] as Record<string, any>;
+    this.wrappedTarget = apiObj;
 
     for (const staticMethod of WRAPPED_STATIC_METHODS) {
       if (typeof apiObj[staticMethod] === 'function') {
@@ -89,30 +103,36 @@ export class ChromeAiApiWrapper {
       }
     }
 
-    if (typeof apiObj.create !== 'function') return;
+    if (typeof apiObj['create'] === 'function') {
+      const originalCreate = apiObj['create'] as Function;
+      const wrapper = this;
+      this.originalCreate = originalCreate;
 
-    const originalCreate = apiObj.create;
-    const wrapper = this;
-    this.originalCreate = originalCreate;
+      apiObj['create'] = async function (this: unknown, options?: unknown) {
+        const receiver = this === undefined || this === null || this === window ? apiObj : this;
 
-    apiObj.create = async function (options?: unknown) {
-      const callId = crypto.randomUUID();
-      const sanitizedOptions = await PostMessageSanitizer.sanitize(options || {});
-      wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.CREATE, { options: sanitizedOptions as any });
+        if (wrapper.isExternalExtensionCall()) {
+          return originalCreate.call(receiver, options);
+        }
 
-      try {
-        // Check which provider is active before deciding the code path
-        const routingResponse = await WindowMessageBridge.sendRequest<RoutingResponseData>(
-          WindowMessageType.ROUTING_REQUEST,
-          WindowMessageType.ROUTING_RESPONSE,
-        );
+        const createTimestamp = Date.now();
+        const callId = crypto.randomUUID();
+        const activeProvider = wrapper.getActiveProviderId() || 'chrome';
 
-        if (routingResponse.modelRouting !== 'chrome' && !LOCAL_ONLY_APIS.includes(wrapper.apiName)) {
+        // External provider routing path (Gemini / OpenAI)
+        if (activeProvider !== 'chrome' && !LOCAL_ONLY_APIS.includes(wrapper.apiName)) {
+          const sanitizedOptions = await PostMessageSanitizer.sanitize(options || {}).catch(() => ({}));
+          wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.CREATE, {
+            timestamp: createTimestamp,
+            options: sanitizedOptions as any,
+          });
           wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.COMPLETED);
           return wrapper.createMockInstance(callId);
         }
 
-        // Chrome on-device path: call the real .create() and wrap the result
+        // Chrome on-device path: invoke originalCreate SYNCHRONOUSLY before awaiting
+        // sanitization so transient user activation (model downloads) and monitor(m)
+        // execute on the caller's synchronous turn.
         let forwardedOptions = options;
         if (
           wrapper.apiName === 'LanguageModel' &&
@@ -126,59 +146,122 @@ export class ChromeAiApiWrapper {
           delete clonedOptions['topK'];
           forwardedOptions = clonedOptions;
         }
-        const originalInstance = await originalCreate.call(this, forwardedOptions);
-        wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.COMPLETED);
-        return wrapper.createTrackedProxy(originalInstance, callId);
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.ERROR, { errorMessage });
-        throw err;
-      }
-    };
+
+        let createPromise: Promise<unknown>;
+        try {
+          createPromise = Promise.resolve(originalCreate.call(receiver, forwardedOptions));
+        } catch (syncErr) {
+          createPromise = Promise.reject(syncErr);
+        }
+        // Prevent interim unhandled-rejection noise while options finish sanitizing
+        createPromise.catch(() => {});
+
+        const sanitizedOptions = await PostMessageSanitizer.sanitize(options || {}).catch(() => ({}));
+        wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.CREATE, {
+          timestamp: createTimestamp,
+          options: sanitizedOptions as any,
+        });
+
+        try {
+          const originalInstance = await createPromise;
+          wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.COMPLETED);
+          return wrapper.createTrackedProxy(originalInstance, callId);
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          wrapper.emitter.emit(callId, callId, 'create', ApiCallStage.ERROR, { errorMessage });
+          throw err;
+        }
+      };
+    }
+
+    this.wrapped = this.originalCreate !== null || this.originalStaticMethods.size > 0;
   }
 
   /**
-   * Restores the original static methods (used when API wrapping is disabled in settings).
+   * Restores the original static methods (used when API wrapping is disabled in settings
+   * or when a polyfilled API is uninstalled).
    */
   unwrap(): void {
-    if (typeof window === 'undefined') return;
-    const apiObj = (window as any)[this.apiName];
-    if (apiObj) {
+    if (!this.wrapped) return;
+    const target =
+      this.wrappedTarget ?? (typeof window !== 'undefined' ? (window as any)[this.apiName] : null);
+    if (target) {
       if (this.originalCreate) {
-        apiObj.create = this.originalCreate;
+        target['create'] = this.originalCreate;
       }
       for (const [methodName, originalFn] of this.originalStaticMethods.entries()) {
-        apiObj[methodName] = originalFn;
+        target[methodName] = originalFn;
       }
     }
+    this.wrappedTarget = null;
     this.originalCreate = null;
     this.originalStaticMethods.clear();
+    this.wrapped = false;
   }
 
   /**
-   * Wraps a static method (such as availability() or params()) to emit
-   * execute/completed/error telemetry stages without altering its behavior.
+   * Detects calls initiated purely by another third-party Chrome extension executing in
+   * the page's MAIN world (contains a foreign `chrome-extension://` frame and zero
+   * page-origin `http(s):` / `file:` / `blob:` script frames).
+   */
+  private isExternalExtensionCall(): boolean {
+    const stack = new Error().stack;
+    if (!stack || !stack.includes('chrome-extension://')) return false;
+
+    const extOrigins = stack.match(CHROME_EXT_ORIGIN_RE);
+    if (!extOrigins || extOrigins.length === 0) return false;
+
+    const hasForeignExtension = extOrigins.some((origin) => origin !== this.ownExtensionOrigin);
+    if (!hasForeignExtension) return false;
+
+    return !PAGE_SCRIPT_SCHEME_RE.test(stack);
+  }
+
+  /**
+   * Wraps a static method (such as `availability()`, `params()`, or `capabilities()`)
+   * to emit execute/completed/error telemetry stages without altering its behavior.
    */
   private wrapStaticMethod(apiObj: Record<string, any>, methodName: string): void {
     const originalFn = apiObj[methodName] as Function;
     const wrapper = this;
     this.originalStaticMethods.set(methodName, originalFn);
 
-    apiObj[methodName] = async function (...args: unknown[]) {
+    apiObj[methodName] = async function (this: unknown, ...args: unknown[]) {
+      const receiver = this === undefined || this === null || this === window ? apiObj : this;
+
+      if (wrapper.isExternalExtensionCall()) {
+        return originalFn.apply(receiver, args);
+      }
+
+      const executeTimestamp = Date.now();
       const callId = crypto.randomUUID();
+
+      let resultPromise: Promise<unknown>;
+      try {
+        resultPromise = Promise.resolve(originalFn.apply(receiver, args));
+      } catch (syncErr) {
+        resultPromise = Promise.reject(syncErr);
+      }
+      resultPromise.catch(() => {});
+
       if (args.length > 0) {
-        const sanitizedArgs = await PostMessageSanitizer.sanitize(args);
+        const sanitizedArgs = await PostMessageSanitizer.sanitize(args).catch(() => []);
         wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.EXECUTE, {
+          timestamp: executeTimestamp,
           args: sanitizedArgs as any,
         });
       } else {
-        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.EXECUTE);
+        wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.EXECUTE, {
+          timestamp: executeTimestamp,
+        });
       }
 
       try {
-        const res = await originalFn.apply(this, args);
-        const sanitizedRes = await PostMessageSanitizer.sanitize(res);
+        const res = await resultPromise;
+        const completedTimestamp = Date.now();
+        const sanitizedRes = await PostMessageSanitizer.sanitize(res).catch(() => undefined);
         wrapper.emitter.emit(callId, callId, methodName, ApiCallStage.COMPLETED, {
+          timestamp: completedTimestamp,
           response: sanitizedRes as any,
         });
         return res;
@@ -193,11 +276,6 @@ export class ChromeAiApiWrapper {
   /**
    * Builds a mock instance that routes all method calls to an external provider
    * (Gemini or OpenAI) via window messages through the content script.
-   *
-   * Why a mock instead of the real instance: When the user selects an external
-   * provider, we don't want to trigger Chrome's on-device model download or
-   * initialization. The mock provides the same interface while forwarding
-   * all actual work to the external API.
    */
   private createMockInstance(sessionCallId: string): Record<string, unknown> {
     const wrapper = this;
@@ -245,8 +323,7 @@ export class ChromeAiApiWrapper {
 
   /**
    * Creates a ReadableStream that sends the request to the external provider
-   * and emits the response as a single chunk (external providers don't support
-   * true streaming through our bridge).
+   * and emits the response as a single chunk.
    */
   private createMockStreamingMethod(
     sessionCallId: string,
@@ -254,22 +331,25 @@ export class ChromeAiApiWrapper {
     args: unknown[],
   ): ReadableStream {
     const methodCallId = crypto.randomUUID();
+    const executeTimestamp = Date.now();
     const emitter = this.emitter;
     const apiName = this.apiName;
 
-    // Fire-and-forget the execute stage emission (don't block the stream)
-    PostMessageSanitizer.sanitize(args).then((sanitizedArgs) => {
-      emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.EXECUTE, {
-        args: sanitizedArgs as any,
+    PostMessageSanitizer.sanitize(args)
+      .catch(() => [])
+      .then((sanitizedArgs) => {
+        emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.EXECUTE, {
+          timestamp: executeTimestamp,
+          args: sanitizedArgs as any,
+        });
       });
-    });
 
     let accumulatedResponse = '';
 
     return new ReadableStream({
       async start(controller) {
         try {
-          const sanitizedArgs = await PostMessageSanitizer.sanitize(args);
+          const sanitizedArgs = await PostMessageSanitizer.sanitize(args).catch(() => []);
 
           const response = await WindowMessageBridge.sendRequest<string>(
             WindowMessageType.PROVIDER_REQUEST,
@@ -302,9 +382,11 @@ export class ChromeAiApiWrapper {
     args: unknown[],
   ): Promise<unknown> {
     const methodCallId = crypto.randomUUID();
+    const executeTimestamp = Date.now();
 
-    const sanitizedArgs = await PostMessageSanitizer.sanitize(args);
+    const sanitizedArgs = await PostMessageSanitizer.sanitize(args).catch(() => []);
     this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.EXECUTE, {
+      timestamp: executeTimestamp,
       args: sanitizedArgs as any,
     });
 
@@ -315,11 +397,15 @@ export class ChromeAiApiWrapper {
         { payload: { api: this.apiName, method: methodName, args: sanitizedArgs } },
       );
 
-      PostMessageSanitizer.sanitize(response).then((sanitizedRes) => {
-        this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
-          response: sanitizedRes as any,
+      const completedTimestamp = Date.now();
+      PostMessageSanitizer.sanitize(response)
+        .catch(() => undefined)
+        .then((sanitizedRes) => {
+          this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
+            timestamp: completedTimestamp,
+            response: sanitizedRes as any,
+          });
         });
-      });
 
       return response;
     } catch (err: unknown) {
@@ -331,12 +417,11 @@ export class ChromeAiApiWrapper {
 
   /**
    * Wraps a real Chrome AI API instance in a Proxy for telemetry.
-   *
-   * The Proxy intercepts property access: for methods in WRAPPED_INSTANCE_METHODS,
-   * it returns an instrumented wrapper that emits lifecycle stages. All other
-   * properties/methods are passed through unchanged.
    */
   private createTrackedProxy(originalInstance: unknown, sessionCallId: string): unknown {
+    if (!originalInstance || (typeof originalInstance !== 'object' && typeof originalInstance !== 'function')) {
+      return originalInstance;
+    }
     const wrapper = this;
 
     return new Proxy(originalInstance as object, {
@@ -372,12 +457,6 @@ export class ChromeAiApiWrapper {
   /**
    * Invokes a method on the real Chrome AI instance while emitting telemetry
    * for each lifecycle stage.
-   *
-   * Handles three result types:
-   * 1. Promise resolving to a ReadableStream (e.g., some APIs return promises that resolve to streams)
-   * 2. Direct ReadableStream return (e.g., promptStreaming)
-   * 3. Promise resolving to a non-stream value (e.g., prompt, summarize)
-   * 4. Synchronous return
    */
   private invokeTrackedMethod(
     target: object,
@@ -386,7 +465,12 @@ export class ChromeAiApiWrapper {
     sessionCallId: string,
     args: unknown[],
   ): unknown {
+    if (this.isExternalExtensionCall()) {
+      return method.apply(target, args);
+    }
+
     const methodCallId = crypto.randomUUID();
+    const executeTimestamp = Date.now();
 
     // Measure input length for telemetry
     let inputLength = 0;
@@ -401,16 +485,19 @@ export class ChromeAiApiWrapper {
     }
 
     // Emit execute stage asynchronously (sanitization may be slow for large inputs)
-    PostMessageSanitizer.sanitize(args).then((sanitizedArgs) => {
-      this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.EXECUTE, {
-        args: sanitizedArgs as any,
-        inputLength,
+    PostMessageSanitizer.sanitize(args)
+      .catch(() => [])
+      .then((sanitizedArgs) => {
+        this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.EXECUTE, {
+          timestamp: executeTimestamp,
+          args: sanitizedArgs as any,
+          inputLength,
+        });
       });
-    });
 
-    // Attempt to measure token usage asynchronously if the API supports it
+    // Attempt to measure token usage asynchronously if the API supports it natively
     const nonMeasuredMethods = ['measureContextUsage', 'measureInputUsage', 'clone', 'destroy'];
-    if (!nonMeasuredMethods.includes(methodName)) {
+    if (!nonMeasuredMethods.includes(methodName) && !LOCAL_ONLY_APIS.includes(this.apiName)) {
       const measureFn =
         typeof (target as any).measureContextUsage === 'function'
           ? (target as any).measureContextUsage
@@ -439,24 +526,28 @@ export class ChromeAiApiWrapper {
 
       // Promise-based result (most common)
       if (result && typeof result.then === 'function') {
-        return result.then(async (res: unknown) => {
-          if (res instanceof ReadableStream) {
-            return this.streamHandler.wrap(res, methodCallId, sessionCallId, methodName);
-          }
+        return result
+          .then(async (res: unknown) => {
+            if (res instanceof ReadableStream) {
+              return this.streamHandler.wrap(res, methodCallId, sessionCallId, methodName);
+            }
 
-          const sanitizedRes = await PostMessageSanitizer.sanitize(res);
-          this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
-            response: sanitizedRes as any,
+            const completedTimestamp = Date.now();
+            const sanitizedRes = await PostMessageSanitizer.sanitize(res).catch(() => undefined);
+            this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
+              timestamp: completedTimestamp,
+              response: sanitizedRes as any,
+            });
+            if (methodName === 'clone' && res && typeof res === 'object') {
+              return this.createTrackedProxy(res, sessionCallId);
+            }
+            return res;
+          })
+          .catch((err: unknown) => {
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.ERROR, { errorMessage });
+            throw err;
           });
-          if (methodName === 'clone' && res && typeof res === 'object') {
-            return this.createTrackedProxy(res, sessionCallId);
-          }
-          return res;
-        }).catch((err: unknown) => {
-          const errorMessage = err instanceof Error ? err.message : String(err);
-          this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.ERROR, { errorMessage });
-          throw err;
-        });
       }
 
       // Direct ReadableStream return (e.g., promptStreaming in some implementations)
@@ -465,11 +556,15 @@ export class ChromeAiApiWrapper {
       }
 
       // Synchronous return
-      PostMessageSanitizer.sanitize(result).then((sanitizedRes) => {
-        this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
-          response: sanitizedRes as any,
+      const completedTimestamp = Date.now();
+      PostMessageSanitizer.sanitize(result)
+        .catch(() => undefined)
+        .then((sanitizedRes) => {
+          this.emitter.emit(methodCallId, sessionCallId, methodName, ApiCallStage.COMPLETED, {
+            timestamp: completedTimestamp,
+            response: sanitizedRes as any,
+          });
         });
-      });
       return result;
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);

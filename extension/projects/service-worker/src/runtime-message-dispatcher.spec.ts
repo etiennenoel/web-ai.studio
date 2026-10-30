@@ -37,6 +37,9 @@ describe('RuntimeMessageDispatcher', () => {
       RuntimeMessageAction.GET_HARDWARE_INFO,
       RuntimeMessageAction.GET_SETTING,
       RuntimeMessageAction.SET_SETTING,
+      RuntimeMessageAction.GET_TAB_SESSIONS,
+      RuntimeMessageAction.PAGE_NAVIGATION_START,
+      RuntimeMessageAction.SYNC_TAB_SESSIONS,
     ];
 
     for (const action of handledActions) {

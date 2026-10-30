@@ -9,7 +9,7 @@ import { ApiStageEmitter } from './api-stage-emitter';
  * (e.g., promptStreaming()), we need to intercept the stream to:
  * 1. Detect when the first chunk arrives (FIRST_TOKEN stage)
  * 2. Accumulate the full response text
- * 3. Emit a COMPLETED stage with the full response when the stream ends
+ * 3. Emit a COMPLETED stage with the full response when the stream ends or is cancelled
  * 4. Emit an ERROR stage if reading fails
  *
  * The wrapped stream behaves identically to the original from the consumer's
@@ -31,6 +31,7 @@ export class TrackedStreamHandler {
   wrap(stream: ReadableStream, callId: string, sessionId: string, method: string): ReadableStream {
     const reader = stream.getReader();
     let firstTokenSeen = false;
+    let finalized = false;
     let accumulatedResponse = '';
 
     return new ReadableStream({
@@ -39,9 +40,12 @@ export class TrackedStreamHandler {
           const { done, value } = await reader.read();
 
           if (done) {
-            this.emitter.emit(callId, sessionId, method, ApiCallStage.COMPLETED, {
-              response: accumulatedResponse,
-            });
+            if (!finalized) {
+              finalized = true;
+              this.emitter.emit(callId, sessionId, method, ApiCallStage.COMPLETED, {
+                response: accumulatedResponse,
+              });
+            }
             controller.close();
           } else {
             if (!firstTokenSeen) {
@@ -56,14 +60,23 @@ export class TrackedStreamHandler {
             controller.enqueue(value);
           }
         } catch (err: unknown) {
-          const errorMessage = err instanceof Error ? err.message : String(err);
-          this.emitter.emit(callId, sessionId, method, ApiCallStage.ERROR, { errorMessage });
+          if (!finalized) {
+            finalized = true;
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            this.emitter.emit(callId, sessionId, method, ApiCallStage.ERROR, { errorMessage });
+          }
           controller.error(err);
         }
       },
 
-      cancel: (reason) => {
-        stream.cancel(reason);
+      cancel: async (reason) => {
+        if (!finalized) {
+          finalized = true;
+          this.emitter.emit(callId, sessionId, method, ApiCallStage.COMPLETED, {
+            response: accumulatedResponse,
+          });
+        }
+        await reader.cancel(reason);
       },
     });
   }

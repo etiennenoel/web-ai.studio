@@ -6,27 +6,33 @@ import { HistoryHandler } from './handlers/history.handler';
 import { HardwareInfoHandler } from './handlers/hardware-info.handler';
 import { SettingsHandler } from './handlers/settings.handler';
 import { OffscreenHandler } from './handlers/offscreen.handler';
+import { TabSessionsHandler } from './handlers/tab-sessions.handler';
 import { WebAIDatabase } from './db';
+import { TabSessionsStore } from './tab-sessions.store';
 
 /**
  * Routes incoming chrome.runtime messages to the appropriate handler.
  *
  * Uses a switch statement on the action field for exhaustive compile-time
  * checking. TypeScript will error at the `never` default if a new enum value
- * is added to RuntimeMessageAction but not handled here.
+ * is added to RuntimeMessage but not handled here.
  */
 export class RuntimeMessageDispatcher {
   private readonly handlers: Map<RuntimeMessageAction, RuntimeMessageHandler>;
 
-  constructor(database: WebAIDatabase) {
+  constructor(
+    database: WebAIDatabase,
+    tabSessions: TabSessionsStore = new TabSessionsStore(),
+  ) {
     this.handlers = new Map();
 
     const allHandlers: RuntimeMessageHandler[] = [
-      new LogApiCallHandler(database),
-      new HistoryHandler(database),
+      new LogApiCallHandler(database, tabSessions),
+      new HistoryHandler(database, tabSessions),
       new HardwareInfoHandler(),
       new SettingsHandler(database),
       new OffscreenHandler(),
+      new TabSessionsHandler(tabSessions),
     ];
 
     for (const handler of allHandlers) {
@@ -60,6 +66,9 @@ export class RuntimeMessageDispatcher {
       case RuntimeMessageAction.GET_HARDWARE_INFO:
       case RuntimeMessageAction.GET_SETTING:
       case RuntimeMessageAction.SET_SETTING:
+      case RuntimeMessageAction.GET_TAB_SESSIONS:
+      case RuntimeMessageAction.PAGE_NAVIGATION_START:
+      case RuntimeMessageAction.SYNC_TAB_SESSIONS:
       case RuntimeMessageAction.ENSURE_OFFSCREEN:
       case RuntimeMessageAction.CLASSIFIER_PROGRESS: {
         const handler = this.handlers.get(action);
@@ -90,7 +99,7 @@ export class RuntimeMessageDispatcher {
         return false;
 
       default: {
-        // Exhaustive check: TypeScript will error if a new RuntimeMessageAction
+        // Exhaustive check: TypeScript will error if a new RuntimeMessage action
         // is added but not handled in the switch above.
         const _exhaustive: never = action;
         void _exhaustive;
