@@ -1,4 +1,4 @@
-import {Component, DOCUMENT, Inject, OnDestroy, OnInit, PLATFORM_ID} from '@angular/core';
+import {ChangeDetectorRef, Component, DOCUMENT, Inject, OnDestroy, OnInit, PLATFORM_ID} from '@angular/core';
 import {isPlatformBrowser} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Title} from '@angular/platform-browser';
@@ -11,11 +11,16 @@ import {EvalsRow} from './evals.row';
 import {EvalsExecutionEnum} from '../../enums/evals-execution.enum';
 import {SpeechQuality, WebSpeechService} from '../../core/services/web-speech.service';
 import {MediaSourceUtils} from '../../core/utils/media-source.utils';
+import {
+  SpreadsheetSheetNotFoundError,
+  SpreadsheetUtils,
+} from '../../core/utils/spreadsheet.utils';
 import {ApiStatusPill} from '../demos/components/api-status/api-status.component';
 import {SummarizerOption} from './summarizer-option.interface';
 import {PROMPT_SAMPLING_MODES} from '../../core/models/prompt-run.options';
 
 type MediaKind = 'image' | 'audio';
+export type EvalsSubtab = 'spreadsheet' | 'manual';
 
 interface ColumnBinding {
   field: keyof EvalsRow;
@@ -59,9 +64,43 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    */
   private static readonly headerVocabulary = new Set([
     'api', 'audio', 'clip', 'clips', 'constraint', 'context', 'expected', 'file', 'files',
-    'image', 'images', 'input', 'length', 'mode', 'optional', 'output', 'preference', 'prompt',
-    'response', 'sampling', 'schema', 'sound', 'speed', 'structured', 'summariser', 'summarizer',
-    'system', 'text', 'type',
+    'image', 'images', 'input', 'instruction', 'instructions', 'length', 'link', 'links',
+    'mode', 'optional', 'output', 'preference', 'prompt', 'response', 'sampling', 'schema',
+    'sound', 'speed', 'structured', 'summariser', 'summarizer', 'system', 'text', 'type',
+    'url', 'urls', 'user',
+  ]);
+
+  /**
+   * Exact canonical spreadsheet column names mapped to Website EvalsRow fields:
+   * - API -> api
+   * - Context -> context
+   * - Input (Text) -> input
+   * - Input (Images) -> images
+   * - Input (Audio) -> audio
+   * - Schema -> schema
+   * - Sampling Mode -> samplingMode
+   * - Summarizer Length (Optional) -> summarizerLength
+   * - Summarizer Type (Optional) -> summarizerType
+   * - Summarizer Speed Preference -> summarizerPreference
+   */
+  private static readonly exactSpreadsheetHeaders: ReadonlyMap<string, keyof EvalsRow> = new Map<
+    string,
+    keyof EvalsRow
+  >([
+    ['api', 'api'],
+    ['context', 'context'],
+    ['input (text)', 'input'],
+    ['input (images)', 'images'],
+    ['input (audio)', 'audio'],
+    ['schema', 'schema'],
+    ['sampling mode', 'samplingMode'],
+    ['sampling mode (optional)', 'samplingMode'],
+    ['summarizer length (optional)', 'summarizerLength'],
+    ['summarizer length', 'summarizerLength'],
+    ['summarizer type (optional)', 'summarizerType'],
+    ['summarizer type', 'summarizerType'],
+    ['summarizer speed preference', 'summarizerPreference'],
+    ['summarizer speed preference (optional)', 'summarizerPreference'],
   ]);
 
   /**
@@ -77,7 +116,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     [/type/, 'summarizerType'],
     [/preference|speed/, 'summarizerPreference'],
     [/api/, 'api'],
-    [/context|system/, 'context'],
+    [/context|system|instruction/, 'context'],
     [/input|prompt|text/, 'input'],
   ];
 
@@ -91,7 +130,59 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     [ApiEnum.WebSpeech]: ['audio'],
   };
 
+  public static readonly DEFAULT_TEST_SPREADSHEET_URL =
+    'https://docs.google.com/spreadsheets/d/1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y/edit?gid=0#gid=0';
+
+  public static readonly TEMPLATE_SPREADSHEET_URL =
+    'https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/edit?gid=0#gid=0';
+
   form: FormGroup;
+
+  activeSubtab: EvalsSubtab = 'spreadsheet';
+
+  isLoadingSheet: boolean = false;
+
+  isLoadingEmbeddedImages: boolean = false;
+
+  sheetLoadProgress: number = 0;
+
+  sheetLoadStage: string = '';
+
+  sheetLoadDetail: string = '';
+
+  sheetLoadElapsedSeconds: number = 0;
+
+  private sheetLoadTimer: ReturnType<typeof setInterval> | null = null;
+
+  private sheetLoadStartedAt: number = 0;
+
+  private sheetLoadPhase: 'packaging' | 'downloading' | 'extracting' | 'idle' = 'idle';
+
+  private allocatedBlobUrls: string[] = [];
+
+  sheetLoadError: string | null = null;
+
+  sheetLoadSuccess: string | null = null;
+
+  availableSheets: string[] = [];
+
+  loadedSheetName: string = '';
+
+  private lastLoadedSheetKey: string = '';
+
+  liveOutputFileHandle: any = null;
+
+  liveOutputFileName: string = '';
+
+  liveOutputLastSavedAt: string = '';
+
+  recoveredCheckpoint: {
+    key: string;
+    completedCount: number;
+    totalRows: number;
+    updatedAt: string;
+    entries: Record<string, {status: string; output: string}>;
+  } | null = null;
 
   statusMessage?: string;
 
@@ -152,18 +243,21 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   constructor(
     private readonly fb: FormBuilder,
-    router: Router,
-    route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     @Inject(DOCUMENT) document: Document,
     @Inject(PLATFORM_ID) private platformId: Object,
     title: Title,
     private readonly webSpeech: WebSpeechService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     super(document, title)
 
     this.setTitle("Evals")
     this.form = this.fb.group({
       settings: this.fb.group({
+        spreadsheetUrl: [EvalsPage.DEFAULT_TEST_SPREADSHEET_URL],
+        sheetName: [''],
         speechLang: ['en-US'],
         speechQuality: ['dictation'],
         samplingMode: [''],
@@ -177,9 +271,67 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   override async ngOnInit() {
     super.ngOnInit();
 
+    this.subscriptions.push(
+      this.route.data.subscribe(data => {
+        if (data?.['evalsSubtab'] === 'spreadsheet') {
+          this.activeSubtab = 'spreadsheet';
+        } else if (data?.['evalsSubtab'] === 'manual') {
+          const tabParam = this.route.snapshot.queryParamMap.get('tab');
+          if (tabParam !== 'spreadsheet') {
+            this.activeSubtab = 'manual';
+          }
+        }
+      }),
+    );
+
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
+
+    if (this.document.location.pathname.includes('spreadsheet-upload')) {
+      this.activeSubtab = 'spreadsheet';
+    }
+
+    this.subscriptions.push(
+      this.route.queryParamMap.subscribe(params => {
+        const tab = params.get('tab');
+        if (tab === 'manual' || tab === 'paste') {
+          this.activeSubtab = 'manual';
+        } else if (tab === 'spreadsheet') {
+          this.activeSubtab = 'spreadsheet';
+        }
+
+        const urlParam = params.get('spreadsheetUrl');
+        const sheetParam = params.get('sheetName');
+        if (urlParam) {
+          this.settings.patchValue({spreadsheetUrl: urlParam});
+        }
+        if (sheetParam !== null) {
+          this.settings.patchValue({sheetName: sheetParam});
+        }
+      }),
+    );
+
+    let lastSpreadsheetId =
+      SpreadsheetUtils.parseGoogleSpreadsheetInput(
+        String(this.settings.value.spreadsheetUrl ?? ''),
+      )?.spreadsheetId ?? '';
+
+    this.subscriptions.push(
+      this.settings
+        .get('spreadsheetUrl')!
+        .valueChanges.subscribe(rawUrl => {
+          const nextId =
+            SpreadsheetUtils.parseGoogleSpreadsheetInput(String(rawUrl ?? ''))?.spreadsheetId ?? '';
+          if (nextId && nextId !== lastSpreadsheetId) {
+            lastSpreadsheetId = nextId;
+            this.availableSheets = [];
+            if (this.settings.value.sheetName) {
+              this.settings.patchValue({sheetName: ''}, {emitEvent: false});
+            }
+          }
+        }),
+    );
 
     this.subscriptions.push(
       this.settings.valueChanges.pipe(
@@ -193,10 +345,48 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   override ngOnDestroy() {
     this.stop();
+    this.stopSheetLoadTimer();
+    this.revokeAllocatedBlobUrls();
     if (this.copyFeedbackTimer) {
       clearTimeout(this.copyFeedbackTimer);
     }
     super.ngOnDestroy();
+  }
+
+  setSubtab(tab: EvalsSubtab) {
+    this.activeSubtab = tab;
+    if (
+      isPlatformBrowser(this.platformId) &&
+      !this.document.location.hostname.includes('zipline.googleplex.com')
+    ) {
+      const targetRoute = tab === 'spreadsheet' ? '/evals/spreadsheet-upload' : '/evals';
+      void this.router.navigate([targetRoute], {
+        queryParams: {tab: null},
+        queryParamsHandling: 'merge',
+      });
+    }
+  }
+
+  usePresetSpreadsheet(preset: 'test' | 'template') {
+    this.sheetLoadError = null;
+    this.sheetLoadSuccess = null;
+    this.availableSheets = [];
+    if (preset === 'test') {
+      this.settings.patchValue({
+        spreadsheetUrl: EvalsPage.DEFAULT_TEST_SPREADSHEET_URL,
+        sheetName: '',
+      });
+    } else {
+      this.settings.patchValue({
+        spreadsheetUrl: EvalsPage.TEMPLATE_SPREADSHEET_URL,
+        sheetName: '',
+      });
+    }
+  }
+
+  selectAvailableSheet(sheet: string) {
+    this.settings.patchValue({sheetName: sheet});
+    void this.loadFromGoogleSheet(false);
   }
 
   get rows(): FormArray {
@@ -233,6 +423,35 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
   get hasOutputs(): boolean {
     return this.rows.controls.some(control => !!control.value.output);
+  }
+
+  get completedRowCount(): number {
+    return this.rows.controls.filter(
+      control =>
+        control.value.status === InferenceStatusEnum.Success ||
+        control.value.status === InferenceStatusEnum.Error,
+    ).length;
+  }
+
+  get successfulRowCount(): number {
+    return this.rows.controls.filter(
+      control => control.value.status === InferenceStatusEnum.Success && !!control.value.output,
+    ).length;
+  }
+
+  get incompleteRowCount(): number {
+    return Math.max(0, this.rows.length - this.successfulRowCount);
+  }
+
+  get canResume(): boolean {
+    return !this.isRunning && this.successfulRowCount > 0 && this.successfulRowCount < this.rows.length;
+  }
+
+  get supportsLiveFileSave(): boolean {
+    return (
+      isPlatformBrowser(this.platformId) &&
+      typeof (window as any).showSaveFilePicker === 'function'
+    );
   }
 
   /** A column is shown once something fills it, or once the user asks for it. */
@@ -294,7 +513,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   // RUNNING
   // ====================================================
 
-  async run() {
+  async run(resumeOnly: boolean = false) {
     if (this.isRunning) {
       return;
     }
@@ -314,9 +533,26 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
       const formRow = this.rows.at(i) as FormGroup;
 
-      formRow.patchValue({status: InferenceStatusEnum.InProgress, output: '', warnings: []});
+      if (
+        resumeOnly &&
+        formRow.value.status === InferenceStatusEnum.Success &&
+        String(formRow.value.output ?? '').trim().length > 0
+      ) {
+        continue;
+      }
 
-      const setOutput = (text: string) => formRow.patchValue({output: text});
+      formRow.patchValue({status: InferenceStatusEnum.InProgress, output: '', warnings: []});
+      this.cdr.detectChanges();
+
+      let lastRenderTime = 0;
+      const setOutput = (text: string) => {
+        formRow.patchValue({output: text}, {emitEvent: false});
+        const now = Date.now();
+        if (now - lastRenderTime >= 100) {
+          lastRenderTime = now;
+          this.cdr.detectChanges();
+        }
+      };
 
       try {
         switch (formRow.value.api) {
@@ -342,9 +578,22 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           output: formRow.value.output || message,
         });
       }
+      this.cdr.detectChanges();
+
+      // 1. Save crash-recovery checkpoint to localStorage after every completed row
+      this.saveRowCheckpoint(i);
+
+      // 2. If a live local output spreadsheet file (.csv/.tsv) is connected, flush immediately to disk
+      if (this.liveOutputFileHandle) {
+        await this.flushLiveOutputFile();
+      }
+
+      // 3. Yield to the browser event loop & GC between rows so large 500-row datasets do not freeze the tab
+      await new Promise<void>(resolve => setTimeout(resolve, 16));
     }
 
     this.finishRun();
+    this.cdr.detectChanges();
   }
 
   stop() {
@@ -379,7 +628,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   // ====================================================
-  // COPYING OUTPUTS
+  // COPYING & EXPORTING OUTPUTS
   // ====================================================
 
   /**
@@ -421,6 +670,278 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       return value;
     }
     return `"${value.replace(/"/g, '""')}"`;
+  }
+
+  /**
+   * Builds a 2D table of headers + rows including the generated Output column for CSV / TSV export.
+   */
+  buildExportTableRows(): string[][] {
+    const headers = [
+      'Context',
+      'Input (Text)',
+      'Input (Images)',
+      'Input (Audio)',
+      'Schema',
+      'Sampling Mode',
+      'API',
+      'Summarizer Length (Optional)',
+      'Summarizer Type (Optional)',
+      'Summarizer Speed Preference',
+      'Status',
+      'Output',
+    ];
+
+    const formatMediaCell = (items: string[] | undefined): string => {
+      if (!items?.length) {
+        return '';
+      }
+      return items
+        .map(item =>
+          MediaSourceUtils.isBlobUrl(item) ||
+          (MediaSourceUtils.isDataUrl(item) && item.length > 2048)
+            ? '[embedded media]'
+            : item,
+        )
+        .join(', ');
+    };
+
+    const dataRows = this.rows.controls.map(control => {
+      const v = control.value;
+      return [
+        String(v.context ?? ''),
+        String(v.input ?? ''),
+        formatMediaCell(v.images),
+        formatMediaCell(v.audio),
+        String(v.schema ?? ''),
+        String(v.samplingMode ?? ''),
+        String(v.api ?? ApiEnum.Prompt),
+        String(v.summarizerLength ?? ''),
+        String(v.summarizerType ?? ''),
+        String(v.summarizerPreference ?? ''),
+        String(v.status ?? ''),
+        String(v.output ?? ''),
+      ];
+    });
+
+    return [headers, ...dataRows];
+  }
+
+  buildExportCsv(): string {
+    return SpreadsheetUtils.formatDelimitedText(this.buildExportTableRows(), ',');
+  }
+
+  buildExportTsv(): string {
+    return SpreadsheetUtils.formatDelimitedText(this.buildExportTableRows(), '\t');
+  }
+
+  /** Formats a local timestamp (`YYYY-MM-DD_HH-mm-ss`) for versioned result CSV/TSV filenames. */
+  static formatResultTimestamp(date: Date = new Date()): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const min = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+    return `${yyyy}-${mm}-${dd}_${hh}-${min}-${ss}`;
+  }
+
+  /** Builds a timestamped result filename (e.g. `Sheet1-results-2026-11-02_10-00-05.csv`). */
+  buildResultFilename(format: 'csv' | 'tsv', date: Date = new Date()): string {
+    const safeSheet = (this.loadedSheetName || this.settings.value.sheetName || 'evals')
+      .trim()
+      .replace(/[^a-zA-Z0-9-_]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'evals';
+    const timestamp = EvalsPage.formatResultTimestamp(date);
+    return `${safeSheet}-results-${timestamp}.${format}`;
+  }
+
+  exportResponses(format: 'csv' | 'tsv'): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const content = format === 'csv' ? this.buildExportCsv() : this.buildExportTsv();
+    const mimeType =
+      format === 'csv' ? 'text/csv;charset=utf-8;' : 'text/tab-separated-values;charset=utf-8;';
+    const blob = new Blob([content], {type: mimeType});
+    const url = URL.createObjectURL(blob);
+
+    const link = this.document.createElement('a');
+    link.href = url;
+    link.download = this.buildResultFilename(format);
+    this.document.body.appendChild(link);
+    link.click();
+    this.document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // ====================================================
+  // LIVE LOCAL CSV AUTO-SAVE & CRASH RECOVERY
+  // ====================================================
+
+  /**
+   * Connects a local `.csv` or `.tsv` file using Chrome's File System Access API (`showSaveFilePicker`)
+   * with a timestamped filename (`<sheet>-results-YYYY-MM-DD_HH-mm-ss.csv`) so every completed row
+   * is flushed straight to disk during the run — even if the PC freezes later, the file on disk
+   * already contains every completed row.
+   */
+  async connectLiveOutputFile(): Promise<void> {
+    if (!this.supportsLiveFileSave) {
+      return;
+    }
+
+    const suggestedName = this.buildResultFilename('csv');
+
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName,
+        types: [
+          {
+            description: 'CSV Spreadsheet (.csv)',
+            accept: {'text/csv': ['.csv']},
+          },
+          {
+            description: 'TSV Spreadsheet (.tsv)',
+            accept: {'text/tab-separated-values': ['.tsv']},
+          },
+        ],
+      });
+      this.liveOutputFileHandle = handle;
+      this.liveOutputFileName = String(handle.name || suggestedName);
+      await this.flushLiveOutputFile();
+      this.cdr.detectChanges();
+    } catch {}
+  }
+
+  disconnectLiveOutputFile(): void {
+    this.liveOutputFileHandle = null;
+    this.liveOutputFileName = '';
+    this.liveOutputLastSavedAt = '';
+    this.cdr.detectChanges();
+  }
+
+  private async flushLiveOutputFile(): Promise<void> {
+    if (!this.liveOutputFileHandle) {
+      return;
+    }
+    try {
+      const isTsv = this.liveOutputFileName.toLowerCase().endsWith('.tsv');
+      const content = isTsv ? this.buildExportTsv() : this.buildExportCsv();
+      const writable = await this.liveOutputFileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      this.liveOutputLastSavedAt = new Date().toLocaleTimeString();
+      this.cdr.detectChanges();
+    } catch (err) {
+      console.warn('Could not flush to live output file:', err);
+    }
+  }
+
+  private getCurrentCheckpointStorageKey(): string {
+    const rawUrl = String(this.settings.value.spreadsheetUrl ?? '').trim();
+    const parsed = SpreadsheetUtils.parseGoogleSpreadsheetInput(
+      rawUrl,
+      String(this.settings.value.sheetName ?? '').trim(),
+    );
+    const idPart = parsed?.spreadsheetId || this.loadedSheetName || 'manual';
+    const tabPart = this.loadedSheetName || parsed?.sheetName || parsed?.gid || 'default';
+    return `webai_evals_cp_${idPart}_${tabPart}_${this.rows.length}`;
+  }
+
+  private saveRowCheckpoint(rowIndex: number): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    try {
+      const key = this.getCurrentCheckpointStorageKey();
+      const existingRaw = window.localStorage.getItem(key);
+      const parsed = existingRaw ? JSON.parse(existingRaw) : {entries: {}};
+      const entries: Record<string, {status: string; output: string}> = parsed.entries || {};
+      const rowVal = this.rows.at(rowIndex)?.value;
+      if (rowVal) {
+        entries[String(rowIndex)] = {
+          status: String(rowVal.status ?? ''),
+          output: String(rowVal.output ?? ''),
+        };
+      }
+      const completedCount = Object.values(entries).filter(
+        e => e.status === InferenceStatusEnum.Success && !!e.output,
+      ).length;
+      window.localStorage.setItem(
+        key,
+        JSON.stringify({
+          key,
+          completedCount,
+          totalRows: this.rows.length,
+          updatedAt: new Date().toLocaleTimeString(),
+          entries,
+        }),
+      );
+    } catch {}
+  }
+
+  checkForSavedCheckpoint(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    try {
+      const key = this.getCurrentCheckpointStorageKey();
+      const raw = window.localStorage.getItem(key);
+      if (!raw) {
+        this.recoveredCheckpoint = null;
+        return;
+      }
+      const data = JSON.parse(raw);
+      if (data && data.completedCount > 0 && data.entries) {
+        this.recoveredCheckpoint = data;
+      } else {
+        this.recoveredCheckpoint = null;
+      }
+    } catch {
+      this.recoveredCheckpoint = null;
+    }
+  }
+
+  restoreSavedCheckpoint(): void {
+    if (!this.recoveredCheckpoint?.entries) {
+      return;
+    }
+    const entries = this.recoveredCheckpoint.entries;
+    for (const [idxStr, state] of Object.entries(entries)) {
+      const idx = Number(idxStr);
+      if (!Number.isNaN(idx) && idx >= 0 && idx < this.rows.length) {
+        this.rows.at(idx).patchValue(
+          {
+            status: state.status || InferenceStatusEnum.Success,
+            output: state.output || '',
+          },
+          {emitEvent: false},
+        );
+      }
+    }
+    this.rows.updateValueAndValidity({emitEvent: true});
+    this.status = EvalsExecutionEnum.Success;
+    this.statusMessage = `Restored ${this.recoveredCheckpoint.completedCount} saved row outputs from checkpoint.`;
+    this.recoveredCheckpoint = null;
+    this.cdr.detectChanges();
+  }
+
+  downloadCheckpointCsv(): void {
+    this.restoreSavedCheckpoint();
+    this.exportResponses('csv');
+  }
+
+  discardSavedCheckpoint(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    try {
+      const key = this.recoveredCheckpoint?.key || this.getCurrentCheckpointStorageKey();
+      window.localStorage.removeItem(key);
+    } catch {}
+    this.recoveredCheckpoint = null;
+    this.cdr.detectChanges();
   }
 
   private async runSummarizer(formRow: FormGroup, setOutput: (text: string) => void): Promise<void> {
@@ -943,8 +1464,609 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   }
 
   // ====================================================
-  // SPREADSHEET IMPORT
+  // GOOGLE SPREADSHEET & FILE IMPORT
   // ====================================================
+
+  private startSheetLoadProgress(stage: string, detail: string): void {
+    this.stopSheetLoadTimer();
+    this.isLoadingSheet = true;
+    this.isLoadingEmbeddedImages = false;
+    this.sheetLoadProgress = 6;
+    this.sheetLoadStage = stage;
+    this.sheetLoadDetail = detail;
+    this.sheetLoadElapsedSeconds = 0;
+    this.sheetLoadStartedAt = Date.now();
+    this.sheetLoadPhase = 'packaging';
+    this.cdr.detectChanges();
+
+    this.sheetLoadTimer = setInterval(() => {
+      if (!this.isLoadingSheet) {
+        this.stopSheetLoadTimer();
+        return;
+      }
+      const elapsedMs = Date.now() - this.sheetLoadStartedAt;
+      this.sheetLoadElapsedSeconds = Math.floor(elapsedMs / 1000);
+      if (this.sheetLoadPhase === 'packaging' && this.sheetLoadProgress < 28) {
+        this.sheetLoadProgress = Math.min(28, 6 + Math.floor(elapsedMs / 450));
+      }
+      this.cdr.detectChanges();
+    }, 450);
+  }
+
+  private updateSheetLoadProgress(progress: number, stage?: string, detail?: string): void {
+    this.sheetLoadProgress = Math.max(this.sheetLoadProgress, Math.min(100, Math.round(progress)));
+    if (stage !== undefined) {
+      this.sheetLoadStage = stage;
+    }
+    if (detail !== undefined) {
+      this.sheetLoadDetail = detail;
+    }
+    this.cdr.detectChanges();
+  }
+
+  private stopSheetLoadTimer(): void {
+    if (this.sheetLoadTimer) {
+      clearInterval(this.sheetLoadTimer);
+      this.sheetLoadTimer = null;
+    }
+    this.sheetLoadPhase = 'idle';
+  }
+
+  private revokeAllocatedBlobUrls(): void {
+    if (!this.allocatedBlobUrls.length || typeof URL.revokeObjectURL !== 'function') {
+      this.allocatedBlobUrls = [];
+      return;
+    }
+    for (const url of this.allocatedBlobUrls) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {}
+    }
+    this.allocatedBlobUrls = [];
+  }
+
+  /**
+   * When a large spreadsheet with hundreds of embedded cell images takes several seconds for
+   * Google Sheets to package as `.xlsx`, this fast CSV preview populates all text rows within ~1.5s
+   * and shows a "Loading image..." indicator in the Images column while the `.xlsx` streams.
+   */
+  private async loadFastCsvPreview(
+    spreadsheetId: string,
+    sheetName: string,
+    gid: string | null,
+    isXlsxFinished: () => boolean,
+  ): Promise<void> {
+    try {
+      const csvUrl = SpreadsheetUtils.buildGvizCsvUrl(spreadsheetId, sheetName, gid);
+      const response = await fetch(csvUrl, {
+        credentials: 'omit',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8_000),
+      });
+      if (!response.ok || isXlsxFinished()) {
+        return;
+      }
+      const contentType = (response.headers?.get?.('content-type') || '').toLowerCase();
+      if (contentType.includes('application/json') || contentType.includes('text/html')) {
+        return;
+      }
+      const text = await response.text();
+      if (isXlsxFinished()) {
+        return;
+      }
+      const sample = text.slice(0, 256).trim().toLowerCase();
+      if (sample.startsWith('<!doctype html') || sample.startsWith('<html')) {
+        return;
+      }
+      const rows = SpreadsheetUtils.parseDelimitedText(text, ',');
+      if (rows.length < 2 || isXlsxFinished()) {
+        return;
+      }
+      const bindings = this.readSpreadsheetHeaderBindings(rows[0]);
+      const imageBinding = bindings.find(b => b.field === 'images');
+      const hasEmbeddedImagesToWaitFor =
+        !!imageBinding &&
+        rows.slice(1).every(r => !String(r[imageBinding.index] ?? '').trim());
+
+      const previewCount = await this.importTabularRows(rows, true);
+      if (previewCount > 0 && !isXlsxFinished()) {
+        if (hasEmbeddedImagesToWaitFor) {
+          this.isLoadingEmbeddedImages = true;
+          if (this.sheetLoadPhase === 'packaging') {
+            this.updateSheetLoadProgress(
+              Math.max(this.sheetLoadProgress, 18),
+              `Loaded ${previewCount} text rows — packaging embedded cell images...`,
+              'Google Sheets is packaging embedded cell images into the workbook export. Large sheets with hundreds of images take ~15–25s.',
+            );
+          }
+        }
+      }
+    } catch {}
+  }
+
+  /**
+   * Loads the dataset from the configured Google Spreadsheet URL + Sheet Name,
+   * populates the evaluation rows, and optionally triggers `run()` immediately.
+   */
+  public async loadFromGoogleSheet(autoRun: boolean = false): Promise<boolean> {
+    if (this.isLoadingSheet || this.isRunning) {
+      return false;
+    }
+
+    this.sheetLoadError = null;
+    this.sheetLoadSuccess = null;
+
+    const rawUrl = String(this.settings.value.spreadsheetUrl ?? '').trim();
+    const rawSheetName = String(this.settings.value.sheetName ?? '').trim();
+
+    const parsed = SpreadsheetUtils.parseGoogleSpreadsheetInput(rawUrl, rawSheetName);
+    if (!parsed) {
+      this.sheetLoadError =
+        'Please enter a valid Google Spreadsheet URL (https://docs.google.com/spreadsheets/d/...) or Spreadsheet ID.';
+      return false;
+    }
+
+    this.startSheetLoadProgress(
+      'Connecting to Google Sheets...',
+      'Requesting spreadsheet data and checking for embedded cell images...',
+    );
+
+    let xlsxFinished = false;
+    const previewTimer = setTimeout(() => {
+      if (!xlsxFinished && this.isLoadingSheet) {
+        void this.loadFastCsvPreview(
+          parsed.spreadsheetId,
+          parsed.sheetName,
+          parsed.gid,
+          () => xlsxFinished,
+        );
+      }
+    }, 1200);
+
+    try {
+      const loaded = await this.fetchSpreadsheetRows(
+        parsed.spreadsheetId,
+        parsed.sheetName,
+        parsed.gid,
+        () => {
+          xlsxFinished = true;
+        },
+      );
+      xlsxFinished = true;
+      clearTimeout(previewTimer);
+
+      this.availableSheets = loaded.sheets;
+      this.loadedSheetName = loaded.resolvedSheet;
+
+      this.updateSheetLoadProgress(
+        96,
+        'Populating evaluation table...',
+        `Rendering rows from "${loaded.resolvedSheet}"...`,
+      );
+
+      const importedCount = await this.importTabularRows(loaded.rows, true);
+      this.isLoadingEmbeddedImages = false;
+
+      if (importedCount === 0) {
+        this.sheetLoadError = `No evaluation rows were found in sheet "${loaded.resolvedSheet}".`;
+        this.isLoadingSheet = false;
+        this.stopSheetLoadTimer();
+        this.cdr.detectChanges();
+        return false;
+      }
+
+      const rowsWithImages = this.rows.controls.filter(
+        control => (control.value.images?.length ?? 0) > 0,
+      ).length;
+      const imageSummary =
+        rowsWithImages > 0
+          ? ` (${rowsWithImages} with embedded image${rowsWithImages === 1 ? '' : 's'})`
+          : '';
+
+      this.sheetLoadProgress = 100;
+      this.sheetLoadSuccess = `Loaded ${importedCount} evaluation row${importedCount === 1 ? '' : 's'}${imageSummary} from "${loaded.resolvedSheet}".`;
+      this.lastLoadedSheetKey = `${rawUrl}|${rawSheetName}`;
+      this.checkForSavedCheckpoint();
+      this.isLoadingSheet = false;
+      this.stopSheetLoadTimer();
+      this.cdr.detectChanges();
+
+      if (autoRun) {
+        await this.run();
+      }
+
+      return true;
+    } catch (error) {
+      xlsxFinished = true;
+      clearTimeout(previewTimer);
+      this.isLoadingEmbeddedImages = false;
+      this.sheetLoadError =
+        error instanceof Error
+          ? error.message
+          : 'Could not load the Google Spreadsheet. Check the sharing settings and sheet name.';
+      return false;
+    } finally {
+      xlsxFinished = true;
+      clearTimeout(previewTimer);
+      this.isLoadingSheet = false;
+      this.isLoadingEmbeddedImages = false;
+      this.stopSheetLoadTimer();
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async fetchSpreadsheetRows(
+    spreadsheetId: string,
+    sheetName: string,
+    gid: string | null,
+    onXlsxDataReady?: () => void,
+  ): Promise<{sheets: string[]; resolvedSheet: string; rows: string[][]}> {
+    let apiErrorMessage: string | null = null;
+    // 1. Direct client-side streaming fetch of Google Sheets `.xlsx` export (`Access-Control-Allow-Origin: *`).
+    //    This works directly in the browser for link-shared sheets, reflects live Google Sheet edits
+    //    immediately, and preserves all embedded cell/drawing images (whereas Google's `gviz/tq?tqx=out:csv`
+    //    CSV export strips embedded images).
+    try {
+      const xlsxUrl = SpreadsheetUtils.buildXlsxExportUrl(spreadsheetId);
+      let lastProgressUiUpdate = 0;
+
+      const xlsxResult = await SpreadsheetUtils.fetchArrayBufferWithProgress(
+        xlsxUrl,
+        {
+          credentials: 'omit',
+          cache: 'no-store',
+          signal: AbortSignal.timeout(180_000),
+        },
+        (receivedBytes, totalBytes) => {
+          this.sheetLoadPhase = 'downloading';
+          const now = Date.now();
+          if (now - lastProgressUiUpdate < 120) {
+            return;
+          }
+          lastProgressUiUpdate = now;
+
+          const mb = (receivedBytes / (1024 * 1024)).toFixed(1);
+          let pct: number;
+          let detail: string;
+          if (totalBytes && totalBytes > 0) {
+            const ratio = Math.min(1, receivedBytes / totalBytes);
+            pct = 28 + Math.round(ratio * 50);
+            const totalMb = (totalBytes / (1024 * 1024)).toFixed(1);
+            detail = `${mb} MB / ${totalMb} MB downloaded from Google Sheets...`;
+          } else {
+            // Asymptotic progress curve from 28% -> 78% when Content-Length is omitted (chunked encoding)
+            const curve = 1 - Math.exp(-receivedBytes / (120 * 1024 * 1024));
+            pct = 28 + Math.round(curve * 50);
+            detail = `${mb} MB downloaded from Google Sheets...`;
+          }
+          this.updateSheetLoadProgress(
+            pct,
+            'Downloading workbook & embedded cell images...',
+            detail,
+          );
+        },
+      );
+
+      if (xlsxResult.ok && xlsxResult.buffer.byteLength >= 4) {
+        const bytes = new Uint8Array(xlsxResult.buffer);
+        if (
+          bytes[0] === 0x50 &&
+          bytes[1] === 0x4b &&
+          bytes[2] === 0x03 &&
+          bytes[3] === 0x04
+        ) {
+          onXlsxDataReady?.();
+          this.sheetLoadPhase = 'extracting';
+          const totalMb = (bytes.byteLength / (1024 * 1024)).toFixed(1);
+          this.updateSheetLoadProgress(
+            80,
+            'Extracting embedded cell images...',
+            `Unpacking ${totalMb} MB workbook archive...`,
+          );
+
+          this.revokeAllocatedBlobUrls();
+          return await SpreadsheetUtils.parseXlsx(xlsxResult.buffer, sheetName, gid, {
+            useBlobUrls: true,
+            onProgress: (completed, total) => {
+              const pct = 80 + Math.round((completed / Math.max(1, total)) * 15);
+              this.updateSheetLoadProgress(
+                pct,
+                'Extracting embedded cell images...',
+                `Extracted ${completed} of ${total} workbook & image entries (${totalMb} MB)...`,
+              );
+            },
+          });
+        }
+      }
+    } catch (err) {
+      if (err instanceof SpreadsheetSheetNotFoundError) {
+        this.availableSheets = err.availableSheets;
+        throw err;
+      }
+    }
+
+    // 2. Fallback: Direct client-side fetch from Google Sheets gviz CSV endpoint
+    const csvUrl = SpreadsheetUtils.buildGvizCsvUrl(spreadsheetId, sheetName, gid);
+    try {
+      const response = await fetch(csvUrl, {
+        credentials: 'omit',
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (response.ok) {
+        const text = await response.text();
+        const sample = text.slice(0, 256).trim().toLowerCase();
+        if (!sample.startsWith('<!doctype html') && !sample.startsWith('<html')) {
+          const rows = SpreadsheetUtils.parseDelimitedText(text, ',');
+          return {
+            sheets: sheetName ? [sheetName] : [],
+            resolvedSheet: sheetName || 'Sheet1',
+            rows,
+          };
+        }
+      }
+    } catch {}
+
+    throw new Error(
+      apiErrorMessage ||
+        'Could not access this Google Spreadsheet. Ensure its sharing permission is set to "Anyone with the link can view", or upload an exported .xlsx / .csv file below.',
+    );
+  }
+
+  /**
+   * Handles uploading or dropping a local `.xlsx`, `.csv`, or `.tsv` spreadsheet file.
+   */
+  public async onSpreadsheetFileSelected(event: Event, autoRun: boolean = false): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+    await this.importSpreadsheetFile(file, autoRun);
+  }
+
+  public async onSpreadsheetFileDropped(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) {
+      return;
+    }
+    await this.importSpreadsheetFile(file, false);
+  }
+
+  public async importSpreadsheetFile(file: File, autoRun: boolean = false): Promise<boolean> {
+    this.sheetLoadError = null;
+    this.sheetLoadSuccess = null;
+    const fileMb = (file.size / (1024 * 1024)).toFixed(1);
+    this.startSheetLoadProgress(
+      `Reading "${file.name}" (${fileMb} MB)...`,
+      'Parsing spreadsheet rows and extracting embedded cell images...',
+    );
+
+    try {
+      const lowerName = file.name.toLowerCase();
+      const requestedSheet = String(this.settings.value.sheetName ?? '').trim();
+      let rows: string[][] = [];
+      let resolvedSheet = file.name;
+
+      if (lowerName.endsWith('.xlsx')) {
+        const buffer = await file.arrayBuffer();
+        this.sheetLoadPhase = 'extracting';
+        this.revokeAllocatedBlobUrls();
+        const parsed = await SpreadsheetUtils.parseXlsx(buffer, requestedSheet, null, {
+          useBlobUrls: true,
+          onProgress: (completed, total) => {
+            const pct = 25 + Math.round((completed / Math.max(1, total)) * 65);
+            this.updateSheetLoadProgress(
+              pct,
+              `Extracting embedded cell images from "${file.name}"...`,
+              `Processed ${completed} of ${total} archive entries (${fileMb} MB)...`,
+            );
+          },
+        });
+        this.availableSheets = parsed.sheets;
+        resolvedSheet = `${file.name} (${parsed.resolvedSheet})`;
+        rows = parsed.rows;
+      } else if (lowerName.endsWith('.tsv') || file.type === 'text/tab-separated-values') {
+        const text = await file.text();
+        rows = SpreadsheetUtils.parseDelimitedText(text, '\t');
+      } else if (lowerName.endsWith('.csv') || file.type === 'text/csv' || file.type === 'text/plain') {
+        const text = await file.text();
+        rows = SpreadsheetUtils.parseDelimitedText(text, ',');
+      } else {
+        throw new Error('Unsupported file format. Please upload a .xlsx, .csv, or .tsv spreadsheet.');
+      }
+
+      this.updateSheetLoadProgress(95, 'Populating evaluation table...', '');
+      const importedCount = await this.importTabularRows(rows, true);
+      if (importedCount === 0) {
+        this.sheetLoadError = `No evaluation rows were found in "${resolvedSheet}".`;
+        return false;
+      }
+
+      const rowsWithImages = this.rows.controls.filter(
+        control => (control.value.images?.length ?? 0) > 0,
+      ).length;
+      const imageSummary =
+        rowsWithImages > 0
+          ? ` (${rowsWithImages} with embedded image${rowsWithImages === 1 ? '' : 's'})`
+          : '';
+
+      this.loadedSheetName = resolvedSheet;
+      this.sheetLoadProgress = 100;
+      this.sheetLoadSuccess = `Loaded ${importedCount} evaluation row${importedCount === 1 ? '' : 's'}${imageSummary} from "${resolvedSheet}".`;
+      this.lastLoadedSheetKey = `${String(this.settings.value.spreadsheetUrl ?? '').trim()}|${String(this.settings.value.sheetName ?? '').trim()}`;
+      this.checkForSavedCheckpoint();
+      this.isLoadingSheet = false;
+      this.stopSheetLoadTimer();
+      this.cdr.detectChanges();
+
+      if (autoRun) {
+        await this.run();
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof SpreadsheetSheetNotFoundError) {
+        this.availableSheets = error.availableSheets;
+      }
+      this.sheetLoadError =
+        error instanceof Error ? error.message : 'Failed to read the uploaded spreadsheet file.';
+      return false;
+    } finally {
+      this.isLoadingSheet = false;
+      this.isLoadingEmbeddedImages = false;
+      this.stopSheetLoadTimer();
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Imports a 2D array of string cells (from Google Sheets API/gviz, XLSX, CSV, or TSV)
+   * into the Evals `rows` FormArray.
+   * Row 1 (`nonEmptyRows[0]`) is always treated as the column header row, and all rows
+   * from Row 2 (`nonEmptyRows.slice(1)`) and onwards are imported as evaluation data rows.
+   * Returns the number of imported evaluation rows.
+   */
+  public async importTabularRows(
+    rawRows: string[][],
+    replaceExisting: boolean = true,
+  ): Promise<number> {
+    const nonEmptyRows = (rawRows ?? []).filter(row =>
+      Array.isArray(row) && row.some(cell => String(cell ?? '').trim().length > 0),
+    );
+
+    if (nonEmptyRows.length < 2) {
+      return 0;
+    }
+
+    const bindings = this.readSpreadsheetHeaderBindings(nonEmptyRows[0]);
+    const candidateRows = nonEmptyRows.slice(1);
+    const contentFields = new Set<keyof EvalsRow>(['context', 'input', 'images', 'audio', 'schema']);
+    const contentBindings = bindings.filter(({field}) => contentFields.has(field));
+    const checkBindings = contentBindings.length ? contentBindings : bindings;
+    let bodyRows = candidateRows.filter(row =>
+      checkBindings.some(({index}) => String(row[index] ?? '').trim().length > 0),
+    );
+
+    if (!bodyRows.length) {
+      bodyRows = candidateRows.filter(row =>
+        bindings.some(({index}) => String(row[index] ?? '').trim().length > 0),
+      );
+    }
+
+    if (!bodyRows.length) {
+      return 0;
+    }
+
+    const parsed: Partial<EvalsRow>[] = [];
+    for (const rowCells of bodyRows) {
+      parsed.push(await this.readTabularRow(rowCells, bindings));
+    }
+
+    if (replaceExisting) {
+      this.requestedColumns.clear();
+      for (const {field} of bindings) {
+        if (
+          field === 'images' ||
+          field === 'audio' ||
+          field === 'schema' ||
+          field === 'samplingMode'
+        ) {
+          this.requestedColumns.add(field);
+        } else if (
+          field === 'summarizerLength' ||
+          field === 'summarizerType' ||
+          field === 'summarizerPreference'
+        ) {
+          this.requestedColumns.add('summarizer');
+        }
+      }
+
+      while (this.rows.length > parsed.length) {
+        this.rows.removeAt(this.rows.length - 1, {emitEvent: false});
+      }
+      for (let i = 0; i < parsed.length; i++) {
+        const item = parsed[i];
+        const fullRow: EvalsRow = {
+          api: item.api || ApiEnum.Prompt,
+          context: item.context || '',
+          input: item.input || '',
+          images: item.images || [],
+          audio: item.audio || [],
+          schema: item.schema || '',
+          samplingMode: item.samplingMode || '',
+          summarizerLength: item.summarizerLength || '',
+          summarizerType: item.summarizerType || '',
+          summarizerPreference: item.summarizerPreference || '',
+          status: InferenceStatusEnum.Idle,
+          output: '',
+          warnings: item.warnings || [],
+        };
+        if (i < this.rows.length) {
+          this.rows.at(i).patchValue(fullRow, {emitEvent: false});
+        } else {
+          this.rows.push(this.createRow(fullRow), {emitEvent: false});
+        }
+      }
+      this.rows.updateValueAndValidity({emitEvent: true});
+    } else {
+      for (let i = 0; i < parsed.length; i++) {
+        if (i < this.rows.length) {
+          this.rows.at(i).patchValue(parsed[i], {emitEvent: false});
+        } else {
+          this.rows.push(this.createRow(parsed[i]), {emitEvent: false});
+        }
+      }
+      this.rows.updateValueAndValidity({emitEvent: true});
+    }
+
+    this.cdr.detectChanges();
+    return parsed.length;
+  }
+
+  /**
+   * Maps Row 1 of an imported spreadsheet to `ColumnBinding[]` using the exact
+   * Spreadsheet-to-Website column mapping table:
+   * - API -> API (`api`)
+   * - Context -> CONTEXT (`context`)
+   * - Input (Text) -> INPUT (`input`)
+   * - Input (Images) -> IMAGES (`images`)
+   * - Input (Audio) -> AUDIO (`audio`)
+   * - Schema -> SCHEMA (`schema`)
+   * - Sampling Mode -> SAMPLING MODE (`samplingMode`)
+   * - Summarizer Length (Optional) -> SUMMARIZER dropdown -> LENGTH (`summarizerLength`)
+   * - Summarizer Type (Optional) -> SUMMARIZER dropdown -> TYPE (`summarizerType`)
+   * - Summarizer Speed Preference -> SUMMARIZER dropdown -> SPEED PREFERENCE (`summarizerPreference`)
+   *
+   * Any column not matching the mapping table (e.g., extra user columns such as `prompt` or `aaaaahhh`)
+   * is ignored regardless of column order.
+   */
+  private readSpreadsheetHeaderBindings(labels: string[]): ColumnBinding[] {
+    const bindings: ColumnBinding[] = [];
+    const fields = new Set<string>();
+
+    labels.forEach((rawLabel, index) => {
+      const normalized = (rawLabel ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+      if (!normalized) {
+        return;
+      }
+
+      const exactField = EvalsPage.exactSpreadsheetHeaders.get(normalized);
+      if (!exactField) {
+        return;
+      }
+
+      if (!fields.has(exactField)) {
+        fields.add(exactField);
+        bindings.push({field: exactField, index});
+      } else if (exactField === 'images' || exactField === 'audio') {
+        bindings.push({field: exactField, index});
+      }
+    });
+
+    return bindings;
+  }
 
   public async onPaste(event: ClipboardEvent, rowIndex: number): Promise<void> {
     const clipboardData = event.clipboardData;
@@ -1010,22 +2132,52 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    * import the way they always did.
    */
   private readHeaderBindings(tableRow: HTMLTableRowElement): ColumnBinding[] | null {
-    const cells = Array.from(tableRow.querySelectorAll('td, th'));
+    const labels = Array.from(tableRow.querySelectorAll('td, th')).map(
+      cell => (cell.textContent ?? '').trim(),
+    );
+    return this.readHeaderBindingsFromLabels(labels);
+  }
+
+  private readHeaderBindingsFromLabels(labels: string[]): ColumnBinding[] | null {
     const bindings: ColumnBinding[] = [];
     const fields = new Set<string>();
+    const boundIndices = new Set<number>();
     let filled = 0;
     let matched = 0;
 
-    cells.forEach((cell, index) => {
-      const label = (cell.textContent ?? '').trim();
+    // Pass 1: Bind exact canonical spreadsheet column names first so extra columns (like "prompt")
+    // never steal a field before "Input (Text)" is visited.
+    labels.forEach((rawLabel, index) => {
+      const normalized = (rawLabel ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+      if (!normalized) {
+        return;
+      }
+      filled++;
+      const exactField = EvalsPage.exactSpreadsheetHeaders.get(normalized);
+      if (!exactField) {
+        return;
+      }
+      matched++;
+      boundIndices.add(index);
+      if (!fields.has(exactField)) {
+        fields.add(exactField);
+        bindings.push({field: exactField, index});
+      } else if (exactField === 'images' || exactField === 'audio') {
+        bindings.push({field: exactField, index});
+      }
+    });
 
+    // Pass 2: Fallback vocabulary matching for any remaining unbound fields
+    labels.forEach((rawLabel, index) => {
+      if (boundIndices.has(index)) {
+        return;
+      }
+      const label = (rawLabel ?? '').trim();
       if (!label) {
         return;
       }
 
-      filled++;
       const field = this.matchColumn(label);
-
       if (!field) {
         return;
       }
@@ -1034,6 +2186,9 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
 
       if (!fields.has(field)) {
         fields.add(field);
+        bindings.push({field, index});
+      } else if (field === 'images' || field === 'audio') {
+        // Allow fallback media columns (e.g. "Input (Images)" followed by "Image link (URL)")
         bindings.push({field, index});
       }
     });
@@ -1059,6 +2214,117 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     return null;
   }
 
+  private async readTabularRow(
+    cells: string[],
+    bindings: ColumnBinding[],
+  ): Promise<Partial<EvalsRow>> {
+    const data: Partial<EvalsRow> = {};
+    const warnings: string[] = [];
+
+    for (const {field, index} of bindings) {
+      const rawText = String(cells[index] ?? '').trim();
+      if (!rawText) {
+        continue;
+      }
+
+      switch (field) {
+        case 'images': {
+          if (!data.images?.length) {
+            data.images = await this.readTabularMediaCell(rawText, 'image', warnings);
+          }
+          break;
+        }
+
+        case 'audio': {
+          if (!data.audio?.length) {
+            data.audio = await this.readTabularMediaCell(rawText, 'audio', warnings);
+          }
+          break;
+        }
+
+        case 'api':
+          data.api = this.normalizeApi(rawText);
+          break;
+
+        case 'samplingMode': {
+          const value = this.normalizeSamplingMode(rawText);
+          if (value === null) {
+            const choices = this.samplingModes.map(mode => mode.value).join(', ');
+            warnings.push(
+              `The Sampling mode "${rawText}" is not a value the API takes — it was ignored. Use ${choices}.`,
+            );
+          } else {
+            data.samplingMode = value;
+          }
+          break;
+        }
+
+        case 'summarizerLength':
+        case 'summarizerType':
+        case 'summarizerPreference': {
+          const option = this.summarizerOptions.find(candidate => candidate.field === field)!;
+          const value = this.normalizeSummarizerValue(option, rawText);
+
+          if (value === null) {
+            warnings.push(
+              `The Summarizer ${option.label.toLowerCase()} "${rawText}" is not a value the API takes — it was ignored. Use ${option.choices.join(', ')}.`,
+            );
+          } else {
+            data[field] = value;
+          }
+          break;
+        }
+
+        default:
+          (data as any)[field] = rawText;
+          break;
+      }
+    }
+
+    data.warnings = warnings;
+    return data;
+  }
+
+  private async readTabularMediaCell(
+    rawText: string,
+    kind: MediaKind,
+    warnings: string[],
+  ): Promise<string[]> {
+    let cleaned = rawText.trim();
+    const imageFormulaMatch = cleaned.match(/^=?\s*image\(\s*"([^"]+)"/i);
+    if (imageFormulaMatch) {
+      cleaned = imageFormulaMatch[1].trim();
+    }
+
+    if (/^https?:\/\/(?:www\.)?web-ai\.studio\/images\//i.test(cleaned)) {
+      cleaned = cleaned.replace(/^https?:\/\/(?:www\.)?web-ai\.studio\/+/i, '');
+    }
+
+    if (MediaSourceUtils.isBlobUrl(cleaned)) {
+      this.allocatedBlobUrls.push(cleaned);
+      return [cleaned];
+    }
+
+    if (MediaSourceUtils.isDataUrl(cleaned)) {
+      return [cleaned];
+    }
+
+    const candidates = cleaned
+      .split(/[\s,]+/)
+      .map(c => c.trim())
+      .filter(
+        candidate =>
+          MediaSourceUtils.isDataOrBlobUrl(candidate) ||
+          MediaSourceUtils.looksLikePath(candidate, kind),
+      );
+
+    const sources: string[] = [];
+    for (const source of candidates) {
+      sources.push(await this.resolveMediaSource(source, kind, warnings, false));
+    }
+    return sources;
+  }
+
   private async readSheetRow(tableRow: HTMLTableRowElement, bindings: ColumnBinding[]): Promise<Partial<EvalsRow>> {
     const cells = Array.from(tableRow.querySelectorAll('td, th'));
     const data: Partial<EvalsRow> = {};
@@ -1072,13 +2338,19 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       }
 
       switch (field) {
-        case 'images':
-          data.images = await this.readMediaCell(cell, 'image', warnings);
+        case 'images': {
+          if (!data.images?.length) {
+            data.images = await this.readMediaCell(cell, 'image', warnings);
+          }
           break;
+        }
 
-        case 'audio':
-          data.audio = await this.readMediaCell(cell, 'audio', warnings);
+        case 'audio': {
+          if (!data.audio?.length) {
+            data.audio = await this.readMediaCell(cell, 'audio', warnings);
+          }
           break;
+        }
 
         case 'api':
           data.api = this.normalizeApi(cell.textContent ?? '');
@@ -1175,7 +2447,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     const sources: string[] = [];
 
     for (const source of found) {
-      sources.push(await this.resolveMediaSource(source, kind, warnings));
+      sources.push(await this.resolveMediaSource(source, kind, warnings, true));
     }
 
     return sources;
@@ -1185,12 +2457,24 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
    * Remote media is inlined so the row survives the sheet going away. When CORS refuses, the
    * URL is kept: the preview still renders it and the run fetches it again.
    */
-  private async resolveMediaSource(source: string, kind: MediaKind, warnings: string[]): Promise<string> {
+  private async resolveMediaSource(
+    source: string,
+    kind: MediaKind,
+    warnings: string[],
+    fromClipboard: boolean = true,
+  ): Promise<string> {
+    // Normalize https://web-ai.studio/... URLs to local relative paths when running on another host
+    source = MediaSourceUtils.normalizeLocalAssetUrl(source);
+
+    if (MediaSourceUtils.isBlobUrl(source)) {
+      return source;
+    }
+
     // A data URL is already the bytes the clipboard carried — there is nothing better to fetch,
     // but it is worth saying so when those bytes are only a cell-sized preview.
     if (MediaSourceUtils.isDataUrl(source)) {
       if (kind === 'image') {
-        await this.warnIfUnderSized(source, source, warnings, true);
+        await this.warnIfUnderSized(source, source, warnings, fromClipboard);
       }
       return source;
     }

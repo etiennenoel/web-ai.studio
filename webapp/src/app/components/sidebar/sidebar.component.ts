@@ -20,6 +20,7 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   isBestPracticesExpanded = false;
   isPlaygroundsExpanded = true;
   isDecisionsBenchmarkExpanded = false;
+  isEvalsExpanded = true;
   activeDecisionsSuiteId = 'laya-typed-decisions';
 
   readonly decisionsBenchmarkSuites: Array<{ id: string; label: string; icon: string }> = [
@@ -172,7 +173,34 @@ export class SidebarComponent extends BaseComponent implements OnInit {
     });
   }
 
+  get isEvalsActive(): boolean {
+    return [
+      RouteEnum.Evals,
+      RouteEnum.EvalsSpreadsheetUpload,
+    ].includes(this.routeEnum);
+  }
+
+  toggleEvals(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isEvalsExpanded = !this.isEvalsExpanded;
+  }
+
+  navigateToEvals() {
+    this.router.navigate([this.RouteEnum.Evals]);
+  }
+
   determineCurrentActiveRoute(pathname: string, search = '') {
+    if (pathname.includes('/evals')) {
+      this.isEvalsExpanded = true;
+      if (pathname.includes('spreadsheet-upload')) {
+        this.routeEnum = RouteEnum.EvalsSpreadsheetUpload;
+      } else {
+        this.routeEnum = RouteEnum.Evals;
+      }
+      return;
+    }
+
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
       return;
