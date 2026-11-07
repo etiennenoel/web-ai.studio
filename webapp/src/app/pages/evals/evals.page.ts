@@ -20,7 +20,6 @@ import {SummarizerOption} from './summarizer-option.interface';
 import {PROMPT_SAMPLING_MODES} from '../../core/models/prompt-run.options';
 
 type MediaKind = 'image' | 'audio';
-export type EvalsSubtab = 'spreadsheet' | 'manual';
 
 interface ColumnBinding {
   field: keyof EvalsRow;
@@ -137,8 +136,6 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     'https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/edit?gid=0#gid=0';
 
   form: FormGroup;
-
-  activeSubtab: EvalsSubtab = 'spreadsheet';
 
   isLoadingSheet: boolean = false;
 
@@ -271,36 +268,12 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
   override async ngOnInit() {
     super.ngOnInit();
 
-    this.subscriptions.push(
-      this.route.data.subscribe(data => {
-        if (data?.['evalsSubtab'] === 'spreadsheet') {
-          this.activeSubtab = 'spreadsheet';
-        } else if (data?.['evalsSubtab'] === 'manual') {
-          const tabParam = this.route.snapshot.queryParamMap.get('tab');
-          if (tabParam !== 'spreadsheet') {
-            this.activeSubtab = 'manual';
-          }
-        }
-      }),
-    );
-
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
 
-    if (this.document.location.pathname.includes('spreadsheet-upload')) {
-      this.activeSubtab = 'spreadsheet';
-    }
-
     this.subscriptions.push(
       this.route.queryParamMap.subscribe(params => {
-        const tab = params.get('tab');
-        if (tab === 'manual' || tab === 'paste') {
-          this.activeSubtab = 'manual';
-        } else if (tab === 'spreadsheet') {
-          this.activeSubtab = 'spreadsheet';
-        }
-
         const urlParam = params.get('spreadsheetUrl');
         const sheetParam = params.get('sheetName');
         if (urlParam) {
@@ -351,20 +324,6 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       clearTimeout(this.copyFeedbackTimer);
     }
     super.ngOnDestroy();
-  }
-
-  setSubtab(tab: EvalsSubtab) {
-    this.activeSubtab = tab;
-    if (
-      isPlatformBrowser(this.platformId) &&
-      !this.document.location.hostname.includes('zipline.googleplex.com')
-    ) {
-      const targetRoute = tab === 'spreadsheet' ? '/evals/spreadsheet-upload' : '/evals';
-      void this.router.navigate([targetRoute], {
-        queryParams: {tab: null},
-        queryParamsHandling: 'merge',
-      });
-    }
   }
 
   usePresetSpreadsheet(preset: 'test' | 'template') {

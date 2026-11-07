@@ -531,18 +531,7 @@ const routes: Routes = [
         title: "Evals",
         component: EvalsPage,
         data: {
-          route: RouteEnum.Evals,
-          evalsSubtab: "manual"
-        }
-      },
-      {
-        path: "evals/spreadsheet-upload",
-
-        title: "Evals - Spreadsheet Dataset",
-        component: EvalsPage,
-        data: {
-          route: RouteEnum.EvalsSpreadsheetUpload,
-          evalsSubtab: "spreadsheet"
+          route: RouteEnum.Evals
         }
       },
       {

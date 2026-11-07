@@ -1,34 +1,6 @@
 <webai-studio-header title="Evals">
-    <div header-title-row class="flex flex-wrap items-center justify-between gap-3 w-full">
-      <div class="flex items-center gap-3">
-        <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">Evals</h2>
-      </div>
-
-      <!-- Subtabs under /evals -->
-      <div class="inline-flex items-center p-1 !rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700" role="tablist" aria-label="Evals mode subtabs">
-        <button type="button"
-                role="tab"
-                [attr.aria-selected]="activeSubtab === 'spreadsheet'"
-                class="flex items-center gap-2 px-3.5 py-1.5 !rounded-lg text-xs font-semibold transition-all border-none"
-                [class]="activeSubtab === 'spreadsheet'
-                  ? 'bg-[#ffffff] dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                  : 'bg-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
-                (click)="setSubtab('spreadsheet')">
-          <i class="bi bi-file-earmark-spreadsheet-fill"></i>
-          Spreadsheet Dataset Eval
-        </button>
-        <button type="button"
-                role="tab"
-                [attr.aria-selected]="activeSubtab === 'manual'"
-                class="flex items-center gap-2 px-3.5 py-1.5 !rounded-lg text-xs font-semibold transition-all border-none"
-                [class]="activeSubtab === 'manual'
-                  ? 'bg-[#ffffff] dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                  : 'bg-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
-                (click)="setSubtab('manual')">
-          <i class="bi bi-clipboard-data"></i>
-          Copy &amp; Paste / Manual Table
-        </button>
-      </div>
+    <div header-title-row class="flex items-center w-full">
+      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0">Evals</h2>
     </div>
   </webai-studio-header>
 
@@ -38,8 +10,7 @@
 
     <form [formGroup]="form">
 
-    @if (activeSubtab === 'spreadsheet') {
-      <!-- Google Spreadsheet Dataset Loader Card -->
+      <!-- Unified Import from Sheets (Link / File Upload / Copy & Paste) Card -->
       <div class="bg-[#ffffff] dark:bg-zinc-800/90 border border-indigo-200 dark:border-indigo-800/60 !rounded-3xl p-5 sm:p-6 mb-6 shadow-sm"
            formGroupName="settings"
            (drop)="onSpreadsheetFileDropped($event)"
@@ -48,10 +19,10 @@
           <div>
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 m-0 flex items-center gap-2">
               <i class="bi bi-file-earmark-spreadsheet text-indigo-600 dark:text-indigo-400"></i>
-              Load Prompt Dataset from Google Spreadsheet
+              Import Dataset from Spreadsheet
             </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-0">
-              Provide a Google Spreadsheet URL and Sheet Name to import columns (<code>Context</code>, <code>Input (Text)</code>, <code>Input (Images)</code>, <code>Input (Audio)</code>, <code>Schema</code>, <code>Sampling Mode</code>, <code>API</code>, <code>Summarizer</code> options), run the evaluation, and export responses.
+              Load rows via a Google Spreadsheet link, upload a local <code>.xlsx</code> / <code>.csv</code> / <code>.tsv</code> file, or <span class="font-medium text-slate-700 dark:text-slate-300">copy &amp; paste</span> cells directly into the first <code>Context</code> cell below (<a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">copy the template</a>).
             </p>
           </div>
 
@@ -135,25 +106,6 @@
             </button>
 
             <button type="button"
-                    class="flex items-center gap-2 px-5 py-2.5 !rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold shadow-sm transition-all border-none"
-                    [disabled]="isLoadingSheet || isRunning"
-                    (click)="run()">
-              <i class="bi bi-lightning-charge-fill"></i>
-              Run Eval ({{ rows.length }} {{ rows.length === 1 ? 'row' : 'rows' }})
-            </button>
-
-            @if (canResume) {
-              <button type="button"
-                      class="flex items-center gap-2 px-4 py-2.5 !rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-sm font-semibold shadow-sm transition-all border-none"
-                      [disabled]="isLoadingSheet || isRunning"
-                      title="Skip completed rows and continue running only unfinished rows"
-                      (click)="run(true)">
-                <i class="bi bi-play-circle-fill"></i>
-                Resume Remaining ({{ incompleteRowCount }} {{ incompleteRowCount === 1 ? 'row' : 'rows' }})
-              </button>
-            }
-
-            <button type="button"
                     class="flex items-center gap-2 px-3.5 py-2.5 !rounded-xl bg-[#ffffff] hover:bg-slate-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 disabled:opacity-50 text-slate-600 dark:text-slate-300 text-xs font-medium transition-all border border-dashed border-slate-300 dark:border-zinc-600"
                     [disabled]="isLoadingSheet || isRunning"
                     (click)="spreadsheetFileInput.click()"
@@ -168,40 +120,62 @@
                    (change)="onSpreadsheetFileSelected($event, false)">
           </div>
 
-          <!-- Export Responses Quick Actions -->
+          <!-- Live Local CSV Auto-Save Action -->
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button"
-                    class="flex items-center gap-1.5 px-3.5 py-2 !rounded-xl text-xs font-semibold border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    [class]="copyFeedback === 'copied'
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-300'
-                      : 'bg-[#ffffff] border-slate-300 text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-600 dark:text-slate-200 dark:hover:bg-zinc-700'"
-                    [disabled]="!hasOutputs"
-                    title="Copy every row's output, one line per row, to paste straight into your Google Sheet Output column"
-                    (click)="copyOutputs()">
-              @if (copyFeedback === 'copied') {
-                <i class="bi bi-check2"></i> Copied Outputs
+            @if (supportsLiveFileSave) {
+              @if (!liveOutputFileName) {
+                <button type="button"
+                        class="flex items-center gap-1.5 px-3.5 py-2 !rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 transition-colors"
+                        (click)="connectLiveOutputFile()"
+                        title="Choose a local timestamped .csv or .tsv file that is automatically updated on disk after every single row finishes">
+                  <i class="bi bi-hdd-fill"></i>
+                  Auto-Save to Local File (.csv / .tsv)
+                </button>
               } @else {
-                <i class="bi bi-clipboard"></i> Copy Outputs Column
+                <div class="flex items-center gap-2 px-3 py-1.5 !rounded-xl text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                  <i class="bi bi-hdd-check-fill text-emerald-600"></i>
+                  <span>Auto-saving to <code>{{ liveOutputFileName }}</code></span>
+                  @if (liveOutputLastSavedAt) {
+                    <span class="text-[11px] opacity-80">(Saved {{ liveOutputLastSavedAt }})</span>
+                  }
+                  <button type="button"
+                          class="ml-1 text-emerald-700 dark:text-emerald-300 hover:opacity-75 bg-transparent border-none"
+                          title="Disconnect live local file"
+                          (click)="disconnectLiveOutputFile()">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
               }
-            </button>
-
-            <button type="button"
-                    class="flex items-center gap-1.5 px-3.5 py-2 !rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white border-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                    [disabled]="!hasOutputs"
-                    title="Download all rows and generated responses as a CSV file"
-                    (click)="exportResponses('csv')">
-              <i class="bi bi-download"></i> Export CSV
-            </button>
-
-            <button type="button"
-                    class="flex items-center gap-1.5 px-3.5 py-2 !rounded-xl text-xs font-semibold bg-[#ffffff] dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    [disabled]="!hasOutputs"
-                    title="Download all rows and generated responses as a TSV file"
-                    (click)="exportResponses('tsv')">
-              <i class="bi bi-file-earmark-spreadsheet"></i> Export TSV
-            </button>
+            }
           </div>
         </div>
+
+        <!-- Column & Copy-Paste Guide -->
+        <details class="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-700/60 group">
+          <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-semibold text-indigo-700 dark:text-indigo-300 select-none">
+            <span class="flex items-center gap-1.5">
+              <i class="bi bi-info-circle"></i>
+              Supported Columns &amp; Copy-Paste Instructions
+            </span>
+            <i class="bi bi-chevron-down transition-transform group-open:rotate-180"></i>
+          </summary>
+          <div class="mt-2.5 text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
+            <p class="m-0">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Copy &amp; Paste:</span>
+              <a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Copy the template</a>, fill in your rows, copy the sheet (<span class="font-semibold">including the header row</span>), and paste it directly into the <code>Context</code> cell of the first row below.
+            </p>
+            <p class="m-0">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Matched Headers (any order):</span>
+              <code>Context</code>, <code>Input (Text)</code>, <code>Input (Images)</code>, <code>Input (Audio)</code>,
+              <code>Schema</code>, <code>Sampling Mode</code>, <code>API</code>, <code>Summarizer Length</code>, <code>Summarizer Type</code>,
+              <code>Summarizer Speed Preference</code>. Unrecognised or omitted columns are ignored.
+            </p>
+            <p class="m-0">
+              <span class="font-semibold text-slate-700 dark:text-slate-300">Media &amp; Options:</span>
+              Pictures placed in <code>Input (Images)</code> cells are downloaded into the row whether loaded via URL/file or pasted. <code>Input (Audio)</code> takes a full URL (e.g. <code>https://web-ai.studio/images/cortex/speeches/spontaneous-speech-en-46.mp3</code>). <code>Schema</code> takes a JSON Schema or a <code>/regex/flags</code> literal (Prompt rows only). The three <code>Summarizer</code> columns accept <code>short</code>/<code>medium</code>/<code>long</code>, <code>key-points</code>/<code>tldr</code>/<code>teaser</code>/<code>headline</code>, and <code>auto</code>/<code>speed</code>/<code>capability</code>.
+            </p>
+          </div>
+        </details>
 
         <!-- Sheet Load Progress Bar & Feedback -->
         @if (isLoadingSheet) {
@@ -242,7 +216,7 @@
               <i class="bi bi-check-circle-fill text-emerald-600 dark:text-emerald-400 text-sm"></i>
               <span>{{ sheetLoadSuccess }}</span>
             </div>
-            <button type="button" class="text-emerald-700 dark:text-emerald-300 hover: opacity-80 bg-transparent border-none" (click)="sheetLoadSuccess = null">
+            <button type="button" class="text-emerald-700 dark:text-emerald-300 hover:opacity-80 bg-transparent border-none" (click)="sheetLoadSuccess = null">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
@@ -291,84 +265,7 @@
             </div>
           </div>
         }
-
-        <!-- Live Local CSV Auto-Save Panel -->
-        <div class="mt-4 pt-4 border-t border-slate-100 dark:border-zinc-700/60 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-col gap-0.5">
-            <div class="flex items-center gap-2">
-              <i class="bi bi-hdd-fill text-emerald-600 dark:text-emerald-400 text-sm"></i>
-              <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                Live Local CSV Auto-Save (Crash-Safe)
-              </span>
-              <span class="px-2 py-0.5 !rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
-                Saves after every row
-              </span>
-            </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 m-0">
-              Automatically updates a timestamped local <code>.csv</code> / <code>.tsv</code> file on disk as each row finishes so zero progress is lost if the PC freezes.
-            </p>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2">
-            @if (supportsLiveFileSave) {
-              @if (!liveOutputFileName) {
-                <button type="button"
-                        class="flex items-center gap-1.5 px-3.5 py-2 !rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 transition-colors"
-                        (click)="connectLiveOutputFile()"
-                        title="Choose a local timestamped .csv or .tsv file that is automatically updated on disk after every single row finishes">
-                  <i class="bi bi-hdd-fill"></i>
-                  Auto-Save to Local File (.csv / .tsv)
-                </button>
-              } @else {
-                <div class="flex items-center gap-2 px-3 py-1.5 !rounded-xl text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
-                  <i class="bi bi-hdd-check-fill text-emerald-600"></i>
-                  <span>Auto-saving to <code>{{ liveOutputFileName }}</code></span>
-                  @if (liveOutputLastSavedAt) {
-                    <span class="text-[11px] opacity-80">(Saved {{ liveOutputLastSavedAt }})</span>
-                  }
-                  <button type="button"
-                          class="ml-1 text-emerald-700 dark:text-emerald-300 hover:opacity-75 bg-transparent border-none"
-                          title="Disconnect live local file"
-                          (click)="disconnectLiveOutputFile()">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                </div>
-              }
-            }
-          </div>
-        </div>
       </div>
-    } @else {
-      <!-- How to Use Card (Copy & Paste / Manual Subtab) -->
-      <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 !rounded-2xl p-5 mb-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
-          <i class="bi bi-file-earmark-spreadsheet"></i> Import from Sheets (Copy &amp; Paste)
-        </h2>
-        <ol class="list-decimal list-inside text-sm text-indigo-800/80 dark:text-indigo-300/80 space-y-1 ml-1">
-          <li><a target="_blank" href="https://docs.google.com/spreadsheets/d/18lCuZ6f3Lehg9rJIYuuFwJq6PfvGzLMEAsi9oAznclk/copy" class="underline hover:text-indigo-600 dark:hover:text-indigo-200">Copy the template</a> and fill in your rows.</li>
-          <li>Copy the sheet — <span class="font-semibold">including the header row</span> — and paste it into the Context cell of the first row below.</li>
-        </ol>
-        <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-3 mb-0">
-          Headers are matched by name in any order:
-          <code>Context</code>, <code>Input (Text)</code>, <code>Input (Images)</code>, <code>Input (Audio)</code>,
-          <code>Schema</code>, <code>Sampling Mode</code>, <code>API</code>, <code>Summarizer Length</code>, <code>Summarizer Type</code>,
-          <code>Summarizer Speed Preference</code>. Columns you leave out are simply not imported, and any column
-          the page does not recognise is ignored.
-        </p>
-        <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-2 mb-0">
-          Put pictures straight into the <code>Input (Images)</code> cells — they come across with the paste and are
-          downloaded into the row. An <code>Input (Audio)</code> cell takes a full URL, for example
-          <code>https://web-ai.studio/images/cortex/speeches/spontaneous-speech-en-46.mp3</code>. A
-          <code>Schema</code> cell takes a JSON Schema or a <code>/regex/flags</code> literal, and applies to
-          Prompt rows only.
-        </p>
-        <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-2 mb-0">
-          The three <code>Summarizer</code> columns set the create options on Summarizer rows:
-          <code>short</code>/<code>medium</code>/<code>long</code>, <code>key-points</code>/<code>tldr</code>/<code>teaser</code>/<code>headline</code>,
-          and <code>auto</code>/<code>speed</code>/<code>capability</code>. Leave a cell blank to keep the model default.
-        </p>
-      </div>
-    }
 
     <!-- Actions & Status -->
     <div class="mb-6 flex flex-col gap-4" formGroupName="settings">
@@ -377,9 +274,24 @@
           <i class="bi bi-stop-circle-fill"></i> Stop
         </button>
       } @else {
-        <button type="button" class="w-full py-4 !rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2" (click)="run()">
-          <i class="bi bi-lightning-charge-fill"></i> Run Evals ({{ rows.length }} {{ rows.length === 1 ? 'row' : 'rows' }})
-        </button>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button type="button"
+                  class="flex-grow py-4 !rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-lg flex items-center justify-center gap-2"
+                  [disabled]="isLoadingSheet"
+                  (click)="run()">
+            <i class="bi bi-lightning-charge-fill"></i> Run Evals ({{ rows.length }} {{ rows.length === 1 ? 'row' : 'rows' }})
+          </button>
+          @if (canResume) {
+            <button type="button"
+                    class="px-6 py-4 !rounded-2xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold shadow-md transition-all active:scale-[0.98] border-none text-base flex items-center justify-center gap-2"
+                    [disabled]="isLoadingSheet"
+                    title="Skip completed rows and continue running only unfinished rows"
+                    (click)="run(true)">
+              <i class="bi bi-play-circle-fill"></i>
+              Resume Remaining ({{ incompleteRowCount }} {{ incompleteRowCount === 1 ? 'row' : 'rows' }})
+            </button>
+          }
+        </div>
       }
 
       <!-- Toolbar: optional columns + export + bulk audio import -->
