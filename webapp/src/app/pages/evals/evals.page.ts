@@ -297,9 +297,10 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
           const nextId =
             SpreadsheetUtils.parseGoogleSpreadsheetInput(String(rawUrl ?? ''))?.spreadsheetId ?? '';
           if (nextId && nextId !== lastSpreadsheetId) {
+            const hadPreviousId = !!lastSpreadsheetId;
             lastSpreadsheetId = nextId;
             this.availableSheets = [];
-            if (this.settings.value.sheetName) {
+            if (hadPreviousId && this.settings.value.sheetName) {
               this.settings.patchValue({sheetName: ''}, {emitEvent: false});
             }
           }
@@ -1744,7 +1745,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       }
     }
 
-    // 2. Fallback: Direct client-side fetch from Google Sheets gviz CSV endpoint
+    // 2. Fallback: Direct client-side fetch from Google Sheets gviz CSV endpoint (or JSON sheet payload)
     const csvUrl = SpreadsheetUtils.buildGvizCsvUrl(spreadsheetId, sheetName, gid);
     try {
       const response = await fetch(csvUrl, {
@@ -1753,7 +1754,24 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
       });
       if (response.ok) {
         const text = await response.text();
-        const sample = text.slice(0, 256).trim().toLowerCase();
+        const trimmed = text.trim();
+        if (trimmed.startsWith('{')) {
+          try {
+            const payload = JSON.parse(trimmed);
+            if (payload && Array.isArray(payload.rows)) {
+              return {
+                sheets: Array.isArray(payload.sheets)
+                  ? payload.sheets
+                  : sheetName
+                    ? [sheetName]
+                    : [],
+                resolvedSheet: String(payload.resolvedSheet || sheetName || 'Sheet1'),
+                rows: payload.rows,
+              };
+            }
+          } catch {}
+        }
+        const sample = trimmed.slice(0, 256).toLowerCase();
         if (!sample.startsWith('<!doctype html') && !sample.startsWith('<html')) {
           const rows = SpreadsheetUtils.parseDelimitedText(text, ',');
           return {
