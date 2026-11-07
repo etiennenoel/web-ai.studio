@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EvalsPage } from './evals.page';
 import { ApiEnum } from './api.enum';
 import { MediaSourceUtils } from '../../core/utils/media-source.utils';
+import { SpreadsheetUtils } from '../../core/utils/spreadsheet.utils';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -541,9 +542,23 @@ describe('EvalsPage', () => {
     });
 
     it('should normalise valid samplingMode values and reject unknown ones', () => {
+      expect(component.samplingModes.map(mode => mode.value)).toEqual([
+        'most-predictable',
+        'predictable',
+        'slightly-predictable',
+        'balanced',
+        'slightly-creative',
+        'creative',
+        'most-creative',
+      ]);
       expect(component.normalizeSamplingMode('Most Predictable')).toBe('most-predictable');
       expect(component.normalizeSamplingMode('most-predictable')).toBe('most-predictable');
+      expect(component.normalizeSamplingMode('predictable')).toBe('predictable');
+      expect(component.normalizeSamplingMode('slightly-predictable')).toBe('slightly-predictable');
+      expect(component.normalizeSamplingMode('balanced')).toBe('balanced');
       expect(component.normalizeSamplingMode('slightly_creative')).toBe('slightly-creative');
+      expect(component.normalizeSamplingMode('creative')).toBe('creative');
+      expect(component.normalizeSamplingMode('most-creative')).toBe('most-creative');
       expect(component.normalizeSamplingMode('  ')).toBe('');
       expect(component.normalizeSamplingMode('random-mode')).toBeNull();
     });
@@ -569,6 +584,186 @@ describe('EvalsPage', () => {
 
       component.cancelReset();
       expect(component.rows.at(0).value.input).toBe('do not lose me');
+    });
+  });
+
+  describe('Google Spreadsheet URL & tabular import / export', () => {
+    it('should parse Google Spreadsheet URLs with gid and sheet name', () => {
+      const parsed = SpreadsheetUtils.parseGoogleSpreadsheetInput(
+        'https://docs.google.com/spreadsheets/d/1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y/edit?gid=0#gid=0',
+        'Sheet1',
+      );
+      expect(parsed).toEqual({
+        spreadsheetId: '1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y',
+        gid: '0',
+        sheetName: 'Sheet1',
+      });
+    });
+
+    it('should omit gid from gviz URL when sheetName is provided', () => {
+      const urlWithSheet = SpreadsheetUtils.buildGvizCsvUrl(
+        '1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y',
+        'PromptsTab',
+        '0',
+      );
+      expect(urlWithSheet).toContain('sheet=PromptsTab');
+      expect(urlWithSheet).not.toContain('gid=');
+
+      const urlWithGidOnly = SpreadsheetUtils.buildGvizCsvUrl(
+        '1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y',
+        '',
+        '0',
+      );
+      expect(urlWithGidOnly).toContain('gid=0');
+    });
+
+    it('should import tabular rows using exact canonical header mapping regardless of column order', async () => {
+      spyOn(window, 'fetch').and.rejectWith(new TypeError('offline'));
+
+      const count = await component.importTabularRows([
+        [
+          'prompt_id',
+          'prompt',
+          'Schema',
+          'API',
+          'Context',
+          'Input (Text)',
+          'Input (Images)',
+          'Sampling Mode',
+          'Summarizer Length (Optional)',
+          'Summarizer Type (Optional)',
+          'Summarizer Speed Preference',
+        ],
+        [
+          'P001',
+          'ignored extra prompt column',
+          '{"type":"object"}',
+          'Prompt',
+          'You are a helpful assistant.',
+          'Describe this image.',
+          'blob:https://web-ai.studio/1234-5678',
+          'most-predictable',
+          'short',
+          'tldr',
+          'speed',
+        ],
+        [
+          'P002',
+          'ignored 2',
+          '',
+          'Summarizer',
+          'Be concise.',
+          'Summarize this paragraph.',
+          '',
+          '',
+          'medium',
+          'key-points',
+          'capability',
+        ],
+      ]);
+
+      expect(count).toBe(2);
+      expect(component.rows.length).toBe(2);
+      expect(component.rows.at(0).value.context).toBe('You are a helpful assistant.');
+      expect(component.rows.at(0).value.input).toBe('Describe this image.');
+      expect(component.rows.at(0).value.schema).toBe('{"type":"object"}');
+      expect(component.rows.at(0).value.images).toEqual(['blob:https://web-ai.studio/1234-5678']);
+      expect(component.rows.at(0).value.samplingMode).toBe('most-predictable');
+      expect(component.rows.at(0).value.summarizerLength).toBe('short');
+      expect(component.rows.at(0).value.summarizerType).toBe('tldr');
+      expect(component.rows.at(0).value.summarizerPreference).toBe('speed');
+      expect(component.rows.at(1).value.api).toBe(ApiEnum.Summarizer);
+    });
+
+    it('should load rows from /api/evals/sheet via loadFromGoogleSheet', async () => {
+      const mockPayload = {
+        spreadsheetId: '1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y',
+        sheets: ['Sheet1', 'EvalSet2'],
+        resolvedSheet: 'Sheet1',
+        rows: [
+          ['Context', 'Input (Text)', 'API'],
+          ['System context 1', 'User prompt 1', 'Prompt'],
+        ],
+      };
+
+      spyOn(window, 'fetch').and.resolveTo(
+        new Response(JSON.stringify(mockPayload), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+
+      component.settings.patchValue({
+        spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y/edit?gid=0#gid=0',
+        sheetName: 'Sheet1',
+      });
+
+      const ok = await component.loadFromGoogleSheet(false);
+      expect(ok).toBeTrue();
+      expect(component.availableSheets).toEqual(['Sheet1', 'EvalSet2']);
+      expect(component.rows.length).toBe(1);
+      expect(component.rows.at(0).value.context).toBe('System context 1');
+      expect(component.rows.at(0).value.input).toBe('User prompt 1');
+    });
+
+    it('should export responses as CSV and TSV with headers and Output column', () => {
+      component.rows.at(0).patchValue({
+        context: 'Be brief',
+        input: 'What is 2+2?',
+        api: ApiEnum.Prompt,
+        status: 'Success',
+        output: '4',
+      });
+
+      const csv = component.buildExportCsv();
+      const parsedCsv = SpreadsheetUtils.parseDelimitedText(csv, ',');
+      expect(parsedCsv.length).toBe(2);
+      expect(parsedCsv[0][0]).toBe('Context');
+      expect(parsedCsv[0][1]).toBe('Input (Text)');
+      expect(parsedCsv[0][11]).toBe('Output');
+      expect(parsedCsv[1][0]).toBe('Be brief');
+      expect(parsedCsv[1][1]).toBe('What is 2+2?');
+      expect(parsedCsv[1][11]).toBe('4');
+    });
+
+    it('should include the timestamp in the result CSV and TSV filenames', () => {
+      component.loadedSheetName = 'Sheet1';
+      const fixedDate = new Date(2026, 10, 2, 9, 58, 33); // 2026-11-02 09:58:33
+      expect(EvalsPage.formatResultTimestamp(fixedDate)).toBe('2026-11-02_09-58-33');
+      expect(component.buildResultFilename('csv', fixedDate)).toBe(
+        'Sheet1-results-2026-11-02_09-58-33.csv',
+      );
+      expect(component.buildResultFilename('tsv', fixedDate)).toBe(
+        'Sheet1-results-2026-11-02_09-58-33.tsv',
+      );
+    });
+
+    it('should save and restore crash-recovery checkpoints from localStorage', () => {
+      window.localStorage.clear();
+      component.settings.patchValue({
+        spreadsheetUrl:
+          'https://docs.google.com/spreadsheets/d/1FBdGLn3npctkZc1hmE1JDlxuXXUVo2y4Tv_6yLwfA1Y/edit#gid=0',
+        sheetName: 'Sheet1',
+      });
+      component.loadedSheetName = 'Sheet1';
+      component.rows.at(0).patchValue({
+        status: 'Success',
+        output: 'Saved output before freeze',
+      });
+
+      (component as any).saveRowCheckpoint(0);
+      component.rows.at(0).patchValue({
+        status: 'Idle',
+        output: '',
+      });
+
+      component.checkForSavedCheckpoint();
+      expect(component.recoveredCheckpoint).toBeTruthy();
+      expect(component.recoveredCheckpoint?.completedCount).toBe(1);
+
+      component.restoreSavedCheckpoint();
+      expect(component.rows.at(0).value.output).toBe('Saved output before freeze');
+      window.localStorage.clear();
     });
   });
 });

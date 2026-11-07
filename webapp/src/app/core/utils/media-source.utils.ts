@@ -9,8 +9,59 @@
  * `fetch` resolves all three identically, so one helper covers every consumer.
  */
 export class MediaSourceUtils {
+  static normalizeLocalAssetUrl(source: string): string {
+    return (source ?? '').trim().replace(/^https?:\/\/(?:www\.)?web-ai\.studio\/+/i, '');
+  }
+
   static async fetchBlob(source: string): Promise<Blob> {
-    const response = await fetch(source);
+    const normalized = MediaSourceUtils.normalizeLocalAssetUrl(source);
+
+    if (MediaSourceUtils.isBlobUrl(normalized)) {
+      const blobResp = await fetch(normalized);
+      if (!blobResp.ok) {
+        throw new Error(`Could not load "${MediaSourceUtils.describe(source)}" (HTTP ${blobResp.status}).`);
+      }
+      return await blobResp.blob();
+    }
+
+    if (MediaSourceUtils.isDataUrl(normalized)) {
+      const commaIdx = normalized.indexOf(',');
+      if (commaIdx > 0) {
+        const header = normalized.slice(5, commaIdx);
+        const body = normalized.slice(commaIdx + 1);
+        const isBase64 = /;base64/i.test(header);
+        const mime = header.split(';')[0] || 'application/octet-stream';
+        if (isBase64) {
+          const binary = atob(body);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          return new Blob([bytes], { type: mime });
+        }
+      }
+    }
+
+    if (MediaSourceUtils.isAbsoluteUrl(normalized)) {
+      try {
+        const directResponse = await fetch(normalized, { signal: AbortSignal.timeout(8_000) });
+        if (directResponse.ok) {
+          return await directResponse.blob();
+        }
+      } catch {
+        // Direct browser fetch failed (e.g., CORS restriction on external media host).
+        // Fall back to the server-side media proxy below.
+      }
+
+      const proxyUrl = `/api/evals/media-proxy?url=${encodeURIComponent(normalized)}`;
+      const proxyResponse = await fetch(proxyUrl, { signal: AbortSignal.timeout(15_000) });
+      if (!proxyResponse.ok) {
+        throw new Error(`Could not load "${MediaSourceUtils.describe(source)}" (HTTP ${proxyResponse.status}).`);
+      }
+      return await proxyResponse.blob();
+    }
+
+    const response = await fetch(normalized);
 
     if (!response.ok) {
       throw new Error(`Could not load "${MediaSourceUtils.describe(source)}" (HTTP ${response.status}).`);
@@ -29,7 +80,15 @@ export class MediaSourceUtils {
   }
 
   static isDataUrl(source: string): boolean {
-    return source.startsWith('data:');
+    return (source ?? '').startsWith('data:');
+  }
+
+  static isBlobUrl(source: string): boolean {
+    return (source ?? '').startsWith('blob:');
+  }
+
+  static isDataOrBlobUrl(source: string): boolean {
+    return MediaSourceUtils.isDataUrl(source) || MediaSourceUtils.isBlobUrl(source);
   }
 
   static isAbsoluteUrl(source: string): boolean {
@@ -108,6 +167,10 @@ export class MediaSourceUtils {
 
   /** A short label for error messages — a data URL would otherwise dump megabytes. */
   static describe(source: string): string {
+    if (MediaSourceUtils.isBlobUrl(source)) {
+      return 'embedded media file';
+    }
+
     if (MediaSourceUtils.isDataUrl(source)) {
       return `${source.slice(0, source.indexOf(';') > 0 ? source.indexOf(';') : 20)} file`;
     }

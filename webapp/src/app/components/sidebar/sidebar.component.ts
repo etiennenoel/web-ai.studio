@@ -173,6 +173,11 @@ export class SidebarComponent extends BaseComponent implements OnInit {
   }
 
   determineCurrentActiveRoute(pathname: string, search = '') {
+    if (pathname.includes('/evals')) {
+      this.routeEnum = RouteEnum.Evals;
+      return;
+    }
+
     if (pathname.includes("/demos")) {
       this.routeEnum = RouteEnum.Demos;
       return;
