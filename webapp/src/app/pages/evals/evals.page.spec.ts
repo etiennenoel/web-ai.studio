@@ -542,9 +542,23 @@ describe('EvalsPage', () => {
     });
 
     it('should normalise valid samplingMode values and reject unknown ones', () => {
+      expect(component.samplingModes.map(mode => mode.value)).toEqual([
+        'most-predictable',
+        'predictable',
+        'slightly-predictable',
+        'balanced',
+        'slightly-creative',
+        'creative',
+        'most-creative',
+      ]);
       expect(component.normalizeSamplingMode('Most Predictable')).toBe('most-predictable');
       expect(component.normalizeSamplingMode('most-predictable')).toBe('most-predictable');
+      expect(component.normalizeSamplingMode('predictable')).toBe('predictable');
+      expect(component.normalizeSamplingMode('slightly-predictable')).toBe('slightly-predictable');
+      expect(component.normalizeSamplingMode('balanced')).toBe('balanced');
       expect(component.normalizeSamplingMode('slightly_creative')).toBe('slightly-creative');
+      expect(component.normalizeSamplingMode('creative')).toBe('creative');
+      expect(component.normalizeSamplingMode('most-creative')).toBe('most-creative');
       expect(component.normalizeSamplingMode('  ')).toBe('');
       expect(component.normalizeSamplingMode('random-mode')).toBeNull();
     });

@@ -253,7 +253,7 @@ export class EvalsPage extends BasePage implements OnInit, OnDestroy {
     this.setTitle("Evals")
     this.form = this.fb.group({
       settings: this.fb.group({
-        spreadsheetUrl: [EvalsPage.DEFAULT_TEST_SPREADSHEET_URL],
+        spreadsheetUrl: [''],
         sheetName: [''],
         speechLang: ['en-US'],
         speechQuality: ['dictation'],
